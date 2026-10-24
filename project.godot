@@ -30,6 +30,8 @@ Calendar="*res://src/autoload/calendar.gd"
 GameState="*res://src/autoload/game_state.gd"
 SaveSystem="*res://src/autoload/save_system.gd"
 SceneRouter="*res://src/autoload/scene_router.gd"
+UiTheme="*res://src/autoload/ui_theme.gd"
+DebugMenu="*res://src/autoload/debug_menu.gd"
 
 [display]
 
@@ -39,6 +41,10 @@ window/size/window_width_override=1440
 window/size/window_height_override=810
 window/stretch/mode="viewport"
 window/stretch/scale_mode="integer"
+
+[gui]
+
+theme/custom="res://assets/ui/theme.tres"
 
 [rendering]
 

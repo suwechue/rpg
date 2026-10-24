@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://b5yxw1qse75bk"
+path="res://.godot/imported/Bounce4.wav-cb47478b2131452c2673d9b17dc6a416.sample"
+
+[deps]
+
+source_file="res://assets/packs/ninja_adventure/Audio/Sounds/Jump & Bounce/Bounce4.wav"
+dest_files=["res://.godot/imported/Bounce4.wav-cb47478b2131452c2673d9b17dc6a416.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

@@ -1,0 +1,19 @@
+{
+  "maxLevel": 20,
+  "xpPerLevel": 20,
+  "statPointsPerLevel": 3,
+  "pityDryRolls": 3,
+  "affinityRaiseOnKnown": 2,
+  "formRollEvery": 2,
+  "perkLevels": [3, 6, 9],
+  "classChangeLevels": [5, 12],
+  "deckMaxBase": 20,
+  "deckMaxGrowth": [ { "level": 5, "add": 2 }, { "level": 12, "add": 2 } ],
+  "deckMin": 10,
+  "maxCopies": 3,
+  "knowledgeTiers": [
+    { "tier": 2, "minLevel": 5, "minInt": 8 },
+    { "tier": 3, "minLevel": 10, "minInt": 12 }
+  ],
+  "catchUpXpShare": 0.5
+}

@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://cdvyfmb7t84hm"
+path="res://.godot/imported/32 - Manor.ogg-844269b21aa1c847a98201470431fca9.oggvorbisstr"
+
+[deps]
+
+source_file="res://assets/packs/ninja_adventure/Audio/Musics/32 - Manor.ogg"
+dest_files=["res://.godot/imported/32 - Manor.ogg-844269b21aa1c847a98201470431fca9.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

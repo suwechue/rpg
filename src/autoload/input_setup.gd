@@ -1,6 +1,6 @@
 ## Registers the input map in code (keyboard + controller) so it is easy to read
 ## and edit. Actions: move_up/down/left/right, interact, end_part, cancel, pause,
-## save_run, load_run.
+## save_run, load_run, debug_menu.
 extends Node
 
 const KEYS := {
@@ -14,6 +14,7 @@ const KEYS := {
 	"pause": [KEY_P],
 	"save_run": [KEY_F5],
 	"load_run": [KEY_F9],
+	"debug_menu": [KEY_F1],
 }
 
 const PAD_BUTTONS := {

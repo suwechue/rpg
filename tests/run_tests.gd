@@ -21,8 +21,31 @@ func _initialize() -> void:
 		if method_name.begins_with("test_"):
 			_current = method_name
 			call(method_name)
+	_run_suites()
 	print("%d checks passed, %d failed" % [_passes, _failures])
 	quit(1 if _failures > 0 else 0)
+
+
+## Every script in tests/suites/ (extending tests/suite.gd), in name order.
+func _run_suites() -> void:
+	var dir := DirAccess.open("res://tests/suites")
+	if dir == null:
+		return
+	var files := Array(dir.get_files())
+	files.sort()
+	for f in files:
+		if not str(f).ends_with(".gd"):
+			continue
+		var script: GDScript = load("res://tests/suites/" + str(f))
+		var suite: Object = script.new()
+		for m in script.get_script_method_list():
+			var method_name := str(m["name"])
+			if method_name.begins_with("test_"):
+				suite.set("current", method_name)
+				suite.call(method_name)
+		_passes += int(suite.get("passes"))
+		_failures += int(suite.get("failures"))
+		print("  %s: %d passed, %d failed" % [str(f).get_basename(), int(suite.get("passes")), int(suite.get("failures"))])
 
 
 func check(cond: bool, msg: String) -> void:

@@ -1,6 +1,8 @@
 {
   "statMin": 1,
   "statMax": 20,
+  "order": ["str", "dex", "con", "int", "per", "wil", "cha"],
+  "names": { "str": "Strength", "dex": "Dexterity", "con": "Constitution", "int": "Intelligence", "per": "Perception", "wil": "Willpower", "cha": "Charisma" },
   "derived": {
     "maxHp":        { "base": 20, "con": 4 },
     "maxMp":        { "base": 10, "int": 2, "wil": 1 },
@@ -9,7 +11,39 @@
     "physDefense":  { "con": 0.5 },
     "magicResist":  { "wil": 0.5 },
     "stability":    { "wil": 1, "int": 0.5 },
-    "critChancePct":{ "base": 5, "dex": 0.5 }
+    "critChancePct":{ "base": 5, "dex": 0.5 },
+    "mpRegen":      { "base": 2, "wilDivisor": 5 }
+  },
+  "combat": {
+    "magicResistPctPerPoint": 2,
+    "maxMagicResistPct": 60,
+    "affinityBonusScale": 0.5,
+    "critMultiplier": 1.5,
+    "guardDefense": 3,
+    "guardMagicResistPct": 15,
+    "openingHand": 5,
+    "drawPerTurn": 2,
+    "handLimit": 7,
+    "fatigueStart": 1,
+    "fatigueStep": 1,
+    "burnDamage": 3,
+    "burnTurns": 2,
+    "steamTurns": 2,
+    "slowTurns": 1,
+    "rootTurns": 1,
+    "blindTurns": 1,
+    "blindMissChance": 0.35,
+    "collisionDamage": 4,
+    "halfCoverRangedMul": 0.75,
+    "hazardDamage": 4,
+    "flankMul": 1.5,
+    "adjacentFriendDamagePct": 0.05,
+    "secondWindHpPct": 0.2,
+    "secondWindBelowPct": 0.3,
+    "corrosionDefense": 2,
+    "corrosionResist": 4,
+    "vitalityDrainPct": 0.5,
+    "constructHpPerPower": 1
   },
   "misinterpretation": { "chaDivisor": 25, "badMoodMultiplier": 1.5, "minimum": 0.02 }
 }

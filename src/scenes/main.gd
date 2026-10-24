@@ -4,14 +4,18 @@
 extends Node2D
 
 const VO := preload("res://src/core/vector_ops.gd")
+const Walker := preload("res://src/scenes/common/walker_sprite.gd")
 const TILE := 16
 const COLS := 30
 const ROWS := 16
 const HUD_ROWS := 3
 
+const PLAYER_SHEET := "res://assets/packs/ninja_adventure/Actor/Character/Boy/SpriteSheet.png"
+
 var player_tile := Vector2i(3, 12)
 var _pois: Array = []
 var _hud: Label
+var _player_sprite: Walker
 
 
 func _ready() -> void:
@@ -19,8 +23,11 @@ func _ready() -> void:
 	_hud.position = Vector2(4, 1)
 	_hud.size = Vector2(472, 46)
 	_hud.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_hud.add_theme_font_size_override("font_size", 8)
 	add_child(_hud)
+	_player_sprite = Walker.new(PLAYER_SHEET)
+	_player_sprite.z_index = 1
+	add_child(_player_sprite)
+	_place_player()
 	EventBus.day_part_changed.connect(_on_day_part_changed)
 	EventBus.ap_changed.connect(func(_ap: int) -> void: _refresh())
 	Narrator.line_said.connect(func(_t: String) -> void: _refresh())
@@ -44,6 +51,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		player_tile = Vector2i(
 			clampi(player_tile.x + dir.x, 0, COLS - 1),
 			clampi(player_tile.y + dir.y, HUD_ROWS, ROWS - 1))
+		_player_sprite.face(dir)
+		_player_sprite.play_walk(0.12)
+		_place_player()
 		_refresh()
 		get_viewport().set_input_as_handled()
 		return
@@ -123,6 +133,10 @@ func _gain_text(gains: Dictionary) -> String:
 	return " " + ", ".join(PackedStringArray(parts))
 
 
+func _place_player() -> void:
+	_player_sprite.position = Vector2(player_tile.x * TILE, (player_tile.y + 1) * TILE)
+
+
 func _poi_at(tile: Vector2i) -> Dictionary:
 	for poi in _pois:
 		var t: Array = poi.get("tile", [0, 0])
@@ -161,7 +175,7 @@ func _refresh() -> void:
 
 
 func _draw() -> void:
-	var font := ThemeDB.fallback_font
+	var font: Font = UiTheme.font
 	draw_rect(Rect2(0, 0, 480, 270), Color("1b1f2b"))
 	draw_rect(Rect2(0, 0, 480, HUD_ROWS * TILE), Color("10131b"))
 	for x in range(0, COLS + 1):
@@ -177,10 +191,7 @@ func _draw() -> void:
 		if not open_parts.has(part_id):
 			color = color.darkened(0.6)
 		draw_rect(Rect2(pos + Vector2(1, 1), Vector2(TILE - 2, TILE - 2)), color)
-		draw_string(font, pos + Vector2(-8, -2), str(poi.get("name", "")), HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color(1, 1, 1, 0.8))
-	var p := Vector2(player_tile.x * TILE, player_tile.y * TILE)
-	draw_rect(Rect2(p + Vector2(3, 3), Vector2(TILE - 6, TILE - 6)), Color("ffd966"))
-	draw_rect(Rect2(p + Vector2(3, 3), Vector2(TILE - 6, TILE - 6)), Color.BLACK, false, 1.0)
+		draw_string(font, pos + Vector2(-8, -2), str(poi.get("name", "")), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, Color(1, 1, 1, 0.8))
 
 
 ## Prints the Vector System worked examples to the Output panel as a smoke test.

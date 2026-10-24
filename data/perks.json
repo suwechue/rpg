@@ -1,0 +1,38 @@
+{
+  "perks": [
+    { "id": "arcane_reserve", "class": "mage", "level": 3, "name": "Arcane Reserve", "text": "+6 Max MP.", "mods": { "derived": { "maxMp": 6 } } },
+    { "id": "steady_hands", "class": "mage", "level": 3, "name": "Steady Hands", "text": "+3 Stability.", "mods": { "derived": { "stability": 3 } } },
+    { "id": "deep_channel", "class": "mage", "level": 6, "name": "Deep Channel", "text": "+1 MP regen per turn.", "mods": { "derived": { "mpRegen": 1 } } },
+    { "id": "spell_focus", "class": "mage", "level": 6, "name": "Spell Focus", "text": "Spells deal +10% damage.", "mods": { "combat": { "spellDamagePct": 0.1 } } },
+    { "id": "wide_casting", "class": "mage", "level": 9, "name": "Wide Casting", "text": "Draw 1 extra card each turn.", "mods": { "combat": { "drawBonus": 1 } } },
+    { "id": "mana_ward", "class": "mage", "level": 9, "name": "Mana Ward", "text": "+4 Magic Resistance.", "mods": { "derived": { "magicResist": 4 } } },
+
+    { "id": "thick_skin", "class": "fighter", "level": 3, "name": "Thick Skin", "text": "+2 Physical Defense.", "mods": { "derived": { "physDefense": 2 } } },
+    { "id": "brawler", "class": "fighter", "level": 3, "name": "Brawler", "text": "Strikes deal +15% damage.", "mods": { "combat": { "strikeDamagePct": 0.15 } } },
+    { "id": "iron_lungs", "class": "fighter", "level": 6, "name": "Iron Lungs", "text": "+12 Max HP.", "mods": { "derived": { "maxHp": 12 } } },
+    { "id": "charge", "class": "fighter", "level": 6, "name": "Charge", "text": "+1 Movement.", "mods": { "derived": { "movement": 1 } } },
+    { "id": "cleave", "class": "fighter", "level": 9, "name": "Cleave", "text": "Strikes deal +25% damage.", "mods": { "combat": { "strikeDamagePct": 0.25 } } },
+    { "id": "bulwark", "class": "fighter", "level": 9, "name": "Bulwark", "text": "Guard gives double Defense.", "mods": { "combat": { "guardMul": 2 } } },
+
+    { "id": "light_feet", "class": "rogue", "level": 3, "name": "Light Feet", "text": "+1 Movement.", "mods": { "derived": { "movement": 1 } } },
+    { "id": "keen_eye", "class": "rogue", "level": 3, "name": "Keen Eye", "text": "+5% crit chance.", "mods": { "derived": { "critChancePct": 5 } } },
+    { "id": "first_strike", "class": "rogue", "level": 6, "name": "First Strike", "text": "+4 Initiative.", "mods": { "derived": { "initiative": 4 } } },
+    { "id": "dirty_tricks", "class": "rogue", "level": 6, "name": "Dirty Tricks", "text": "Strikes deal +15% damage.", "mods": { "combat": { "strikeDamagePct": 0.15 } } },
+    { "id": "shadow_step", "class": "rogue", "level": 9, "name": "Shadow Step", "text": "+2 Movement.", "mods": { "derived": { "movement": 2 } } },
+    { "id": "assassin", "class": "rogue", "level": 9, "name": "Assassin", "text": "+10% crit chance.", "mods": { "derived": { "critChancePct": 10 } } },
+
+    { "id": "gentle_light", "class": "healer", "level": 3, "name": "Gentle Light", "text": "Healing +20%.", "mods": { "combat": { "healPct": 0.2 } } },
+    { "id": "calm_mind", "class": "healer", "level": 3, "name": "Calm Mind", "text": "+3 Stability.", "mods": { "derived": { "stability": 3 } } },
+    { "id": "bedside_manner", "class": "healer", "level": 6, "name": "Bedside Manner", "text": "+1 MP regen per turn.", "mods": { "derived": { "mpRegen": 1 } } },
+    { "id": "sturdy", "class": "healer", "level": 6, "name": "Sturdy", "text": "+10 Max HP.", "mods": { "derived": { "maxHp": 10 } } },
+    { "id": "radiance", "class": "healer", "level": 9, "name": "Radiance", "text": "Healing +40%.", "mods": { "combat": { "healPct": 0.4 } } },
+    { "id": "guardian_angel", "class": "healer", "level": 9, "name": "Guardian Angel", "text": "Shields absorb +50%.", "mods": { "combat": { "shieldPct": 0.5 } } },
+
+    { "id": "crowd_work", "class": "bard", "level": 3, "name": "Crowd Work", "text": "+2 Initiative.", "mods": { "derived": { "initiative": 2 } } },
+    { "id": "silver_tongue", "class": "bard", "level": 3, "name": "Silver Tongue", "text": "Misheard lines half as often.", "mods": { "social": { "misinterpretMul": 0.5 } } },
+    { "id": "encore", "class": "bard", "level": 6, "name": "Encore", "text": "Draw 1 extra card each turn.", "mods": { "combat": { "drawBonus": 1 } } },
+    { "id": "stage_presence", "class": "bard", "level": 6, "name": "Stage Presence", "text": "+8 Max HP.", "mods": { "derived": { "maxHp": 8 } } },
+    { "id": "anthem", "class": "bard", "level": 9, "name": "Anthem", "text": "Spells deal +15% damage.", "mods": { "combat": { "spellDamagePct": 0.15 } } },
+    { "id": "standing_ovation", "class": "bard", "level": 9, "name": "Standing Ovation", "text": "+1 MP regen per turn.", "mods": { "derived": { "mpRegen": 1 } } }
+  ]
+}

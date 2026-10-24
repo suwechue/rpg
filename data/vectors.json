@@ -1,18 +1,34 @@
 {
   "magnitudes": {
-    "minor":    { "power": 5,  "cost": 1, "minTier": 1 },
-    "standard": { "power": 10, "cost": 2, "minTier": 1 },
-    "major":    { "power": 20, "cost": 4, "minTier": 2 },
-    "grand":    { "power": 35, "cost": 7, "minTier": 3 }
+    "minor":    { "power": 5,  "cost": 1, "minTier": 1, "name": "Minor" },
+    "standard": { "power": 10, "cost": 2, "minTier": 1, "name": "Standard" },
+    "major":    { "power": 20, "cost": 4, "minTier": 2, "name": "Major" },
+    "grand":    { "power": 35, "cost": 7, "minTier": 3, "name": "Grand" }
   },
+  "magnitudeOrder": ["minor", "standard", "major", "grand"],
   "hybridExtraCost": 1,
   "improvise": { "costMultiplier": 1.5, "flatExtra": 1, "discardCards": 1, "instabilityBonus": 3 },
+  "names": {
+    "heat": "Ember", "cold": "Frost", "force": "Force", "motion": "Swift", "binding": "Binding",
+    "light": "Radiant", "transmutation": "Shifting", "vitality": "Living", "corrosion": "Rotting"
+  },
+  "display": {
+    "heat": "Heat", "cold": "Cold", "force": "Force", "motion": "Motion", "binding": "Binding",
+    "light": "Light", "transmutation": "Transmutation", "vitality": "Vitality", "corrosion": "Corrosion"
+  },
+  "colors": {
+    "heat": "#e8663c", "cold": "#7cc7e8", "force": "#c9a66b", "motion": "#9be36d", "binding": "#b07ce8",
+    "light": "#f5e27a", "transmutation": "#e87cc9", "vitality": "#5fd98a", "corrosion": "#8a9b3c"
+  },
   "gridEffects": {
     "heat": "Burning tiles for 2 turns; water becomes sight-blocking steam",
     "cold": "Slow (-1 Movement); freezes water into walkable ice",
     "force": "Push 1 tile per 10 Magnitude; collisions deal bonus damage",
-    "motion": "Teleport, swap, pull, or extra movement for allies",
+    "motion": "Pulls enemies toward you; gives allies extra movement",
     "binding": "Root for 1 turn; tether two units",
-    "light": "Reveal hidden units and traps, blind, heal with Shield or Aura"
+    "light": "Reveal hidden units and traps, blind, heal with Shield or Aura",
+    "transmutation": "Turns hazards and water back into floor",
+    "vitality": "Heals the caster for half the damage dealt",
+    "corrosion": "Shreds 2 Physical Defense and 4 Magic Resistance"
   }
 }

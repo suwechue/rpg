@@ -1,8 +1,11 @@
 ## Loads every JSON file under res://data into tables keyed by relative path
 ## without extension ("calendar", "cards/starter_cards"), and validates them.
+## The loading itself is src/core/data_tables.gd, shared with the tests.
 ## Note for exports: add *.json to the export preset's "non-resource files" filter.
 extends Node
 
+const DT := preload("res://src/core/data_tables.gd")
+const CardRules := preload("res://src/core/card.gd")
 const DATA_ROOT := "res://data"
 
 var errors: Array[String] = []
@@ -15,14 +18,22 @@ func _ready() -> void:
 
 
 func reload() -> void:
-	_tables.clear()
+	var result := DT.load_all(DATA_ROOT)
+	_tables = result["tables"]
 	errors.clear()
-	_load_dir(DATA_ROOT, "")
+	for e in result["errors"]:
+		errors.append(str(e))
 	_loaded = true
 	_validate()
 	for e in errors:
 		push_error("DataDB: " + e)
 	print("DataDB: loaded %d tables, %d errors" % [_tables.size(), errors.size()])
+
+
+## Every table, for passing to src/core functions.
+func all() -> Dictionary:
+	_ensure_loaded()
+	return _tables
 
 
 func has_table(key: String) -> bool:
@@ -36,32 +47,16 @@ func table(key: String, fallback: Variant = {}) -> Variant:
 	return _tables.get(key, fallback)
 
 
-## Find a record by id inside a table. Searches every array value in the table
-## (for example "classes" in school_classes.json).
+## Find a record by id inside a table (searches every array value).
 func record(table_key: String, id: String) -> Dictionary:
-	var t: Variant = table(table_key)
-	if typeof(t) != TYPE_DICTIONARY:
-		return {}
-	for key in t:
-		var value: Variant = t[key]
-		if typeof(value) == TYPE_ARRAY:
-			for item in value:
-				if typeof(item) == TYPE_DICTIONARY and str(item.get("id", "")) == id:
-					return item
-	return {}
+	_ensure_loaded()
+	return DT.record(_tables, table_key, id)
 
 
-## All records with this id key across tables whose path starts with prefix
-## (for example every card in data/cards/).
+## All records in `list_key` arrays across tables whose path starts with prefix.
 func records_under(prefix: String, list_key: String) -> Array:
 	_ensure_loaded()
-	var out: Array = []
-	for key in _tables:
-		if str(key).begins_with(prefix):
-			var t: Variant = _tables[key]
-			if typeof(t) == TYPE_DICTIONARY and typeof(t.get(list_key)) == TYPE_ARRAY:
-				out.append_array(t[list_key])
-	return out
+	return DT.records_under(_tables, prefix, list_key)
 
 
 func _ensure_loaded() -> void:
@@ -69,38 +64,44 @@ func _ensure_loaded() -> void:
 		reload()
 
 
-func _load_dir(path: String, prefix: String) -> void:
-	var dir := DirAccess.open(path)
-	if dir == null:
-		errors.append("cannot open %s" % path)
-		return
-	for file_name in dir.get_files():
-		if not file_name.ends_with(".json"):
-			continue
-		var full := path + "/" + file_name
-		var json := JSON.new()
-		var err := json.parse(FileAccess.get_file_as_string(full))
-		if err != OK:
-			errors.append("%s line %d: %s" % [full, json.get_error_line(), json.get_error_message()])
-			continue
-		_tables[prefix + file_name.get_basename()] = json.data
-	for sub in dir.get_directories():
-		_load_dir(path + "/" + sub, prefix + sub + "/")
-
-
-## Minimal schema checks. Extend as new tables are added.
+## Schema checks. Extend as new tables are added.
 func _validate() -> void:
-	for required in ["spaces", "matchups", "calendar", "vectors", "forms", "classes", "player_template"]:
+	for required in ["spaces", "matchups", "calendar", "vectors", "forms", "classes", "stats", "leveling", "perks", "traits"]:
 		if not _tables.has(required):
 			errors.append("missing required table data/%s.json" % required)
 	if not (_tables.has("spaces") and _tables.has("forms") and _tables.has("vectors")):
 		return
 	var arcane: Array = _tables["spaces"].get("arcane", {}).get("axes", [])
-	var forms := {}
-	for f in _tables["forms"].get("forms", []):
-		forms[f["id"]] = f
-	var magnitudes: Dictionary = _tables["vectors"].get("magnitudes", {})
-	var hybrid_extra := int(_tables["vectors"].get("hybridExtraCost", 1))
+	var stat_axes: Array = _tables["spaces"].get("stats", {}).get("axes", [])
+	var form_axes: Array = _tables["spaces"].get("forms", {}).get("axes", [])
+	_validate_cards(arcane)
+	var perk_ids := {}
+	for p in records_under("perks", "perks"):
+		perk_ids[str(p.get("id"))] = true
+	for cls in _tables.get("classes", {}).get("classes", []):
+		var id := str(cls.get("id", "?"))
+		for s in cls.get("growth", {}):
+			if not stat_axes.has(s):
+				errors.append("class %s: unknown growth stat '%s'" % [id, s])
+		for v in cls.get("vectorAffinity", {}):
+			if not arcane.has(v):
+				errors.append("class %s: unknown Vector '%s'" % [id, v])
+		for f in cls.get("formAffinity", {}):
+			if not form_axes.has(f):
+				errors.append("class %s: unknown Form '%s'" % [id, f])
+		for f in cls.get("startForms", []):
+			if not form_axes.has(f):
+				errors.append("class %s: unknown start Form '%s'" % [id, f])
+		for entry in cls.get("starterDeck", []):
+			if entry.has("basic") and CardRules.resolve(_tables, str(entry["basic"])).is_empty():
+				errors.append("class %s: unknown starter card '%s'" % [id, entry["basic"]])
+	for t in records_under("traits", "traits"):
+		for s in t.get("mods", {}).get("stats", {}):
+			if not stat_axes.has(s):
+				errors.append("trait %s: unknown stat '%s'" % [t.get("id"), s])
+
+
+func _validate_cards(arcane: Array) -> void:
 	for card in records_under("cards/", "cards"):
 		var id := str(card.get("id", "?"))
 		if str(card.get("kind", "")) != "spell":
@@ -111,14 +112,12 @@ func _validate() -> void:
 				errors.append("card %s: unknown vector '%s'" % [id, axis])
 		var form_id := str(card.get("form", ""))
 		var mag_id := str(card.get("magnitude", ""))
-		if not forms.has(form_id):
+		if DT.record(_tables, "forms", form_id).is_empty():
 			errors.append("card %s: unknown form '%s'" % [id, form_id])
 			continue
-		if not magnitudes.has(mag_id):
+		if not _tables["vectors"].get("magnitudes", {}).has(mag_id):
 			errors.append("card %s: unknown magnitude '%s'" % [id, mag_id])
 			continue
-		var expected := int(magnitudes[mag_id]["cost"]) + int(forms[form_id]["cost"])
-		if vectors.size() > 1:
-			expected += hybrid_extra
+		var expected := CardRules.spell_cost(_tables, card)
 		if int(card.get("cost", -1)) != expected:
 			errors.append("card %s: cost %s but rules say %d" % [id, str(card.get("cost")), expected])
