@@ -43,12 +43,16 @@ var forms: Dictionary = {}
 var _spawn_counter := 0
 var _ai: GDScript = null           # enemy_ai.gd, loaded lazily (it preloads this script)
 var _note := ""                    # why the next hit did what it did ("Cold, resisted"), for the log
+var turn_mode := "move_or_act"     # data/combat_rules.json "turnMode" (AR); setup "turnMode" overrides
+var ai_overrides: Dictionary = {}  # sims: data/ai.json values to replace for this fight
 
 
 func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) -> void:
 	db = p_db
 	rng = p_rng
 	library = setup.get("library", {})
+	turn_mode = str(setup.get("turnMode", db.get("combat_rules", {}).get("turnMode", "move_or_act")))
+	ai_overrides = setup.get("ai", {})
 	boss_fight = bool(setup.get("boss", false))
 	flee_allowed = bool(setup.get("fleeAllowed", not boss_fight))
 	for f in db.get("forms", {}).get("forms", []):
@@ -397,8 +401,31 @@ func _answer_help(helper: UnitScript, target: UnitScript) -> void:
 
 # --- Movement -----------------------------------------------------------------
 
+## Whether this unit may still move this turn under the turn mode.
+func can_move(u: UnitScript) -> bool:
+	if u.move_left <= 0:
+		return false
+	if u.action_used and turn_mode != "move_and_act" and not _moves_and_acts(u):
+		return false
+	return true
+
+
+## Whether this unit may still take its action: under move_or_act, not after moving.
+func act_block(u: UnitScript) -> String:
+	if u.action_used:
+		return "No action left"
+	if turn_mode == "move_or_act" and u.moved_steps > 0 and not _moves_and_acts(u):
+		return "Already moved (undo the move to act)"
+	return ""
+
+
+## Fast elites (data "moveAndAct") ignore the move-or-act rule.
+func _moves_and_acts(u: UnitScript) -> bool:
+	return bool(u.source.get("moveAndAct", false)) or bool(u.statuses.has("haste_full"))
+
+
 func move(u: UnitScript, dest: Vector2i) -> bool:
-	if result != "" or u != current or not u.alive():
+	if result != "" or u != current or not u.alive() or not can_move(u):
 		return false
 	var reach := reachable_cells(u)
 	if not reach.has(dest):
@@ -550,8 +577,8 @@ func card_block(u: UnitScript, card: Dictionary) -> String:
 		return "No card"
 	if bool(card.get("quick", false)) and not u.quick_used:
 		pass
-	elif u.action_used:
-		return "No action left"
+	elif act_block(u) != "" and not (bool(card.get("moves", false)) and not u.action_used):
+		return act_block(u)
 	var cost := card_cost(u, card)
 	if cost > u.mp:
 		return "Needs %d MP" % cost
@@ -591,7 +618,7 @@ func play_card(u: UnitScript, hand_index: int, target: Vector2i) -> bool:
 
 ## The basic Strike (adjacent, STR): always available as the turn's action.
 func strike(u: UnitScript, target: Vector2i) -> bool:
-	if result != "" or u != current or u.action_used or not u.alive():
+	if result != "" or u != current or act_block(u) != "" or not u.alive():
 		return false
 	if not _adjacent_hostiles(u, 1).has(target):
 		return false
@@ -604,7 +631,7 @@ func strike(u: UnitScript, target: Vector2i) -> bool:
 
 ## The basic Guard (uses the action; the Guard card is a quick card instead).
 func guard(u: UnitScript) -> bool:
-	if result != "" or u != current or u.action_used or not u.alive():
+	if result != "" or u != current or act_block(u) != "" or not u.alive():
 		return false
 	u.action_used = true
 	u.undo_ok = false
@@ -639,8 +666,8 @@ func improvise_error(u: UnitScript, vectors: Array, form: String, magnitude: Str
 	var err := CardRules.design_error(db, fake, vectors, form, magnitude)
 	if err != "":
 		return err
-	if u.action_used:
-		return "No action left"
+	if act_block(u) != "":
+		return act_block(u)
 	if u.deck == null or u.deck.hand.is_empty():
 		return "You need a card in hand to burn as fuel."
 	var v := {}
@@ -684,21 +711,23 @@ func preview(u: UnitScript, card: Dictionary, target: Vector2i, improvised: bool
 	if card.is_empty():
 		return out
 	if CardRules.is_spell(card):
-		var form := form_rec(str(card.get("form", "")))
+		var form := Forms.at_magnitude(form_rec(str(card.get("form", ""))), str(card.get("magnitude", "")))
 		var cells := Forms.footprint(grid, form, u.cell, target, occupied())
 		out["cells"] = cells
 		var cost := improvise_cost(u, card) if improvised else card_cost(u, card, target)
 		out["cost"] = cost
 		var spec := _spell_spec(u, card)
 		out["chance"] = Res.stability_chance(db, u.stability + int(spec.get("stabilityBonus", 0)), cost, u.mp, improvised and u.perk != "unstable")
-		for c in cells:
+		var n := 0
+		for c in area_order(cells, target):
 			var t := unit_at(c)
 			if t == null:
 				continue
 			if bool(spec["heal"]) and t.team == u.team:
 				out["hits"].append({ "unit": t.id, "heal": _heal_value(u, spec) })
 			elif float(spec["mult"]) > 0.0 and (is_hostile(u, t) or t.is_prop()):
-				out["hits"].append({ "unit": t.id, "damage": roundi(_expected_hit(u, t, spec)), "status": _preview_statuses(spec["vectors"], t) })
+				n += 1
+				out["hits"].append({ "unit": t.id, "damage": roundi(_expected_hit(u, t, _area_spec(spec, n))), "status": _preview_statuses(spec["vectors"], t) })
 		_preview_motion(u, spec, out)
 	else:
 		out["cells"] = [target]
@@ -788,7 +817,7 @@ func push_landing(u: UnitScript, t: UnitScript, dir: Vector2i, steps: int, colli
 
 ## A spell as a resolution spec (shared by cards and enemy actions).
 func _spell_spec(u: UnitScript, card: Dictionary) -> Dictionary:
-	var form := form_rec(str(card.get("form", "")))
+	var form := Forms.at_magnitude(form_rec(str(card.get("form", ""))), str(card.get("magnitude", "")))
 	return {
 		"name": str(card.get("name", "Spell")),
 		"vectors": card.get("vectors", {}),
@@ -804,9 +833,32 @@ func _spell_spec(u: UnitScript, card: Dictionary) -> Dictionary:
 
 
 func _expected_hit(u: UnitScript, t: UnitScript, spec: Dictionary) -> float:
+	var area := float(spec.get("areaMul", 1.0))
 	if str(spec.get("kind", "spell")) == "strike":
-		return Res.strike_damage(db, float(spec["base"]), u, t, _shared(u, t, false))
-	return Res.spell_damage(db, float(spec["power"]), float(spec["mult"]), spec["vectors"], u, t, _shared(u, t, bool(spec["ranged"])))
+		return Res.strike_damage(db, float(spec["base"]), u, t, _shared(u, t, false)) * area
+	return Res.spell_damage(db, float(spec["power"]), float(spec["mult"]), spec["vectors"], u, t, _shared(u, t, bool(spec["ranged"]))) * area
+
+
+## Area cells nearest the aim point first (for the falloff rule).
+func area_order(cells: Array, target: Vector2i) -> Array:
+	var out := cells.duplicate()
+	out.sort_custom(func(a: Vector2i, b: Vector2i) -> bool:
+		var da := GridScript.manhattan(a, target)
+		var dbb := GridScript.manhattan(b, target)
+		if da != dbb:
+			return da < dbb
+		return a.y < b.y or (a.y == b.y and a.x < b.x))
+	return out
+
+
+## The nth target of an area attack: beyond the first `fullHits`, damage is reduced.
+func _area_spec(spec: Dictionary, n: int) -> Dictionary:
+	var fall: Dictionary = db.get("combat_rules", {}).get("areaFalloff", {})
+	if n <= int(fall.get("fullHits", 2)):
+		return spec
+	var out := spec.duplicate()
+	out["areaMul"] = float(fall.get("mul", 0.75))
+	return out
 
 
 func _expected_strike(u: UnitScript, t: UnitScript, card: Dictionary) -> float:
@@ -932,7 +984,8 @@ func _resolve_spec(u: UnitScript, spec: Dictionary, target: Vector2i) -> void:
 	var cells := Forms.footprint(grid, form, u.cell, target, occupied())
 	_emit({ "t": "area", "cells": cells, "vectors": spec["vectors"] })
 	var hit: Array = []
-	for c in cells:
+	var n := 0
+	for c in area_order(cells, target):
 		var t := unit_at(c)
 		if t == null or t == u:
 			continue
@@ -941,7 +994,8 @@ func _resolve_spec(u: UnitScript, spec: Dictionary, target: Vector2i) -> void:
 				_heal(u, t, _heal_value(u, spec))
 				_note_support(u, t)
 		elif is_hostile(u, t) or t.is_prop():
-			if _hit_unit(u, t, spec, true):
+			n += 1
+			if _hit_unit(u, t, _area_spec(spec, n), true):
 				hit.append(t)
 	_apply_vector_effects(u, spec, cells, hit)
 
@@ -1091,6 +1145,7 @@ func _apply_vector_effects(u: UnitScript, spec: Dictionary, cells: Array, hit: A
 			if t.alive() and not t.is_prop():
 				t.statuses["root"] = int(cfg.get("rootTurns", 1)) + root_bonus
 				_emit({ "t": "status", "unit": t.id, "status": "root" })
+				_interrupt(t, "root")
 				if t.intent.has("move"):
 					t.intent["move"] = t.cell
 	if v.has("light"):
@@ -1275,7 +1330,7 @@ func action_spec(u: UnitScript, action: Dictionary) -> Dictionary:
 		var base := float(u.stats.get(str(action.get("stat", "str")), 5)) * float(action.get("mult", 1.0)) + float(action.get("power", 0))
 		return { "name": str(action.get("name", "Strike")), "vectors": action.get("vectors", {}), "form": form_rec("touch"),
 			"power": float(action.get("power", 0)), "mult": 1.0, "heal": false, "ranged": false, "kind": "strike", "base": base }
-	var form := form_rec(str(action.get("form", "bolt")))
+	var form := Forms.at_magnitude(form_rec(str(action.get("form", "bolt"))), str(action.get("magnitude", "standard")))
 	var heal: bool = (str(form.get("id", "")) == "shield" or str(form.get("id", "")) == "aura") and (action.get("vectors", {}).has("light") or action.get("vectors", {}).has("vitality"))
 	return { "name": str(action.get("name", "Attack")), "vectors": action.get("vectors", {}), "form": form,
 		"power": float(action.get("power", 5)), "mult": float(form.get("multiplier", 1.0)), "heal": heal,
@@ -1296,7 +1351,7 @@ func action_targets(u: UnitScript, action: Dictionary, from_cell: Vector2i) -> A
 
 
 func perform_action(u: UnitScript, action: Dictionary, target: Vector2i) -> bool:
-	if result != "" or u != current or not u.alive() or u.action_used:
+	if result != "" or u != current or not u.alive() or act_block(u) != "":
 		return false
 	if not action_targets(u, action, u.cell).has(target):
 		return false
@@ -1438,7 +1493,15 @@ func pattern_cells(u: UnitScript, pattern: String, target: Vector2i) -> Array:
 
 ## Pushed or pulled while charging: the charged area moves with the caster.
 func _shift_intent(u: UnitScript, delta: Vector2i) -> void:
-	if u.intent.is_empty() or int(u.intent.get("charge", 0)) <= 0 or delta == Vector2i.ZERO:
+	if u.intent.is_empty() or delta == Vector2i.ZERO:
+		return
+	if int(u.intent.get("charge", 0)) <= 0:
+		# A normal attack pushed out of range is cancelled.
+		if str(u.intent.get("kind", "")) == "attack" and str(u.intent.get("mode", "locked")) == "locked":
+			var tgt: Vector2i = u.intent.get("target", u.cell)
+			if not action_targets(u, u.intent.get("action", {}), u.cell).has(tgt):
+				u.intent = {}
+				_emit({ "t": "interrupt", "unit": u.id, "text": "%s is knocked out of range." % u.name })
 		return
 	var moved: Array = []
 	for c in u.intent.get("cells", []):
@@ -1449,9 +1512,21 @@ func _shift_intent(u: UnitScript, delta: Vector2i) -> void:
 	_emit({ "t": "interrupt", "unit": u.id, "text": "%s's charge is knocked aside." % u.name })
 
 
-## Blind cancels a charge; Slow delays it a turn.
+## Blind cancels a charge (and, under move_or_act, any attack); Slow delays a
+## charge a turn; Root cancels a planned move.
 func _interrupt(t: UnitScript, status: String) -> void:
-	if t.intent.is_empty() or int(t.intent.get("charge", 0)) <= 0:
+	if t.intent.is_empty():
+		return
+	var kind := str(t.intent.get("kind", ""))
+	if status == "root" and kind == "move":
+		t.intent = {}
+		_emit({ "t": "interrupt", "unit": t.id, "text": "%s is rooted and can't get into position." % t.name })
+		return
+	if status == "blind" and kind in ["attack", "special"] and turn_mode == "move_or_act":
+		t.intent = {}
+		_emit({ "t": "interrupt", "unit": t.id, "text": "%s is blinded and loses its target." % t.name })
+		return
+	if int(t.intent.get("charge", 0)) <= 0:
 		return
 	if status == "blind":
 		t.intent = {}

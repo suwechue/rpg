@@ -211,6 +211,20 @@ func _level_text(reports: Array) -> String:
 
 
 func _show_fights(box: VBoxContainer) -> void:
+	box.add_child(UiTheme.label("Turn rule (this fight and the next ones): %s" % GameState.combat_turn_mode, UiTheme.ACCENT))
+	var mode_row := HBoxContainer.new()
+	box.add_child(mode_row)
+	for m in DataDB.table("combat_rules").get("turnModes", []):
+		var mid := str(m)
+		var mb := UiTheme.button(mid.replace("_", " "), func() -> void:
+			GameState.combat_turn_mode = mid
+			var scene := get_tree().current_scene
+			if scene != null and scene.get("state") != null:
+				scene.get("state").set("turn_mode", mid)
+				scene.call("_sync_views")
+			_open(_show_fights))
+		mb.disabled = mid == GameState.combat_turn_mode
+		mode_row.add_child(mb)
 	box.add_child(UiTheme.label("Spawn a fight (party: you + roster picks for tonight)", UiTheme.ACCENT))
 	var ally_row := HBoxContainer.new()
 	box.add_child(ally_row)

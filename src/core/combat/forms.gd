@@ -74,6 +74,28 @@ static func footprint(grid: GridScript, form: Dictionary, caster: Vector2i, targ
 					var c := target + Vector2i(dx, dy)
 					if grid.in_bounds(c):
 						out.append(c)
+		"plus":
+			for d in [Vector2i.ZERO] + GridScript.DIRS:
+				var c: Vector2i = target + d
+				if grid.in_bounds(c):
+					out.append(c)
+		"plus_self":
+			for d in [Vector2i.ZERO] + GridScript.DIRS:
+				var c: Vector2i = caster + d
+				if grid.in_bounds(c):
+					out.append(c)
+		"diamond_r1_self":
+			for d in GridScript.DIRS:
+				var c: Vector2i = caster + d
+				if grid.in_bounds(c):
+					out.append(c)
+		"ring_self":
+			for c in grid.all_cells():
+				if GridScript.manhattan(c, caster) == 2:
+					out.append(c)
+		"row":
+			for x in grid.cols:
+				out.append(Vector2i(x, target.y))
 		"diamond_r2_self":
 			for c in grid.all_cells():
 				var d := GridScript.manhattan(c, caster)
@@ -87,6 +109,17 @@ static func footprint(grid: GridScript, form: Dictionary, caster: Vector2i, targ
 						out.append(c)
 		_:
 			out.append(target)
+	return out
+
+
+## The Form as cast at a Magnitude: "footprintByMagnitude" in data/forms.json
+## picks the area (Burst is a plus shape below Major, the full 3x3 from Major).
+static func at_magnitude(form: Dictionary, magnitude: String) -> Dictionary:
+	var by: Dictionary = form.get("footprintByMagnitude", {})
+	if by.is_empty():
+		return form
+	var out := form.duplicate()
+	out["footprint"] = str(by.get(magnitude if magnitude != "" else "standard", form.get("footprint", "")))
 	return out
 
 

@@ -16,7 +16,11 @@ const Forms := preload("res://src/core/combat/forms.gd")
 
 
 static func cfg(state: StateScript) -> Dictionary:
-	return state.db.get("ai", {})
+	if state.ai_overrides.is_empty():
+		return state.db.get("ai", {})
+	var out: Dictionary = state.db.get("ai", {}).duplicate()
+	out.merge(state.ai_overrides, true)
+	return out
 
 
 ## Profile weight: Match on the signed disposition, mapped to 0..1 and sharpened.
@@ -32,8 +36,14 @@ static func profile_weight(state: StateScript, disposition: Dictionary, profile:
 static func options(state: StateScript, u: UnitScript) -> Array:
 	var out: Array = []
 	var c := cfg(state)
-	var reach := state.reachable_cells(u)
+	var reach := state.reachable_cells(u) if state.can_move(u) else {}
 	reach[u.cell] = 0
+	# Under move_or_act a unit either moves or acts: actions only from where it stands.
+	var act_reach := reach
+	if state.turn_mode == "move_or_act" and not state._moves_and_acts(u):
+		act_reach = { u.cell: 0 }
+	if state.act_block(u) != "":
+		act_reach = {}
 	var opponents := state.opponents_of(u)
 	if opponents.is_empty():
 		return out
@@ -46,7 +56,7 @@ static func options(state: StateScript, u: UnitScript) -> Array:
 	for act in acts:
 		var spec: Dictionary = act["spec"]
 		var best := {}
-		for m in reach:
+		for m in act_reach:
 			var targets := _candidate_targets(state, u, act, m, opponents)
 			for t in targets:
 				var ev := _ev_at(state, u, spec, m, t)

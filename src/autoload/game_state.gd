@@ -15,6 +15,7 @@ const BondRules := preload("res://src/core/social/bonds.gd")
 const COMBAT_SCENE := "res://src/scenes/combat/combat.tscn"
 
 var run: Dictionary = {}
+var combat_turn_mode := ""   # F1 > Fights override of data/combat_rules.json "turnMode" ("" = data)
 var dev_autoplay := false
 var pending_combat: Dictionary = {}
 var combat_return := ""

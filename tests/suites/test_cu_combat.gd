@@ -19,9 +19,10 @@ func hero(extra: Dictionary = {}) -> Dictionary:
 	return Char.create(db(), "mage", seeded(1), opts)
 
 
-## A fight where the player acts first (very high initiative).
-func fight(map: Array, enemies: Array) -> StateScript:
-	var st := StateScript.new(db(), seeded(5), { "layout": { "map": map }, "party": [{ "char": hero() }], "enemies": enemies })
+## A fight where the player acts first (very high initiative). CU's rule by
+## default (move and act); AR's move_or_act is tested in test_ar_combat.gd.
+func fight(map: Array, enemies: Array, mode: String = "move_and_act") -> StateScript:
+	var st := StateScript.new(db(), seeded(5), { "layout": { "map": map }, "party": [{ "char": hero() }], "enemies": enemies, "turnMode": mode })
 	return st
 
 

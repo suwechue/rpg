@@ -1,0 +1,6 @@
+{
+  "comment": "Turn rules (docs/ARENA.md Part 1). turnMode: move_or_act (move OR one action each turn, the default), move_then_act (move first, then one action), move_and_act (move and one action in any order). Quick cards work with either. F1 > Fights switches it mid-fight.",
+  "turnMode": "move_or_act",
+  "turnModes": ["move_or_act", "move_then_act", "move_and_act"],
+  "areaFalloff": { "comment": "Area attacks deal this much to every target beyond the first `fullHits`.", "fullHits": 2, "mul": 0.75 }
+}

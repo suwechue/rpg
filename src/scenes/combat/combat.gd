@@ -62,6 +62,8 @@ func _ready() -> void:
 	var setup: Dictionary = GameState.take_pending_combat()
 	if setup.is_empty():
 		setup = GameState.debug_combat_setup()
+	if GameState.combat_turn_mode != "" and not setup.has("turnMode"):
+		setup["turnMode"] = GameState.combat_turn_mode
 	state = StateScript.new(DataDB.all(), Rng.stream("combat"), setup)
 	var layout: Dictionary = setup.get("layout", {})
 	# Cell sizes are in tiles (data/display.json "combat"); wide or deep layouts get smaller cells.
@@ -288,9 +290,10 @@ func _refresh_hud() -> void:
 	_refresh_hand()
 	var player_turn := _player_turn()
 	_buttons["end"].disabled = not player_turn
-	_buttons["strike"].disabled = not player_turn or u.action_used
-	_buttons["guard"].disabled = not player_turn or u.action_used
-	_buttons["wheel"].disabled = not player_turn or u.action_used or u.known_vectors.is_empty()
+	var act_block := state.act_block(u) if u != null else "-"
+	_buttons["strike"].disabled = not player_turn or act_block != ""
+	_buttons["guard"].disabled = not player_turn or act_block != ""
+	_buttons["wheel"].disabled = not player_turn or act_block != "" or u.known_vectors.is_empty()
 	_buttons["flee"].disabled = not player_turn or not state.can_flee()
 	_buttons["undo"].disabled = not player_turn or not state.can_undo_move(u)
 	if mode == "idle" and _hover_card < 0:
@@ -302,16 +305,19 @@ func _turn_hint() -> String:
 	var u := state.current
 	if not _player_turn() or u == null:
 		return ""
-	if u.action_used and u.move_left <= 0:
+	var can_act := state.act_block(u) == ""
+	if not can_act and not state.can_move(u):
 		_buttons["end"].grab_focus.call_deferred()
 		return "Turn done. End turn [Space]."
 	var parts: Array = []
-	if u.move_left > 0:
-		parts.append("Move %d" % u.move_left)
-	parts.append("action used" if u.action_used else "1 action")
+	if state.can_move(u):
+		parts.append("move %d" % u.move_left)
+	if can_act:
+		parts.append("act once")
 	if not u.quick_used:
 		parts.append("1 quick card")
-	return "This turn: %s.\nRed tiles: enemy attacks. Step off them to dodge." % ", ".join(PackedStringArray(parts))
+	var rule := " or " if state.turn_mode == "move_or_act" and u.moved_steps == 0 and not u.action_used else ", "
+	return "This turn: %s.\nRed tiles: enemy attacks. Step off them to dodge, or strike first." % rule.join(PackedStringArray(parts))
 
 
 func _refresh_hand() -> void:
@@ -420,7 +426,7 @@ func _refresh_overlays() -> void:
 		var u := state.current
 		match mode:
 			"idle":
-				field.reach_cells = state.reachable_cells(u).keys()
+				field.reach_cells = state.reachable_cells(u).keys() if state.can_move(u) else []
 				if _hover_card >= 0 and _hover_card < u.deck.hand.size():
 					var card := state.card_of(u, _hover_card)
 					field.target_cells = state.card_targets(u, card)
@@ -690,7 +696,7 @@ func _click_cell(c: Vector2i) -> void:
 	var u := state.current
 	match mode:
 		"idle":
-			if state.reachable_cells(u).has(c):
+			if state.can_move(u) and state.reachable_cells(u).has(c):
 				state.move(u, c)
 				_after_action()
 		"card":
