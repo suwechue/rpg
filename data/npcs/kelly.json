@@ -1,0 +1,55 @@
+{
+  "id": "kelly",
+  "name": "Kelly",
+  "role": "Cheerleader",
+  "home": "kelly_house",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Princess/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Princess/Faceset.png",
+  "startBond": -10,
+  "disposition": {
+    "courage": 20,
+    "greed": 10,
+    "curiosity": 15,
+    "loyalty": 5,
+    "kindness": -30,
+    "pride": 70
+  },
+  "restingLoyaltyEarned": 60,
+  "traits": [
+    "panics_under_pressure",
+    "reads_a_room",
+    "all_or_nothing"
+  ],
+  "recruitable": true,
+  "combat": {
+    "class": "bard",
+    "advanced": "idol",
+    "stats": {
+      "str": 6,
+      "dex": 9,
+      "con": 7,
+      "int": 8,
+      "per": 10,
+      "wil": 9,
+      "cha": 12
+    },
+    "vectors": [
+      "light",
+      "force"
+    ]
+  },
+  "schedule": {
+    "weekday": {
+      "before_school": "front_steps",
+      "lunch": "cafeteria",
+      "after_school": "field"
+    },
+    "weekend": {
+      "morning": "home",
+      "midday": "town_square",
+      "afternoon": "arcade",
+      "weekend_evening": "home"
+    }
+  },
+  "greeting": "Wow, you're STILL here."
+}

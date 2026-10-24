@@ -1,0 +1,53 @@
+{
+  "id": "dex",
+  "name": "Dex",
+  "role": "Student (Core Four)",
+  "home": "dex_house",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/MonkeyBoxerRed/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/MonkeyBoxerRed/Faceset.png",
+  "startBond": 10,
+  "disposition": {
+    "courage": 50,
+    "greed": 15,
+    "curiosity": 60,
+    "loyalty": 50,
+    "kindness": 45,
+    "pride": 25
+  },
+  "traits": [
+    "cant_resist_a_bit",
+    "sets_traps_for_laughs",
+    "deflects_with_humor"
+  ],
+  "recruitable": true,
+  "combat": {
+    "class": "rogue",
+    "advanced": "trickster",
+    "stats": {
+      "str": 8,
+      "dex": 14,
+      "con": 8,
+      "int": 9,
+      "per": 10,
+      "wil": 7,
+      "cha": 12
+    },
+    "vectors": [
+      "motion",
+      "binding"
+    ]
+  },
+  "schedule": {
+    "weekday": {
+      "before_school": "hallways",
+      "lunch": "cafeteria",
+      "after_school": "arcade"
+    },
+    "weekend": {
+      "midday": "arcade",
+      "afternoon": "arcade",
+      "weekend_evening": "arcade"
+    }
+  },
+  "greeting": "Okay but hear me out, what if we did the DANGEROUS version of this plan."
+}

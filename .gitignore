@@ -10,3 +10,6 @@ tools/*.log
 # downloaded pack archives (unpacked copies live next to them)
 assets/packs/*.zip
 tools/apply_town_update.py
+
+# screenshots from the --shot dev flag
+tools/screenshots/

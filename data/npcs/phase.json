@@ -1,0 +1,64 @@
+{
+  "id": "phase",
+  "name": "Phase",
+  "role": "Student",
+  "home": "phase_house",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/FighterRed/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/FighterRed/Faceset.png",
+  "startBond": 10,
+  "disposition": {
+    "courage": 60,
+    "greed": 5,
+    "curiosity": 20,
+    "loyalty": 55,
+    "kindness": 60,
+    "pride": 25
+  },
+  "traits": [
+    "wins_by_accident",
+    "oblivious",
+    "improvised_tank"
+  ],
+  "recruitable": true,
+  "recruitWeek": 3,
+  "recruitCounter": {
+    "deli_shifts": 3
+  },
+  "combat": {
+    "class": "fighter",
+    "advanced": "deli_knight",
+    "stats": {
+      "str": 16,
+      "dex": 12,
+      "con": 15,
+      "int": 7,
+      "per": 6,
+      "wil": 9,
+      "cha": 10
+    },
+    "vectors": [
+      "force",
+      "heat"
+    ]
+  },
+  "schedule": {
+    "weekday": {
+      "before_school": "gym",
+      "lunch": "gym",
+      "after_school": "field"
+    },
+    "days": {
+      "tue": {
+        "after_school": "garys_deli"
+      },
+      "thu": {
+        "after_school": "garys_deli"
+      }
+    },
+    "weekend": {
+      "morning": "gym",
+      "midday": "garys_deli"
+    }
+  },
+  "greeting": "Wait, what happened? Hi!"
+}

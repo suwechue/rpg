@@ -37,12 +37,14 @@ func _ready() -> void:
 	add_section("Fights", _show_fights, left)
 	add_section("Time", _show_time, left)
 	add_section("Stats/Flags", _show_stats, left)
+	add_section("Town", _show_town, left)
 	_dev_args.call_deferred()
 
 
 ## Dev hook for screenshots from the command line (after `--`):
 ##   --scene=res://path.tscn  --debug  --shot=C:/out.png  --frames=30
 ##   --autoplay (AI plays the party)  --seed=N --class=mage (fresh run first)
+##   --jump=week,day_index,part_index  --town=zone:x,y (start position in the town)
 ## --debug opens this menu; --shot saves the viewport after N frames and quits.
 func _dev_args() -> void:
 	var args := {}
@@ -53,6 +55,14 @@ func _dev_args() -> void:
 		GameState.dev_autoplay = true
 	if args.has("seed"):
 		GameState.new_run(int(args["seed"]), str(args.get("class", "mage")))
+	if args.has("jump"):
+		var j := str(args["jump"]).split(",")
+		Calendar.reset({ "week": int(j[0]), "day_index": int(j[1]), "part_index": int(j[2]), "ap": -1 })
+		GameState.run["schedule_week"] = int(j[0])
+	if args.has("town"):
+		var t := str(args["town"]).split(":")
+		var xy := t[1].split(",")
+		GameState.run["town_pos"] = { "map": t[0], "interior": false, "loc": "", "cell": [int(xy[0]), int(xy[1])] }
 	if args.has("scene"):
 		SceneRouter.goto(str(args["scene"]))
 	if args.has("debug"):
@@ -281,3 +291,20 @@ func _show_stats(box: VBoxContainer) -> void:
 	flags_l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	flags_l.custom_minimum_size = Vector2(380, 0)
 	box.add_child(flags_l)
+
+
+func _show_town(box: VBoxContainer) -> void:
+	box.add_child(UiTheme.label("Go to the town scene at:", UiTheme.ACCENT))
+	var places := { "Home (Maple St)": ["residential", 4, 37], "Downtown square": ["downtown", 38, 25], "Gary's Deli door": ["downtown", 21, 14],
+		"School front steps": ["school", 29, 14], "Forge": ["outskirts", 41, 13], "Park and woods edge": ["outskirts", 34, 24], "Hillside": ["residential", 28, 7] }
+	for name in places:
+		var p: Array = places[name]
+		box.add_child(UiTheme.button(str(name), func() -> void:
+			toggle()
+			GameState.run["town_pos"] = { "map": p[0], "interior": false, "loc": "", "cell": [p[1], p[2]] }
+			SceneRouter.goto("res://src/scenes/town/town.tscn")))
+	box.add_child(UiTheme.button("Unlock all STORY places", func() -> void:
+		for l in DataDB.table("town/locations").get("locations", []):
+			if l.has("storyFlag"):
+				GameState.set_flag(str(l["storyFlag"]))
+		_open(_show_town)))

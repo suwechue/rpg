@@ -241,7 +241,7 @@ func leave_combat() -> void:
 	if str(last_combat.get("result", "")) == "lose":
 		EventBus.run_ended.emit("combat")
 		return
-	var dest := combat_return if combat_return != "" else "res://src/scenes/main.tscn"
+	var dest := combat_return if combat_return != "" else "res://src/scenes/town/town.tscn"
 	SceneRouter.goto(dest)
 
 

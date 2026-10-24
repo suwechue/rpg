@@ -596,6 +596,7 @@ func _expected_hit(u: UnitScript, t: UnitScript, spec: Dictionary) -> float:
 
 func _expected_strike(u: UnitScript, t: UnitScript, card: Dictionary) -> float:
 	var base := float(u.stats.get(str(card.get("stat", "str")), 5)) * float(card.get("mult", 1.0))
+	base += float(u.mods.get("combat", {}).get("strikePower", 0.0))
 	if not u.infusion.is_empty():
 		base += float(u.infusion["power"]) * 0.5
 	var dmg := Res.strike_damage(db, base, u, t, _shared(u, t, false))

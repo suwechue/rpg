@@ -1,0 +1,38 @@
+{
+  "id": "ms_g",
+  "name": "Ms. G",
+  "role": "Physics and Chemistry teacher",
+  "home": "ms_g_house",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Shaman/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Shaman/Faceset.png",
+  "startBond": 10,
+  "disposition": {
+    "courage": 30,
+    "greed": 5,
+    "curiosity": 90,
+    "loyalty": 40,
+    "kindness": 45,
+    "pride": 25
+  },
+  "traits": [],
+  "recruitable": false,
+  "teaches": [
+    "physics",
+    "chemistry"
+  ],
+  "mentor": "kinetic_logician",
+  "schedule": {
+    "weekday": {
+      "before_school": "lab",
+      "lunch": "lab",
+      "after_school": "lab"
+    },
+    "weekend": {
+      "midday": "library"
+    },
+    "weekendDays": [
+      "sat"
+    ]
+  },
+  "greeting": "Okay but have you ever thought about momentum as a METAPHOR--"
+}

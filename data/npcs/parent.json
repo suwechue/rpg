@@ -1,0 +1,30 @@
+{
+  "id": "parent",
+  "name": "Your guardian",
+  "role": "Parent/Guardian",
+  "home": "player_home",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Woman/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Woman/Faceset.png",
+  "startBond": 50,
+  "disposition": {
+    "courage": 20,
+    "greed": 10,
+    "curiosity": 20,
+    "loyalty": 80,
+    "kindness": 75,
+    "pride": 15
+  },
+  "traits": [],
+  "recruitable": false,
+  "awayOtherwise": true,
+  "schedule": {
+    "weekday": {
+      "before_school": "home"
+    },
+    "weekend": {
+      "morning": "home",
+      "weekend_evening": "home"
+    }
+  },
+  "greeting": "Did you eat? Eat something. Love you. Late shift tonight."
+}

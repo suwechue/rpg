@@ -1,0 +1,29 @@
+{
+  "id": "todd",
+  "name": "Todd",
+  "role": "Townsperson",
+  "home": "todd_house",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Villager2/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Villager2/Faceset.png",
+  "startBond": 0,
+  "disposition": {
+    "courage": 10,
+    "greed": 5,
+    "curiosity": 10,
+    "loyalty": 30,
+    "kindness": 40,
+    "pride": 5
+  },
+  "traits": [],
+  "recruitable": false,
+  "missingChance": 0.4,
+  "schedule": {
+    "weekday": {
+      "after_school": "town_square"
+    },
+    "weekend": {
+      "midday": "town_square"
+    }
+  },
+  "greeting": "...don't ask. Please. I'm so tired."
+}

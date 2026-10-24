@@ -1,0 +1,33 @@
+{
+  "id": "blacksmith",
+  "name": "The Blacksmith",
+  "role": "Blacksmith",
+  "home": "blacksmith_cottage",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Hunter/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Hunter/Faceset.png",
+  "startBond": 0,
+  "disposition": {
+    "courage": 60,
+    "greed": 10,
+    "curiosity": 20,
+    "loyalty": 80,
+    "kindness": 35,
+    "pride": 40
+  },
+  "traits": [],
+  "recruitable": false,
+  "mentor": "smith_mage",
+  "schedule": {
+    "weekday": {
+      "before_school": "forge",
+      "after_school": "forge"
+    },
+    "weekend": {
+      "morning": "forge",
+      "midday": "forge",
+      "afternoon": "forge",
+      "weekend_evening": "forge"
+    }
+  },
+  "greeting": "Took you long enough."
+}

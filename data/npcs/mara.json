@@ -1,0 +1,52 @@
+{
+  "id": "mara",
+  "name": "Mara",
+  "role": "Student (Core Four)",
+  "home": "mara_house",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/NinjaLeaf/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/NinjaLeaf/Faceset.png",
+  "startBond": 10,
+  "disposition": {
+    "courage": 20,
+    "greed": 5,
+    "curiosity": 50,
+    "loyalty": 60,
+    "kindness": 80,
+    "pride": 15
+  },
+  "traits": [
+    "channels_emotion",
+    "reads_people_well",
+    "quiet_strength"
+  ],
+  "recruitable": true,
+  "combat": {
+    "class": "healer",
+    "advanced": "medic",
+    "stats": {
+      "str": 5,
+      "dex": 8,
+      "con": 7,
+      "int": 11,
+      "per": 13,
+      "wil": 12,
+      "cha": 10
+    },
+    "vectors": [
+      "light",
+      "binding"
+    ]
+  },
+  "schedule": {
+    "weekday": {
+      "lunch": "art_room",
+      "after_school": "park"
+    },
+    "weekend": {
+      "morning": "park",
+      "midday": "park",
+      "afternoon": "park"
+    }
+  },
+  "greeting": "...oh. Hi. Sorry, I was drawing you. Is that weird?"
+}

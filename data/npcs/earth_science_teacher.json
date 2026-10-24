@@ -1,0 +1,40 @@
+{
+  "id": "earth_science_teacher",
+  "name": "Earth Science Teacher",
+  "role": "Earth Science teacher",
+  "home": "elm_apartments",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Eskimo/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Eskimo/Faceset.png",
+  "startBond": 10,
+  "disposition": {
+    "courage": 30,
+    "greed": 5,
+    "curiosity": 55,
+    "loyalty": 40,
+    "kindness": 55,
+    "pride": 15
+  },
+  "traits": [],
+  "recruitable": false,
+  "teaches": [
+    "earth_science"
+  ],
+  "schedule": {
+    "weekday": {
+      "lunch": "earth_science_room",
+      "after_school": "earth_science_room"
+    },
+    "days": {
+      "wed": {
+        "after_school": "park"
+      },
+      "fri": {
+        "after_school": "park"
+      }
+    },
+    "weekend": {
+      "morning": "park"
+    }
+  },
+  "greeting": "And here we see a student, approaching cautiously. Fascinating."
+}

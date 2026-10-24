@@ -79,7 +79,7 @@ func smoke_week_of_school() -> void:
 	var flow: Node = _root_node("Flow")
 	_root_node("SaveSystem").call("delete_save")
 	gs.call("new_run", 777, "bard")
-	await _goto("res://src/scenes/main.tscn")
+	await _goto("res://src/scenes/town/town.tscn")
 	var stats0: Dictionary = gs.get("player")["stats"].duplicate()
 	var guard := 0
 	var seen := {}
@@ -110,6 +110,71 @@ func smoke_week_of_school() -> void:
 			changed += 1
 	check(changed >= 2, "stats changed over the week (%d)" % changed)
 	check(_root_node("SaveSystem").call("has_save"), "autosave written at part changes")
+
+
+func _wait_modal(needle_script: String, frames: int = 30) -> Node:
+	for i in frames:
+		await process_frame
+		var m := _top_modal()
+		if m != null and str(m.get_script().resource_path).ends_with(needle_script):
+			return m
+	return null
+
+
+## M5 "Done when": walk the town, buy, train and meet NPCs on schedule.
+func smoke_town() -> void:
+	var gs: Node = _root_node("GameState")
+	var cal: Node = _root_node("Calendar")
+	gs.call("new_run", 4321, "fighter")
+	gs.get("run")["schedule_week"] = 1
+	cal.call("reset", { "week": 1, "day_index": 0, "part_index": 5, "ap": -1 })
+	var town: Node = await _goto("res://src/scenes/town/town.tscn")
+	check(town != null and str(town.get("map_id")) == "school", "after school starts at the school")
+	var c0: Vector2i = town.get("cell")
+	await town.call("step", Vector2i.LEFT)
+	await town.call("step", Vector2i.LEFT)
+	check(town.get("cell") != c0, "walking moves the player")
+	check(int(cal.call("ap")) == 3, "walking is free")
+	town.call("_load_map", "downtown", false, "", Vector2i(21, 14))
+	town.set("facing", Vector2i.UP)
+	await town.call("interact")
+	check(bool(town.get("interior")) and str(town.get("interior_loc")) == "garys_deli", "the deli door leads inside")
+	check(town.get("npcs").values().has("gary"), "Gary is at his deli after school")
+	var money0: int = int(gs.get("money"))
+	town.call("location_menu", "garys_deli")
+	var menu := await _wait_modal("modal.gd")
+	check(menu != null and _press(menu, "Shop"), "the deli has a shop")
+	var shop := await _wait_modal("shop_screen.gd")
+	check(shop != null and _press(shop, "Breakfast"), "buy breakfast")
+	await process_frame
+	_press(shop, "Done")
+	await process_frame
+	check(int(gs.get("money")) < money0 and int(cal.call("ap")) == 2, "money spent and 1 AP for the visit")
+	town.call("location_menu", "garys_deli")
+	menu = await _wait_modal("modal.gd")
+	var stats0: Dictionary = gs.get("player").get("statXp", {}).duplicate()
+	check(menu != null and _press(menu, "Work a deli shift"), "train with a deli shift")
+	await process_frame
+	check(int(cal.call("ap")) == 0 and int(gs.get("run")["shifts"].get("deli_shifts", 0)) == 1, "the shift costs 2 AP and counts")
+	check(gs.get("player").get("statXp", {}) != stats0, "training fills stat bars")
+	var gary_cell: Vector2i = Vector2i(-1, -1)
+	for at in town.get("npcs"):
+		if str(town.get("npcs")[at]) == "gary":
+			gary_cell = at
+	town.call("_load_map", "deli", true, "garys_deli", gary_cell + Vector2i(0, 2))
+	town.set("facing", Vector2i.UP)
+	town.call("interact")
+	var talk := await _wait_modal("dialogue_screen.gd")
+	check(talk != null, "talking to Gary opens a conversation")
+	if talk != null:
+		_press(talk, "Bye")
+	await process_frame
+	check(bool(gs.get("run")["npcs"]["gary"]["met"]), "Gary is met")
+	town.call("_load_map", "downtown", false, "", Vector2i(14, 25))
+	town.set("facing", Vector2i.UP)
+	town.call("interact")
+	await process_frame
+	check(str(_root_node("Narrator").get("last_line")).find("renovations") >= 0, "the closed cinema gives its door line")
 
 
 func _smoke_combat() -> void:

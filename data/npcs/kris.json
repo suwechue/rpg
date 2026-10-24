@@ -1,0 +1,52 @@
+{
+  "id": "kris",
+  "name": "Kris",
+  "role": "Student",
+  "home": "kris_house",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/NinjaGray/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/NinjaGray/Faceset.png",
+  "startBond": 10,
+  "disposition": {
+    "courage": 20,
+    "greed": 5,
+    "curiosity": 40,
+    "loyalty": 65,
+    "kindness": 50,
+    "pride": 10
+  },
+  "traits": [
+    "minimal_input",
+    "unbothered",
+    "retains_everything"
+  ],
+  "recruitable": true,
+  "recruitWeek": 3,
+  "combat": {
+    "class": "fighter",
+    "advanced": "kinetic_logician",
+    "stats": {
+      "str": 10,
+      "dex": 11,
+      "con": 9,
+      "int": 13,
+      "per": 12,
+      "wil": 10,
+      "cha": 7
+    },
+    "vectors": [
+      "motion",
+      "binding"
+    ]
+  },
+  "schedule": {
+    "weekday": {
+      "lunch": "cafeteria",
+      "after_school": "@nap"
+    },
+    "weekend": {
+      "midday": "@nap",
+      "afternoon": "@nap"
+    }
+  },
+  "greeting": "...yeah."
+}

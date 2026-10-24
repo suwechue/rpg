@@ -33,6 +33,7 @@ SaveSystem="*res://src/autoload/save_system.gd"
 SceneRouter="*res://src/autoload/scene_router.gd"
 UiTheme="*res://src/autoload/ui_theme.gd"
 Flow="*res://src/autoload/flow.gd"
+Social="*res://src/autoload/social.gd"
 DebugMenu="*res://src/autoload/debug_menu.gd"
 
 [display]

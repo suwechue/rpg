@@ -1,0 +1,32 @@
+{
+  "id": "patti",
+  "name": "Nurse Patti",
+  "role": "Hospital nurse",
+  "home": "elm_apartments",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/OldWoman/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/OldWoman/Faceset.png",
+  "startBond": 10,
+  "disposition": {
+    "courage": 30,
+    "greed": 25,
+    "curiosity": 70,
+    "loyalty": 55,
+    "kindness": 65,
+    "pride": 15
+  },
+  "traits": [],
+  "recruitable": false,
+  "schedule": {
+    "weekday": {
+      "before_school": "hospital",
+      "lunch": "hospital",
+      "after_school": "hospital"
+    },
+    "weekend": {
+      "morning": "hospital",
+      "midday": "town_square",
+      "afternoon": "hospital"
+    }
+  },
+  "greeting": "Oh, you're the new one. I already heard about you."
+}

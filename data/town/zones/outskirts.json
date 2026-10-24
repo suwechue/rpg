@@ -1,0 +1,33 @@
+{
+  "id": "outskirts", "name": "Outskirts", "size": [60, 34], "ground": "grass", "music": "town",
+  "fills": [
+    { "ground": "path", "rect": [33, 17, 2, 7] },
+    { "ground": "path", "rect": [26, 23, 18, 1] },
+    { "ground": "water", "rect": [2, 27, 10, 6] },
+    { "ground": "dirt", "rect": [14, 19, 7, 6] }
+  ],
+  "roads": [ { "dir": "h", "x": 0, "y": 15, "len": 60 } ],
+  "buildings": [
+    { "loc": "forge", "rect": [38, 7, 8, 6], "style": "stone_gray", "door": 3, "label": "Forge" },
+    { "loc": "blacksmith_cottage", "rect": [48, 8, 5, 5], "style": "house_gray", "door": 2 },
+    { "loc": "train_station", "rect": [2, 3, 10, 7], "style": "civic", "door": 4, "label": "Station" },
+    { "loc": "abandoned_mansion", "rect": [16, 1, 10, 7], "style": "stone_gray", "door": 4, "label": "The Mansion" },
+    { "loc": "old_factory", "rect": [2, 19, 9, 6], "style": "shop_brick", "door": 4, "label": "Factory" },
+    { "loc": "lake_boathouse", "rect": [12, 28, 5, 4], "style": "house_gray", "door": 2 }
+  ],
+  "props": [
+    { "kind": "trees", "rect": [18, 29, 32, 5], "step": 2 },
+    { "kind": "trees", "rect": [44, 19, 4, 9], "step": 2 },
+    { "kind": "trees", "rect": [56, 0, 4, 14], "step": 3 },
+    { "kind": "fence", "rect": [13, 18, 9, 1] }, { "kind": "fence", "rect": [13, 25, 9, 1] }, { "kind": "fence", "rect": [13, 19, 1, 6] }, { "kind": "fence", "rect": [21, 19, 1, 6] },
+    { "kind": "fence", "rect": [15, 9, 12, 1] },
+    { "kind": "chainfence", "rect": [1, 26, 11, 1] }, { "kind": "chainfence", "rect": [1, 18, 11, 1] },
+    { "kind": "fence", "rect": [48, 19, 10, 1] }, { "kind": "fence", "rect": [48, 28, 10, 1] }, { "kind": "fence", "rect": [48, 20, 1, 8] }, { "kind": "fence", "rect": [57, 20, 1, 8] },
+    { "kind": "grave", "at": [50, 21] }, { "kind": "grave", "at": [52, 21] }, { "kind": "grave", "at": [54, 21] }, { "kind": "grave", "at": [50, 24] }, { "kind": "grave", "at": [52, 24] }, { "kind": "grave", "at": [54, 24] }, { "kind": "grave", "at": [55, 26] },
+    { "kind": "tower", "at": [30, 4] }, { "kind": "busstop", "at": [52, 17] }, { "kind": "sign", "at": [36, 17], "text": "Park and woods. Please stay on the path." },
+    { "kind": "bench", "at": [29, 21] }, { "kind": "lamp", "at": [32, 22] }
+  ],
+  "spots": { "park": [34, 25], "bus_stop_outskirts": [52, 17], "abandoned_lot": [17, 26], "water_tower": [30, 5], "cemetery": [52, 19] },
+  "exits": [ { "rect": [59, 15, 1, 2], "to": "downtown", "spawn": [2, 15] } ],
+  "starts": {}
+}

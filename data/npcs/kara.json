@@ -1,0 +1,31 @@
+{
+  "id": "kara",
+  "name": "Kara",
+  "role": "Cheer squad",
+  "home": "kara_house",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/EggGirl/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/EggGirl/Faceset.png",
+  "startBond": 0,
+  "disposition": {
+    "courage": 15,
+    "greed": 10,
+    "curiosity": 55,
+    "loyalty": 45,
+    "kindness": 50,
+    "pride": 30
+  },
+  "traits": [],
+  "recruitable": false,
+  "schedule": {
+    "weekday": {
+      "before_school": "front_steps",
+      "lunch": "cafeteria",
+      "after_school": "field"
+    },
+    "weekend": {
+      "midday": "town_square",
+      "afternoon": "arcade"
+    }
+  },
+  "greeting": "Do you think she noticed? Oh no, she noticed."
+}

@@ -4,7 +4,7 @@ extends Control
 
 const Modal := preload("res://src/scenes/ui/modal.gd")
 const Char := preload("res://src/core/character.gd")
-const TOWN_SCENE := "res://src/scenes/main.tscn"
+const TOWN_SCENE := "res://src/scenes/town/town.tscn"
 
 static var extra_buttons: Array = []   # [{ "label", "run": Callable }]
 

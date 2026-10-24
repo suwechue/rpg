@@ -1,0 +1,34 @@
+{
+  "id": "gary",
+  "name": "Gary",
+  "role": "Deli owner",
+  "home": "garys_apartment",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Villager4/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Villager4/Faceset.png",
+  "startBond": 15,
+  "disposition": {
+    "courage": 40,
+    "greed": 20,
+    "curiosity": 30,
+    "loyalty": 75,
+    "kindness": 65,
+    "pride": 25
+  },
+  "traits": [],
+  "recruitable": false,
+  "mentor": "deli_knight",
+  "schedule": {
+    "weekday": {
+      "before_school": "garys_deli",
+      "lunch": "garys_deli",
+      "after_school": "garys_deli"
+    },
+    "weekend": {
+      "morning": "garys_deli",
+      "midday": "garys_deli",
+      "afternoon": "garys_deli",
+      "weekend_evening": "garys_deli"
+    }
+  },
+  "greeting": "You want the good stuff or the MENU stuff?"
+}

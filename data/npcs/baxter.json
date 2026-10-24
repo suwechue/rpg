@@ -1,0 +1,52 @@
+{
+  "id": "baxter",
+  "name": "Baxter",
+  "role": "Student",
+  "home": "baxter_house",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Knight/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Knight/Faceset.png",
+  "startBond": 5,
+  "disposition": {
+    "courage": 30,
+    "greed": 15,
+    "curiosity": 35,
+    "loyalty": 70,
+    "kindness": 35,
+    "pride": 85
+  },
+  "traits": [
+    "prepares_obsessively",
+    "short_fuse",
+    "disciplined_swordplay"
+  ],
+  "recruitable": true,
+  "recruitWeek": 2,
+  "combat": {
+    "class": "mage",
+    "advanced": "spellblade",
+    "stats": {
+      "str": 9,
+      "dex": 10,
+      "con": 9,
+      "int": 15,
+      "per": 9,
+      "wil": 13,
+      "cha": 8
+    },
+    "vectors": [
+      "binding",
+      "light"
+    ]
+  },
+  "schedule": {
+    "weekday": {
+      "lunch": "library",
+      "after_school": "debate_hall"
+    },
+    "weekend": {
+      "morning": "library",
+      "midday": "library"
+    }
+  },
+  "greeting": "I have PREPARED for this conversation. Proceed."
+}

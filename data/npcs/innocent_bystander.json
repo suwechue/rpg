@@ -1,0 +1,33 @@
+{
+  "id": "innocent_bystander",
+  "name": "Innocent Bystander",
+  "role": "Townsperson",
+  "home": "bystander_house",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Villager/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Villager/Faceset.png",
+  "startBond": 0,
+  "disposition": {
+    "courage": 10,
+    "greed": 10,
+    "curiosity": 20,
+    "loyalty": 20,
+    "kindness": 40,
+    "pride": 10
+  },
+  "traits": [],
+  "recruitable": false,
+  "schedule": {
+    "weekday": {
+      "before_school": "town_square",
+      "lunch": "town_square",
+      "after_school": "town_square"
+    },
+    "weekend": {
+      "morning": "town_square",
+      "midday": "town_square",
+      "afternoon": "town_square",
+      "weekend_evening": "town_square"
+    }
+  },
+  "greeting": "Is this... normal here?"
+}

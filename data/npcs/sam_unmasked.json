@@ -1,0 +1,17 @@
+{
+  "id": "sam_unmasked",
+  "name": "Sam, Unmasked",
+  "role": "Hidden encounter",
+  "home": "sam_estate",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/NinjaDark/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/NinjaDark/Faceset.png",
+  "startBond": 0,
+  "disposition": {},
+  "traits": [],
+  "recruitable": false,
+  "hidden": true,
+  "hiddenClass": "complete_axiomatic_mage",
+  "note": "Out of alpha scope. Gate: a party member in a Tier 3 class. Everything else TBD.",
+  "schedule": {},
+  "greeting": "..."
+}

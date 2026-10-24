@@ -1,0 +1,55 @@
+{
+  "id": "diane",
+  "name": "Diane",
+  "role": "Student",
+  "home": "diane_house",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/NinjaWater/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/NinjaWater/Faceset.png",
+  "startBond": 5,
+  "disposition": {
+    "courage": 30,
+    "greed": 5,
+    "curiosity": 60,
+    "loyalty": 60,
+    "kindness": 55,
+    "pride": 25
+  },
+  "traits": [
+    "analytical_precision",
+    "keeps_a_private_log",
+    "doesnt_report_everything"
+  ],
+  "recruitable": true,
+  "recruitWeek": 3,
+  "combat": {
+    "class": "mage",
+    "advanced": "kinetic_logician",
+    "stats": {
+      "str": 6,
+      "dex": 8,
+      "con": 7,
+      "int": 15,
+      "per": 16,
+      "wil": 11,
+      "cha": 10
+    },
+    "vectors": [
+      "light",
+      "binding"
+    ]
+  },
+  "schedule": {
+    "weekday": {
+      "lunch": "library",
+      "after_school": [
+        "library",
+        "town_square"
+      ]
+    },
+    "weekend": {
+      "morning": "library",
+      "midday": "library"
+    }
+  },
+  "greeting": "I'm documenting this. I'm not necessarily SENDING it anywhere."
+}

@@ -1,0 +1,49 @@
+{
+  "id": "penny",
+  "name": "Penny",
+  "role": "Student",
+  "home": "penny_house",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/KnightGold/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/KnightGold/Faceset.png",
+  "startBond": -5,
+  "disposition": {
+    "courage": 20,
+    "greed": 10,
+    "curiosity": 35,
+    "loyalty": 40,
+    "kindness": 40,
+    "pride": 80
+  },
+  "traits": [
+    "flawless_defense",
+    "perfectionist",
+    "guarded"
+  ],
+  "recruitable": true,
+  "recruitWeek": 3,
+  "combat": {
+    "class": "fighter",
+    "advanced": "guardian",
+    "stats": {
+      "str": 8,
+      "dex": 10,
+      "con": 10,
+      "int": 14,
+      "per": 11,
+      "wil": 15,
+      "cha": 8
+    },
+    "vectors": [
+      "binding",
+      "light"
+    ]
+  },
+  "schedule": {
+    "weekday": {
+      "lunch": "library",
+      "after_school": "library"
+    },
+    "weekend": {}
+  },
+  "greeting": "We are not friends. We are rivals. There's a difference."
+}

@@ -9,22 +9,22 @@ Claude Code updates this at the end of every milestone and before stopping, so a
 | M2 Characters, cards, decks | Done | Character model, derived stats, cards with MP cost and Tier caps, hybrids, Deck with Fatigue, leveling with pity; seeded mage reaches level 5 identically |
 | M3 Grid combat | Done | 2.5D grid combat: all 11 Forms, Vector effects, Contest, Instability, Vector Wheel, initiative timeline, disposition AI, flee, downed/death, MP carry-over. F1 > Fights |
 | M4 Calendar and AP | Done | Run as one Dictionary, Flow autoload runs day parts, schedule/class/night/detention screens, 64 class events, skipping and detention, Night workbench with a stub timing minigame, Property Bank crafting, deck editor, title screen |
-| M5 Town | Not started | |
+| M5 Town | Done | 4 walkable zones built from data with Kenney tiles, 72 locations with status/hours/door lines, 13 interiors, 35 NPC records with homes and schedules, doorstep talks, shops (deli, forge, hospital, corner store), items and gear |
 | M6 Social system | Not started | |
 | M7 The Upside-Down | Not started | |
 | M8 Alpha content and polish | Not started | |
 
 ## Next step
 
-Start M5 (the town: 4 zones from docs/TOWN.md as TileMapLayers, every location as a record in data/town/locations.json, every named NPC with a home and schedule, shops and money).
+Start M6 (social: dialogue topics, gifts, traits and disposition per character in data/npcs/, Charisma gates, reception by Match, misheard lines, Bonds and tiers, recruitment, portraits, narrator Bond tone, the week 1 Monday Kelly scenario with Kelly Risk, Todd and the Innocent Bystander as town flavor).
 
 ## How to check
 
 - Tests: `& $godot --headless --path . -s res://tests/run_tests.gd` (exit 0 = pass). Suites live in `tests/suites/*.gd` and extend `tests/suite.gd`; `run_tests.gd` runs its own `test_` methods and then every suite.
 - Load check: `& $godot --headless --path . --quit`.
-- Screenshots (needs a window, not headless): `& $godot --path . -- --scene=res://... --debug --shot=C:/out.png --frames=30` (handled in `DebugMenu._dev_args`).
+- Screenshots (needs a window, not headless): `& $godot --path . -- --scene=res://... --debug --shot=C:/Users/itzju/Documents/project-vector/tools/screenshots/name.png --frames=30` (handled in `DebugMenu._dev_args`). Save screenshots in `tools/screenshots/` (gitignored).
 - Scene smoke tests (autoloads + real scenes): `& $godot --headless --path . -s res://tests/smoke_scenes.gd` (exit 0 = pass). Add a `smoke_*` method per scene.
-- Dev flags after `--`: `--seed=N --class=mage` (fresh run), `--scene=res://...`, `--autoplay` (AI plays the party), `--debug`, `--shot=PATH --frames=N`.
+- Dev flags after `--`: `--seed=N --class=mage` (fresh run), `--jump=week,day_index,part_index`, `--town=zone:x,y`, `--scene=res://...`, `--autoplay` (AI plays the party), `--debug`, `--shot=PATH --frames=N`.
 - F1 opens the debug menu in any scene.
 
 ## Milestone notes
@@ -53,9 +53,16 @@ Start M5 (the town: 4 zones from docs/TOWN.md as TileMapLayers, every location a
 - Data: `data/events/class_events.json` (64 events: lesson, quiz, partner, disruption, accident, spotlight, plus the week 1 Monday story disruption), `data/events/detention.json`, `data/minigames.json`, `data/properties.json` (15 properties), `school_classes.json` (professors, classmates, rooms).
 - Debug (F1): Time (advance, jump to any week/day/part, +AP) and Stats/Flags.
 
+### M5 (done)
+- Data: `data/town/` (styles: Kenney tile indices for building stamping; zones/: school, downtown, residential (Hillside north, Elm middle, Maple south), outskirts; locations.json: every TOWN.md place; interiors.json: 13 templates; shops.json), `data/npcs/<id>.json` (35 records: home, sprite, portrait, schedule, disposition, traits, stats, greeting), `data/items.json` (gear, gifts).
+- Core: `src/core/town/schedule.gd` (where everyone is per part; "@nap" rotation, Todd's missing days, flags and day overrides, injured members at the hospital), `locations.gd` (status, hours, gates, door results), `shop.gd` (prices with Greed and CHA, buy/sell/equip).
+- Scene: `src/scenes/town/town.tscn` (town.gd controller, town_map.gd builds TileMapLayers from data at runtime, shop_screen.gd). Tile-step movement, camera limits, edge exits between zones, doors, nested school rooms, NPCs placed by schedule with name tags when close, lit windows when someone is home, boarded doors on CLOSED/STORY places, bus stops from week 2, part start positions from `calendar.json` "start".
+- `Social` autoload + `src/scenes/ui/dialogue_screen.gd` (portrait, Bond tier, greeting; M6 adds topics via `extra_options`).
+- The M4 hub (`main.tscn`, `data/locations.json`) is gone; the title goes to the town. F1 > Town teleports.
+
 ## Decisions made during development
 
-- **Git remote:** adding `origin` was blocked by the Claude Code permission classifier in this session, so commits are local only. To push: `git remote add origin https://github.com/suwechue/rpg.git` then `git push -u origin main`. Art and audio under `assets/` are tracked with Git LFS.
+- **Git:** `origin` is https://github.com/suwechue/rpg.git; every milestone commit is pushed. Art and audio under `assets/` are tracked with Git LFS.
 - **Assets imported** with `godot --headless --import`; the `.import` files are committed. The pack font imports with antialiasing, hinting and subpixel positioning off.
 - **UI font:** NormalFont.ttf has a 227.5-unit pixel grid (2048 per em), so its native size is 9px (18 for titles). Its space is 1px, so the theme uses a FontVariation with +2 space width (`assets/ui/theme.tres`, set as the project theme because theme inheritance stops at Node2D parents).
 - **Starter decks are 10 cards** for every class (the Mage's "8-card deck" plus Strike and 2 Guard) so they meet the 10-card deck minimum.
@@ -81,14 +88,18 @@ Start M5 (the town: 4 zones from docs/TOWN.md as TileMapLayers, every location a
 - **Crafting:** input vector = design direction x Magnitude power. Performance below 0.35 rolls no Properties, below 0.8 one, else two; 0.95+ adds a Magnitude step (capped by Tier). Designs without Properties live in the collection by spell id; designs with Properties are stored as `craft_N`. Property effects: power, powerPct, costDelta, stability, critPct.
 - **Card collection** is shared; each deck may use up to the owned count (max 3 per design). Party members can also use their own starter cards. Spell cards need the deck owner to know the card's Vectors and Form.
 - **The worked-example test** for properties now filters to the doc's three sample properties, since the Property Bank grew.
+- **Town layout:** Residential is one zone with Hillside at the north end, Elm Street in the middle and Maple Street in the south; it joins downtown on its east edge at Elm Street (TOWN.md's diagram can't hold both "Hillside north of downtown" and "one zone"). The abandoned mansion sits in the outskirts zone as the table says.
+- **Interiors** are small rooms with Ninja Adventure floor/brick tiles and drawn placeholder furniture. School classrooms are rooms off one hallway interior. The corner store stays EXTERIOR but sells through a walk-up window, so it can be one of the four shops.
+- **Shops** cost 1 AP per visit. Price = base x (1 + keeper Greed / 200) x (1 - (CHA - 5) x 0.02). New gear auto-equips into an empty slot; combat item cards go straight into the deck if there's room. Weapons add Strike power (`strikePower` mod), armor adds Defense.
+- **Talking** across a counter or desk works (shopkeepers stand behind them).
 - **Magic Resistance as a percent:** each point of Magic Resistance is 2% spell damage reduction, capped at 60% (`stats.json` combat block).
 
 ## Stubs and known issues
 
 - Combat: no tethering (Binding's second effect) and no hidden units yet (Light's reveal has nothing to reveal). Constructs are always barriers (no turrets or decoys).
 - The combat timeline shows 2-letter name tags instead of portraits.
-- Git: no remote configured (see Decisions); nothing has been pushed.
 
-- `src/scenes/main.tscn` is the M4 placeholder hub until the M5 town replaces it.
+- Town art: interior furniture is drawn rectangles; water is drawn; road intersections reuse the horizontal road tile.
+- Doorstep and in-town conversations only show a greeting until M6.
 - The crafting minigame is one timing bar for all 4 archetypes (M8 makes distinct ones).
 - The evening dungeon is skipped with a narrator line until M7.

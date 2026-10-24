@@ -1,0 +1,31 @@
+{
+  "id": "mr_j",
+  "name": "Mr. J",
+  "role": "Shop teacher",
+  "home": "mr_j_house",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Monk2/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Monk2/Faceset.png",
+  "startBond": 5,
+  "disposition": {
+    "courage": 25,
+    "greed": 10,
+    "curiosity": 60,
+    "loyalty": 35,
+    "kindness": 50,
+    "pride": 20
+  },
+  "traits": [],
+  "recruitable": false,
+  "teaches": [
+    "shop"
+  ],
+  "schedule": {
+    "weekday": {
+      "before_school": "shop_classroom",
+      "lunch": "shop_classroom",
+      "after_school": "shop_classroom"
+    },
+    "weekend": {}
+  },
+  "greeting": "Nice, nice, just don't lose a finger."
+}

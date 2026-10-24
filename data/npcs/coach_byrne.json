@@ -1,0 +1,33 @@
+{
+  "id": "coach_byrne",
+  "name": "Coach Byrne",
+  "role": "PE teacher and cheer adviser",
+  "home": "byrne_house",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/FighterWhite/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/FighterWhite/Faceset.png",
+  "startBond": 0,
+  "disposition": {
+    "courage": 75,
+    "greed": 5,
+    "curiosity": 15,
+    "loyalty": 55,
+    "kindness": 40,
+    "pride": 60
+  },
+  "traits": [],
+  "recruitable": false,
+  "teaches": [
+    "pe"
+  ],
+  "schedule": {
+    "weekday": {
+      "before_school": "gym",
+      "lunch": "gym",
+      "after_school": "field"
+    },
+    "weekend": {
+      "morning": "gym"
+    }
+  },
+  "greeting": "Again."
+}

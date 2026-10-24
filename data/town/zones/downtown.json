@@ -1,0 +1,39 @@
+{
+  "id": "downtown", "name": "Downtown", "size": [60, 34], "ground": "concrete", "music": "town",
+  "fills": [
+    { "ground": "grass", "rect": [33, 18, 12, 10] },
+    { "ground": "path", "rect": [36, 21, 6, 4] },
+    { "ground": "grass", "rect": [0, 26, 10, 8] }
+  ],
+  "roads": [ { "dir": "h", "x": 0, "y": 15, "len": 60 }, { "dir": "v", "x": 29, "y": 0, "len": 34 } ],
+  "buildings": [
+    { "loc": "corner_store", "rect": [3, 3, 6, 5], "style": "shop_brown", "door": 3, "label": "Corner Store" },
+    { "loc": "post_office", "rect": [11, 3, 6, 5], "style": "civic", "door": 2, "label": "Post Office" },
+    { "loc": "garys_deli", "rect": [18, 8, 7, 6], "style": "shop_brick", "door": 3, "label": "Gary's Deli" },
+    { "loc": "garys_apartment", "rect": [25, 8, 3, 6], "style": "house_gray", "door": 1 },
+    { "loc": "town_hall", "rect": [33, 3, 10, 9], "style": "civic", "door": 4, "label": "Town Hall" },
+    { "loc": "library", "rect": [47, 3, 10, 9], "style": "civic", "door": 4, "label": "Library" },
+    { "loc": "arcade", "rect": [3, 18, 7, 6], "style": "shop_brown", "door": 3, "label": "Arcade" },
+    { "loc": "movie_theater", "rect": [11, 18, 8, 7], "style": "shop_brick", "door": 3, "label": "Cinema" },
+    { "loc": "town_museum", "rect": [20, 18, 7, 7], "style": "civic", "door": 3, "label": "Museum" },
+    { "loc": "hospital", "rect": [47, 18, 11, 8], "style": "hospital", "door": 5, "label": "Hospital" },
+    { "loc": "hospital_closed_wing", "rect": [47, 27, 7, 5], "style": "hospital", "door": 3, "label": "Closed Wing" }
+  ],
+  "props": [
+    { "kind": "well", "at": [38, 21] },
+    { "kind": "bench", "at": [34, 19] }, { "kind": "bench", "at": [40, 26] },
+    { "kind": "planter", "at": [33, 18] }, { "kind": "planter", "at": [44, 18] }, { "kind": "planter", "at": [33, 27] }, { "kind": "planter", "at": [44, 27] },
+    { "kind": "lamp", "at": [28, 13] }, { "kind": "lamp", "at": [31, 13] }, { "kind": "lamp", "at": [28, 18] }, { "kind": "lamp", "at": [45, 13] }, { "kind": "lamp", "at": [12, 13] },
+    { "kind": "busstop", "at": [26, 17] }, { "kind": "bench", "at": [23, 17] },
+    { "kind": "car", "at": [1, 13] }, { "kind": "car", "at": [53, 13] }, { "kind": "hydrant", "at": [17, 14] }, { "kind": "bin", "at": [25, 14] },
+    { "kind": "trees", "rect": [0, 27, 10, 7], "step": 3 },
+    { "kind": "crate", "at": [19, 6] }, { "kind": "crate", "at": [24, 6] }
+  ],
+  "spots": { "town_square": [38, 24], "bus_stop_downtown": [27, 17], "hidden_alley": [21, 6] },
+  "exits": [
+    { "rect": [59, 15, 1, 2], "to": "school", "spawn": [2, 16] },
+    { "rect": [0, 15, 1, 2], "to": "outskirts", "spawn": [57, 15] },
+    { "rect": [29, 33, 2, 1], "to": "residential", "spawn": [56, 18] }
+  ],
+  "starts": {}
+}

@@ -1,0 +1,31 @@
+{
+  "id": "kayla",
+  "name": "Kayla",
+  "role": "Cheer squad",
+  "home": "kayla_house",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Cavegirl2/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Cavegirl2/Faceset.png",
+  "startBond": 0,
+  "disposition": {
+    "courage": 35,
+    "greed": 5,
+    "curiosity": 20,
+    "loyalty": 55,
+    "kindness": 45,
+    "pride": 15
+  },
+  "traits": [],
+  "recruitable": false,
+  "schedule": {
+    "weekday": {
+      "before_school": "front_steps",
+      "lunch": "cafeteria",
+      "after_school": "field"
+    },
+    "weekend": {
+      "midday": "town_square",
+      "afternoon": "arcade"
+    }
+  },
+  "greeting": "...she definitely noticed."
+}

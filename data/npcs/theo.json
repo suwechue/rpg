@@ -1,0 +1,51 @@
+{
+  "id": "theo",
+  "name": "Theo",
+  "role": "Student (Core Four)",
+  "home": "theo_house",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/NinjaBlue/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/NinjaBlue/Faceset.png",
+  "startBond": 5,
+  "disposition": {
+    "courage": 15,
+    "greed": 5,
+    "curiosity": 85,
+    "loyalty": 55,
+    "kindness": 45,
+    "pride": 20
+  },
+  "traits": [
+    "theorycrafts",
+    "nervous_in_groups",
+    "precise_not_powerful"
+  ],
+  "recruitable": true,
+  "combat": {
+    "class": "mage",
+    "advanced": "elementalist",
+    "stats": {
+      "str": 5,
+      "dex": 8,
+      "con": 6,
+      "int": 17,
+      "per": 11,
+      "wil": 10,
+      "cha": 6
+    },
+    "vectors": [
+      "force",
+      "motion"
+    ]
+  },
+  "schedule": {
+    "weekday": {
+      "lunch": "library",
+      "after_school": "lab"
+    },
+    "weekend": {
+      "midday": "library",
+      "afternoon": "library"
+    }
+  },
+  "greeting": "Statistically, you talking to me is... unexpected. Hi."
+}

@@ -1,0 +1,33 @@
+{
+  "id": "narrator",
+  "name": "The Narrator",
+  "role": "The narrator",
+  "home": "park",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Spirit/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Spirit/Faceset.png",
+  "startBond": 0,
+  "disposition": {
+    "courage": 30,
+    "greed": 10,
+    "curiosity": 85,
+    "loyalty": 0,
+    "kindness": 20,
+    "pride": 75
+  },
+  "traits": [],
+  "recruitable": false,
+  "schedule": {
+    "weekday": {
+      "before_school": "park",
+      "lunch": "park",
+      "after_school": "park"
+    },
+    "weekend": {
+      "morning": "park",
+      "midday": "park",
+      "afternoon": "park",
+      "weekend_evening": "park"
+    }
+  },
+  "greeting": "Bold strategy, talking to the narrator. Go on."
+}

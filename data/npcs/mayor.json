@@ -1,0 +1,32 @@
+{
+  "id": "mayor",
+  "name": "The Mayor",
+  "role": "Mayor",
+  "home": "mayor_residence",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Sultan/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Sultan/Faceset.png",
+  "startBond": 5,
+  "disposition": {
+    "courage": 10,
+    "greed": 35,
+    "curiosity": 15,
+    "loyalty": 20,
+    "kindness": 30,
+    "pride": 45
+  },
+  "traits": [],
+  "recruitable": false,
+  "schedule": {
+    "weekday": {
+      "before_school": "town_square",
+      "lunch": "town_square",
+      "after_school": "town_square"
+    },
+    "weekend": {
+      "morning": "town_hall",
+      "midday": "town_hall",
+      "afternoon": "town_square"
+    }
+  },
+  "greeting": "Great to see a young face! Vote-- er, welcome to town!"
+}

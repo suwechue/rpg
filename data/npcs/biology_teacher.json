@@ -1,0 +1,30 @@
+{
+  "id": "biology_teacher",
+  "name": "Biology Teacher",
+  "role": "Biology teacher",
+  "home": "elm_apartments",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Villager6/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Villager6/Faceset.png",
+  "startBond": 10,
+  "disposition": {
+    "courage": 15,
+    "greed": 5,
+    "curiosity": 50,
+    "loyalty": 35,
+    "kindness": 50,
+    "pride": 20
+  },
+  "traits": [],
+  "recruitable": false,
+  "teaches": [
+    "biology"
+  ],
+  "schedule": {
+    "weekday": {
+      "lunch": "biology_room",
+      "after_school": "biology_room"
+    },
+    "weekend": {}
+  },
+  "greeting": "Ah. A specimen. A student! I meant student."
+}

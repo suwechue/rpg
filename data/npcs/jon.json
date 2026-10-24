@@ -1,0 +1,52 @@
+{
+  "id": "jon",
+  "name": "Jon",
+  "role": "Student",
+  "home": "jon_house",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/LionBoy/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/LionBoy/Faceset.png",
+  "startBond": 10,
+  "disposition": {
+    "courage": 35,
+    "greed": 10,
+    "curiosity": 90,
+    "loyalty": 65,
+    "kindness": 55,
+    "pride": 20
+  },
+  "traits": [
+    "obsessive_collector",
+    "misreads_the_room",
+    "finally_someone_gets_it"
+  ],
+  "recruitable": true,
+  "recruitWeek": 2,
+  "combat": {
+    "class": "mage",
+    "advanced": "elementalist",
+    "stats": {
+      "str": 7,
+      "dex": 9,
+      "con": 7,
+      "int": 14,
+      "per": 10,
+      "wil": 9,
+      "cha": 8
+    },
+    "vectors": [
+      "force",
+      "motion"
+    ]
+  },
+  "schedule": {
+    "weekday": {
+      "lunch": "cafeteria",
+      "after_school": "arcade"
+    },
+    "weekend": {
+      "midday": "arcade",
+      "afternoon": "arcade"
+    }
+  },
+  "greeting": "Wait, wait, you have to see this combo--"
+}

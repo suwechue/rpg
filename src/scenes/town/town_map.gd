@@ -1,0 +1,359 @@
+## Builds one town map (a zone from data/town/zones/ or an interior template
+## from data/town/interiors.json) as TileMapLayers stamped from the Kenney Tiny
+## and Ninja Adventure sheets, plus a drawn overlay for water, furniture, signs,
+## lit windows and shut doors. Display only; the town scene asks it what is
+## blocked, where doors, spots and exits are.
+extends Node2D
+
+const TILE := 16
+const SRC := { "town": 0, "city": 1, "floor": 2 }
+
+var map_id := ""
+var is_interior := false
+var size := Vector2i(30, 17)
+var blocked: Dictionary = {}       # Vector2i -> true
+var doors: Dictionary = {}         # door cell -> { "loc", "approach": Vector2i }
+var door_by_loc: Dictionary = {}   # loc id -> door cell
+var spots: Dictionary = {}         # loc id -> Vector2i
+var exits: Array = []              # [{ "rect": Rect2i, "to", "spawn" }]
+var furniture: Dictionary = {}     # cell -> furniture record
+var signs: Dictionary = {}         # cell -> text
+var interior_exit := Vector2i(-1, -1)
+var room_doors: Dictionary = {}    # school hall: cell -> room loc id
+var lit: Array = []                # loc ids with someone home
+var shut: Dictionary = {}          # loc id -> "closed" | "story" (drawn boards)
+var buildings: Array = []
+
+var _ground: TileMapLayer
+var _objects: TileMapLayer
+var _overlay: Node2D
+var _water: Array = []
+var _labels: Array = []            # [{ "pos", "text", "color" }]
+var _styles: Dictionary = {}
+var _db: Dictionary = {}
+
+
+func build(db: Dictionary, id: String, interior: bool) -> void:
+	_db = db
+	map_id = id
+	is_interior = interior
+	_styles = db.get("town/styles", {})
+	var ts := _tileset()
+	_ground = TileMapLayer.new()
+	_ground.tile_set = ts
+	add_child(_ground)
+	_objects = TileMapLayer.new()
+	_objects.tile_set = ts
+	add_child(_objects)
+	_overlay = Node2D.new()
+	_overlay.z_index = 2
+	_overlay.draw.connect(_draw_overlay)
+	add_child(_overlay)
+	if interior:
+		_build_interior(db.get("town/interiors", {}).get("interiors", []).filter(func(r: Variant) -> bool: return str(r.get("id", "")) == id)[0])
+	else:
+		_build_zone(db.get("town/zones/" + id, {}))
+	_overlay.queue_redraw()
+
+
+func _tileset() -> TileSet:
+	var ts := TileSet.new()
+	ts.tile_size = Vector2i(TILE, TILE)
+	var packs: Dictionary = _styles.get("packs", {})
+	for key in ["town", "city", "floor"]:
+		var src := TileSetAtlasSource.new()
+		var tex: Texture2D = load(str(packs.get(key, "")))
+		src.texture = tex
+		src.texture_region_size = Vector2i(TILE, TILE)
+		var cols := tex.get_width() / TILE
+		var rows := tex.get_height() / TILE
+		for r in rows:
+			for c in cols:
+				src.create_tile(Vector2i(c, r))
+		ts.add_source(src, int(SRC[key]))
+	return ts
+
+
+func _put(layer: TileMapLayer, cell: Vector2i, pack: String, index: int) -> void:
+	var cols := 22 if pack == "floor" else 12
+	layer.set_cell(cell, int(SRC[pack]), Vector2i(index % cols, index / cols))
+
+
+func _block(cell: Vector2i) -> void:
+	blocked[cell] = true
+
+
+# --- Zones -------------------------------------------------------------------------
+
+func _build_zone(z: Dictionary) -> void:
+	var sz: Array = z.get("size", [60, 34])
+	size = Vector2i(int(sz[0]), int(sz[1]))
+	_fill(Rect2i(0, 0, size.x, size.y), str(z.get("ground", "grass")))
+	for f in z.get("fills", []):
+		_fill(_rect(f["rect"]), str(f["ground"]))
+	var road: Dictionary = _styles.get("road", {})
+	for r in z.get("roads", []):
+		var x := int(r["x"])
+		var y := int(r["y"])
+		for i in int(r["len"]):
+			if str(r["dir"]) == "h":
+				_put(_ground, Vector2i(x + i, y), "city", int(road["h"][0]))
+				_put(_ground, Vector2i(x + i, y + 1), "city", int(road["h"][1]))
+			else:
+				_put(_ground, Vector2i(x, y + i), "city", int(road["v"][0]))
+				_put(_ground, Vector2i(x + 1, y + i), "city", int(road["v"][1]))
+	for b in z.get("buildings", []):
+		_stamp_building(b)
+	for p in z.get("props", []):
+		_prop(p)
+	for key in z.get("spots", {}):
+		var a: Array = z["spots"][key]
+		spots[str(key)] = Vector2i(int(a[0]), int(a[1]))
+	for e in z.get("exits", []):
+		var sp: Array = e["spawn"]
+		exits.append({ "rect": _rect(e["rect"]), "to": str(e["to"]), "spawn": Vector2i(int(sp[0]), int(sp[1])) })
+
+
+func _rect(a: Array) -> Rect2i:
+	return Rect2i(int(a[0]), int(a[1]), int(a[2]), int(a[3]))
+
+
+func _fill(r: Rect2i, ground: String) -> void:
+	var g: Dictionary = _styles.get("ground", {}).get(ground, {})
+	var tiles: Array = g.get("tiles", [0])
+	for y in range(r.position.y, r.end.y):
+		for x in range(r.position.x, r.end.x):
+			var cell := Vector2i(x, y)
+			if ground == "water":
+				_water.append(cell)
+				_ground.erase_cell(cell)
+				_block(cell)
+				continue
+			var t := int(tiles[absi(x * 7 + y * 13 + (x * y) % 5) % tiles.size()])
+			_put(_ground, cell, str(g.get("pack", "town")), t)
+			if bool(g.get("blocked", false)):
+				_block(cell)
+
+
+## Stamp a building: roof rows, plain wall rows, then the base row with the door.
+func _stamp_building(b: Dictionary) -> void:
+	var r := _rect(b["rect"])
+	var style: Dictionary = _styles.get("styles", {}).get(str(b.get("style", "house_red")), {})
+	var pack := str(style.get("pack", "town"))
+	var door_dx := int(b.get("door", r.size.x / 2))
+	var wall_rows := 1 if r.size.y >= 5 else 0
+	var roof_rows := maxi(1, r.size.y - 1 - wall_rows)
+	var roof: Dictionary = style.get("roof", {})
+	for ry in roof_rows:
+		var set_key := "top"
+		if ry == roof_rows - 1 and roof_rows > 1:
+			set_key = "bottom"
+		elif ry > 0 and roof.has("mid"):
+			set_key = "mid"
+		var row: Array = roof.get(set_key, roof.get("top", [0, 0, 0]))
+		for dx in r.size.x:
+			var t := int(row[1])
+			if dx == 0:
+				t = int(row[0])
+			elif dx == r.size.x - 1:
+				t = int(row[2])
+			if set_key == "bottom" and dx == door_dx and roof.has("gable"):
+				t = int(roof["gable"])
+			_put(_objects, r.position + Vector2i(dx, ry), pack, t)
+	var wall: Array = style.get("wall", [0, 0, 0])
+	for wy in wall_rows:
+		for dx in r.size.x:
+			var t := int(wall[1])
+			if dx == 0:
+				t = int(wall[0])
+			elif dx == r.size.x - 1:
+				t = int(wall[2])
+			elif style.has("wallWindow") and dx % 3 == 1:
+				t = int(style["wallWindow"])
+			_put(_objects, r.position + Vector2i(dx, roof_rows + wy), pack, t)
+	var base: Dictionary = style.get("base", {})
+	var by := r.end.y - 1
+	var dbl: Array = base.get("doubleDoor", [])
+	var win: Array = base.get("window", [])
+	for dx in r.size.x:
+		var t := int(base.get("mid", 0))
+		if dx == 0:
+			t = int(base.get("left", 0))
+		elif dx == r.size.x - 1:
+			t = int(base.get("right", 0))
+		if win.size() == 2 and dx >= 1 and dx <= 2 and door_dx > 2:
+			t = int(win[dx - 1])
+		if dx == door_dx:
+			t = int(dbl[0]) if dbl.size() == 2 else int(base.get("door", 0))
+		elif dbl.size() == 2 and dx == door_dx + 1 and dx < r.size.x - 1:
+			t = int(dbl[1])
+		_put(_objects, Vector2i(r.position.x + dx, by), pack, t)
+	for y in range(r.position.y, r.end.y):
+		for x in range(r.position.x, r.end.x):
+			_block(Vector2i(x, y))
+	var door := Vector2i(r.position.x + door_dx, by)
+	var loc := str(b.get("loc", ""))
+	doors[door] = { "loc": loc, "approach": door + Vector2i(0, 1) }
+	door_by_loc[loc] = door
+	buildings.append({ "loc": loc, "rect": r, "door": door })
+	if b.has("label"):
+		_labels.append({ "pos": Vector2(r.position.x * TILE + 2, (r.position.y + roof_rows) * TILE + 10), "text": str(b["label"]), "color": Color("fff3c4") })
+
+
+func _prop(p: Dictionary) -> void:
+	var kind := str(p.get("kind", ""))
+	if p.has("rect"):
+		var r := _rect(p["rect"])
+		match kind:
+			"trees":
+				var step := int(p.get("step", 2))
+				for y in range(r.position.y, r.end.y, step):
+					for x in range(r.position.x + (y / step) % 2, r.end.x, step):
+						if not blocked.has(Vector2i(x, y)):
+							_tree(Vector2i(x, y))
+			"fence", "chainfence":
+				for y in range(r.position.y, r.end.y):
+					for x in range(r.position.x, r.end.x):
+						var c := Vector2i(x, y)
+						if kind == "chainfence":
+							_put(_objects, c, "city", 127)
+						elif r.size.y == 1:
+							_put(_objects, c, "town", 44 if x == r.position.x else (46 if x == r.end.x - 1 else 45))
+						else:
+							_put(_objects, c, "town", 47)
+						_block(c)
+		return
+	var a: Array = p.get("at", [0, 0])
+	var cell := Vector2i(int(a[0]), int(a[1]))
+	match kind:
+		"tree":
+			_tree(cell)
+		"bench":
+			for i in 3:
+				_put(_objects, cell + Vector2i(i, 0), "city", 93 + i)
+				_block(cell + Vector2i(i, 0))
+		"car":
+			_put(_objects, cell, "city", 122)
+			_put(_objects, cell + Vector2i(1, 0), "city", 123)
+			_block(cell)
+			_block(cell + Vector2i(1, 0))
+		_:
+			var table := { "lamp": ["city", 86], "bin": ["city", 109], "hydrant": ["city", 102], "busstop": ["city", 96],
+				"planter": ["city", 70], "well": ["town", 104], "crate": ["town", 103], "target": ["town", 95],
+				"sign": ["town", 83], "mailbox": ["city", 97], "grave": ["city", 103], "tower": ["city", 87], "hoop": ["city", 85] }
+			var t: Array = table.get(kind, ["town", 17])
+			_put(_objects, cell, str(t[0]), int(t[1]))
+			_block(cell)
+			if kind == "sign" and p.has("text"):
+				signs[cell] = str(p["text"])
+			if kind == "tower":
+				_labels.append({ "pos": Vector2(cell.x * TILE - 12, cell.y * TILE - 2), "text": "Water tower", "color": Color("c9c9c9") })
+
+
+func _tree(cell: Vector2i) -> void:
+	var options := [16, 16, 4, 28, 16, 5, 15]
+	_put(_objects, cell, "town", int(options[absi(cell.x * 3 + cell.y * 5) % options.size()]))
+	_block(cell)
+
+
+# --- Interiors ---------------------------------------------------------------------------
+
+func _build_interior(t: Dictionary) -> void:
+	var sz: Array = t.get("size", [16, 10])
+	size = Vector2i(int(sz[0]), int(sz[1]))
+	var wall_rows := int(t.get("wallRows", 2))
+	for y in size.y:
+		for x in size.x:
+			var cell := Vector2i(x, y)
+			var edge := y < wall_rows or x == 0 or x == size.x - 1 or y == size.y - 1
+			_put(_ground, cell, "floor", int(t.get("wall", 266)) if edge else int(t.get("floor", 34)))
+			if edge:
+				_block(cell)
+	interior_exit = Vector2i(size.x / 2, size.y - 1)
+	blocked.erase(interior_exit)
+	_put(_ground, interior_exit, "floor", int(t.get("floor", 34)))
+	for f in t.get("furniture", []):
+		var r := _rect(f["rect"])
+		for y in range(r.position.y, r.end.y):
+			for x in range(r.position.x, r.end.x):
+				furniture[Vector2i(x, y)] = f
+				_block(Vector2i(x, y))
+	for key in t.get("spots", {}):
+		var a: Array = t["spots"][key]
+		spots[str(key)] = Vector2i(int(a[0]), int(a[1]))
+	for d in t.get("doors", []):
+		var a: Array = d["at"]
+		room_doors[Vector2i(int(a[0]), int(a[1]))] = str(d["to"])
+
+
+## NPC standing spots for this interior, in order.
+func npc_spots() -> Array:
+	var out: Array = []
+	var t: Array = _db.get("town/interiors", {}).get("interiors", [])
+	for r in t:
+		if str(r.get("id", "")) == map_id:
+			for a in r.get("npcSpots", []):
+				out.append(Vector2i(int(a[0]), int(a[1])))
+	return out
+
+
+func walkable(cell: Vector2i) -> bool:
+	return cell.x >= 0 and cell.y >= 0 and cell.x < size.x and cell.y < size.y and not blocked.has(cell)
+
+
+func refresh_overlay() -> void:
+	_overlay.queue_redraw()
+
+
+# --- Overlay ---------------------------------------------------------------------------
+
+const FURN_COLORS := { "counter": "#8a5a3a", "table": "#9c7a52", "bed": "#6d8fbf", "workbench": "#a0703c", "shelf": "#6b4a2a",
+	"fridge": "#c9e3ef", "forge": "#c0502a", "anvil": "#4a4a55", "desk": "#7a5a3a", "machine": "#4a3a7a", "lockers": "#5a6a88",
+	"board": "#2f4a3a", "labbench": "#6a7a8a", "hoop": "#d9773a", "bench": "#8a6a4a", "saw": "#888888", "cabinet": "#5a4a3a",
+	"easel": "#b08a5a", "closet": "#6a5a4a", "door_locked": "#3a2a2a" }
+
+
+func _draw_overlay() -> void:
+	var font: Font = UiTheme.font
+	var t := Time.get_ticks_msec() / 1000.0
+	for c in _water:
+		var shade := 0.06 * sin(t * 1.5 + float(c.x + c.y))
+		_overlay.draw_rect(Rect2(c * TILE, Vector2(TILE, TILE)), Color(0.24 + shade, 0.45 + shade, 0.75, 1.0))
+	for cell in furniture:
+		var f: Dictionary = furniture[cell]
+		var col := Color(str(FURN_COLORS.get(str(f.get("kind", "")), "#7a6a5a")))
+		_overlay.draw_rect(Rect2(cell * TILE + Vector2i(1, 2), Vector2(TILE - 2, TILE - 3)), col)
+		_overlay.draw_rect(Rect2(cell * TILE + Vector2i(1, 2), Vector2(TILE - 2, 3)), col.lightened(0.2))
+	for cell in furniture:
+		var f: Dictionary = furniture[cell]
+		var r := _rect(f["rect"])
+		if f.has("label") and cell == r.position:
+			_overlay.draw_string(font, Vector2(r.position.x * TILE, r.position.y * TILE - 1), str(f["label"]), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, Color("fff3c4"))
+	for cell in room_doors:
+		var loc := str(room_doors[cell])
+		var st := str(shut.get(loc, ""))
+		_overlay.draw_rect(Rect2(cell * TILE + Vector2i(3, 2), Vector2(10, 14)), Color("5a3a22"))
+		if st != "":
+			_draw_boards(cell)
+	for b in buildings:
+		var loc := str(b["loc"])
+		var door: Vector2i = b["door"]
+		if lit.has(loc):
+			var r: Rect2i = b["rect"]
+			for dx in r.size.x:
+				if r.position.x + dx != door.x and dx % 2 == 0:
+					_overlay.draw_rect(Rect2(Vector2((r.position.x + dx) * TILE + 4, (r.end.y - 1) * TILE + 4), Vector2(8, 6)), Color(1.0, 0.85, 0.4, 0.45))
+		if shut.has(loc):
+			_draw_boards(door)
+	for l in _labels:
+		var p: Vector2 = l["pos"]
+		_overlay.draw_string(font, p + Vector2(1, 1), str(l["text"]), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, Color(0, 0, 0, 0.7))
+		_overlay.draw_string(font, p, str(l["text"]), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, l["color"])
+
+
+## Boarded-up door: two planks and a CLOSED tag. Never an invisible wall.
+func _draw_boards(cell: Vector2i) -> void:
+	var o := Vector2(cell * TILE)
+	_overlay.draw_line(o + Vector2(1, 3), o + Vector2(15, 13), Color("8a6a3a"), 3.0)
+	_overlay.draw_line(o + Vector2(15, 3), o + Vector2(1, 13), Color("6a4a2a"), 3.0)
+	_overlay.draw_rect(Rect2(o + Vector2(2, -6), Vector2(12, 5)), Color("b03a2a"))

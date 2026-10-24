@@ -1,0 +1,31 @@
+{
+  "id": "ms_marlowe",
+  "name": "Ms. Marlowe",
+  "role": "Librarian",
+  "home": "elm_apartments",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Villager5/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Villager5/Faceset.png",
+  "startBond": 5,
+  "disposition": {
+    "courage": 25,
+    "greed": 5,
+    "curiosity": 65,
+    "loyalty": 45,
+    "kindness": 40,
+    "pride": 30
+  },
+  "traits": [],
+  "recruitable": false,
+  "schedule": {
+    "weekday": {
+      "lunch": "library",
+      "after_school": "library"
+    },
+    "weekend": {
+      "morning": "library",
+      "midday": "library",
+      "afternoon": "library"
+    }
+  },
+  "greeting": "It's in the back, third shelf. You're welcome."
+}

@@ -1,0 +1,35 @@
+{
+  "id": "ms_nonsense",
+  "name": "Ms. Nonsense",
+  "role": "History teacher",
+  "home": "nonsense_house",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/SorcererBlack/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/SorcererBlack/Faceset.png",
+  "startBond": -5,
+  "disposition": {
+    "courage": 40,
+    "greed": 10,
+    "curiosity": 20,
+    "loyalty": 25,
+    "kindness": -20,
+    "pride": 65
+  },
+  "traits": [],
+  "recruitable": false,
+  "teaches": [
+    "history"
+  ],
+  "schedule": {
+    "weekday": {
+      "before_school": "history_room",
+      "after_school": "history_room"
+    },
+    "weekend": {
+      "afternoon": "library"
+    },
+    "weekendDays": [
+      "sun"
+    ]
+  },
+  "greeting": "Pay attention. I will not repeat myself twice in one century."
+}

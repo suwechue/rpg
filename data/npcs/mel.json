@@ -1,0 +1,52 @@
+{
+  "id": "mel",
+  "name": "Mel",
+  "role": "Student",
+  "home": "mel_house",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Child/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Child/Faceset.png",
+  "startBond": 10,
+  "disposition": {
+    "courage": 40,
+    "greed": 10,
+    "curiosity": 30,
+    "loyalty": 55,
+    "kindness": 50,
+    "pride": 35
+  },
+  "traits": [
+    "underestimated",
+    "two_worlds",
+    "fast_learner"
+  ],
+  "recruitable": true,
+  "recruitWeek": 4,
+  "combat": {
+    "class": "rogue",
+    "advanced": "trickster",
+    "stats": {
+      "str": 8,
+      "dex": 14,
+      "con": 9,
+      "int": 12,
+      "per": 10,
+      "wil": 9,
+      "cha": 9
+    },
+    "vectors": [
+      "motion",
+      "heat"
+    ]
+  },
+  "schedule": {
+    "weekday": {
+      "lunch": "cafeteria",
+      "after_school": "gym"
+    },
+    "weekend": {
+      "morning": "home",
+      "midday": "gym"
+    }
+  },
+  "greeting": "I know I look young. Doesn't mean I'm not good."
+}

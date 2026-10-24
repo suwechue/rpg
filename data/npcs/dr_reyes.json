@@ -1,0 +1,32 @@
+{
+  "id": "dr_reyes",
+  "name": "Dr. Reyes",
+  "role": "Hospital doctor",
+  "home": "reyes_house",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Village6/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Village6/Faceset.png",
+  "startBond": 5,
+  "disposition": {
+    "courage": 35,
+    "greed": 5,
+    "curiosity": 55,
+    "loyalty": 70,
+    "kindness": 60,
+    "pride": 30
+  },
+  "traits": [],
+  "recruitable": false,
+  "mentor": "medic",
+  "schedule": {
+    "weekday": {
+      "lunch": "hospital",
+      "after_school": "hospital"
+    },
+    "weekend": {
+      "morning": "hospital",
+      "midday": "hospital",
+      "afternoon": "town_square"
+    }
+  },
+  "greeting": "I'm not going to lie to you. I'm also not going to tell you everything."
+}

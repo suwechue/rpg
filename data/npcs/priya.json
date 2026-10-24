@@ -1,0 +1,50 @@
+{
+  "id": "priya",
+  "name": "Priya",
+  "role": "Student (Core Four)",
+  "home": "priya_house",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/NinjaMageOrange/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/NinjaMageOrange/Faceset.png",
+  "startBond": 5,
+  "disposition": {
+    "courage": 40,
+    "greed": 15,
+    "curiosity": 45,
+    "loyalty": 50,
+    "kindness": 40,
+    "pride": 70
+  },
+  "traits": [
+    "reads_the_room_priya",
+    "wins_the_argument",
+    "ambitious"
+  ],
+  "recruitable": true,
+  "combat": {
+    "class": "bard",
+    "advanced": "idol",
+    "stats": {
+      "str": 5,
+      "dex": 8,
+      "con": 7,
+      "int": 12,
+      "per": 10,
+      "wil": 11,
+      "cha": 16
+    },
+    "vectors": [
+      "light",
+      "binding"
+    ]
+  },
+  "schedule": {
+    "weekday": {
+      "lunch": "library",
+      "after_school": "debate_hall"
+    },
+    "weekend": {
+      "midday": "library"
+    }
+  },
+  "greeting": "I'm not saying you're wrong. I'm saying you haven't heard my rebuttal yet."
+}

@@ -97,6 +97,7 @@ func _validate() -> void:
 				errors.append("class %s: unknown starter card '%s'" % [id, entry["basic"]])
 	_validate_combat(arcane)
 	_validate_events()
+	_validate_town()
 	for t in records_under("traits", "traits"):
 		for s in t.get("mods", {}).get("stats", {}):
 			if not stat_axes.has(s):
@@ -157,7 +158,7 @@ func _validate_combat(arcane: Array) -> void:
 
 const EFFECT_KEYS := ["statXp", "stats", "affinity", "grade", "gradeFor", "bond", "flag", "unflag", "hp", "mp", "money",
 	"item", "card", "kellyRisk", "learnVector", "learnForm", "xp", "signature", "counter", "disposition", "narrate",
-	"repeatClassGain", "bondPartner", "recruit", "topic", "rumor", "narratorBond", "goto", "combat", "journal", "classChange"]
+	"repeatClassGain", "bondPartner", "healInjuries", "recruit", "topic", "rumor", "narratorBond", "goto", "combat", "journal", "classChange"]
 
 
 ## Every effects Dictionary in event tables must use known keys.
@@ -187,3 +188,24 @@ func _validate_events() -> void:
 			for ch in e.get("choices", []):
 				for fk in ["effects", "success", "fail"]:
 					_validate_effects(id, ch.get(fk, {}))
+
+
+func _validate_town() -> void:
+	var locs := {}
+	for l in table("town/locations").get("locations", []):
+		locs[str(l["id"])] = true
+	for key in _tables:
+		if str(key).begins_with("npcs/"):
+			var n: Dictionary = _tables[key]
+			if not locs.has(str(n.get("home", ""))):
+				errors.append("%s: home '%s' is not a location" % [key, n.get("home")])
+			if not ResourceLoader.exists(str(n.get("sprite", ""))):
+				errors.append("%s: missing sprite" % key)
+		elif str(key).begins_with("town/zones/"):
+			for b in _tables[key].get("buildings", []):
+				if not locs.has(str(b.get("loc", ""))):
+					errors.append("%s: building '%s' is not a location" % [key, b.get("loc")])
+	for s in table("town/shops").get("shops", []):
+		for e in s.get("entries", []):
+			if str(e.get("type", "")) == "item" and record("items", str(e.get("item", ""))).is_empty():
+				errors.append("shop %s: unknown item '%s'" % [s.get("id"), e.get("item")])

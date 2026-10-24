@@ -1,0 +1,48 @@
+{
+  "id": "mr_b",
+  "name": "Mr. B",
+  "role": "Vice principal",
+  "home": "mr_b_house",
+  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Noble/SpriteSheet.png",
+  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Noble/Faceset.png",
+  "startBond": -20,
+  "disposition": {
+    "courage": 45,
+    "greed": 70,
+    "curiosity": 40,
+    "loyalty": 10,
+    "kindness": -60,
+    "pride": 85
+  },
+  "traits": [],
+  "recruitable": false,
+  "combat": {
+    "class": "guardian",
+    "advanced": "spellblade",
+    "stats": {
+      "str": 8,
+      "dex": 7,
+      "con": 10,
+      "int": 15,
+      "per": 12,
+      "wil": 16,
+      "cha": 9
+    },
+    "vectors": [
+      "binding",
+      "corrosion"
+    ]
+  },
+  "schedule": {
+    "weekday": {
+      "before_school": "admin_office",
+      "lunch": "admin_office",
+      "after_school": "admin_office"
+    },
+    "weekend": {
+      "morning": "town_hall",
+      "midday": "town_hall"
+    }
+  },
+  "greeting": "This isn't personal. It's policy."
+}
