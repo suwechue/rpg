@@ -1,0 +1,8 @@
+{
+  "comment": "Asset ids the game needs by role rather than through another record.",
+  "player": "player_walk",
+  "debugAlly": "debug_ally_walk",
+  "dungeonEvent": "dungeon_event_walk",
+  "dungeonMerchant": "dungeon_merchant_walk",
+  "font": "font_ui"
+}

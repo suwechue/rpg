@@ -29,10 +29,10 @@ func header() -> void:
 	var rec: Dictionary = DataDB.table("npcs/" + npc_id)
 	var r := row()
 	var portrait := TextureRect.new()
-	var path := str(rec.get("portrait", ""))
-	if ResourceLoader.exists(path):
-		portrait.texture = load(path)
-	portrait.custom_minimum_size = Vector2(38, 38)
+	portrait.texture = Assets.texture(str(rec.get("portrait", "")))
+	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	portrait.custom_minimum_size = Display.portrait
 	r.add_child(portrait)
 	var bond := float(GameState.bonds.get(npc_id, 0.0))
 	var tier := Dlg.bond_tier(DataDB.all(), bond)

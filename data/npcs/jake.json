@@ -3,8 +3,8 @@
   "name": "Jake",
   "role": "Student",
   "home": "jake_house",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/NinjaFire/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/NinjaFire/Faceset.png",
+  "sprite": "npc_jake_walk",
+  "portrait": "portrait_jake",
   "startBond": 10,
   "disposition": {
     "courage": 70,

@@ -3,8 +3,8 @@
   "name": "Diane",
   "role": "Student",
   "home": "diane_house",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/NinjaWater/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/NinjaWater/Faceset.png",
+  "sprite": "npc_diane_walk",
+  "portrait": "portrait_diane",
   "startBond": 5,
   "disposition": {
     "courage": 30,

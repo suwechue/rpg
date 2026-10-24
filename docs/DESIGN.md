@@ -868,5 +868,6 @@ These answers override anything marked "proposed" or "open" earlier in this doc.
 | Kelly's first night (alpha build) | Week 1 Monday's floor is a scripted tutorial floor (lantern, first fight with Kelly as an AI guest who calls for help, the shortcut, the panic moment), not a generated one. Risk sources are exactly the Section 13 table. |
 | Party size scaling (alpha build) | Smaller parties face fewer, weaker enemies (solo: half the enemies at 75% power). Bosses always appear. |
 | HP across a night (alpha build) | HP carries between fights like MP, but everyone standing recovers 20% of max HP after a won fight. Rest rooms restore everything. |
+| Display and art size (Phase 2, Oct 24, 2026) | 32x32 tiles at a 640x360 base, 32x32 characters (up to 32x48), 64x64 portraits; overrides the 16x16 / 480x270 setup in Sections 1 and 16 and the Art row above. Sizes live in `data/display.json`; art is referenced by asset id (`data/assets/manifest.json`, `docs/ASSETS.md`). See docs/ROADMAP.md. |
 | Leveling pace (alpha build) | 45 x level XP per level, tuned so a run ends around level 12 to 14. |
 | Recruit pacing (alpha build) | Core Four from week 1 (week 2 brings them to your table); Sam, Baxter, Jon week 2; Kris, Diane, Penny, Jake (after the forge), Phase (after 3 deli shifts) week 3; Mel week 4; Kelly at Bond 60 after a kind first night. |

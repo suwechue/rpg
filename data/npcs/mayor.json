@@ -3,8 +3,8 @@
   "name": "The Mayor",
   "role": "Mayor",
   "home": "mayor_residence",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Sultan/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Sultan/Faceset.png",
+  "sprite": "npc_mayor_walk",
+  "portrait": "portrait_mayor",
   "startBond": 5,
   "disposition": {
     "courage": 10,

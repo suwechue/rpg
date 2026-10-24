@@ -3,8 +3,8 @@
   "name": "Priya",
   "role": "Student (Core Four)",
   "home": "priya_house",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/NinjaMageOrange/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/NinjaMageOrange/Faceset.png",
+  "sprite": "npc_priya_walk",
+  "portrait": "portrait_priya",
   "startBond": 5,
   "disposition": {
     "courage": 40,

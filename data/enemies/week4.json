@@ -48,7 +48,7 @@
       ],
       "xp": 11,
       "money": 4,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Spirit2/SpriteSheet.png"
+      "sprite": "enemy_iv_wisp"
     },
     {
       "id": "gurney_ghoul",
@@ -100,7 +100,7 @@
       ],
       "xp": 12,
       "money": 5,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Mole2/Mole2.png"
+      "sprite": "enemy_gurney_ghoul"
     },
     {
       "id": "night_nurse",
@@ -163,7 +163,7 @@
       ],
       "xp": 12,
       "money": 5,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Owl2/Owl2.png"
+      "sprite": "enemy_night_nurse"
     },
     {
       "id": "chief_of_staff",
@@ -240,7 +240,7 @@
       ],
       "xp": 40,
       "money": 18,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Eye2/Eye2.png"
+      "sprite": "enemy_chief_of_staff"
     }
   ]
 }

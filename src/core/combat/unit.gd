@@ -43,7 +43,6 @@ var xp := 0
 var money := 0
 var signature: Dictionary = {}
 var sprite := ""
-var sprite_frame: Array = []     # [w, h] for single-frame strips (bosses)
 var phases: Array = []
 var phase_index := 0
 var blocks_sight := false
@@ -148,7 +147,6 @@ static func from_enemy(rec: Dictionary, scale: float = 1.0) -> CombatUnit:
 	u.money = int(rec.get("money", 2))
 	u.signature = rec.get("signature", {})
 	u.sprite = str(rec.get("sprite", ""))
-	u.sprite_frame = rec.get("spriteFrame", [])
 	u.phases = rec.get("phases", [])
 	u.facing = -1
 	return u

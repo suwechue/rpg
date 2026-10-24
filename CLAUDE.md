@@ -16,7 +16,7 @@ The alpha (M0 to M8) is done:
 
 Gotchas: JSON numbers load as floats, so `[3.0].has(3)` is false; compare with `int()`. New `class_name`s are not visible until the editor rescans, so reference scripts with `preload` constants. The UI font's native size is 9px (`UiTheme.FONT_SIZE`). `:=` on a Variant (dict.get, array[i]) is a parse error in this project; cast or type it. Python on Windows writes CRLF unless you pass newline=''; keep files LF.
 
-Phase 2: M9 (stabilize, gameplay log in `PlayLog` autoload, docs/PLAYTEST.md) is done. Next: M10 (art pipeline, 640x360 and 32x32). `Calendar.spend_ap(amount, kind)` takes an action kind for the log. Screenshots go in `tools/screenshots/` (gitignored). Push after every commit. Progress, decisions and stubs are tracked in `docs/PROGRESS.md`; the full alpha instructions are in `docs/PROMPT_alpha_run.md`. Final design decisions are in DESIGN.md Section 18. The cast is in `docs/characters.md` and the town plan in `docs/TOWN.md`; both are sources of truth.
+Phase 2: M9 (stabilize, gameplay log) and M10 (art pipeline, 640x360, 32x32) are done. Next: M11 (UI skin, readable combat). Art and sound are named by asset id (`data/assets/manifest.json`, loaded by the `Assets` autoload: `Assets.texture(id)`, `Assets.frame(id)`, `Assets.stream(id)`); sizes come from the `Display` autoload (`Display.tile`, `Display.base`). Never write a literal 16/32/480/270/640/360 in `src/` (a test checks). After changing the manifest, regenerate docs/ASSETS.md with `tools/gen_assets_doc.gd`. `Calendar.spend_ap(amount, kind)` takes an action kind for the gameplay log. Screenshots go in `tools/screenshots/` (gitignored). Push after every commit. Progress, decisions and stubs are tracked in `docs/PROGRESS.md`; the full alpha instructions are in `docs/PROMPT_alpha_run.md`. Final design decisions are in DESIGN.md Section 18. The cast is in `docs/characters.md` and the town plan in `docs/TOWN.md`; both are sources of truth.
 
 ## How this project is built
 
@@ -25,7 +25,7 @@ Phase 2: M9 (stabilize, gameplay log in `PlayLog` autoload, docs/PLAYTEST.md) is
 
 - Engine: Godot 4.7, statically typed GDScript, tabs for indentation.
 - Work one milestone at a time from DESIGN.md Section 17. Meet each milestone's "Done when" check, update docs/PROGRESS.md, commit and push, then continue to the next one (see docs/PROMPT_alpha_run.md) unless I ask you to stop.
-- Display: moving to 640x360 base resolution with 32x32 tiles in Phase 2 M10 (see docs/ROADMAP.md, top). Sizes come from data/display.json; never hardcode a tile size. `viewport` stretch, integer scaling, nearest filtering.
+- Display: 640x360 base resolution with 32x32 tiles (docs/ROADMAP.md, top). Sizes come from data/display.json via the `Display` autoload; never hardcode a tile size. `viewport` stretch, integer scaling, nearest filtering.
 - Godot executable (4.7.2): `C:\Users\itzju\Downloads\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe`
 - Run tests from the project folder (PowerShell):
   `& "C:\Users\itzju\Downloads\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe" --headless --path . -s res://tests/run_tests.gd` (exit code 0 = pass).

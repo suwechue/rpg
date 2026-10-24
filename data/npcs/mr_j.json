@@ -3,8 +3,8 @@
   "name": "Mr. J",
   "role": "Shop teacher",
   "home": "mr_j_house",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Monk2/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Monk2/Faceset.png",
+  "sprite": "npc_mr_j_walk",
+  "portrait": "portrait_mr_j",
   "startBond": 5,
   "disposition": {
     "courage": 25,

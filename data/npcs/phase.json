@@ -3,8 +3,8 @@
   "name": "Phase",
   "role": "Student",
   "home": "phase_house",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/FighterRed/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/FighterRed/Faceset.png",
+  "sprite": "npc_phase_walk",
+  "portrait": "portrait_phase",
   "startBond": 10,
   "disposition": {
     "courage": 60,

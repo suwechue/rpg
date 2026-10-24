@@ -6,6 +6,7 @@ extends Node
 
 const DT := preload("res://src/core/data_tables.gd")
 const CardRules := preload("res://src/core/card.gd")
+const AssetSpecs := preload("res://src/core/assets/asset_specs.gd")
 const DATA_ROOT := "res://data"
 
 var errors: Array[String] = []
@@ -66,7 +67,7 @@ func _ensure_loaded() -> void:
 
 ## Schema checks. Extend as new tables are added.
 func _validate() -> void:
-	for required in ["spaces", "matchups", "calendar", "vectors", "forms", "classes", "stats", "leveling", "perks", "traits"]:
+	for required in ["spaces", "matchups", "calendar", "vectors", "forms", "classes", "stats", "leveling", "perks", "traits", "display", "assets/manifest", "assets/roles"]:
 		if not _tables.has(required):
 			errors.append("missing required table data/%s.json" % required)
 	if not (_tables.has("spaces") and _tables.has("forms") and _tables.has("vectors")):
@@ -75,6 +76,7 @@ func _validate() -> void:
 	var stat_axes: Array = _tables["spaces"].get("stats", {}).get("axes", [])
 	var form_axes: Array = _tables["spaces"].get("forms", {}).get("axes", [])
 	_validate_cards(arcane)
+	_validate_assets()
 	var perk_ids := {}
 	for p in records_under("perks", "perks"):
 		perk_ids[str(p.get("id"))] = true
@@ -137,8 +139,6 @@ func _validate_combat(arcane: Array) -> void:
 			for axis in e.get(list_key, []):
 				if not arcane.has(axis):
 					errors.append("enemy %s: unknown Vector '%s' in %s" % [id, axis, list_key])
-		if e.has("sprite") and not ResourceLoader.exists(str(e["sprite"])):
-			errors.append("enemy %s: missing sprite %s" % [id, e["sprite"]])
 		var actions: Array = e.get("actions", []).duplicate()
 		for ph in e.get("phases", []):
 			actions.append_array(ph.get("actions", []))
@@ -203,6 +203,18 @@ func _validate_events() -> void:
 					_validate_effects(id, ch.get(fk, {}))
 
 
+## Asset ids: the manifest is well formed, data only names listed ids, and
+## every pack source file exists (missing art would show as a placeholder).
+func _validate_assets() -> void:
+	for e in AssetSpecs.validate(_tables):
+		errors.append(str(e))
+	var all: Dictionary = AssetSpecs.manifest(_tables).get("assets", {})
+	for id in all:
+		var src := str(all[id].get("source", ""))
+		if src != "" and not ResourceLoader.exists(src):
+			errors.append("asset %s: source file missing: %s" % [id, src])
+
+
 func _validate_town() -> void:
 	var locs := {}
 	for l in table("town/locations").get("locations", []):
@@ -212,8 +224,8 @@ func _validate_town() -> void:
 			var n: Dictionary = _tables[key]
 			if not locs.has(str(n.get("home", ""))):
 				errors.append("%s: home '%s' is not a location" % [key, n.get("home")])
-			if not ResourceLoader.exists(str(n.get("sprite", ""))):
-				errors.append("%s: missing sprite" % key)
+			if not n.has("sprite"):
+				errors.append("%s: no sprite" % key)
 		elif str(key).begins_with("town/zones/"):
 			for b in _tables[key].get("buildings", []):
 				if not locs.has(str(b.get("loc", ""))):

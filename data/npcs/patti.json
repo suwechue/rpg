@@ -3,8 +3,8 @@
   "name": "Nurse Patti",
   "role": "Hospital nurse",
   "home": "elm_apartments",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/OldWoman/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/OldWoman/Faceset.png",
+  "sprite": "npc_patti_walk",
+  "portrait": "portrait_patti",
   "startBond": 10,
   "disposition": {
     "courage": 30,

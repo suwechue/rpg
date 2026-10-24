@@ -1,0 +1,15 @@
+{
+  "comment": "Screen and art sizes (ROADMAP M10). Every scene reads these; never hardcode a tile size. project.godot's viewport must match baseWidth x baseHeight (a test checks).",
+  "tileSize": 32,
+  "baseWidth": 640,
+  "baseHeight": 360,
+  "windowScale": 2,
+  "characterSize": [32, 32],
+  "portraitSize": [64, 64],
+  "cardArtSize": [48, 48],
+  "uiIconSize": 16,
+  "itemIconSize": 32,
+  "detailScale": 2,
+  "detailScaleNote": "Hand-drawn overlay details (furniture, boards, status chips, unit shadows) were authored for 16 px tiles; offsets are multiplied by this.",
+  "combat": { "frontY": 0.74, "cellWidth": 1.8, "cellWidthWide": 1.6, "cellHeight": 0.9, "cellHeightTall": 0.78, "shrink": 0.9 }
+}

@@ -1,12 +1,14 @@
 ## Builds one town map (a zone from data/town/zones/ or an interior template
-## from data/town/interiors.json) as TileMapLayers stamped from the Kenney Tiny
-## and Ninja Adventure sheets, plus a drawn overlay for water, furniture, signs,
+## from data/town/interiors.json) as TileMapLayers stamped from the tilesets
+## named in data/town/styles.json "packs" (asset ids), plus a drawn overlay for water, furniture, signs,
 ## lit windows and shut doors. Display only; the town scene asks it what is
 ## blocked, where doors, spots and exits are.
 extends Node2D
 
-const TILE := 16
 const SRC := { "town": 0, "city": 1, "floor": 2 }
+
+var TILE: int:
+	get: return Display.tile
 
 var map_id := ""
 var is_interior := false
@@ -31,6 +33,7 @@ var _water: Array = []
 var _labels: Array = []            # [{ "pos", "text", "color" }]
 var _styles: Dictionary = {}
 var _db: Dictionary = {}
+var _cols: Dictionary = {}          # pack -> tileset columns
 
 
 func build(db: Dictionary, id: String, interior: bool) -> void:
@@ -62,11 +65,12 @@ func _tileset() -> TileSet:
 	var packs: Dictionary = _styles.get("packs", {})
 	for key in ["town", "city", "floor"]:
 		var src := TileSetAtlasSource.new()
-		var tex: Texture2D = load(str(packs.get(key, "")))
+		var tex := Assets.texture(str(packs.get(key, "")))
 		src.texture = tex
 		src.texture_region_size = Vector2i(TILE, TILE)
 		var cols := tex.get_width() / TILE
 		var rows := tex.get_height() / TILE
+		_cols[key] = maxi(cols, 1)
 		for r in rows:
 			for c in cols:
 				src.create_tile(Vector2i(c, r))
@@ -75,7 +79,7 @@ func _tileset() -> TileSet:
 
 
 func _put(layer: TileMapLayer, cell: Vector2i, pack: String, index: int) -> void:
-	var cols := 22 if pack == "floor" else 12
+	var cols := int(_cols.get(pack, 1))
 	layer.set_cell(cell, int(SRC[pack]), Vector2i(index % cols, index / cols))
 
 
@@ -197,7 +201,7 @@ func _stamp_building(b: Dictionary) -> void:
 	door_by_loc[loc] = door
 	buildings.append({ "loc": loc, "rect": r, "door": door })
 	if b.has("label"):
-		_labels.append({ "pos": Vector2(r.position.x * TILE + 2, (r.position.y + roof_rows) * TILE + 10), "text": str(b["label"]), "color": Color("fff3c4") })
+		_labels.append({ "pos": Vector2(r.position.x * TILE + 2, (r.position.y + roof_rows) * TILE + TILE / 2.0 + 4), "text": str(b["label"]), "color": Color("fff3c4") })
 
 
 func _prop(p: Dictionary) -> void:
@@ -215,51 +219,46 @@ func _prop(p: Dictionary) -> void:
 				for y in range(r.position.y, r.end.y):
 					for x in range(r.position.x, r.end.x):
 						var c := Vector2i(x, y)
+						var fence: Dictionary = _styles.get("fence", {})
 						if kind == "chainfence":
-							_put(_objects, c, "city", 127)
+							var chain: Dictionary = _styles.get("chainfence", {})
+							_put(_objects, c, str(chain.get("pack", "city")), int(chain.get("tile", 0)))
 						elif r.size.y == 1:
-							_put(_objects, c, "town", 44 if x == r.position.x else (46 if x == r.end.x - 1 else 45))
+							var part := "left" if x == r.position.x else ("right" if x == r.end.x - 1 else "mid")
+							_put(_objects, c, str(fence.get("pack", "town")), int(fence.get(part, 0)))
 						else:
-							_put(_objects, c, "town", 47)
+							_put(_objects, c, str(fence.get("pack", "town")), int(fence.get("post", 0)))
 						_block(c)
 		return
 	var a: Array = p.get("at", [0, 0])
 	var cell := Vector2i(int(a[0]), int(a[1]))
-	match kind:
-		"tree":
-			_tree(cell)
-		"bench":
-			for i in 3:
-				_put(_objects, cell + Vector2i(i, 0), "city", 93 + i)
-				_block(cell + Vector2i(i, 0))
-		"car":
-			_put(_objects, cell, "city", 122)
-			_put(_objects, cell + Vector2i(1, 0), "city", 123)
-			_block(cell)
-			_block(cell + Vector2i(1, 0))
-		_:
-			var table := { "lamp": ["city", 86], "bin": ["city", 109], "hydrant": ["city", 102], "busstop": ["city", 96],
-				"planter": ["city", 70], "well": ["town", 104], "crate": ["town", 103], "target": ["town", 95],
-				"sign": ["town", 83], "mailbox": ["city", 97], "grave": ["city", 103], "tower": ["city", 87], "hoop": ["city", 85] }
-			var t: Array = table.get(kind, ["town", 17])
-			_put(_objects, cell, str(t[0]), int(t[1]))
-			_block(cell)
-			if kind == "sign" and p.has("text"):
-				signs[cell] = str(p["text"])
-			if kind == "tower":
-				_labels.append({ "pos": Vector2(cell.x * TILE - 12, cell.y * TILE - 2), "text": "Water tower", "color": Color("c9c9c9") })
+	if kind == "tree":
+		_tree(cell)
+		return
+	# Props are one or more tiles in a row (data/town/styles.json "props").
+	var props: Dictionary = _styles.get("props", {})
+	var prop: Dictionary = props.get(kind, props.get("default", {}))
+	var tiles: Array = prop.get("tiles", [])
+	for i in tiles.size():
+		_put(_objects, cell + Vector2i(i, 0), str(prop.get("pack", "town")), int(tiles[i]))
+		_block(cell + Vector2i(i, 0))
+	if kind == "sign" and p.has("text"):
+		signs[cell] = str(p["text"])
+	if kind == "tower":
+		_labels.append({ "pos": Vector2(cell.x * TILE - TILE * 0.75, cell.y * TILE - 2), "text": "Water tower", "color": Color("c9c9c9") })
 
 
 func _tree(cell: Vector2i) -> void:
-	var options := [16, 16, 4, 28, 16, 5, 15]
-	_put(_objects, cell, "town", int(options[absi(cell.x * 3 + cell.y * 5) % options.size()]))
+	var trees: Dictionary = _styles.get("trees", {})
+	var options: Array = trees.get("tiles", [0])
+	_put(_objects, cell, str(trees.get("pack", "town")), int(options[absi(cell.x * 3 + cell.y * 5) % options.size()]))
 	_block(cell)
 
 
 # --- Interiors ---------------------------------------------------------------------------
 
 func _build_interior(t: Dictionary) -> void:
-	var sz: Array = t.get("size", [16, 10])
+	var sz: Array = t.get("size", [12, 10])
 	size = Vector2i(int(sz[0]), int(sz[1]))
 	var wall_rows := int(t.get("wallRows", 2))
 	for y in size.y:
@@ -315,6 +314,7 @@ const FURN_COLORS := { "counter": "#8a5a3a", "table": "#9c7a52", "bed": "#6d8fbf
 
 func _draw_overlay() -> void:
 	var font: Font = UiTheme.font
+	var d := Display.detail
 	var t := Time.get_ticks_msec() / 1000.0
 	for c in _water:
 		var shade := 0.06 * sin(t * 1.5 + float(c.x + c.y))
@@ -322,8 +322,9 @@ func _draw_overlay() -> void:
 	for cell in furniture:
 		var f: Dictionary = furniture[cell]
 		var col := Color(str(FURN_COLORS.get(str(f.get("kind", "")), "#7a6a5a")))
-		_overlay.draw_rect(Rect2(cell * TILE + Vector2i(1, 2), Vector2(TILE - 2, TILE - 3)), col)
-		_overlay.draw_rect(Rect2(cell * TILE + Vector2i(1, 2), Vector2(TILE - 2, 3)), col.lightened(0.2))
+		var o := Vector2(cell * TILE) + Vector2(1, 2) * d
+		_overlay.draw_rect(Rect2(o, Vector2(TILE - 2 * d, TILE - 3 * d)), col)
+		_overlay.draw_rect(Rect2(o, Vector2(TILE - 2 * d, 3 * d)), col.lightened(0.2))
 	for cell in furniture:
 		var f: Dictionary = furniture[cell]
 		var r := _rect(f["rect"])
@@ -332,7 +333,7 @@ func _draw_overlay() -> void:
 	for cell in room_doors:
 		var loc := str(room_doors[cell])
 		var st := str(shut.get(loc, ""))
-		_overlay.draw_rect(Rect2(cell * TILE + Vector2i(3, 2), Vector2(10, 14)), Color("5a3a22"))
+		_overlay.draw_rect(Rect2(Vector2(cell * TILE) + Vector2(3, 2) * d, Vector2(10, 14) * d), Color("5a3a22"))
 		if st != "":
 			_draw_boards(cell)
 	for b in buildings:
@@ -342,7 +343,7 @@ func _draw_overlay() -> void:
 			var r: Rect2i = b["rect"]
 			for dx in r.size.x:
 				if r.position.x + dx != door.x and dx % 2 == 0:
-					_overlay.draw_rect(Rect2(Vector2((r.position.x + dx) * TILE + 4, (r.end.y - 1) * TILE + 4), Vector2(8, 6)), Color(1.0, 0.85, 0.4, 0.45))
+					_overlay.draw_rect(Rect2(Vector2((r.position.x + dx) * TILE, (r.end.y - 1) * TILE) + Vector2(4, 4) * d, Vector2(8, 6) * d), Color(1.0, 0.85, 0.4, 0.45))
 		if shut.has(loc):
 			_draw_boards(door)
 	for l in _labels:
@@ -354,6 +355,7 @@ func _draw_overlay() -> void:
 ## Boarded-up door: two planks and a CLOSED tag. Never an invisible wall.
 func _draw_boards(cell: Vector2i) -> void:
 	var o := Vector2(cell * TILE)
-	_overlay.draw_line(o + Vector2(1, 3), o + Vector2(15, 13), Color("8a6a3a"), 3.0)
-	_overlay.draw_line(o + Vector2(15, 3), o + Vector2(1, 13), Color("6a4a2a"), 3.0)
-	_overlay.draw_rect(Rect2(o + Vector2(2, -6), Vector2(12, 5)), Color("b03a2a"))
+	var d := Display.detail
+	_overlay.draw_line(o + Vector2(1, 3) * d, o + Vector2(TILE - d, 13 * d), Color("8a6a3a"), 3.0 * d)
+	_overlay.draw_line(o + Vector2(TILE - d, 3 * d), o + Vector2(1, 13) * d, Color("6a4a2a"), 3.0 * d)
+	_overlay.draw_rect(Rect2(o + Vector2(2, -6) * d, Vector2(12, 5) * d), Color("b03a2a"))

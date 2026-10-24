@@ -3,8 +3,8 @@
   "name": "Mr. B",
   "role": "Vice principal",
   "home": "mr_b_house",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Noble/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Noble/Faceset.png",
+  "sprite": "npc_mr_b_walk",
+  "portrait": "portrait_mr_b",
   "startBond": -20,
   "disposition": {
     "courage": 45,

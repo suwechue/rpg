@@ -22,12 +22,16 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
-	for i in 18:
-		var c := Color("0b0614").lerp(Color("3a1d4a"), float(i) / 17.0)
-		draw_rect(Rect2(0, i * 15, 480, 16), c)
+	var view := Display.size_f()
+	var bands := 18
+	var band_h := ceilf(view.y / float(bands))
+	for i in bands:
+		var c := Color("0b0614").lerp(Color("3a1d4a"), float(i) / float(bands - 1))
+		draw_rect(Rect2(0, i * band_h, view.x, band_h + 1), c)
 	var glow := 0.5 + 0.5 * sin(_t)
-	draw_circle(Vector2(240, 120), 30.0 + 6.0 * glow, Color(1.0, 0.9, 0.6, 0.12))
-	draw_circle(Vector2(240, 120), 12.0, Color(1.0, 0.95, 0.8, 0.35))
+	var center := Vector2(view.x / 2.0, view.y * 0.44)
+	draw_circle(center, 30.0 + 6.0 * glow, Color(1.0, 0.9, 0.6, 0.12))
+	draw_circle(center, 12.0, Color(1.0, 0.95, 0.8, 0.35))
 
 
 func _play() -> void:

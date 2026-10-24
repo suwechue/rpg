@@ -3,8 +3,8 @@
   "name": "Mara",
   "role": "Student (Core Four)",
   "home": "mara_house",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/NinjaLeaf/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/NinjaLeaf/Faceset.png",
+  "sprite": "npc_mara_walk",
+  "portrait": "portrait_mara",
   "startBond": 10,
   "disposition": {
     "courage": 20,

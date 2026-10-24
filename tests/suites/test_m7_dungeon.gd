@@ -134,7 +134,7 @@ func test_after_combat_logs_and_rewards() -> void:
 func test_hollow_mascot_phases() -> void:
 	var boss: Dictionary = DT.index_under(db(), "enemies/", "enemies")["hollow_mascot"]
 	check(boss["phases"].size() == 3 and boss["tier"] == "boss", "three phases")
-	check(ResourceLoader.exists(str(boss["sprite"])), "boss sprite exists")
+	check(ResourceLoader.exists(str(db()["assets/manifest"]["assets"][str(boss["sprite"])]["source"])), "boss sprite exists")
 	var st = preload("res://src/core/combat/combat_state.gd").new(db(), seeded(1), {
 		"layout": DT.record(db(), "rooms/combat_layouts", "boss_stage"), "party": [{ "char": fresh(1)["player"] }], "enemies": [boss.duplicate(true)], "boss": true })
 	var m = null

@@ -3,8 +3,8 @@
   "name": "Earth Science Teacher",
   "role": "Earth Science teacher",
   "home": "elm_apartments",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Eskimo/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Eskimo/Faceset.png",
+  "sprite": "npc_earth_science_teacher_walk",
+  "portrait": "portrait_earth_science_teacher",
   "startBond": 10,
   "disposition": {
     "courage": 30,

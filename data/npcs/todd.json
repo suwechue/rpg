@@ -3,8 +3,8 @@
   "name": "Todd",
   "role": "Townsperson",
   "home": "todd_house",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Villager2/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Villager2/Faceset.png",
+  "sprite": "npc_todd_walk",
+  "portrait": "portrait_todd",
   "startBond": 0,
   "disposition": {
     "courage": 10,

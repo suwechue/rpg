@@ -63,7 +63,7 @@
       ],
       "xp": 10,
       "money": 4,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Beast/Beast.png"
+      "sprite": "enemy_frost_wolf"
     },
     {
       "id": "freezer_burn",
@@ -128,7 +128,7 @@
       ],
       "xp": 9,
       "money": 3,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Slime2/Slime2.png"
+      "sprite": "enemy_freezer_burn"
     },
     {
       "id": "meat_hook",
@@ -190,7 +190,7 @@
       ],
       "xp": 10,
       "money": 4,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/SkullBlue/SpriteSheet.png"
+      "sprite": "enemy_meat_hook"
     },
     {
       "id": "ice_larva",
@@ -242,7 +242,7 @@
       ],
       "xp": 7,
       "money": 2,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Larva2/Larva2.png"
+      "sprite": "enemy_ice_larva"
     },
     {
       "id": "head_chef",
@@ -320,7 +320,7 @@
       ],
       "xp": 30,
       "money": 14,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Cyclope2/SpriteSheet.png"
+      "sprite": "enemy_head_chef"
     }
   ]
 }

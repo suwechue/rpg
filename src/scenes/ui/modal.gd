@@ -14,14 +14,14 @@ func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 
 
-func build(title: String, width: float = 360.0) -> void:
+func build(title: String, width: float = 380.0) -> void:
 	var dim := ColorRect.new()
 	dim.color = Color(0, 0, 0, 0.55)
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(dim)
 	panel = PanelContainer.new()
 	panel.custom_minimum_size = Vector2(width, 0)
-	panel.position = Vector2((480.0 - width) / 2.0, 14)
+	panel.position = Vector2((Display.base.x - width) / 2.0, 14)
 	add_child(panel)
 	var scroll := ScrollContainer.new()
 	scroll.custom_minimum_size = Vector2(width - 8, 0)
@@ -36,15 +36,15 @@ func build(title: String, width: float = 360.0) -> void:
 	_fit.call_deferred()
 
 
-## Keep the panel inside the screen, growing down to 242 px tall.
+## Keep the panel inside the screen, leaving room for the HUD bars.
 func _fit() -> void:
 	if panel == null:
 		return
 	var scroll: ScrollContainer = panel.get_child(0)
 	var want := body.get_combined_minimum_size().y + 8
-	scroll.custom_minimum_size.y = minf(want, 236.0)
+	scroll.custom_minimum_size.y = minf(want, Display.base.y - 34.0)
 	panel.size = Vector2(panel.custom_minimum_size.x, 0)
-	panel.position.y = maxf(6.0, (270.0 - panel.get_combined_minimum_size().y) / 2.0)
+	panel.position.y = maxf(6.0, (Display.base.y - panel.get_combined_minimum_size().y) / 2.0)
 
 
 func clear_body() -> void:
@@ -56,7 +56,7 @@ func clear_body() -> void:
 func text(t: String, color: Color = UiTheme.TEXT) -> Label:
 	var l := UiTheme.label(t, color)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	l.custom_minimum_size = Vector2(panel.custom_minimum_size.x - 16, 0)
+	l.custom_minimum_size = Vector2(panel.custom_minimum_size.x - 2 * UiTheme.FONT_SIZE, 0)
 	body.add_child(l)
 	_fit.call_deferred()
 	return l

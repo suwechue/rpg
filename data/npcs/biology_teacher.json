@@ -3,8 +3,8 @@
   "name": "Biology Teacher",
   "role": "Biology teacher",
   "home": "elm_apartments",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Villager6/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Villager6/Faceset.png",
+  "sprite": "npc_biology_teacher_walk",
+  "portrait": "portrait_biology_teacher",
   "startBond": 10,
   "disposition": {
     "courage": 15,

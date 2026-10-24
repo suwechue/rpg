@@ -3,8 +3,8 @@
   "name": "Ms. Nonsense",
   "role": "History teacher",
   "home": "nonsense_house",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/SorcererBlack/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/SorcererBlack/Faceset.png",
+  "sprite": "npc_ms_nonsense_walk",
+  "portrait": "portrait_ms_nonsense",
   "startBond": -5,
   "disposition": {
     "courage": 40,

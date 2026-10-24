@@ -144,11 +144,7 @@
       ],
       "xp": 60,
       "money": 30,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Boss/GiantRacoon/Idle.png",
-      "spriteFrame": [
-        60,
-        60
-      ]
+      "sprite": "enemy_hollow_mascot"
     },
     {
       "id": "cold_cut",
@@ -287,11 +283,7 @@
       ],
       "xp": 80,
       "money": 45,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Boss/GiantSlime2/Idle.png",
-      "spriteFrame": [
-        62,
-        52
-      ]
+      "sprite": "enemy_cold_cut"
     },
     {
       "id": "forge_revenant",
@@ -428,11 +420,7 @@
       ],
       "xp": 100,
       "money": 60,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Boss/GiantFlam/Idle.png",
-      "spriteFrame": [
-        50,
-        50
-      ]
+      "sprite": "enemy_forge_revenant"
     },
     {
       "id": "night_ward",
@@ -567,11 +555,7 @@
       ],
       "xp": 120,
       "money": 70,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Boss/GiantSpirit/Idle.png",
-      "spriteFrame": [
-        50,
-        50
-      ]
+      "sprite": "enemy_night_ward"
     },
     {
       "id": "mirror_town",
@@ -729,11 +713,7 @@
       ],
       "xp": 0,
       "money": 0,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Boss/DemonCyclop/Idle.png",
-      "spriteFrame": [
-        50,
-        50
-      ]
+      "sprite": "enemy_mirror_town"
     }
   ]
 }

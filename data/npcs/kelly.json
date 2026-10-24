@@ -3,8 +3,8 @@
   "name": "Kelly",
   "role": "Cheerleader",
   "home": "kelly_house",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Princess/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Princess/Faceset.png",
+  "sprite": "npc_kelly_walk",
+  "portrait": "portrait_kelly",
   "startBond": -10,
   "disposition": {
     "courage": 20,

@@ -3,8 +3,8 @@
   "name": "Innocent Bystander",
   "role": "Townsperson",
   "home": "bystander_house",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Villager/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Villager/Faceset.png",
+  "sprite": "npc_innocent_bystander_walk",
+  "portrait": "portrait_innocent_bystander",
   "startBond": 0,
   "disposition": {
     "courage": 10,

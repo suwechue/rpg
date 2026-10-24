@@ -84,7 +84,7 @@ func test_every_named_character_has_a_home_and_schedule() -> void:
 		var n: Dictionary = db()["npcs/" + str(id)]
 		var home := str(n.get("home", ""))
 		check(not Locs.rec(db(), home).is_empty(), "%s's home %s is a location" % [id, home])
-		check(ResourceLoader.exists(str(n.get("sprite", ""))), "%s has a sprite" % id)
+		check(ResourceLoader.exists(str(db()["assets/manifest"]["assets"].get(str(n.get("sprite", "")), {}).get("source", ""))), "%s has a sprite" % id)
 		var sched: Dictionary = n.get("schedule", {})
 		for table_key in ["weekday", "weekend"]:
 			var t: Dictionary = sched.get(table_key, {})

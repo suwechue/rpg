@@ -3,8 +3,8 @@
   "name": "Mr. Mustard",
   "role": "Drama and Debate teacher",
   "home": "elm_apartments",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Monk/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Monk/Faceset.png",
+  "sprite": "npc_mr_mustard_walk",
+  "portrait": "portrait_mr_mustard",
   "startBond": 15,
   "disposition": {
     "courage": 20,

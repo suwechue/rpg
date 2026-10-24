@@ -44,4 +44,4 @@ func _draw() -> void:
 		var r := 18.0 + 11.0 * i
 		var a: float = float(_angles[i]) - PI / 2.0
 		var col := Color("b07ce8") if i >= _locked else Color("f5e27a")
-		draw_arc(center, r, a + 0.4, a + TAU - 0.4, 32, col, 3.0)
+		draw_arc(center, r, a + 0.4, a + TAU - 0.4, 36, col, 3.0)

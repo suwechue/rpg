@@ -204,7 +204,7 @@ func add_debug_ally(class_id: String) -> void:
 		new_run()
 	var id := "debug_%s_%d" % [class_id, roster.size()]
 	var ch := Char.create(DataDB.all(), class_id, Rng.stream("creation"), { "id": id, "name": "Debug %s" % class_id.capitalize() })
-	ch["sprite"] = "res://assets/packs/ninja_adventure/Actor/Character/Knight/SpriteSheet.png"
+	ch["sprite"] = Assets.role("debugAlly")
 	roster.append(ch)
 	party_ids.append(id)
 

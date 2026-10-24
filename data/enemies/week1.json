@@ -12,7 +12,7 @@
         { "id": "pom_slap", "name": "Pom Slap", "kind": "strike", "stat": "dex", "mult": 0.6, "profile": { "courage": 0.8 } }
       ],
       "xp": 7, "money": 2,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Butterfly/SpriteSheet.png" },
+      "sprite": "enemy_pom_pom_wisp" },
 
     { "id": "megaphone_mimic", "name": "Megaphone Mimic", "tier": "normal", "weeks": [1],
       "text": "It repeats everything you say, louder, and slightly meaner.",
@@ -26,7 +26,7 @@
         { "id": "call_out", "name": "Call Out", "form": "bolt", "vectors": { "force": 1 }, "power": 5, "target": "strongest", "profile": { "pride": 1.0 } }
       ],
       "xp": 9, "money": 3,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Eye/Eye.png" },
+      "sprite": "enemy_megaphone_mimic" },
 
     { "id": "bleacher_creeper", "name": "Bleacher Creeper", "tier": "normal", "weeks": [1],
       "text": "Lives under the bleachers. Grabs ankles. Has opinions about your shoes.",
@@ -40,7 +40,7 @@
         { "id": "creak", "name": "Creak", "form": "touch", "vectors": { "force": 1 }, "power": 4, "profile": { "courage": 0.7 } }
       ],
       "xp": 9, "money": 4,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Larva/Larva.png" },
+      "sprite": "enemy_bleacher_creeper" },
 
     { "id": "locker_lurker", "name": "Locker Lurker", "tier": "normal", "weeks": [1],
       "text": "Something that got stuck in a locker in 1987 and stayed out of spite.",
@@ -53,7 +53,7 @@
         { "id": "slam", "name": "Locker Slam", "kind": "strike", "stat": "str", "mult": 1.0, "vectors": { "force": 1 }, "power": 2, "profile": { "courage": 0.9 } }
       ],
       "xp": 10, "money": 5,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Mole/Mole.png" },
+      "sprite": "enemy_locker_lurker" },
 
     { "id": "spirit_stick", "name": "Spirit Stick", "tier": "normal", "weeks": [1, 2],
       "text": "A baton that remembers every pep rally. It wants you to BELIEVE.",
@@ -67,7 +67,7 @@
         { "id": "team_spirit", "name": "Team Spirit", "form": "shield", "vectors": { "light": 1 }, "power": 6, "profile": { "loyalty": 1.0, "kindness": 0.4 } }
       ],
       "xp": 9, "money": 3,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/LanternRed/SpriteSheet.png" },
+      "sprite": "enemy_spirit_stick" },
 
     { "id": "detention_slip", "name": "Detention Slip", "tier": "normal", "weeks": [1, 2, 3],
       "text": "A pink slip that drifts toward whoever looks most guilty.",
@@ -80,7 +80,7 @@
         { "id": "write_up", "name": "Write-Up", "form": "bolt", "vectors": { "binding": 1 }, "power": 4, "profile": { "pride": 0.6, "greed": 0.4 } }
       ],
       "xp": 7, "money": 2,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Skull/SpriteSheet.png" },
+      "sprite": "enemy_detention_slip" },
 
     { "id": "varsity_shade", "name": "Varsity Shade", "tier": "elite", "weeks": [1],
       "text": "The ghost of every senior who peaked in high school. Elite.",
@@ -95,6 +95,6 @@
         { "id": "target_star", "name": "Target the Star", "form": "bolt", "vectors": { "force": 1 }, "power": 7, "target": "strongest", "profile": { "pride": 1.0, "courage": 0.3 } }
       ],
       "xp": 25, "money": 12,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Cyclope/SpriteSheet.png" }
+      "sprite": "enemy_varsity_shade" }
   ]
 }

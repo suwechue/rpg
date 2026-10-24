@@ -3,8 +3,8 @@
   "name": "Kara",
   "role": "Cheer squad",
   "home": "kara_house",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/EggGirl/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/EggGirl/Faceset.png",
+  "sprite": "npc_kara_walk",
+  "portrait": "portrait_kara",
   "startBond": 0,
   "disposition": {
     "courage": 15,

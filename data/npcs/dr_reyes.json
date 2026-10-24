@@ -3,8 +3,8 @@
   "name": "Dr. Reyes",
   "role": "Hospital doctor",
   "home": "reyes_house",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Village6/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Village6/Faceset.png",
+  "sprite": "npc_dr_reyes_walk",
+  "portrait": "portrait_dr_reyes",
   "startBond": 5,
   "disposition": {
     "courage": 35,

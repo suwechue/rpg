@@ -3,8 +3,8 @@
   "name": "Ms. G",
   "role": "Physics and Chemistry teacher",
   "home": "ms_g_house",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Shaman/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Shaman/Faceset.png",
+  "sprite": "npc_ms_g_walk",
+  "portrait": "portrait_ms_g",
   "startBond": 10,
   "disposition": {
     "courage": 30,

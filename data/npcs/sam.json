@@ -3,8 +3,8 @@
   "name": "Sam",
   "role": "Student",
   "home": "sam_estate",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/NinjaMasked/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/NinjaMasked/Faceset.png",
+  "sprite": "npc_sam_walk",
+  "portrait": "portrait_sam",
   "startBond": 15,
   "disposition": {
     "courage": 25,

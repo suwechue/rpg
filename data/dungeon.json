@@ -16,6 +16,7 @@
   "fledFirst": true,
   "roomSize": [11, 9],
   "roomSpacing": 13,
+  "tileset": "tileset_dungeon",
   "tiles": { "floor": [48, 48, 48, 49, 50], "wall": 40, "door": 48, "stairs": 36, "chest": 89, "chestOpen": 91, "fire": 29, "merchant": 84, "bones": 64 },
   "treasure": { "money": [8, 20], "itemChance": 0.6, "items": ["rare_ore", "old_photo", "good_coffee", "spice_tin", "collectible_figure", "lucky_coin"], "shardChance": 0.5, "cardChance": 0.4, "cards": ["card_first_aid", "card_deli_sandwich"] },
   "combatLoot": { "shardChance": 0.15 },

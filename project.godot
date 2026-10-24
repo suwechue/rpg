@@ -25,6 +25,8 @@ EventBus="*res://src/autoload/event_bus.gd"
 InputSetup="*res://src/autoload/input_setup.gd"
 DataDB="*res://src/autoload/data_db.gd"
 Rng="*res://src/autoload/rng.gd"
+Display="*res://src/autoload/display.gd"
+Assets="*res://src/autoload/assets.gd"
 Audio="*res://src/autoload/audio.gd"
 Narrator="*res://src/autoload/narrator.gd"
 Calendar="*res://src/autoload/calendar.gd"
@@ -40,10 +42,10 @@ PlayLog="*res://src/autoload/play_log.gd"
 
 [display]
 
-window/size/viewport_width=480
-window/size/viewport_height=270
-window/size/window_width_override=1440
-window/size/window_height_override=810
+window/size/viewport_width=640
+window/size/viewport_height=360
+window/size/window_width_override=1280
+window/size/window_height_override=720
 window/stretch/mode="viewport"
 window/stretch/scale_mode="integer"
 

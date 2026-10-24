@@ -62,16 +62,17 @@ func _draw_backdrop() -> void:
 	var top := col("skyTop", "#1a1030")
 	var bottom := col("skyBottom", "#4a2c5e")
 	var horizon_y := proj.top_y()
+	var view := Display.size_f()
 	var steps := 12
 	for i in steps:
 		var y0 := horizon_y * float(i) / float(steps)
 		var y1 := horizon_y * float(i + 1) / float(steps)
-		draw_rect(Rect2(0, y0, 480, y1 - y0 + 1), top.lerp(bottom, float(i) / float(steps - 1)))
+		draw_rect(Rect2(0, y0, view.x, y1 - y0 + 1), top.lerp(bottom, float(i) / float(steps - 1)))
 	# A skyline of crooked town shapes, the Upside-Down version of wherever this is.
 	var hcol := col("horizon", "#251b38")
 	var x := 0.0
 	var i := 0
-	while x < 480.0:
+	while x < view.x:
 		var w := 18.0 + float((i * 37) % 23)
 		var h := 14.0 + float((i * 53) % 29)
 		draw_rect(Rect2(x, horizon_y - h, w - 2.0, h), hcol)
@@ -79,7 +80,7 @@ func _draw_backdrop() -> void:
 			draw_rect(Rect2(x + 4, horizon_y - h + 4, 3, 3), col("accent", "#f5e27a").darkened(0.4))
 		x += w
 		i += 1
-	draw_rect(Rect2(0, horizon_y, 480, 270 - horizon_y), hcol.darkened(0.3))
+	draw_rect(Rect2(0, horizon_y, view.x, view.y - horizon_y), hcol.darkened(0.3))
 
 
 func _draw_cell(cell: Vector2i) -> void:

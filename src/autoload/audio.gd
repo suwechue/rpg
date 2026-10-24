@@ -1,4 +1,4 @@
-## Music and sound effects by id (data/audio.json). Music crossfades are kept
+## Music and sound effects by id (data/audio.json names -> asset ids). Music crossfades are kept
 ## simple: a new track replaces the old one; the same id keeps playing.
 extends Node
 
@@ -28,10 +28,9 @@ func _ready() -> void:
 func play_music(id: String) -> void:
 	if muted or id == _music_id:
 		return
-	var path := str(DataDB.table("audio").get("music", {}).get(id, ""))
-	if path == "" or not ResourceLoader.exists(path):
+	var stream := Assets.stream(str(DataDB.table("audio").get("music", {}).get(id, "")))
+	if stream == null:
 		return
-	var stream := load(path) as AudioStream
 	if stream is AudioStreamOggVorbis:
 		(stream as AudioStreamOggVorbis).loop = true
 	_music.stream = stream
@@ -47,10 +46,10 @@ func stop_music() -> void:
 func play_sfx(id: String) -> void:
 	if muted:
 		return
-	var path := str(DataDB.table("audio").get("sfx", {}).get(id, ""))
-	if path == "" or not ResourceLoader.exists(path):
+	var stream := Assets.stream(str(DataDB.table("audio").get("sfx", {}).get(id, "")))
+	if stream == null:
 		return
 	var p: AudioStreamPlayer = _sfx[_next]
 	_next = (_next + 1) % _sfx.size()
-	p.stream = load(path)
+	p.stream = stream
 	p.play()

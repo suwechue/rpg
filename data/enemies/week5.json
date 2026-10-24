@@ -63,7 +63,7 @@
       ],
       "xp": 13,
       "money": 6,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Spirit/SpriteSheet.png"
+      "sprite": "enemy_mirror_kid"
     },
     {
       "id": "glass_hound",
@@ -117,7 +117,7 @@
       ],
       "xp": 13,
       "money": 6,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Racoon/SpriteSheet.png"
+      "sprite": "enemy_glass_hound"
     },
     {
       "id": "town_echo",
@@ -180,7 +180,7 @@
       ],
       "xp": 12,
       "money": 6,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Bamboo/SpriteSheet.png"
+      "sprite": "enemy_town_echo"
     },
     {
       "id": "mr_b_aide",
@@ -260,7 +260,7 @@
       ],
       "xp": 46,
       "money": 20,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Cyclope2/SpriteSheet.png"
+      "sprite": "enemy_mr_b_aide"
     }
   ]
 }

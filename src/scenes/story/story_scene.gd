@@ -34,12 +34,16 @@ func _draw() -> void:
 	var theme: Dictionary = DataDB.record("rooms/themes", str(story.get("theme", "school")))
 	var top := Color(str(theme.get("skyTop", "#1a1030")))
 	var bot := Color(str(theme.get("skyBottom", "#4a2c5e")))
-	for i in 18:
-		draw_rect(Rect2(0, i * 15, 480, 16), top.lerp(bot, float(i) / 17.0))
-	for i in 9:
-		var x := 30.0 + i * 52.0
+	var view := Display.size_f()
+	var bands := 18
+	var band_h := ceilf(view.y / float(bands))
+	for i in bands:
+		draw_rect(Rect2(0, i * band_h, view.x, band_h + 1), top.lerp(bot, float(i) / float(bands - 1)))
+	var trunks := 9
+	for i in trunks:
+		var x := view.x * (0.06 + 0.11 * i)
 		var h := 60.0 + 30.0 * sin(_t * 0.7 + i)
-		draw_rect(Rect2(x, 270 - h, 18, h), Color(0, 0, 0, 0.35))
+		draw_rect(Rect2(x, view.y - h, 18, h), Color(0, 0, 0, 0.35))
 
 
 func _save(step: int, combat: int = -1) -> void:

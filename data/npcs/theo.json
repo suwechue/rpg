@@ -3,8 +3,8 @@
   "name": "Theo",
   "role": "Student (Core Four)",
   "home": "theo_house",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/NinjaBlue/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/NinjaBlue/Faceset.png",
+  "sprite": "npc_theo_walk",
+  "portrait": "portrait_theo",
   "startBond": 5,
   "disposition": {
     "courage": 15,

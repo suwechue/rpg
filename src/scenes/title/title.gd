@@ -16,17 +16,17 @@ func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	Flow.set_hud(false)
 	var title := UiTheme.label("Project Vector", UiTheme.ACCENT, UiTheme.TITLE_SIZE)
-	title.position = Vector2(150, 50)
+	title.position = Vector2((Display.base.x - 180) / 2.0, 50)
 	title.size = Vector2(180, 24)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(title)
 	var sub := UiTheme.label("A small town. A big week. Five of them, actually.", UiTheme.DIM)
-	sub.position = Vector2(90, 74)
+	sub.position = Vector2((Display.base.x - 300) / 2.0, 74)
 	sub.size = Vector2(300, 12)
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(sub)
 	_menu = VBoxContainer.new()
-	_menu.position = Vector2(180, 110)
+	_menu.position = Vector2((Display.base.x - 120) / 2.0, 110)
 	_menu.custom_minimum_size = Vector2(120, 0)
 	add_child(_menu)
 	_menu.add_child(UiTheme.button("New run", _new_run))
@@ -48,28 +48,32 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
-	for i in 14:
-		var c := Color("120c22").lerp(Color("4a2c5e"), float(i) / 13.0)
-		draw_rect(Rect2(0, i * 14, 480, 15), c)
-	draw_rect(Rect2(0, 196, 480, 74), Color("0d0a14"))
+	var view := Display.size_f()
+	var ground := roundf(view.y * 0.73)
+	var bands := 14
+	var band_h := ceilf(view.y / float(bands))
+	for i in bands:
+		var c := Color("120c22").lerp(Color("4a2c5e"), float(i) / float(bands - 1))
+		draw_rect(Rect2(0, i * band_h, view.x, band_h + 1), c)
+	draw_rect(Rect2(0, ground, view.x, view.y - ground), Color("0d0a14"))
 	var x := 0.0
 	var i := 0
-	while x < 480.0:
-		var w := 16.0 + float((i * 37) % 21)
+	while x < view.x:
+		var w := 18.0 + float((i * 37) % 21)
 		var h := 18.0 + float((i * 53) % 34)
-		draw_rect(Rect2(x, 196 - h, w - 2, h), Color("1d1530"))
+		draw_rect(Rect2(x, ground - h, w - 2, h), Color("1d1530"))
 		if (i * 7) % 3 == 0:
 			var glow := 0.5 + 0.5 * sin(_t * 1.7 + float(i))
-			draw_rect(Rect2(x + 4, 196 - h + 5, 3, 3), Color("ffd966").darkened(0.6 - glow * 0.3))
+			draw_rect(Rect2(x + 4, ground - h + 5, 3, 3), Color("ffd966").darkened(0.6 - glow * 0.3))
 		x += w
 		i += 1
 	# The town's reflection: the Upside-Down, faintly, below the line.
 	x = 0.0
 	i = 0
-	while x < 480.0:
-		var w := 16.0 + float((i * 37) % 21)
+	while x < view.x:
+		var w := 18.0 + float((i * 37) % 21)
 		var h := 18.0 + float((i * 53) % 34)
-		draw_rect(Rect2(x, 198, w - 2, h * 0.6), Color("2a0f22", 0.6 + 0.2 * sin(_t + float(i))))
+		draw_rect(Rect2(x, ground + 2, w - 2, h * 0.6), Color("2a0f22", 0.6 + 0.2 * sin(_t + float(i))))
 		x += w
 		i += 1
 

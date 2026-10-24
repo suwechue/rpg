@@ -14,7 +14,7 @@ const VERSION := 3
 static func new_run(db: Dictionary, seed_value: int, class_id: String, rng: RandomNumberGenerator, opts: Dictionary = {}) -> Dictionary:
 	var player := Char.create(db, class_id, rng, {
 		"id": "player", "name": str(opts.get("name", "New Kid")), "isPlayer": true, "traits": opts.get("traits", []) })
-	player["sprite"] = str(opts.get("sprite", "res://assets/packs/ninja_adventure/Actor/Character/Boy/SpriteSheet.png"))
+	player["sprite"] = str(opts.get("sprite", db.get("assets/roles", {}).get("player", "")))
 	var collection := {}
 	for id in player["deck"]:
 		collection[id] = int(collection.get(id, 0)) + 1

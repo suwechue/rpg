@@ -3,8 +3,8 @@
   "name": "Dex",
   "role": "Student (Core Four)",
   "home": "dex_house",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/MonkeyBoxerRed/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/MonkeyBoxerRed/Faceset.png",
+  "sprite": "npc_dex_walk",
+  "portrait": "portrait_dex",
   "startBond": 10,
   "disposition": {
     "courage": 50,

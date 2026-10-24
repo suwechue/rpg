@@ -3,7 +3,6 @@
 ## panels and button styles, in code so it is easy to read.
 extends Node
 
-const FONT_PATH := "res://assets/packs/ninja_adventure/Ui/Font/NormalFont.ttf"
 const FONT_SIZE := 9
 const TITLE_SIZE := 18
 
@@ -26,9 +25,12 @@ func _ready() -> void:
 		theme = Theme.new()
 		get_tree().root.theme = theme
 	font = theme.default_font
-	if font == null:
+	var base_font := Assets.font(Assets.role("font"))
+	if font is FontVariation and base_font != null:
+		(font as FontVariation).base_font = base_font
+	elif font == null:
 		var v := FontVariation.new()
-		v.base_font = load(FONT_PATH) as Font
+		v.base_font = base_font
 		v.spacing_space = 2
 		font = v
 	_fill_theme(theme)

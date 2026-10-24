@@ -3,8 +3,8 @@
   "name": "Baxter",
   "role": "Student",
   "home": "baxter_house",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Knight/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Knight/Faceset.png",
+  "sprite": "npc_baxter_walk",
+  "portrait": "portrait_baxter",
   "startBond": 5,
   "disposition": {
     "courage": 30,

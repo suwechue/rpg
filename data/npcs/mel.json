@@ -3,8 +3,8 @@
   "name": "Mel",
   "role": "Student",
   "home": "mel_house",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Child/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Child/Faceset.png",
+  "sprite": "npc_mel_walk",
+  "portrait": "portrait_mel",
   "startBond": 10,
   "disposition": {
     "courage": 40,

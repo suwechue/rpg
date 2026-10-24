@@ -62,7 +62,7 @@
       ],
       "xp": 11,
       "money": 5,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Flam/SpriteSheet.png"
+      "sprite": "enemy_slag_imp"
     },
     {
       "id": "chain_wraith",
@@ -124,7 +124,7 @@
       ],
       "xp": 11,
       "money": 5,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Snake2/Snake2.png"
+      "sprite": "enemy_chain_wraith"
     },
     {
       "id": "ember_moth",
@@ -175,7 +175,7 @@
       ],
       "xp": 8,
       "money": 3,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/ButterflyBlue/SpriteSheet.png"
+      "sprite": "enemy_ember_moth"
     },
     {
       "id": "anvil_crab",
@@ -230,7 +230,7 @@
       ],
       "xp": 12,
       "money": 6,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Mollusc/Mollusc.png"
+      "sprite": "enemy_anvil_crab"
     },
     {
       "id": "foreman_ghost",
@@ -309,7 +309,7 @@
       ],
       "xp": 36,
       "money": 16,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Cyclope/SpriteSheet.png"
+      "sprite": "enemy_foreman_ghost"
     }
   ]
 }

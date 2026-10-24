@@ -14,7 +14,6 @@ const FieldScript := preload("res://src/scenes/combat/combat_field.gd")
 const UnitView := preload("res://src/scenes/combat/unit_view.gd")
 const Res := preload("res://src/core/combat/resolver.gd")
 
-const HAND_Y := 206
 const CARD_W := 54
 const CARD_H := 60
 
@@ -54,7 +53,13 @@ func _ready() -> void:
 		setup = GameState.debug_combat_setup()
 	state = StateScript.new(DataDB.all(), Rng.stream("combat"), setup)
 	var layout: Dictionary = setup.get("layout", {})
-	proj = Proj.new(state.grid.cols, state.grid.rows, 240.0, 198.0, 44.0 if state.grid.cols <= 9 else 40.0, 22.0 if state.grid.rows <= 5 else 19.0)
+	# Cell sizes are in tiles (data/display.json "combat"); wide or deep layouts get smaller cells.
+	var cc: Dictionary = Display.combat
+	var t := float(Display.tile)
+	var cw := float(cc.get("cellWidth", 1.8)) if state.grid.cols <= 9 else float(cc.get("cellWidthWide", 1.6))
+	var ch := float(cc.get("cellHeight", 0.9)) if state.grid.rows <= 5 else float(cc.get("cellHeightTall", 0.78))
+	proj = Proj.new(state.grid.cols, state.grid.rows, Display.base.x / 2.0, Display.base.y * float(cc.get("frontY", 0.74)),
+		cw * t, ch * t, float(cc.get("shrink", 0.9)))
 	field = FieldScript.new()
 	field.proj = proj
 	field.grid = state.grid
@@ -92,7 +97,7 @@ func _make_walls() -> void:
 		var wv := WallView.new()
 		var poly := proj.cell_polygon(cell)
 		wv.w = poly[2].x - poly[3].x - 4.0
-		wv.h = 18.0 + 10.0 * proj.row_scale(cell.y)
+		wv.h = Display.tile * (0.6 + 0.3 * proj.row_scale(cell.y))
 		wv.color = Color(str(field.theme_rec.get("horizon", "#2b2440"))).lightened(0.15)
 		wv.position = proj.cell_center(cell) + Vector2(0, (poly[2].y - poly[0].y) / 2.0)
 		wv.z_index = 10 + cell.y
@@ -104,10 +109,10 @@ func _view_for(u: UnitScript) -> Node2D:
 	if views.has(u):
 		return views[u]
 	var v := UnitView.new()
-	var sprite_path := u.sprite
-	if sprite_path == "" and u.team == "party":
-		sprite_path = "res://assets/packs/ninja_adventure/Actor/Character/Boy/SpriteSheet.png"
-	v.setup(u.id, u.team, sprite_path, u.sprite_frame, u.id if u.is_prop() else "")
+	var sprite_id := u.sprite
+	if sprite_id == "" and u.team == "party":
+		sprite_id = Assets.role("player")
+	v.setup(u.id, u.team, sprite_id, u.id if u.is_prop() else "")
 	add_child(v)
 	views[u] = v
 	return v
@@ -150,6 +155,8 @@ func _sync_views() -> void:
 # --- UI -----------------------------------------------------------------------------------
 
 func _build_ui() -> void:
+	var view := Display.size_f()
+	var hand_y := view.y - CARD_H - 4
 	_ui = CanvasLayer.new()
 	_ui.layer = 10
 	add_child(_ui)
@@ -164,7 +171,7 @@ func _build_ui() -> void:
 	_unit_panel = UiTheme.label("")
 	up.add_child(_unit_panel)
 	var ip := PanelContainer.new()
-	ip.position = Vector2(352, 24)
+	ip.position = Vector2(view.x - 128, 24)
 	ip.custom_minimum_size = Vector2(126, 0)
 	_ui.add_child(ip)
 	_info = UiTheme.label("")
@@ -173,17 +180,17 @@ func _build_ui() -> void:
 	ip.add_child(_info)
 	_banner = UiTheme.label("", UiTheme.ACCENT)
 	_banner.position = Vector2(118, 26)
-	_banner.size = Vector2(232, 12)
+	_banner.size = Vector2(view.x - 248, 12)
 	_banner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_banner.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_ui.add_child(_banner)
 	_hand = HBoxContainer.new()
-	_hand.position = Vector2(4, HAND_Y)
+	_hand.position = Vector2(4, hand_y)
 	_hand.add_theme_constant_override("separation", 2)
 	_ui.add_child(_hand)
 	var col := GridContainer.new()
 	col.columns = 2
-	col.position = Vector2(398, 206)
+	col.position = Vector2(view.x - 82, hand_y)
 	col.add_theme_constant_override("h_separation", 1)
 	col.add_theme_constant_override("v_separation", 1)
 	_ui.add_child(col)
@@ -203,7 +210,7 @@ func _refresh_hud() -> void:
 		c.queue_free()
 	for u in state.timeline(14):
 		var box := Panel.new()
-		box.custom_minimum_size = Vector2(16, 18)
+		box.custom_minimum_size = Vector2(UiTheme.FONT_SIZE * 2, 18)
 		var sb := UiTheme.box(Color("2a5a3a") if u.team == "party" else Color("5a2a2a"), Color("ffd966") if u == state.current else Color("101010"))
 		box.add_theme_stylebox_override("panel", sb)
 		var l := UiTheme.label(u.name.substr(0, 2), UiTheme.TEXT)
@@ -504,7 +511,7 @@ func _open_wheel() -> void:
 	if wheel_vectors.is_empty() and not u.known_vectors.is_empty():
 		wheel_vectors = [u.known_vectors[0]]
 	_wheel = PanelContainer.new()
-	_wheel.position = Vector2(110, 60)
+	_wheel.position = Vector2((Display.base.x - 260) / 2.0, 60)
 	_wheel.custom_minimum_size = Vector2(260, 0)
 	_ui.add_child(_wheel)
 	var box := VBoxContainer.new()
@@ -742,7 +749,7 @@ func _float_text(v: Node2D, text: String, color: Color) -> void:
 	# Texts on the same unit at the same time stack upward instead of overlapping.
 	var slot := int(_float_slots.get(v, 0))
 	_float_slots[v] = slot + 1
-	l.position = v.position + Vector2(-10, -v.sprite_height() - 16 - 10 * slot)
+	l.position = v.position + Vector2(-10, -v.sprite_height() - UiTheme.FONT_SIZE - 7 - 10 * slot)
 	_fx.add_child(l)
 	var tw := create_tween()
 	tw.tween_property(l, "position:y", l.position.y - 12, 0.6)
@@ -791,7 +798,7 @@ func _finish() -> void:
 	var result := str(summary["result"])
 	var outcome: Dictionary = GameState.finish_combat(summary)
 	_result_panel = PanelContainer.new()
-	_result_panel.position = Vector2(120, 70)
+	_result_panel.position = Vector2((Display.base.x - 240) / 2.0, 70)
 	_result_panel.custom_minimum_size = Vector2(240, 0)
 	_ui.add_child(_result_panel)
 	var box := VBoxContainer.new()

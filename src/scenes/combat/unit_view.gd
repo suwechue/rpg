@@ -1,9 +1,9 @@
-## An upright unit on the 2.5D battlefield: oval shadow, an integer-scaled
-## pixel sprite facing left or right, and a small HP bar. Display only.
+## An upright unit on the 2.5D battlefield: oval shadow, the pixel sprite at 1x
+## (asset id: a walk sheet, or a one-row strip for bosses) facing left or
+## right, and a small HP bar. Display only.
 extends Node2D
 
 const Walker := preload("res://src/scenes/common/walker_sprite.gd")
-const SCALE := 2
 
 var unit_id := ""
 var team := "party"
@@ -16,33 +16,28 @@ var highlight := false
 var statuses: Array = []   # short codes: RO, SL, BL, HA, RA, IN, GD
 
 const STATUS_COLORS := { "RO": "#b07ce8", "SL": "#7cc7e8", "BL": "#f5e27a", "HA": "#9be36d", "RA": "#e87cc9", "IN": "#e8663c", "GD": "#c9c9c9" }
-var _frame_w := 16
-var _frame_h := 16
+var _frame := Vector2i.ONE
 var _walker := false
 var _bob := 0.0
 
 
-func setup(id: String, p_team: String, sprite_path: String, frame: Array, prop_kind: String = "") -> void:
+func setup(id: String, p_team: String, sprite_id: String, prop_kind: String = "") -> void:
 	unit_id = id
 	team = p_team
 	is_prop = prop_kind != ""
 	if is_prop:
 		return
-	if frame.size() == 2:
+	_frame = Assets.frame(sprite_id)
+	if str(Assets.spec(sprite_id).get("kind", "")) == "strip":
 		sprite = Sprite2D.new()
 		sprite.centered = false
 		sprite.region_enabled = true
-		_frame_w = int(frame[0])
-		_frame_h = int(frame[1])
-		sprite.region_rect = Rect2(0, 0, _frame_w, _frame_h)
-		if ResourceLoader.exists(sprite_path):
-			sprite.texture = load(sprite_path)
-		sprite.offset = Vector2(-_frame_w / 2.0, -_frame_h)
-		sprite.scale = Vector2(1, 1)
+		sprite.texture = Assets.texture(sprite_id)
+		sprite.region_rect = Rect2(Vector2.ZERO, _frame)
+		sprite.offset = Vector2(-_frame.x / 2.0, -_frame.y)
 	else:
-		var w := Walker.new(sprite_path)
-		w.offset = Vector2(-8, -16)
-		w.scale = Vector2(SCALE, SCALE)
+		var w := Walker.new(sprite_id)
+		w.offset = Vector2(-_frame.x / 2.0, -_frame.y)
 		sprite = w
 		_walker = true
 	add_child(sprite)
@@ -74,25 +69,25 @@ func _process(delta: float) -> void:
 
 func sprite_height() -> float:
 	if is_prop:
-		return 18.0
-	if _walker:
-		return 16.0 * SCALE
-	return float(_frame_h)
+		return Display.tile * 0.56
+	return float(_frame.y)
 
 
 func _draw() -> void:
-	var w := 14.0 if not is_prop else 16.0
+	var w := Display.tile * (0.44 if not is_prop else 0.5)
 	var pts := PackedVector2Array()
-	for i in 16:
-		var a := TAU * float(i) / 16.0
+	var segments := 18
+	for i in segments:
+		var a := TAU * float(i) / float(segments)
 		pts.append(Vector2(cos(a) * w, sin(a) * 3.5))
 	draw_colored_polygon(pts, Color(0, 0, 0, 0.35))
 	if is_prop:
-		var h := 18.0
-		draw_rect(Rect2(-11, -h, 22, h), Color("7a5a3a"))
-		draw_rect(Rect2(-11, -h, 22, 4), Color("9c7a52"))
-		draw_rect(Rect2(-11, -h, 22, h), Color("3d2b1a"), false, 1.0)
-		draw_line(Vector2(-11, -h), Vector2(11, 0), Color("3d2b1a"), 1.0)
+		var h := sprite_height()
+		var hw := Display.tile * 0.35
+		draw_rect(Rect2(-hw, -h, hw * 2.0, h), Color("7a5a3a"))
+		draw_rect(Rect2(-hw, -h, hw * 2.0, 4), Color("9c7a52"))
+		draw_rect(Rect2(-hw, -h, hw * 2.0, h), Color("3d2b1a"), false, 1.0)
+		draw_line(Vector2(-hw, -h), Vector2(hw, 0), Color("3d2b1a"), 1.0)
 	if highlight:
 		draw_arc(Vector2.ZERO, w + 2.0, 0, TAU, 20, Color("ffd966"), 1.0)
 	var top := -sprite_height() - 5.0

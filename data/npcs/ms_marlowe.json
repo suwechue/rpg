@@ -3,8 +3,8 @@
   "name": "Ms. Marlowe",
   "role": "Librarian",
   "home": "elm_apartments",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Villager5/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Villager5/Faceset.png",
+  "sprite": "npc_ms_marlowe_walk",
+  "portrait": "portrait_ms_marlowe",
   "startBond": 5,
   "disposition": {
     "courage": 25,

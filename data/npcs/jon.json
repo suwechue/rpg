@@ -3,8 +3,8 @@
   "name": "Jon",
   "role": "Student",
   "home": "jon_house",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/LionBoy/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/LionBoy/Faceset.png",
+  "sprite": "npc_jon_walk",
+  "portrait": "portrait_jon",
   "startBond": 10,
   "disposition": {
     "courage": 35,

@@ -17,7 +17,7 @@ func _init() -> void:
 func _ready() -> void:
 	var bar := PanelContainer.new()
 	bar.position = Vector2(0, 0)
-	bar.custom_minimum_size = Vector2(480, 0)
+	bar.custom_minimum_size = Vector2(Display.base.x, 0)
 	bar.mouse_filter = Control.MOUSE_FILTER_PASS
 	add_child(bar)
 	var h := HBoxContainer.new()
@@ -28,13 +28,13 @@ func _ready() -> void:
 	_end = UiTheme.button("End part [Space]", func() -> void: Flow.end_part())
 	h.add_child(_end)
 	var bottom := PanelContainer.new()
-	bottom.position = Vector2(0, 244)
-	bottom.custom_minimum_size = Vector2(480, 26)
+	bottom.position = Vector2(0, Display.base.y - 26)
+	bottom.custom_minimum_size = Vector2(Display.base.x, 26)
 	bottom.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bottom)
 	_line = UiTheme.label("")
 	_line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_line.custom_minimum_size = Vector2(470, 0)
+	_line.custom_minimum_size = Vector2(Display.base.x - 10, 0)
 	bottom.add_child(_line)
 	EventBus.ap_changed.connect(func(_a: int) -> void: refresh())
 	EventBus.money_changed.connect(func(_m: int) -> void: refresh())

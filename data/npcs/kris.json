@@ -3,8 +3,8 @@
   "name": "Kris",
   "role": "Student",
   "home": "kris_house",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/NinjaGray/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/NinjaGray/Faceset.png",
+  "sprite": "npc_kris_walk",
+  "portrait": "portrait_kris",
   "startBond": 10,
   "disposition": {
     "courage": 20,

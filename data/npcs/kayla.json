@@ -3,8 +3,8 @@
   "name": "Kayla",
   "role": "Cheer squad",
   "home": "kayla_house",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Cavegirl2/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Cavegirl2/Faceset.png",
+  "sprite": "npc_kayla_walk",
+  "portrait": "portrait_kayla",
   "startBond": 0,
   "disposition": {
     "courage": 35,

@@ -5,6 +5,7 @@ extends CanvasLayer
 
 const CharSheet := preload("res://src/scenes/ui/character_sheet.gd")
 const Lv := preload("res://src/core/progression/leveling.gd")
+const AssetSpecs := preload("res://src/core/assets/asset_specs.gd")
 
 var _root: PanelContainer
 var _content: VBoxContainer
@@ -16,7 +17,7 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_root = PanelContainer.new()
 	_root.position = Vector2(4, 4)
-	_root.size = Vector2(472, 262)
+	_root.size = Display.size_f() - Vector2(8, 8)
 	_root.visible = false
 	add_child(_root)
 	var h := HBoxContainer.new()
@@ -39,6 +40,7 @@ func _ready() -> void:
 	add_section("Stats/Flags", _show_stats, left)
 	add_section("Town", _show_town, left)
 	add_section("Social", _show_social, left)
+	add_section("Art", _show_art, left)
 	_dev_args.call_deferred()
 
 
@@ -46,12 +48,16 @@ func _ready() -> void:
 ##   --scene=res://path.tscn  --debug  --shot=C:/out.png  --frames=30
 ##   --autoplay (AI plays the party)  --seed=N --class=mage (fresh run first)
 ##   --jump=week,day_index,part_index  --town=zone:x,y (start position in the town)
+##   --section=Art (with --debug)  --custom=C:/folder (use another custom art folder)
 ## --debug opens this menu; --shot saves the viewport after N frames and quits.
 func _dev_args() -> void:
 	var args := {}
 	for a in OS.get_cmdline_user_args():
 		var kv := str(a).trim_prefix("--").split("=", true, 1)
 		args[kv[0]] = kv[1] if kv.size() > 1 else "true"
+	if args.has("custom"):
+		Assets.override_root = str(args["custom"])
+		Assets.reload()
 	if args.has("autoplay"):
 		GameState.dev_autoplay = true
 	if args.has("seed"):
@@ -74,6 +80,13 @@ func _dev_args() -> void:
 		Social.talk(str(args["talk"]))
 	if args.has("debug"):
 		toggle.call_deferred()
+		if args.has("art"):
+			_art_id = str(args["art"])
+			_art_group = str(Assets.spec(_art_id).get("type", _art_group))
+		if args.has("section"):
+			for s in _sections:
+				if str(s["title"]) == str(args["section"]):
+					_open.call_deferred(s["fill"])
 	if args.has("shot"):
 		for i in int(args.get("frames", "30")):
 			await get_tree().process_frame
@@ -351,3 +364,107 @@ func _show_social(box: VBoxContainer) -> void:
 				rflow.add_child(UiTheme.button(rid.capitalize(), func() -> void:
 					preload("res://src/core/social/bonds.gd").recruit(DataDB.all(), GameState.run, rid, Rng.stream("npc"))
 					_open(_show_social)))
+
+
+# --- Art viewer (M10) ----------------------------------------------------------------
+
+var _art_group := "portraits"
+var _art_id := ""
+
+
+## Browse every asset id by type, see the current image and its spec, and
+## reload assets/custom/ without restarting (the current scene is rebuilt).
+func _show_art(box: VBoxContainer) -> void:
+	var row := HBoxContainer.new()
+	box.add_child(row)
+	row.add_child(UiTheme.button("Reload custom art", func() -> void:
+		Assets.reload()
+		_rebuild_scene()
+		_open(_show_art)))
+	var where := UiTheme.label("Drop files in %s/<type>/<id>.png, then reload." % Assets.custom_root.trim_prefix("res://"), UiTheme.DIM)
+	where.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY
+	where.custom_minimum_size = Vector2(380, 0)
+	box.add_child(where)
+	var groups := HFlowContainer.new()
+	groups.custom_minimum_size = Vector2(380, 0)
+	box.add_child(groups)
+	var by_type := Assets.ids_by_type()
+	for g in by_type:
+		var gid := str(g)
+		var b := UiTheme.button("%s (%d)" % [gid, by_type[g].size()], func() -> void:
+			_art_group = gid
+			_art_id = ""
+			_open(_show_art))
+		b.disabled = gid == _art_group
+		groups.add_child(b)
+	var ids: Array = by_type.get(_art_group, [])
+	if _art_id == "" and not ids.is_empty():
+		_art_id = str(ids[0])
+	if _art_id != "":
+		_art_detail(box, _art_id)
+	var list := HFlowContainer.new()
+	list.custom_minimum_size = Vector2(380, 0)
+	box.add_child(list)
+	for id in ids:
+		var aid := str(id)
+		var src := Assets.source(aid)
+		var b := UiTheme.button(aid if src == "pack" else "%s [%s]" % [aid, src], func() -> void:
+			_art_id = aid
+			_open(_show_art))
+		if src == "custom":
+			b.add_theme_color_override("font_color", UiTheme.GOOD)
+		elif src == "missing":
+			b.add_theme_color_override("font_color", UiTheme.BAD)
+		list.add_child(b)
+
+
+func _art_detail(box: VBoxContainer, id: String) -> void:
+	var sp := Assets.spec(id)
+	var row := HBoxContainer.new()
+	box.add_child(row)
+	var kind := str(sp.get("kind", ""))
+	if kind in ["music", "sfx"]:
+		row.add_child(UiTheme.button("Play", func() -> void:
+			if kind == "music":
+				Audio.stop_music()
+				var p := AudioStreamPlayer.new()
+				add_child(p)
+				p.stream = Assets.stream(id)
+				p.play()
+				get_tree().create_timer(4.0).timeout.connect(p.queue_free)
+			else:
+				var p := AudioStreamPlayer.new()
+				add_child(p)
+				p.stream = Assets.stream(id)
+				p.play()
+				p.finished.connect(p.queue_free)))
+	elif kind != "font":
+		var tex := Assets.texture(id)
+		var view := TextureRect.new()
+		view.texture = tex
+		view.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		view.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		view.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
+		var s := Vector2(tex.get_size())
+		var fit := minf(1.0, Display.base.y * 0.35 / maxf(s.y, 1.0))
+		view.custom_minimum_size = s * maxf(fit, 0.1)
+		row.add_child(view)
+	var lines: Array = ["%s  (%s)" % [id, Assets.source(id)]]
+	for key in ["kind", "frame", "size", "fit", "native", "scale", "layout", "anchor", "tileset", "index", "notes"]:
+		if sp.has(key):
+			lines.append("%s: %s" % [key, str(sp[key])])
+	if Assets.custom_file(id) != "":
+		lines.append("custom file: %s" % Assets.custom_file(id))
+	else:
+		lines.append("replace with: %s" % AssetSpecs.custom_candidates(Assets.custom_root, sp, id)[0])
+	var info := UiTheme.label("\n".join(PackedStringArray(lines)))
+	info.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY
+	info.custom_minimum_size = Vector2(260, 0)
+	row.add_child(info)
+
+
+## Re-open the current scene so maps and sprites pick up reloaded art.
+func _rebuild_scene() -> void:
+	var cur := get_tree().current_scene
+	if cur != null and cur.scene_file_path != "":
+		SceneRouter.goto(cur.scene_file_path)

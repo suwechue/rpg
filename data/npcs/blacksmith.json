@@ -3,8 +3,8 @@
   "name": "The Blacksmith",
   "role": "Blacksmith",
   "home": "blacksmith_cottage",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Hunter/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Hunter/Faceset.png",
+  "sprite": "npc_blacksmith_walk",
+  "portrait": "portrait_blacksmith",
   "startBond": 0,
   "disposition": {
     "courage": 60,

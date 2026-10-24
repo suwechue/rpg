@@ -11,7 +11,8 @@ const Workbench := preload("res://src/scenes/ui/workbench_screen.gd")
 const ShopScreen := preload("res://src/scenes/town/shop_screen.gd")
 const Locs := preload("res://src/core/town/locations.gd")
 const Sched := preload("res://src/core/town/schedule.gd")
-const TILE := 16
+var TILE: int:
+	get: return Display.tile
 const STEP_TIME := 0.11
 
 var map: MapScript
@@ -33,14 +34,14 @@ var _prompt: Label
 func _ready() -> void:
 	if not GameState.has_run():
 		GameState.new_run()
-	player = Walker.new(str(GameState.player.get("sprite", "res://assets/packs/ninja_adventure/Actor/Character/Boy/SpriteSheet.png")))
+	player = Walker.new(str(GameState.player.get("sprite", Assets.role("player"))))
 	player.z_index = 5
 	_camera = Camera2D.new()
 	_prompt = UiTheme.label("", UiTheme.ACCENT)
 	var ui := CanvasLayer.new()
 	ui.layer = 5
 	add_child(ui)
-	_prompt.position = Vector2(4, 230)
+	_prompt.position = Vector2(4, Display.base.y - 40)
 	_prompt.add_theme_color_override("font_outline_color", Color.BLACK)
 	_prompt.add_theme_constant_override("outline_size", 3)
 	ui.add_child(_prompt)
@@ -86,21 +87,23 @@ func _load_map(id: String, is_int: bool, loc: String, at: Vector2i) -> void:
 	if _camera.get_parent() != null:
 		_camera.get_parent().remove_child(_camera)
 	player.add_child(_camera)
-	_camera.position = Vector2(8, -8)
+	_camera.position = Vector2(TILE / 2.0, -TILE / 2.0)
 	var w := map.size.x * TILE
 	var h := map.size.y * TILE
-	if w <= 480:
-		_camera.limit_left = (w - 480) / 2
-		_camera.limit_right = _camera.limit_left + 480
+	var view := Display.base
+	if w <= view.x:
+		_camera.limit_left = (w - view.x) / 2
+		_camera.limit_right = _camera.limit_left + view.x
 	else:
 		_camera.limit_left = 0
 		_camera.limit_right = w
-	if h <= 270:
-		_camera.limit_top = (h - 270) / 2 - 16
-		_camera.limit_bottom = _camera.limit_top + 270
+	# Room above the map for the HUD bar, below it for the bottom bar.
+	if h <= view.y:
+		_camera.limit_top = (h - view.y) / 2 - TILE
+		_camera.limit_bottom = _camera.limit_top + view.y
 	else:
-		_camera.limit_top = -16
-		_camera.limit_bottom = h + 26
+		_camera.limit_top = -TILE
+		_camera.limit_bottom = h + TILE
 	_camera.make_current()
 	_refresh_people()
 	_save_pos()
@@ -154,7 +157,7 @@ func _enter_interior(loc: String, zone: String, back_cell: Vector2i) -> void:
 	return_cell = back_cell
 	var tmpl := str(r.get("interior", ""))
 	var t := Locs.interior(DataDB.all(), tmpl)
-	var sz: Array = t.get("size", [16, 10])
+	var sz: Array = t.get("size", [12, 10])
 	facing = Vector2i.UP
 	_load_map(tmpl, true, loc, Vector2i(int(sz[0]) / 2, int(sz[1]) - 2))
 	Audio.play_sfx("door")
@@ -260,7 +263,7 @@ func _place_npc(id: String, at: Vector2i) -> void:
 	var tag := UiTheme.label(str(rec.get("name", id)).split(" ")[0], Color("fff3c4"))
 	tag.add_theme_color_override("font_outline_color", Color.BLACK)
 	tag.add_theme_constant_override("outline_size", 2)
-	tag.position = Vector2(-6, -27)
+	tag.position = Vector2((w.frame_size.x - tag.get_minimum_size().x) / 2.0, -w.frame_size.y - UiTheme.FONT_SIZE - 3)
 	w.add_child(tag)
 
 
@@ -448,7 +451,7 @@ func location_menu(loc: String) -> void:
 		Narrator.say(reason)
 		return
 	var m := Modal.new()
-	m.build(str(r.get("name", loc)), 360)
+	m.build(str(r.get("name", loc)), 380)
 	m.text("AP left: %d   $%d" % [Calendar.ap(), GameState.money], UiTheme.DIM)
 	var acts := Locs.activities(db, GameState.run, loc, Calendar.part_id(), GameState.ctx())
 	for a in acts:

@@ -3,8 +3,8 @@
   "name": "Your guardian",
   "role": "Parent/Guardian",
   "home": "player_home",
-  "sprite": "res://assets/packs/ninja_adventure/Actor/Character/Woman/SpriteSheet.png",
-  "portrait": "res://assets/packs/ninja_adventure/Actor/Character/Woman/Faceset.png",
+  "sprite": "npc_parent_walk",
+  "portrait": "portrait_parent",
   "startBond": 50,
   "disposition": {
     "courage": 20,

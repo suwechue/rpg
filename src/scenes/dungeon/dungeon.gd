@@ -12,7 +12,6 @@ const Walker := preload("res://src/scenes/common/walker_sprite.gd")
 const Modal := preload("res://src/scenes/ui/modal.gd")
 const ShopScreen := preload("res://src/scenes/town/shop_screen.gd")
 const Char := preload("res://src/core/character.gd")
-const TILE := 16
 const SELF := "res://src/scenes/dungeon/dungeon.tscn"
 const TOWN := "res://src/scenes/town/town.tscn"
 
@@ -32,6 +31,10 @@ var _prompt: Label
 var _sprites: Dictionary = {}      # room id -> Node2D
 var _week := 1
 var _day := "mon"
+var _cols := 1
+
+var TILE: int:
+	get: return Display.tile
 
 
 func _ready() -> void:
@@ -50,12 +53,12 @@ func _ready() -> void:
 	ui.layer = 5
 	add_child(ui)
 	var bar := PanelContainer.new()
-	bar.custom_minimum_size = Vector2(480, 0)
+	bar.custom_minimum_size = Vector2(Display.base.x, 0)
 	ui.add_child(bar)
 	_hud = UiTheme.label("")
 	bar.add_child(_hud)
 	_prompt = UiTheme.label("", UiTheme.ACCENT)
-	_prompt.position = Vector2(4, 252)
+	_prompt.position = Vector2(4, Display.base.y - 18)
 	_prompt.add_theme_color_override("font_outline_color", Color.BLACK)
 	_prompt.add_theme_constant_override("outline_size", 3)
 	ui.add_child(_prompt)
@@ -88,16 +91,17 @@ func _build() -> void:
 	var ts := TileSet.new()
 	ts.tile_size = Vector2i(TILE, TILE)
 	var src := TileSetAtlasSource.new()
-	src.texture = load("res://assets/packs/kenney_tiny_dungeon/Tilemap/tilemap_packed.png")
+	src.texture = Assets.texture(str(dcfg.get("tileset", "")))
 	src.texture_region_size = Vector2i(TILE, TILE)
-	for r in 11:
-		for c in 12:
+	_cols = maxi(1, src.texture.get_width() / TILE)
+	for r in src.texture.get_height() / TILE:
+		for c in _cols:
 			src.create_tile(Vector2i(c, r))
 	ts.add_source(src, 0)
 	var void_bg := ColorRect.new()
 	void_bg.color = Color("0b0812")
-	void_bg.position = Vector2(-2000, -2000)
-	void_bg.size = Vector2(6000, 6000)
+	void_bg.position = -Vector2.ONE * TILE * 100
+	void_bg.size = Vector2.ONE * TILE * 300
 	void_bg.z_index = -10
 	add_child(void_bg)
 	_layer = TileMapLayer.new()
@@ -124,7 +128,7 @@ func _build() -> void:
 			if int(n["id"]) < int(room["id"]):
 				continue
 			_corridor(room_rects[int(room["id"])], room_rects[int(n["id"])], floors)
-	player = Walker.new(str(GameState.player.get("sprite", "res://assets/packs/ninja_adventure/Actor/Character/Boy/SpriteSheet.png")))
+	player = Walker.new(str(GameState.player.get("sprite", Assets.role("player"))))
 	player.z_index = 5
 	add_child(player)
 	var start_rect: Rect2i = room_rects[0]
@@ -134,7 +138,7 @@ func _build() -> void:
 		cell = Vector2i(int(fp[0]), int(fp[1]))
 	player.position = _pos(cell)
 	_camera = Camera2D.new()
-	_camera.position = Vector2(8, -8)
+	_camera.position = Vector2(TILE / 2.0, -TILE / 2.0)
 	player.add_child(_camera)
 	_camera.make_current()
 	_overlay = Node2D.new()
@@ -146,7 +150,7 @@ func _build() -> void:
 
 
 func _put(c: Vector2i, index: int) -> void:
-	_layer.set_cell(c, 0, Vector2i(index % 12, index / 12))
+	_layer.set_cell(c, 0, Vector2i(index % _cols, index / _cols))
 
 
 func _corridor(a: Rect2i, b: Rect2i, floors: Array) -> void:
@@ -179,23 +183,24 @@ func _place_contents() -> void:
 		var t := str(room["type"])
 		if t in ["combat", "elite", "boss"] and not bool(room.get("cleared", false)) and not room.get("enemies", []).is_empty():
 			var rec: Dictionary = enemies.get(str(room["enemies"][0]), {})
-			var frame: Array = rec.get("spriteFrame", [])
-			if frame.size() == 2:
+			var sprite_id := str(rec.get("sprite", ""))
+			if str(Assets.spec(sprite_id).get("kind", "")) == "strip":
+				var frame := Assets.frame(sprite_id)
 				var s := Sprite2D.new()
-				s.texture = load(str(rec.get("sprite", "")))
+				s.texture = Assets.texture(sprite_id)
 				s.region_enabled = true
-				s.region_rect = Rect2(0, 0, int(frame[0]), int(frame[1]))
+				s.region_rect = Rect2(Vector2.ZERO, frame)
 				s.centered = false
-				s.offset = Vector2(-int(frame[0]) / 2.0 + 8, -int(frame[1]))
+				s.offset = Vector2(-frame.x / 2.0 + TILE / 2.0, -frame.y)
 				node = s
 			else:
-				var w := Walker.new(str(rec.get("sprite", "")))
+				var w := Walker.new(sprite_id)
 				w.face(Vector2i.DOWN)
 				node = w
 		elif t == "event" and not bool(room.get("cleared", false)):
-			node = Walker.new("res://assets/packs/ninja_adventure/Actor/Character/Spirit/SpriteSheet.png")
+			node = Walker.new(Assets.role("dungeonEvent"))
 		elif t == "merchant":
-			node = Walker.new("res://assets/packs/ninja_adventure/Actor/Character/SorcererOrange/SpriteSheet.png")
+			node = Walker.new(Assets.role("dungeonMerchant"))
 		if node != null:
 			node.position = _pos(center)
 			node.z_index = 4
@@ -420,7 +425,7 @@ func _draw_overlay() -> void:
 		if not bool(room.get("visited", false)) and int(room["id"]) != 0:
 			_overlay.draw_rect(px, Color(0.03, 0.02, 0.06, 0.82))
 		elif str(room["type"]) in ["combat", "elite", "boss"] and bool(room.get("cleared", false)):
-			_overlay.draw_string(UiTheme.font, px.position + Vector2(4, 12), "cleared" if not bool(room.get("fled", false)) else "fled", HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, Color(1, 1, 1, 0.4))
+			_overlay.draw_string(UiTheme.font, px.position + Vector2(4, 4) + Vector2(0, UiTheme.FONT_SIZE), "cleared" if not bool(room.get("fled", false)) else "fled", HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, Color(1, 1, 1, 0.4))
 
 
 # --- Test and simulation helpers ------------------------------------------------------
