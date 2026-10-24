@@ -1,0 +1,17 @@
+{
+  "archetypes": [
+    { "id": "thermal",   "name": "Thermal",   "vectors": ["heat", "cold"],
+      "text": "Keep the temperature needle inside the band as it drifts. Hold to heat, release to cool." },
+    { "id": "precision", "name": "Precision", "vectors": ["force", "motion"],
+      "text": "Stop the swinging marker on the target line. Three swings." },
+    { "id": "alignment", "name": "Alignment", "vectors": ["binding", "light"],
+      "text": "Line up the rotating rings so the gaps meet." },
+    { "id": "chemical",  "name": "Chemical",  "vectors": ["transmutation", "vitality", "corrosion"],
+      "text": "Add reagents in the right order before the mix turns." }
+  ],
+  "defaultArchetype": "precision",
+  "propertyPicks": [ { "below": 0.35, "picks": 0 }, { "below": 0.8, "picks": 1 }, { "picks": 2 } ],
+  "perfectAt": 0.95,
+  "craftAp": { "night": 1, "elsewhere": 2 },
+  "copyAp": 1
+}

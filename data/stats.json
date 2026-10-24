@@ -45,5 +45,6 @@
     "vitalityDrainPct": 0.5,
     "constructHpPerPower": 1
   },
+  "training": { "barsBase": 3, "barsStatStep": 6, "barsMax": 5, "classBars": 1.0, "repeatMul": 0.5, "activityBars": 1.0 },
   "misinterpretation": { "chaDivisor": 25, "badMoodMultiplier": 1.5, "minimum": 0.02 }
 }

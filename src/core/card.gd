@@ -56,14 +56,28 @@ static func spell_name(db: Dictionary, vectors: Dictionary, form: String) -> Str
 	return "%s %s" % ["-".join(PackedStringArray(parts)), str(form_rec.get("name", form.capitalize()))]
 
 
-## Cost = Magnitude cost + Form cost + 1 if hybrid.
+## Cost = Magnitude cost + Form cost + 1 if hybrid (+ Property cost edits, min 0).
 static func spell_cost(db: Dictionary, card: Dictionary) -> int:
 	var mags: Dictionary = db.get("vectors", {}).get("magnitudes", {})
 	var form_rec := DT.record(db, "forms", str(card.get("form", "")))
 	var c := int(mags.get(str(card.get("magnitude", "")), {}).get("cost", 0)) + int(form_rec.get("cost", 0))
 	if ordered_vectors(db, card.get("vectors", {})).size() > 1:
 		c += int(db.get("vectors", {}).get("hybridExtraCost", 1))
-	return c
+	c += int(property_mods(db, card).get("costDelta", 0))
+	return maxi(0, c)
+
+
+## Merged Property edits on a card: power, powerPct, costDelta, stability, critPct.
+static func property_mods(db: Dictionary, card: Dictionary) -> Dictionary:
+	var out := {}
+	var props: Array = card.get("properties", [])
+	if props.is_empty():
+		return out
+	for p in db.get("properties", {}).get("properties", []):
+		if props.has(str(p["id"])):
+			for k in p.get("mods", {}):
+				out[k] = float(out.get(k, 0.0)) + float(p["mods"][k])
+	return out
 
 
 static func cost(db: Dictionary, card: Dictionary) -> int:
@@ -80,7 +94,9 @@ static func improvise_cost(db: Dictionary, card: Dictionary) -> int:
 
 static func power(db: Dictionary, card: Dictionary) -> float:
 	var mags: Dictionary = db.get("vectors", {}).get("magnitudes", {})
-	return float(mags.get(str(card.get("magnitude", "")), {}).get("power", 0))
+	var pm := property_mods(db, card)
+	var base := float(mags.get(str(card.get("magnitude", "")), {}).get("power", 0)) + float(pm.get("power", 0.0))
+	return base * (1.0 + float(pm.get("powerPct", 0.0)))
 
 
 ## Find a card by id: parseable spell ids first, then the run's library, then data.

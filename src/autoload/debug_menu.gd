@@ -35,6 +35,8 @@ func _ready() -> void:
 	add_section("Character", _show_character, left)
 	add_section("Leveling", _show_leveling, left)
 	add_section("Fights", _show_fights, left)
+	add_section("Time", _show_time, left)
+	add_section("Stats/Flags", _show_stats, left)
 	_dev_args.call_deferred()
 
 
@@ -195,3 +197,87 @@ func _show_fights(box: VBoxContainer) -> void:
 		flow.add_child(UiTheme.button(str(e["name"]), func() -> void:
 			toggle()
 			GameState.start_combat(GameState.combat_setup([eid], "open_field"))))
+
+
+func _show_time(box: VBoxContainer) -> void:
+	box.add_child(UiTheme.label("%s  (AP %d)  seed %d" % [Calendar.label(), Calendar.ap(), GameState.run_seed], UiTheme.ACCENT))
+	var r := HBoxContainer.new()
+	box.add_child(r)
+	r.add_child(UiTheme.button("Advance part", func() -> void:
+		toggle()
+		GameState.advance_part()))
+	r.add_child(UiTheme.button("+5 AP", func() -> void:
+		Calendar.set_ap(Calendar.ap() + 5)
+		_open(_show_time)))
+	box.add_child(UiTheme.label("Jump to (screens for the new part run as usual):", UiTheme.DIM))
+	for w in range(1, 6):
+		var row := HBoxContainer.new()
+		box.add_child(row)
+		row.add_child(UiTheme.label("Week %d" % w))
+		var days: Array = DataDB.table("calendar").get("days", [])
+		for di in days.size():
+			var week := w
+			var day := di
+			row.add_child(UiTheme.button(str(days[di]).capitalize(), func() -> void:
+				_jump(week, day, 0)))
+	box.add_child(UiTheme.label("Parts of the current day:", UiTheme.DIM))
+	var prow := HFlowContainer.new()
+	prow.custom_minimum_size = Vector2(380, 0)
+	box.add_child(prow)
+	var parts: Array = Calendar.logic.parts()
+	for pi in parts.size():
+		var p := pi
+		prow.add_child(UiTheme.button(str(parts[pi].get("name", "")), func() -> void:
+			_jump(Calendar.week(), Calendar.logic.day_index, p)))
+
+
+func _jump(week: int, day: int, part: int) -> void:
+	toggle()
+	if week != Calendar.week():
+		GameState.run["schedule_week"] = 0
+	Calendar.reset({ "week": week, "day_index": day, "part_index": part, "ap": -1 })
+	Calendar.set_ap(Calendar.max_ap())
+	EventBus.part_started.emit()
+
+
+func _show_stats(box: VBoxContainer) -> void:
+	var p: Dictionary = GameState.player
+	box.add_child(UiTheme.label("Stats (click +1 / -1)", UiTheme.ACCENT))
+	for s in DataDB.table("stats").get("order", []):
+		var stat := str(s)
+		var row := HBoxContainer.new()
+		box.add_child(row)
+		row.add_child(UiTheme.label("%s %d" % [stat.to_upper(), int(p["stats"].get(stat, 0))]))
+		row.add_child(UiTheme.button("+1", func() -> void:
+			GameState.apply_effects({ "stats": { stat: 1 } })
+			_open(_show_stats)))
+		row.add_child(UiTheme.button("-1", func() -> void:
+			GameState.apply_effects({ "stats": { stat: -1 } })
+			_open(_show_stats)))
+	var mrow := HBoxContainer.new()
+	box.add_child(mrow)
+	mrow.add_child(UiTheme.button("+$50", func() -> void:
+		GameState.apply_effects({ "money": 50 })
+		_open(_show_stats)))
+	mrow.add_child(UiTheme.button("Full HP/MP", func() -> void:
+		preload("res://src/core/character.gd").full_restore(DataDB.all(), GameState.player)
+		EventBus.stats_changed.emit("player")
+		_open(_show_stats)))
+	mrow.add_child(UiTheme.button("Knowledge Tier +1", func() -> void:
+		GameState.player["knowledgeTier"] = mini(3, int(GameState.player.get("knowledgeTier", 1)) + 1)
+		_open(_show_stats)))
+	box.add_child(UiTheme.label("Kelly Risk: %d" % int(GameState.run.get("kelly_risk", 0))))
+	var flag_edit := LineEdit.new()
+	flag_edit.placeholder_text = "flag name"
+	flag_edit.custom_minimum_size = Vector2(160, 0)
+	var frow := HBoxContainer.new()
+	box.add_child(frow)
+	frow.add_child(flag_edit)
+	frow.add_child(UiTheme.button("Set flag", func() -> void:
+		if flag_edit.text.strip_edges() != "":
+			GameState.set_flag(flag_edit.text.strip_edges())
+		_open(_show_stats)))
+	var flags_l := UiTheme.label("Flags: " + ", ".join(PackedStringArray(GameState.flags.keys())), UiTheme.DIM)
+	flags_l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	flags_l.custom_minimum_size = Vector2(380, 0)
+	box.add_child(flags_l)

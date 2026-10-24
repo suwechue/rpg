@@ -29,6 +29,24 @@ func ap() -> int:
 	return logic.ap
 
 
+func part_id() -> String:
+	return logic.part_id()
+
+
+func is_weekend() -> bool:
+	return logic.is_weekend()
+
+
+## Set AP directly (skipping a class turns the period into a free part).
+func set_ap(amount: int) -> void:
+	logic.ap = maxi(0, amount)
+	EventBus.ap_changed.emit(logic.ap)
+
+
+func label() -> String:
+	return "Week %d, %s, %s" % [logic.week, logic.day_name().capitalize(), str(current_part().get("name", ""))]
+
+
 func max_ap() -> int:
 	return logic.max_ap()
 

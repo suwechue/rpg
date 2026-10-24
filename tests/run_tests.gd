@@ -84,7 +84,10 @@ func test_example_2_invention() -> void:
 	var input := { "heat": 12, "force": 4 }
 	check_near(VO.complexity(input), 4.6, "complexity")
 	check(VO.dominant_axis(input) == "heat", "dominant axis is heat (Thermal minigame)")
-	var props: Array = load_json("res://data/properties.json")["properties"]
+	var props: Array = []
+	for p in load_json("res://data/properties.json")["properties"]:
+		if p["id"] in ["searing_edge", "keen_balance", "frostbite"]:
+			props.append(p)
 	var performance := 0.5
 	var weights := {}
 	var cosines := {}

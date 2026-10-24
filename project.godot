@@ -16,7 +16,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 
 config/name="Project Vector"
 config/description="Top-down school-life RPG with Vector spell cards and a weekly Upside-Down dungeon."
-run/main_scene="res://src/scenes/main.tscn"
+run/main_scene="res://src/scenes/title/title.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 
 [autoload]
@@ -32,6 +32,7 @@ GameState="*res://src/autoload/game_state.gd"
 SaveSystem="*res://src/autoload/save_system.gd"
 SceneRouter="*res://src/autoload/scene_router.gd"
 UiTheme="*res://src/autoload/ui_theme.gd"
+Flow="*res://src/autoload/flow.gd"
 DebugMenu="*res://src/autoload/debug_menu.gd"
 
 [display]

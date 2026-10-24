@@ -86,6 +86,8 @@ func load_state(state: Dictionary) -> void:
 	day_index = int(state.get("day_index", 0))
 	part_index = int(state.get("part_index", 0))
 	ap = int(state.get("ap", max_ap()))
+	if ap < 0:
+		ap = max_ap()
 
 
 func _enter_part() -> void:

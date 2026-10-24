@@ -1,0 +1,18 @@
+{
+  "events": [
+    { "id": "detention_1", "title": "Detention", "speaker": "Mr. B",
+      "text": "The vice principal's office smells like toner and patience running out. Mr. B doesn't look up from your file. \"Three skips. This isn't personal. It's policy.\" He slides a form across the desk.",
+      "choices": [
+        { "label": "Apologize and sign it", "effects": { "bond": { "mr_b": 2 }, "flag": "mr_b_noticed" }, "result": "\"Good.\" He puts your file in a drawer. A thick drawer." },
+        { "label": "\"Is this really the best use of your time?\"", "cond": { "minStat": { "cha": 7 } }, "lockedHint": "CHA 7", "effects": { "bond": { "mr_b": -6 }, "flag": ["mr_b_noticed", "mr_b_annoyed"] }, "result": "He finally looks up. \"You'll find I have a great deal of time.\" It does not sound like a joke." },
+        { "label": "Stare out the window the whole hour", "effects": { "statXp": { "wil": 0.5 }, "flag": "mr_b_noticed" }, "result": "Outside, the light by the woods flickers in a way light shouldn't. Mr. B pulls the blind down without comment." }
+      ] },
+    { "id": "detention_2", "title": "Detention again", "speaker": "Mr. B",
+      "cond": { "flag": "mr_b_noticed" },
+      "text": "\"Back so soon.\" Mr. B has a second file now, thinner, labeled with a date from before you moved here. He notices you noticing.",
+      "choices": [
+        { "label": "Say nothing", "effects": { "flag": "mr_b_file_seen" }, "result": "He closes it. \"Students who keep their heads down do very well in this town.\"" },
+        { "label": "Ask about the file", "cond": { "minStat": { "cha": 9 } }, "lockedHint": "CHA 9", "effects": { "bond": { "mr_b": -8 }, "flag": ["mr_b_file_seen", "mr_b_suspicious"] }, "result": "\"Administrative.\" He files it away. You catch one word on the tab: INCONVENIENT." }
+      ] }
+  ]
+}

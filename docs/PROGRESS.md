@@ -8,7 +8,7 @@ Claude Code updates this at the end of every milestone and before stopping, so a
 | M1 Vector core | Done | VectorOps (8 operations), RngStreams, CalendarLogic; 70 checks pass |
 | M2 Characters, cards, decks | Done | Character model, derived stats, cards with MP cost and Tier caps, hybrids, Deck with Fatigue, leveling with pity; seeded mage reaches level 5 identically |
 | M3 Grid combat | Done | 2.5D grid combat: all 11 Forms, Vector effects, Contest, Instability, Vector Wheel, initiative timeline, disposition AI, flee, downed/death, MP carry-over. F1 > Fights |
-| M4 Calendar and AP | Not started | |
+| M4 Calendar and AP | Done | Run as one Dictionary, Flow autoload runs day parts, schedule/class/night/detention screens, 64 class events, skipping and detention, Night workbench with a stub timing minigame, Property Bank crafting, deck editor, title screen |
 | M5 Town | Not started | |
 | M6 Social system | Not started | |
 | M7 The Upside-Down | Not started | |
@@ -16,7 +16,7 @@ Claude Code updates this at the end of every milestone and before stopping, so a
 
 ## Next step
 
-Start M4 (calendar, AP, schedule, class events, skipping and detention, Night crafting).
+Start M5 (the town: 4 zones from docs/TOWN.md as TileMapLayers, every location as a record in data/town/locations.json, every named NPC with a home and schedule, shops and money).
 
 ## How to check
 
@@ -44,6 +44,15 @@ Start M4 (calendar, AP, schedule, class events, skipping and detention, Night cr
 - `Audio` autoload plays ids from `data/audio.json` (Ninja Adventure music and sfx).
 - Balance snapshot (AI vs AI, 30 seeds): duo parties win 57 to 100% of week-1 fights; a solo Mage wins 13% against three enemies. Tune in M8.
 
+### M4 (done)
+- The run is one Dictionary (`src/core/run/run_model.gd`); `GameState.run` holds it and exposes `player`, `roster`, `money`... as properties. Save = `{ version, rng, calendar, run }`.
+- `src/core/run/effects.gd`: the shared effects vocabulary and `conditions_met()` (used by class, town, story and dialogue data). `src/core/run/school.gd`: schedule, attendance, class events, skipping, detention. `src/core/run/day_flow.gd`: part kinds, screens per part, sleep, injuries, weekly decay. `src/core/progression/crafting.gd`: archetypes, Property Bank rolls, perfect-step, copies, collection and deck rules.
+- `Flow` autoload (CanvasLayer 40) runs each part's screens over any scene and owns the HUD; free-roam scenes call `Flow.begin()` and `Flow.set_hud(true)` and ignore input while `Flow.is_busy()`. Hooks for later milestones: `Flow.custom_screens`, `night_hooks`, `night_line_hooks`, `part_hooks`.
+- Screens: `src/scenes/ui/` (modal base, schedule, class, night, workbench with deck editor, generic event screen, HUD), `src/scenes/minigames/timing_minigame.gd` (stub for all 4 archetypes), `src/scenes/title/` (main scene: New run with class pick and optional seed, Continue).
+- `src/scenes/main.tscn` is now the M4 hub (walkable placeholder with data-driven activities in `data/locations.json`); M5 replaces it with the town.
+- Data: `data/events/class_events.json` (64 events: lesson, quiz, partner, disruption, accident, spotlight, plus the week 1 Monday story disruption), `data/events/detention.json`, `data/minigames.json`, `data/properties.json` (15 properties), `school_classes.json` (professors, classmates, rooms).
+- Debug (F1): Time (advance, jump to any week/day/part, +AP) and Stats/Flags.
+
 ## Decisions made during development
 
 - **Git remote:** adding `origin` was blocked by the Claude Code permission classifier in this session, so commits are local only. To push: `git remote add origin https://github.com/suwechue/rpg.git` then `git push -u origin main`. Art and audio under `assets/` are tracked with Git LFS.
@@ -64,6 +73,14 @@ Start M4 (calendar, AP, schedule, class events, skipping and detention, Night cr
 - **Perks in combat:** Overchannel (first improvise at normal cost), Second Wind (auto at <30% HP), Backstab (+50% from behind or a different row within 1 column), Triage (-1 MP on heals for allies under half HP), Hype (+4 initiative and +1 draw on turn 1 for the whole party).
 - **Guests call for help** (Kelly, M6): when hurt below 60% or next to an enemy at the start of their turn. The call is answered if a player-controlled unit heals or shields them, or hits an enemy next to them, before their next turn.
 - **Units are drawn at 2x** (integer scale) in combat; bosses at 1x since their sheets are already 50 to 60 px.
+- **Stat training bars:** a stat point costs 3 bars below 7, 4 from 7, 5 from 13 (`stats.json` "training"). A class gives 1 bar to each of its stats; repeating a class the same day gives half. Pop quiz success repeats the class gains. Class checks are d6 + stat against a DC.
+- **Grade** is per professor (Ms. G and Mr. Mustard each teach two classes): +3 per attendance, -5 per skip, 0 to 100. Spotlight events need Grade 25 to 40.
+- **Sleep restores HP and MP fully** at the end of each day. HP lost to class accidents carries into that evening's dungeon. MP only refills by sleeping, rest rooms, food and per-turn regen.
+- **Injuries:** a member downed at a fight's end is injured for 2 day-ends, so they miss the next evening's dungeon.
+- **Detention** (3 skips in a week) takes the next After School: a Mr. B scene, then AP 0.
+- **Crafting:** input vector = design direction x Magnitude power. Performance below 0.35 rolls no Properties, below 0.8 one, else two; 0.95+ adds a Magnitude step (capped by Tier). Designs without Properties live in the collection by spell id; designs with Properties are stored as `craft_N`. Property effects: power, powerPct, costDelta, stability, critPct.
+- **Card collection** is shared; each deck may use up to the owned count (max 3 per design). Party members can also use their own starter cards. Spell cards need the deck owner to know the card's Vectors and Form.
+- **The worked-example test** for properties now filters to the doc's three sample properties, since the Property Bank grew.
 - **Magic Resistance as a percent:** each point of Magic Resistance is 2% spell damage reduction, capped at 60% (`stats.json` combat block).
 
 ## Stubs and known issues
@@ -72,4 +89,6 @@ Start M4 (calendar, AP, schedule, class events, skipping and detention, Night cr
 - The combat timeline shows 2-letter name tags instead of portraits.
 - Git: no remote configured (see Decisions); nothing has been pushed.
 
-- The M0 sandbox (`src/scenes/main.tscn`) is still the main scene; it is replaced by the title screen and town in later milestones.
+- `src/scenes/main.tscn` is the M4 placeholder hub until the M5 town replaces it.
+- The crafting minigame is one timing bar for all 4 archetypes (M8 makes distinct ones).
+- The evening dungeon is skipped with a narrator line until M7.

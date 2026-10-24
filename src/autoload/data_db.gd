@@ -96,6 +96,7 @@ func _validate() -> void:
 			if entry.has("basic") and CardRules.resolve(_tables, str(entry["basic"])).is_empty():
 				errors.append("class %s: unknown starter card '%s'" % [id, entry["basic"]])
 	_validate_combat(arcane)
+	_validate_events()
 	for t in records_under("traits", "traits"):
 		for s in t.get("mods", {}).get("stats", {}):
 			if not stat_axes.has(s):
@@ -152,3 +153,37 @@ func _validate_combat(arcane: Array) -> void:
 			if str(row).length() != str(map[0]).length():
 				errors.append("layout %s: rows have different lengths" % l.get("id"))
 				break
+
+
+const EFFECT_KEYS := ["statXp", "stats", "affinity", "grade", "gradeFor", "bond", "flag", "unflag", "hp", "mp", "money",
+	"item", "card", "kellyRisk", "learnVector", "learnForm", "xp", "signature", "counter", "disposition", "narrate",
+	"repeatClassGain", "bondPartner", "recruit", "topic", "rumor", "narratorBond", "goto", "combat", "journal", "classChange"]
+
+
+## Every effects Dictionary in event tables must use known keys.
+func _validate_effects(where: String, fx: Variant) -> void:
+	if typeof(fx) != TYPE_DICTIONARY:
+		return
+	for k in fx:
+		if not EFFECT_KEYS.has(str(k)):
+			errors.append("%s: unknown effect '%s'" % [where, k])
+
+
+func _validate_events() -> void:
+	var class_ids := ["any"]
+	for c in table("school_classes").get("classes", []):
+		class_ids.append(str(c["id"]))
+		if not table("school_classes").get("professors", {}).has(str(c.get("professor", ""))):
+			errors.append("class %s: unknown professor '%s'" % [c["id"], c.get("professor")])
+	for key in _tables:
+		if not str(key).begins_with("events/"):
+			continue
+		for e in _tables[key].get("events", []):
+			var id := "%s/%s" % [key, e.get("id", "?")]
+			if str(key) == "events/class_events" and not class_ids.has(str(e.get("class", "any"))):
+				errors.append("%s: unknown class '%s'" % [id, e.get("class")])
+			for fk in ["effects", "success", "fail"]:
+				_validate_effects(id, e.get(fk, {}))
+			for ch in e.get("choices", []):
+				for fk in ["effects", "success", "fail"]:
+					_validate_effects(id, ch.get(fk, {}))

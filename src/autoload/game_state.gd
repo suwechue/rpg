@@ -1,51 +1,78 @@
-## The single source of truth for a run. Saving = to_dict(); loading = load_dict().
+## The single source of truth for a run: one Dictionary built by
+## src/core/run/run_model.gd. Saving = to_dict(); loading = load_dict().
+## Fields are exposed as properties so scenes can read GameState.player etc.
 extends Node
 
-const SAVE_VERSION := 2
+const SAVE_VERSION := 3
 const Char := preload("res://src/core/character.gd")
 const Lv := preload("res://src/core/progression/leveling.gd")
 const DT := preload("res://src/core/data_tables.gd")
+const RM := preload("res://src/core/run/run_model.gd")
+const Fx := preload("res://src/core/run/effects.gd")
+const DayFlow := preload("res://src/core/run/day_flow.gd")
 
-var run_seed: int = 0
-var player: Dictionary = {}
-var roster: Array = []
-var cards: Dictionary = {}
-var flags: Dictionary = {}
-var bonds: Dictionary = {}
-var schedule: Array = []
-var town_signature: Dictionary = {}
-var encounter_log: Array = []
+const COMBAT_SCENE := "res://src/scenes/combat/combat.tscn"
+
+var run: Dictionary = {}
+var dev_autoplay := false
+var pending_combat: Dictionary = {}
+var combat_return := ""
+var last_combat: Dictionary = {}
+
+var run_seed: int:
+	get: return int(run.get("seed", 0))
+var player: Dictionary:
+	get: return run.get("player", {})
+	set(v): run["player"] = v
+var roster: Array:
+	get: return run.get("roster", [])
+	set(v): run["roster"] = v
+var party_ids: Array:
+	get: return run.get("party_ids", [])
+	set(v): run["party_ids"] = v
+var cards: Dictionary:
+	get: return run.get("cards", {})
+var money: int:
+	get: return int(run.get("money", 0))
+	set(v): run["money"] = v
+var flags: Dictionary:
+	get: return run.get("flags", {})
+var bonds: Dictionary:
+	get: return run.get("bonds", {})
+var schedule: Array:
+	get: return run.get("schedule", [])
 
 
 ## Start a fresh run. Pass a seed to replay a run exactly; -1 picks one.
-func new_run(seed_value: int = -1, class_id: String = "mage", player_name: String = "New Kid") -> void:
+func new_run(seed_value: int = -1, class_id: String = "mage", player_name: String = "New Kid", opts: Dictionary = {}) -> void:
 	if seed_value < 0:
 		seed_value = absi(hash(Time.get_ticks_usec() + int(Time.get_unix_time_from_system()))) % 2147483647
-	run_seed = seed_value
-	Rng.reseed(run_seed)
-	player = Char.create(DataDB.all(), class_id, Rng.stream("creation"), { "id": "player", "name": player_name, "isPlayer": true })
-	roster = []
-	cards = {}
-	money = int(DataDB.table("economy").get("startMoney", 20))
-	party_ids = []
-	flags = {}
-	bonds = {}
-	schedule = DataDB.table("school_classes").get("defaultSchedule", []).duplicate()
-	town_signature = {}
-	encounter_log = []
+	Rng.reseed(seed_value)
+	var o := opts.duplicate()
+	o["name"] = player_name
+	run = RM.new_run(DataDB.all(), seed_value, class_id, Rng.stream("creation"), o)
+	pending_combat = {}
+	last_combat = {}
 	Calendar.reset()
-	EventBus.run_started.emit(run_seed)
+	EventBus.run_started.emit(seed_value)
 	EventBus.stats_changed.emit("player")
+
+
+func has_run() -> bool:
+	return not run.is_empty()
 
 
 ## Character record by id: "player" or a roster member.
 func character(id: String) -> Dictionary:
-	if id == "player":
-		return player
-	for m in roster:
-		if str(m.get("id", "")) == id:
-			return m
-	return {}
+	return RM.character(run, id)
+
+
+func flag(key: String) -> bool:
+	return RM.flag(run, key)
+
+
+func set_flag(key: String, value: Variant = true) -> void:
+	RM.set_flag(run, key, value)
 
 
 ## Give XP and run level-ups (the "leveling" stream). Returns the reports.
@@ -56,30 +83,72 @@ func give_xp(id: String, amount: int) -> Array:
 	var reports := Lv.add_xp(DataDB.all(), ch, amount, Rng.stream("leveling"))
 	if not ch.get("isPlayer", false):
 		Lv.auto_perks(DataDB.all(), ch)
+	if not reports.is_empty():
+		Audio.play_sfx("levelup")
 	EventBus.stats_changed.emit(id)
 	return reports
 
 
+## Apply an effects Dictionary (see src/core/run/effects.gd). Returns lines.
+func apply_effects(fx: Dictionary, extra_ctx: Dictionary = {}) -> Array:
+	var c := ctx()
+	c.merge(extra_ctx, true)
+	var lines := Fx.apply(DataDB.all(), run, fx, Rng.stream("events"), c)
+	EventBus.stats_changed.emit("player")
+	EventBus.money_changed.emit(money)
+	return lines
+
+
+## Context for event conditions: week, day, part, period.
+func ctx() -> Dictionary:
+	return { "week": Calendar.week(), "day": Calendar.day_name(), "part": Calendar.part_id(),
+		"period": int(Calendar.current_part().get("period", 0)) }
+
+
+func conditions_met(cond: Dictionary) -> bool:
+	return Fx.conditions_met(DataDB.all(), run, cond, ctx())
+
+
+func spend_money(amount: int) -> bool:
+	if amount > money:
+		return false
+	money -= amount
+	EventBus.money_changed.emit(money)
+	return true
+
+
+# --- Time ---------------------------------------------------------------------------
+
+## Move to the next day part. Handles sleep at the end of a day and the weekly
+## reset, autosaves, and announces the new part.
+func advance_part() -> void:
+	var day_before: int = Calendar.logic.day_index
+	var week_before: int = Calendar.week()
+	Calendar.advance_part()
+	if Calendar.logic.day_index != day_before or Calendar.week() != week_before:
+		for line in DayFlow.end_day(DataDB.all(), run):
+			Narrator.say(str(line))
+	if Calendar.week() != week_before:
+		DayFlow.new_week(DataDB.all(), run)
+		EventBus.week_started.emit(Calendar.week())
+	SaveSystem.save_run()
+	EventBus.part_started.emit()
+
+
+## Screens the current part opens with (see DayFlow.on_enter).
+func part_screens() -> Array:
+	return DayFlow.on_enter(run, Calendar.week(), Calendar.day_name(), Calendar.current_part(), Calendar.logic.is_weekend())
+
+
 # --- Combat hand-off --------------------------------------------------------------
-
-const COMBAT_SCENE := "res://src/scenes/combat/combat.tscn"
-
-var money: int = 0
-var dev_autoplay := false
-var party_ids: Array = []
-var pending_combat: Dictionary = {}
-var combat_return := ""
-var last_combat: Dictionary = {}
-
 
 ## Characters who fight tonight: the player plus chosen roster members who are
 ## not injured, as combat setup entries.
 func combat_party() -> Array:
 	var out: Array = [{ "char": player }]
-	for id in party_ids:
+	for id in DayFlow.available_party(run):
 		var m := character(str(id))
-		if not m.is_empty() and not bool(m.get("injured", false)):
-			out.append({ "char": m, "ai": bool(m.get("guest", false)), "guest": bool(m.get("guest", false)) })
+		out.append({ "char": m, "ai": bool(m.get("guest", false)), "guest": bool(m.get("guest", false)) })
 	return out
 
 
@@ -99,10 +168,9 @@ func combat_setup(enemies: Array, layout_id: String, opts: Dictionary = {}) -> D
 		"boss": bool(opts.get("boss", false)),
 		"library": cards,
 	}
-	if opts.has("intro"):
-		setup["intro"] = opts["intro"]
-	if opts.has("fleeAllowed"):
-		setup["fleeAllowed"] = opts["fleeAllowed"]
+	for key in ["intro", "fleeAllowed", "context"]:
+		if opts.has(key):
+			setup[key] = opts[key]
 	return setup
 
 
@@ -124,6 +192,8 @@ func take_pending_combat() -> Dictionary:
 
 ## Debug: add a generated party member and put them in tonight's party.
 func add_debug_ally(class_id: String) -> void:
+	if run.is_empty():
+		new_run()
 	var id := "debug_%s_%d" % [class_id, roster.size()]
 	var ch := Char.create(DataDB.all(), class_id, Rng.stream("creation"), { "id": id, "name": "Debug %s" % class_id.capitalize() })
 	ch["sprite"] = "res://assets/packs/ninja_adventure/Actor/Character/Knight/SpriteSheet.png"
@@ -133,7 +203,7 @@ func add_debug_ally(class_id: String) -> void:
 
 ## Used when the combat scene is opened directly (F6 in the editor, debug).
 func debug_combat_setup() -> Dictionary:
-	if player.is_empty():
+	if run.is_empty():
 		new_run()
 	return combat_setup(["pom_pom_wisp", "megaphone_mimic", "bleacher_creeper"], "open_field")
 
@@ -155,7 +225,7 @@ func finish_combat(summary: Dictionary) -> Dictionary:
 		if ch.is_empty():
 			continue
 		if bool(p.get("downed", false)) and not ch.get("isPlayer", false):
-			ch["injured"] = true
+			ch["injured"] = int(DataDB.table("leveling").get("injuryDays", 2))
 			lines.append("%s is injured and will need the hospital." % ch.get("name", "?"))
 		if result == "win" and int(summary.get("xp", 0)) > 0:
 			for r in give_xp(str(p["id"]), int(summary.get("xp", 0))):
@@ -170,41 +240,24 @@ func finish_combat(summary: Dictionary) -> Dictionary:
 func leave_combat() -> void:
 	if str(last_combat.get("result", "")) == "lose":
 		EventBus.run_ended.emit("combat")
+		return
 	var dest := combat_return if combat_return != "" else "res://src/scenes/main.tscn"
 	SceneRouter.goto(dest)
 
 
+# --- Save ----------------------------------------------------------------------------
+
 func to_dict() -> Dictionary:
 	return {
 		"version": SAVE_VERSION,
-		"run_seed": run_seed,
 		"rng": Rng.get_state(),
 		"calendar": Calendar.get_state(),
-		"player": player,
-		"roster": roster,
-		"cards": cards,
-		"money": money,
-		"party_ids": party_ids,
-		"flags": flags,
-		"bonds": bonds,
-		"schedule": schedule,
-		"town_signature": town_signature,
-		"encounter_log": encounter_log,
+		"run": run,
 	}
 
 
 func load_dict(d: Dictionary) -> void:
-	run_seed = int(d.get("run_seed", 0))
+	run = d.get("run", {})
 	Rng.set_state(d.get("rng", {}))
-	player = d.get("player", {})
-	roster = d.get("roster", [])
-	cards = d.get("cards", {})
-	money = int(d.get("money", 0))
-	party_ids = d.get("party_ids", [])
-	flags = d.get("flags", {})
-	bonds = d.get("bonds", {})
-	schedule = d.get("schedule", [])
-	town_signature = d.get("town_signature", {})
-	encounter_log = d.get("encounter_log", [])
 	Calendar.reset(d.get("calendar", {}))
 	EventBus.stats_changed.emit("player")

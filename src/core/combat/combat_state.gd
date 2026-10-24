@@ -548,8 +548,8 @@ func preview(u: UnitScript, card: Dictionary, target: Vector2i, improvised: bool
 		out["cells"] = cells
 		var cost := improvise_cost(u, card) if improvised else card_cost(u, card, target)
 		out["cost"] = cost
-		out["chance"] = Res.stability_chance(db, u.stability, cost, u.mp, improvised)
 		var spec := _spell_spec(u, card)
+		out["chance"] = Res.stability_chance(db, u.stability + int(spec.get("stabilityBonus", 0)), cost, u.mp, improvised)
 		for c in cells:
 			var t := unit_at(c)
 			if t == null:
@@ -583,6 +583,8 @@ func _spell_spec(u: UnitScript, card: Dictionary) -> Dictionary:
 		"heal": CardRules.heals(card),
 		"ranged": int(form.get("range", 1)) > 1,
 		"kind": "spell",
+		"critBonus": float(CardRules.property_mods(db, card).get("critPct", 0.0)),
+		"stabilityBonus": int(CardRules.property_mods(db, card).get("stability", 0.0)),
 	}
 
 
@@ -636,7 +638,7 @@ func _cast(u: UnitScript, card: Dictionary, target: Vector2i, improvised: bool, 
 	uses[key] = int(uses.get(key, 0)) + 1
 	if u.team == "party":
 		u.source["pairUses"] = uses
-	var roll := Res.roll_stability(db, u.stability, cost, mp_before, improvised, rng)
+	var roll := Res.roll_stability(db, u.stability + int(spec.get("stabilityBonus", 0)), cost, mp_before, improvised, rng)
 	if not bool(roll["ok"]):
 		var failure := Res.roll_failure(db, rng)
 		_emit({ "t": "instability", "unit": u.id, "result": failure, "roll": roll["roll"], "need": roll["target"],
@@ -733,7 +735,7 @@ func _hit_unit(u: UnitScript, t: UnitScript, spec: Dictionary, can_miss: bool) -
 	if can_miss and u.statuses.has("blind") and rng.randf() < float(Res.combat_cfg(db).get("blindMissChance", 0.35)):
 		_emit({ "t": "miss", "unit": t.id })
 		return false
-	var dmg := Res.finalize(db, _expected_hit(u, t, spec), u, rng)
+	var dmg := Res.finalize(db, _expected_hit(u, t, spec), u, rng, float(spec.get("critBonus", 0.0)))
 	_damage(t, int(dmg["amount"]), u, VO.dominant_axis(spec["vectors"], CardRules.arcane_axes(db)), "hit", bool(dmg["crit"]))
 	if spec["vectors"].has("vitality") and u.alive():
 		_heal(u, u, maxi(1, roundi(float(dmg["amount"]) * float(Res.combat_cfg(db).get("vitalityDrainPct", 0.5)))))

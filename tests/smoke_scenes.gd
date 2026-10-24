@@ -21,6 +21,7 @@ func check(cond: bool, msg: String) -> void:
 
 func _run() -> void:
 	await process_frame
+	_parse_all("res://src")
 	await _smoke_combat()
 	for m in get_script().get_script_method_list():
 		var n := str(m["name"])
@@ -28,6 +29,17 @@ func _run() -> void:
 			await call(n)
 	print("smoke: %d passed, %d failed" % [_passes, _failures])
 	quit(1 if _failures > 0 else 0)
+
+
+## Load every script so parse errors in scenes that no test visits still fail.
+func _parse_all(path: String) -> void:
+	var dir := DirAccess.open(path)
+	for f in dir.get_files():
+		if str(f).ends_with(".gd"):
+			var s: GDScript = load(path + "/" + str(f))
+			check(s != null and s.can_instantiate(), "script parses: %s/%s" % [path, f])
+	for d in dir.get_directories():
+		_parse_all(path + "/" + str(d))
 
 
 func _root_node(name: String) -> Node:
@@ -39,6 +51,65 @@ func _goto(path: String) -> Node:
 	await process_frame
 	await process_frame
 	return current_scene
+
+
+## The newest modal Flow is showing, or null.
+func _top_modal() -> Node:
+	var flow: Node = _root_node("Flow")
+	for i in range(flow.get_child_count() - 1, -1, -1):
+		var c: Node = flow.get_child(i)
+		if c.has_signal("closed") and not c.is_queued_for_deletion():
+			return c
+	return null
+
+
+## Press the first enabled button in a modal whose text contains `needle`.
+func _press(modal: Node, needle: String = "") -> bool:
+	for b in modal.find_children("*", "Button", true, false):
+		var btn := b as Button
+		if btn != null and not btn.disabled and btn.is_visible_in_tree() and (needle == "" or btn.text.find(needle) >= 0):
+			btn.pressed.emit()
+			return true
+	return false
+
+
+func smoke_week_of_school() -> void:
+	var gs: Node = _root_node("GameState")
+	var cal: Node = _root_node("Calendar")
+	var flow: Node = _root_node("Flow")
+	_root_node("SaveSystem").call("delete_save")
+	gs.call("new_run", 777, "bard")
+	await _goto("res://src/scenes/main.tscn")
+	var stats0: Dictionary = gs.get("player")["stats"].duplicate()
+	var guard := 0
+	var seen := {}
+	while int(cal.call("week")) == 1 and guard < 400:
+		guard += 1
+		await process_frame
+		var m := _top_modal()
+		if m != null:
+			var script_name := str(m.get_script().resource_path.get_file())
+			seen[script_name] = true
+			if script_name == "class_screen.gd" and m.get("_event").is_empty() and m.find_children("*", "Button", true, false).size() >= 2 and not seen.has("attended_%d" % guard):
+				_press(m, "Attend")
+			elif script_name == "night_screen.gd":
+				_press(m, "Go to sleep")
+			elif script_name == "schedule_screen.gd":
+				_press(m, "Confirm")
+			else:
+				_press(m)
+			await process_frame
+			continue
+		if not flow.call("is_busy"):
+			flow.call("end_part")
+	check(int(cal.call("week")) == 2, "a whole week passes through the UI (guard %d)" % guard)
+	check(seen.has("schedule_screen.gd") and seen.has("class_screen.gd") and seen.has("night_screen.gd"), "schedule, class and night screens appeared: %s" % str(seen.keys()))
+	var changed := 0
+	for s in stats0:
+		if int(gs.get("player")["stats"][s]) != int(stats0[s]):
+			changed += 1
+	check(changed >= 2, "stats changed over the week (%d)" % changed)
+	check(_root_node("SaveSystem").call("has_save"), "autosave written at part changes")
 
 
 func _smoke_combat() -> void:

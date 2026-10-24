@@ -15,5 +15,6 @@
     { "tier": 2, "minLevel": 5, "minInt": 8 },
     { "tier": 3, "minLevel": 10, "minInt": 12 }
   ],
-  "catchUpXpShare": 0.5
+  "catchUpXpShare": 0.5,
+  "injuryDays": 2
 }

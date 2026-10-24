@@ -1,25 +1,44 @@
 {
+  "comment": "M4 hub stand-in for the town. M5 replaces this with data/town/locations.json and walkable zones.",
   "locations": [
-    { "id": "home", "name": "Home", "tile": [3, 13], "ap": 1, "color": "#6fa8dc",
-      "openParts": ["before_school", "night", "morning", "weekend_evening"],
-      "action": "Sketch a spell card at your workbench (crafting arrives in M4)", "effects": {} },
-    { "id": "high_school", "name": "High School", "tile": [15, 4], "ap": 1, "color": "#c9c9c9",
-      "openParts": ["lunch"],
-      "action": "Sit with classmates at lunch (social system arrives in M6)", "effects": { "cha": 1 } },
-    { "id": "garys_deli", "name": "Gary's Deli", "tile": [24, 8], "ap": 1, "color": "#e69138",
-      "openParts": ["before_school", "lunch", "after_school", "morning", "midday", "afternoon"],
-      "action": "Gary's breakfast special. He says the freezer's been acting weird", "effects": {} },
-    { "id": "blacksmith", "name": "Blacksmith", "tile": [6, 7], "ap": 2, "color": "#cc4125",
-      "openParts": ["after_school", "morning", "midday", "afternoon"],
-      "action": "Work the bellows at the forge", "effects": { "str": 1 } },
-    { "id": "library", "name": "Library", "tile": [10, 11], "ap": 2, "color": "#8e7cc3",
-      "openParts": ["after_school", "morning", "midday", "afternoon"],
-      "action": "Study old town records", "effects": { "int": 1 } },
-    { "id": "hospital", "name": "Hospital", "tile": [24, 13], "ap": 2, "color": "#93c47d",
+    { "id": "home", "name": "Home", "tile": [3, 12], "color": "#6fa8dc",
+      "openParts": ["before_school", "morning", "weekend_evening"],
+      "activities": [
+        { "label": "Eat breakfast with your guardian", "ap": 1, "effects": { "hp": 5, "bond": { "parent": 2 } }, "say": "Your guardian is already halfway out the door. Toast is a form of love." }
+      ] },
+    { "id": "school_grounds", "name": "School Grounds", "tile": [15, 4], "color": "#c9c9c9",
+      "openParts": ["lunch", "after_school"],
+      "activities": [
+        { "label": "Hang around the cafeteria", "ap": 1, "effects": { "statXp": { "cha": 0.5 } }, "say": "You sit near the center table. Not AT it. Near it." },
+        { "label": "Run the track", "ap": 2, "parts": ["after_school"], "effects": { "statXp": { "con": 1 } }, "say": "Coach Byrne watches you from the bleachers and says nothing. Encouraging." }
+      ] },
+    { "id": "garys_deli", "name": "Gary's Deli", "tile": [24, 8], "color": "#e69138",
+      "openParts": ["before_school", "after_school", "morning", "midday", "afternoon", "weekend_evening"],
+      "activities": [
+        { "label": "Breakfast special ($4)", "ap": 1, "money": 4, "effects": { "hp": 8, "mp": 6 }, "say": "\"You want the good stuff or the MENU stuff?\" Gary gives you the good stuff." },
+        { "label": "Work a shift", "ap": 2, "parts": ["after_school", "morning", "midday", "afternoon"], "effects": { "money": 12, "statXp": { "str": 0.5 }, "counter": { "deli_shifts": 1 }, "bond": { "gary": 2 } }, "say": "You slice, you wrap, you learn exactly nothing about the recipe." }
+      ] },
+    { "id": "blacksmith", "name": "Blacksmith", "tile": [6, 7], "color": "#cc4125",
+      "openParts": ["before_school", "after_school", "morning", "midday", "afternoon"],
+      "activities": [
+        { "label": "Work the bellows", "ap": 2, "effects": { "statXp": { "str": 1 }, "affinity": { "heat": 1 }, "counter": { "forge_shifts": 1 } }, "say": "\"Took you long enough.\" The forge breathes when you do." },
+        { "label": "Use the forge workbench (craft, 2 AP)", "ap": 0, "workbench": true }
+      ] },
+    { "id": "library", "name": "Library", "tile": [10, 11], "color": "#8e7cc3",
+      "openParts": ["lunch", "after_school", "morning", "midday", "afternoon"],
+      "activities": [
+        { "label": "Study old town records", "ap": 2, "effects": { "statXp": { "int": 1 } }, "say": "Ms. Marlowe sets a book in front of you without being asked. It's the right one." },
+        { "label": "Use the study carrel workbench (craft, 2 AP)", "ap": 0, "workbench": true }
+      ] },
+    { "id": "hospital", "name": "Hospital", "tile": [24, 13], "color": "#93c47d",
       "openParts": ["after_school", "morning", "midday", "afternoon", "weekend_evening"],
-      "action": "Volunteer shift with Nurse Patti", "effects": { "wil": 1 } },
-    { "id": "woods_edge", "name": "Woods Edge", "tile": [28, 4], "ap": 1, "color": "#38761d",
+      "activities": [
+        { "label": "Volunteer shift with Nurse Patti", "ap": 2, "effects": { "statXp": { "wil": 1 }, "counter": { "hospital_shifts": 1 }, "bond": { "patti": 2 } }, "say": "\"Oh, you're the new one. I already heard about you.\"" }
+      ] },
+    { "id": "woods_edge", "name": "Woods Edge", "tile": [28, 4], "color": "#38761d",
       "openParts": ["after_school", "afternoon", "weekend_evening"],
-      "action": "Someone is narrating your every step. Out loud", "effects": { "per": 1 } }
+      "activities": [
+        { "label": "Sit very still and listen", "ap": 1, "effects": { "statXp": { "per": 1 } }, "say": "Someone is narrating your every step. Out loud. You decide to find this normal." }
+      ] }
   ]
 }
