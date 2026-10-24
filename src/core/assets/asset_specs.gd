@@ -173,6 +173,8 @@ static func referenced_ids(db: Dictionary) -> Dictionary:
 		out[str(s.get("icon", ""))] = "ui statuses"
 	for k in db.get("ui", {}).get("kindIcons", {}).values():
 		out[str(k)] = "ui kindIcons"
+	for k in db.get("ui", {}).get("intentIcons", {}).values():
+		out[str(k)] = "ui intentIcons"
 	return out
 
 

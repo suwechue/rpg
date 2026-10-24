@@ -82,7 +82,7 @@
       "xp": 7, "money": 2,
       "sprite": "enemy_detention_slip" },
 
-    { "id": "varsity_shade", "name": "Varsity Shade", "tier": "elite", "weeks": [1],
+    { "id": "varsity_shade", "intent": "tracking", "name": "Varsity Shade", "tier": "elite", "weeks": [1],
       "text": "The ghost of every senior who peaked in high school. Elite.",
       "hp": 40, "movement": 4, "initiative": 8, "physDefense": 3, "magicResist": 4, "stability": 8,
       "stats": { "str": 8, "dex": 6 },

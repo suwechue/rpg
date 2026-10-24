@@ -76,7 +76,7 @@
           ],
           "actions": [
             {
-              "id": "spotlight",
+              "id": "spotlight", "charge": 1, "pattern": "cross",
               "name": "Spotlight",
               "form": "burst",
               "vectors": {
@@ -104,7 +104,7 @@
           ]
         },
         {
-          "hpBelow": 0.33,
+          "hpBelow": 0.33, "hazards": 3,
           "say": "The costume tears. Inside: nothing but noise and a single blinking light. It stops pretending to be friendly.",
           "movement": 4,
           "disposition": {
@@ -114,7 +114,7 @@
           },
           "actions": [
             {
-              "id": "crowd_crush",
+              "id": "crowd_crush", "charge": 1, "pattern": "ring",
               "name": "Crowd Crush",
               "form": "burst",
               "vectors": {
@@ -220,7 +220,7 @@
           ],
           "actions": [
             {
-              "id": "deep_freeze",
+              "id": "deep_freeze", "charge": 1, "pattern": "rows",
               "name": "Deep Freeze",
               "form": "burst",
               "vectors": {
@@ -248,12 +248,12 @@
           ]
         },
         {
-          "hpBelow": 0.33,
+          "hpBelow": 0.33, "hazards": 3,
           "say": "The freezer door slams behind you. The Cold Cut's breath fogs the whole room. It wants the recipe.",
           "movement": 4,
           "actions": [
             {
-              "id": "whiteout",
+              "id": "whiteout", "charge": 1, "pattern": "checker",
               "name": "Whiteout",
               "form": "burst",
               "vectors": {
@@ -359,7 +359,7 @@
           ],
           "actions": [
             {
-              "id": "pour",
+              "id": "pour", "charge": 1, "pattern": "line",
               "name": "Pour",
               "form": "burst",
               "vectors": {
@@ -385,12 +385,12 @@
           ]
         },
         {
-          "hpBelow": 0.33,
+          "hpBelow": 0.33, "hazards": 3,
           "say": "It goes white-hot. 'IT WILL HOLD,' it roars, in a voice like the blacksmith's. 'PROBABLY.'",
           "movement": 4,
           "actions": [
             {
-              "id": "temper",
+              "id": "temper", "charge": 1, "pattern": "ring",
               "name": "Temper",
               "form": "burst",
               "vectors": {
@@ -496,7 +496,7 @@
           ],
           "actions": [
             {
-              "id": "rounds",
+              "id": "rounds", "charge": 1, "pattern": "cross",
               "name": "Rounds",
               "form": "burst",
               "vectors": {
@@ -522,11 +522,11 @@
           ]
         },
         {
-          "hpBelow": 0.33,
+          "hpBelow": 0.33, "hazards": 3,
           "say": "The Ward reads from its clipboard: every name the town forgot. One of them is yours, dated next week.",
           "actions": [
             {
-              "id": "flatline",
+              "id": "flatline", "charge": 1, "pattern": "checker",
               "name": "Flatline",
               "form": "line",
               "vectors": {
@@ -647,7 +647,7 @@
           ],
           "actions": [
             {
-              "id": "all_vectors",
+              "id": "all_vectors", "charge": 1, "pattern": "ring",
               "name": "Every Vector",
               "form": "burst",
               "vectors": {
@@ -676,14 +676,14 @@
           ]
         },
         {
-          "hpBelow": 0.35,
+          "hpBelow": 0.35, "hazards": 3,
           "say": "The town folds tighter. Every building you've walked past is in it. A Mirror Kid peels off its walls.",
           "summon": [
             "mirror_kid"
           ],
           "actions": [
             {
-              "id": "final_bell",
+              "id": "final_bell", "charge": 1, "pattern": "checker",
               "name": "The Final Bell",
               "form": "burst",
               "vectors": {

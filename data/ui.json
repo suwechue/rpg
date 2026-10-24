@@ -57,5 +57,7 @@
     "shield": { "name": "Shielded", "text": "A Shield absorbs damage first.", "icon": "icon_status_shield", "color": "#7cc7e8" }
   },
   "kindIcons": { "spell": "icon_kind_spell", "basic": "icon_kind_basic", "item": "icon_kind_item" },
+  "intentIcons": { "attack": "icon_intent_attack", "special": "icon_intent_special", "buff": "icon_intent_buff", "defend": "icon_intent_defend", "move": "icon_intent_move", "tracking": "icon_intent_tracking" },
+  "combatSpeed": { "comment": "Seconds of enemy-turn pauses are multiplied by the chosen speed; holding Fast-forward (Shift, pad X) multiplies again.", "setting": "normal", "normal": 1.0, "fast": 0.45, "instant": 0.0, "holdMul": 0.2 },
   "timeline": { "count": 12, "portrait": 20 }
 }

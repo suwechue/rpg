@@ -38,6 +38,11 @@ static func options(state: StateScript, u: UnitScript) -> Array:
 	if opponents.is_empty():
 		return out
 	var acts := _actions(state, u)
+	# Party AI steps out of telegraphed tiles (CU); enemies ignore their own.
+	var danger := {}
+	if u.team == "party":
+		for m in reach:
+			danger[m] = float(state.threat_at(m, u.team)) * float(c.get("dodgeWeight", 1.2))
 	for act in acts:
 		var spec: Dictionary = act["spec"]
 		var best := {}
@@ -48,6 +53,13 @@ static func options(state: StateScript, u: UnitScript) -> Array:
 				if ev <= 0.0:
 					continue
 				ev -= float(reach[m]) * float(c.get("moveCostPerStep", 0.05))
+				ev -= float(danger.get(m, 0.0))
+				if u.team == "enemy" and bool(spec.get("ranged", false)):
+					# Ranged enemies keep their distance.
+					var gap := 99
+					for o in opponents:
+						gap = mini(gap, GridScript.manhattan(o.cell, m))
+					ev += float(mini(gap, 4)) * float(c.get("rangedSpacing", 0.6))
 				if best.is_empty() or ev > float(best["ev"]):
 					best = { "kind": act["kind"], "move": m, "target": t, "ev": ev, "profile": act["profile"],
 						"action": act.get("action", {}), "hand": act.get("hand", -1), "card": act.get("card", {}) }
@@ -82,7 +94,18 @@ static func options(state: StateScript, u: UnitScript) -> Array:
 				near_cell = m
 	if near_cell != u.cell:
 		out.append({ "kind": "move", "move": near_cell, "target": near_cell, "profile": c.get("advance", { "courage": 1.0 }),
-			"ev": float(c.get("advanceBase", 3.0)) + (2.0 if nearest_dist > 3 else 0.0) })
+			"ev": float(c.get("advanceBase", 3.0)) + (2.0 if nearest_dist > 3 else 0.0) - float(danger.get(near_cell, 0.0)) })
+	# Dodge: standing in a telegraph, step to the nearest safe tile.
+	if float(danger.get(u.cell, 0.0)) > 0.0:
+		var safe := u.cell
+		var safe_d := 999
+		for m in reach:
+			if float(danger.get(m, 0.0)) <= 0.0 and int(reach[m]) < safe_d:
+				safe_d = int(reach[m])
+				safe = m
+		if safe != u.cell:
+			out.append({ "kind": "move", "move": safe, "target": safe, "profile": c.get("retreat", { "courage": -1.0 }),
+				"ev": float(danger[u.cell]) })
 	out.append({ "kind": "guard", "move": u.cell, "target": u.cell, "profile": c.get("guard", { "loyalty": 0.5, "courage": -0.3 }),
 		"ev": float(c.get("guardBase", 1.0)) })
 	return out
@@ -104,12 +127,63 @@ static func choose(state: StateScript, u: UnitScript) -> Dictionary:
 	return opts[keys.find(pick)]
 
 
-## Run a whole AI turn: choose, move, act, end turn.
+## An enemy's telegraphed next action (CU), chosen like a normal turn and
+## then frozen: the tiles it will hit, where it will stand, any charge-up.
+static func plan_intent(state: StateScript, u: UnitScript) -> Dictionary:
+	# Planned during someone else's turn: score moves with next turn's Movement.
+	var saved_move := u.move_left
+	u.move_left = 0 if u.statuses.has("root") else maxi(0, u.movement - (1 if u.statuses.has("slow") else 0))
+	var plan := choose(state, u)
+	u.move_left = saved_move
+	if plan.is_empty():
+		return {}
+	match str(plan["kind"]):
+		"move":
+			return { "kind": "move", "move": plan["move"], "cells": [] }
+		"guard":
+			return { "kind": "defend", "move": u.cell, "cells": [] }
+	var action: Dictionary = plan.get("action", {})
+	var spec := state.action_spec(u, action)
+	var m: Vector2i = plan["move"]
+	var target: Vector2i = plan["target"]
+	if bool(spec["heal"]):
+		return { "kind": "buff", "action": action, "move": m, "target": target, "cells": [] }
+	var charge := int(action.get("charge", 0))
+	if charge > 0:
+		# Charging attacks are aimed from where the unit stands now.
+		m = u.cell
+	var cells: Array
+	if action.has("pattern"):
+		var saved := u.cell
+		u.cell = m
+		cells = state.pattern_cells(u, str(action["pattern"]), target)
+		u.cell = saved
+	elif str(spec["kind"]) == "strike":
+		cells = [target]
+	else:
+		var occ := state.occupied(u)
+		occ[m] = u
+		cells = Forms.footprint(state.grid, spec["form"], m, target, occ)
+	var tracked := state.unit_at(target)
+	var mode := str(action.get("intent", u.source.get("intent", "locked")))
+	return { "kind": "special" if charge > 0 or action.has("pattern") else "attack", "action": action, "move": m, "target": target,
+		"cells": cells, "mode": mode, "unit": tracked.id if tracked != null else "", "charge": charge }
+
+
+## Run a whole AI turn: carry out the intent (enemies) or choose, move, act, end turn.
 static func take_turn(state: StateScript, u: UnitScript) -> Dictionary:
+	if u.team == "enemy" and not u.intent.is_empty():
+		var it: Dictionary = u.intent
+		if state.execute_intent(u):
+			if state.result == "" and state.current == u:
+				state.end_turn()
+			return it
 	var plan := choose(state, u)
 	if plan.is_empty():
+		u.intent = {}
 		state.end_turn()
 		return plan
+	u.intent = {}
 	if plan["move"] != u.cell:
 		state.move(u, plan["move"])
 	if state.result == "" and u.alive():
@@ -156,7 +230,7 @@ static func _actions(state: StateScript, u: UnitScript) -> Array:
 				continue
 			seen[id] = true
 			var card := CardRules.resolve(state.db, id, state.library)
-			if card.is_empty() or state.card_cost(u, card) > u.mp:
+			if card.is_empty() or state.card_block(u, card) != "":
 				continue
 			if CardRules.is_spell(card):
 				var fid := str(card.get("form", ""))
@@ -167,7 +241,7 @@ static func _actions(state: StateScript, u: UnitScript) -> Array:
 				var base := float(u.stats.get(str(card.get("stat", "str")), 5)) * float(card.get("mult", 1.0))
 				out.append({ "kind": "card", "card": card, "spec": { "kind": "strike", "base": base, "vectors": {}, "form": state.form_rec("touch"), "power": 0.0, "mult": 1.0, "heal": false, "ranged": false },
 					"profile": c.get("attack", { "courage": 0.6 }) })
-	if not u.free_action_used:
+	if not u.action_used:
 		var base := float(u.stats.get("str", 5))
 		out.append({ "kind": "strike", "spec": { "kind": "strike", "base": base, "vectors": {}, "form": state.form_rec("touch"), "power": 0.0, "mult": 1.0, "heal": false, "ranged": false },
 			"profile": c.get("attack", { "courage": 0.6 }) })

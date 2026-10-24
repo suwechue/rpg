@@ -49,6 +49,7 @@ func _ready() -> void:
 ##   --autoplay (AI plays the party)  --seed=N --class=mage (fresh run first)
 ##   --jump=week,day_index,part_index  --town=zone:x,y (start position in the town)
 ##   --section=Art (with --debug)  --custom=C:/folder (use another custom art folder)
+##   --hand=ids --hovercard=N --card=N --hover=x,y (combat previews, see _combat_dev_args)
 ## --debug opens this menu; --shot saves the viewport after N frames and quits.
 func _dev_args() -> void:
 	var args := {}
@@ -74,6 +75,8 @@ func _dev_args() -> void:
 		GameState.pending_combat = GameState.combat_setup(str(args["fight"]).split(","), str(args.get("layout", "boss_stage")), { "boss": true })
 	if args.has("scene"):
 		SceneRouter.goto(str(args["scene"]))
+	if args.has("hand") or args.has("hovercard") or args.has("card"):
+		_combat_dev_args.call_deferred(args)
 	if args.has("talk"):
 		for i in 10:
 			await get_tree().process_frame
@@ -93,6 +96,33 @@ func _dev_args() -> void:
 		var img := get_viewport().get_texture().get_image()
 		img.save_png(str(args["shot"]))
 		get_tree().quit()
+
+
+## Combat screenshots: --hand=id,id (the acting unit's hand), --hovercard=N
+## (preview card N), --card=N (select it), --hover=x,y (the tile under the mouse).
+func _combat_dev_args(args: Dictionary) -> void:
+	for i in 40:
+		await get_tree().process_frame
+	var scene := get_tree().current_scene
+	if scene == null or scene.get("state") == null:
+		return
+	for i in 600:
+		if scene.call("_player_turn"):
+			break
+		await get_tree().process_frame
+	var u: Object = scene.get("state").get("current")
+	if args.has("hand") and u != null and u.get("deck") != null:
+		u.get("deck").set("hand", Array(str(args["hand"]).split(",")))
+		u.set("mp", maxi(int(u.get("mp")), 10))
+	if args.has("hover"):
+		var xy := str(args["hover"]).split(",")
+		scene.set("hover_cell", Vector2i(int(xy[0]), int(xy[1])))
+	scene.call("_sync_views")
+	if args.has("hovercard"):
+		scene.call("_hover_card_changed", int(args["hovercard"]))
+	if args.has("card"):
+		scene.call("_on_card", int(args["card"]))
+		scene.call("_refresh_overlays")
 
 
 func add_section(title: String, fill: Callable, parent: Control = null) -> void:

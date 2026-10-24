@@ -1,5 +1,7 @@
 ## Draws the battlefield: themed backdrop, the trapezoid floor, terrain, tile
-## effects and the tinted overlays (reach, targets, footprint, hover).
+## effects and the tinted overlays (reach, card range, footprint in the card's
+## Vector color, enemy telegraphs with their damage, push landings, predicted
+## numbers, hover).
 ## Display only; the controller sets the overlay arrays and calls queue_redraw().
 extends Node2D
 
@@ -13,6 +15,10 @@ var reach_cells: Array = []
 var target_cells: Array = []
 var footprint_cells: Array = []
 var footprint_heal := false
+var footprint_color := Color(1.0, 0.35, 0.3, 0.45)
+var threat_cells: Dictionary = {}    # cell -> { "damage": n, "charge": n }
+var push_marks: Array = []           # [{ "from", "to", "collide", "hazard", "slide" }]
+var preview_labels: Dictionary = {}  # cell -> text drawn above the unit there
 var hover_cell := Vector2i(-1, -1)
 var cursor_cell := Vector2i(-1, -1)
 var glyph_cells: Array = []
@@ -23,7 +29,7 @@ var _time := 0.0
 
 func _process(delta: float) -> void:
 	_time += delta
-	if not grid.burning.is_empty() or not flash_cells.is_empty():
+	if not grid.burning.is_empty() or not flash_cells.is_empty() or not threat_cells.is_empty():
 		queue_redraw()
 
 
@@ -39,9 +45,11 @@ func _draw() -> void:
 		for c in grid.cols:
 			_draw_cell(Vector2i(c, r))
 	_draw_overlay(reach_cells, Color(0.45, 0.75, 1.0, 0.28))
+	_draw_threats()
 	_draw_overlay(target_cells, Color(1.0, 0.85, 0.4, 0.22))
-	_draw_overlay(footprint_cells, Color(0.55, 1.0, 0.6, 0.45) if footprint_heal else Color(1.0, 0.35, 0.3, 0.45))
+	_draw_overlay(footprint_cells, Color(0.55, 1.0, 0.6, 0.45) if footprint_heal else footprint_color)
 	_draw_overlay(flash_cells, flash_color)
+	_draw_pushes()
 	for g in glyph_cells:
 		var ctr := proj.cell_center(g)
 		draw_arc(ctr, 6.0, 0, TAU, 12, Color("b07ce8"), 1.0)
@@ -50,6 +58,44 @@ func _draw() -> void:
 		draw_polyline(_closed(proj.cell_polygon(hover_cell)), Color("ffd966"), 1.0)
 	if cursor_cell.x >= 0 and cursor_cell != hover_cell:
 		draw_polyline(_closed(proj.cell_polygon(cursor_cell)), Color("ffffff"), 1.0)
+	for cell in preview_labels:
+		var at := proj.cell_center(cell) + Vector2(-8, -Display.tile * 1.6)
+		draw_string_outline(UiTheme.font, at, str(preview_labels[cell]), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, 3, UiTheme.color("outline"))
+		draw_string(UiTheme.font, at, str(preview_labels[cell]), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, UiTheme.ACCENT)
+
+
+## Enemy telegraphs: red tiles (pulsing harder while charging) with the damage waiting there.
+func _draw_threats() -> void:
+	var pulse := 0.5 + 0.5 * sin(_time * 6.0)
+	for cell in threat_cells:
+		var t: Dictionary = threat_cells[cell]
+		var charging := int(t.get("charge", 0)) > 0
+		var c := UiTheme.color("bad")
+		c.a = (0.35 + 0.25 * pulse) if charging else 0.45
+		var poly := proj.cell_polygon(cell)
+		draw_colored_polygon(poly, c)
+		draw_polyline(_closed(poly), Color(UiTheme.color("bad"), 0.9), 2.0 if charging else 1.0)
+		var dmg := int(t.get("damage", 0))
+		if dmg > 0:
+			# On the tile's front edge, where a unit standing there doesn't cover it.
+			var at := (poly[3] + poly[2]) / 2.0 + Vector2(-6, -2)
+			draw_string_outline(UiTheme.font, at, str(dmg), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, 3, UiTheme.color("outline"))
+			draw_string(UiTheme.font, at, str(dmg), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, UiTheme.color("damage"))
+
+
+## Where pushed or pulled units would land: an arrow and a ring, "!" on a collision or hazard.
+func _draw_pushes() -> void:
+	for m in push_marks:
+		var a := proj.cell_center(m["from"])
+		var b := proj.cell_center(m["to"])
+		var c := UiTheme.ACCENT
+		if a != b:
+			draw_line(a, b, c, 1.0)
+			draw_arc(b, 6.0, 0, TAU, 12, c, 1.0)
+		if bool(m.get("collide", false)) or bool(m.get("hazard", false)):
+			var at := b + Vector2(5, -4)
+			draw_string_outline(UiTheme.font, at, "!", HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, 3, UiTheme.color("outline"))
+			draw_string(UiTheme.font, at, "!", HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, UiTheme.color("bad"))
 
 
 func _closed(p: PackedVector2Array) -> PackedVector2Array:

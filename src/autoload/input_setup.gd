@@ -1,6 +1,7 @@
 ## Registers the input map in code (keyboard + controller) so it is easy to read
 ## and edit. Actions: move_up/down/left/right, interact, end_part, cancel, pause,
-## save_run, load_run, debug_menu.
+## save_run, load_run, debug_menu, card_prev/card_next (highlight a card in
+## combat), fast_forward (hold to speed up enemy turns).
 extends Node
 
 const KEYS := {
@@ -15,6 +16,9 @@ const KEYS := {
 	"save_run": [KEY_F5],
 	"load_run": [KEY_F9],
 	"debug_menu": [KEY_F1],
+	"card_prev": [KEY_Q],
+	"card_next": [KEY_TAB],
+	"fast_forward": [KEY_SHIFT],
 }
 
 const PAD_BUTTONS := {
@@ -26,6 +30,9 @@ const PAD_BUTTONS := {
 	"cancel": [JOY_BUTTON_B],
 	"end_part": [JOY_BUTTON_Y],
 	"pause": [JOY_BUTTON_START],
+	"card_prev": [JOY_BUTTON_LEFT_SHOULDER],
+	"card_next": [JOY_BUTTON_RIGHT_SHOULDER],
+	"fast_forward": [JOY_BUTTON_X],
 }
 
 

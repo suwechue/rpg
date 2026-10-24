@@ -72,6 +72,7 @@
         "<P.......E.",
         "<P..c....E.",
         "<P.......E."
-      ] }
+      ] },
+    { "id": "training_yard", "theme": "school", "weight": 0, "note": "Debug and screenshots only (weight 0): a hazard behind the first enemy, an ice strip in the last row.", "map": ["<P..Eh....", "<P........", "<P....E...", "<P........", "<P..Eiii.."] }
   ]
 }

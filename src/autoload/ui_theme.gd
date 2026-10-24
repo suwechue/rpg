@@ -173,6 +173,11 @@ func _fill_theme(t: Theme) -> void:
 	t.set_constant("v_separation", "CompactGrid", 1)
 
 
+func _exit_tree() -> void:
+	if DisplayServer.get_name() != "headless":
+		Input.set_custom_mouse_cursor(null)
+
+
 func _set_cursor() -> void:
 	if DisplayServer.get_name() == "headless":
 		return

@@ -5,14 +5,14 @@
   "names": { "str": "Strength", "dex": "Dexterity", "con": "Constitution", "int": "Intelligence", "per": "Perception", "wil": "Willpower", "cha": "Charisma" },
   "derived": {
     "maxHp":        { "base": 20, "con": 4 },
-    "maxMp":        { "base": 10, "int": 2, "wil": 1 },
+    "maxMp":        { "base": 4, "int": 0.5, "wil": 0.34, "perLevel": 0.5 },
     "movement":     { "base": 3, "dexDivisor": 5 },
     "initiative":   { "dex": 1, "per": 0.5 },
     "physDefense":  { "con": 0.5 },
     "magicResist":  { "wil": 0.5 },
     "stability":    { "wil": 1, "int": 0.5 },
     "critChancePct":{ "base": 5, "dex": 0.5 },
-    "mpRegen":      { "base": 2, "wilDivisor": 5 }
+    "mpRegen":      { "base": 1, "wilDivisor": 0 }
   },
   "combat": {
     "magicResistPctPerPoint": 2,
@@ -37,6 +37,8 @@
     "halfCoverRangedMul": 0.75,
     "hazardDamage": 4,
     "flankMul": 1.5,
+    "backMul": 1.15,
+    "telegraphDamageMul": 1.35,
     "adjacentFriendDamagePct": 0.05,
     "secondWindHpPct": 0.2,
     "secondWindBelowPct": 0.3,

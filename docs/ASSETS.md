@@ -18,7 +18,7 @@ Sizes: tiles 32x32, characters 32x32 (up to 32x48 for tall ones), portraits 64x6
 
 Pack art is a placeholder: the 16x16 packs are scaled up 2x (nearest neighbour) to fit the 32x32 grid until you replace them.
 
-Replaced so far: Characters (walk sheets) 0/39, Portraits 0/35, Enemies and bosses 0/30, Tilesets 0/4, Single tiles 0/120, UI 0/16, Icons 0/20, Card art 0/11, VFX 0/0, Music 0/13, Sound effects 0/13.
+Replaced so far: Characters (walk sheets) 0/39, Portraits 0/35, Enemies and bosses 0/30, Tilesets 0/4, Single tiles 0/120, UI 0/16, Icons 0/26, Card art 0/11, VFX 0/0, Music 0/13, Sound effects 0/13.
 
 ## Characters (walk sheets) (39)
 
@@ -306,7 +306,7 @@ Single tiles inside a tileset. Replacing one changes it everywhere it's used. Dr
 | [ ] | `ui_cursor` | 12x12 | Mouse cursor, hotspot top left; scaled with the window | top left | pack: res: |  |
 | [ ] | `font_ui` | - | - | - | pack: res: | Pixel font drawn at its native 9 px (or an integer multiple). .ttf or .otf. |
 
-## Icons (20)
+## Icons (26)
 
 
 
@@ -332,6 +332,12 @@ Single tiles inside a tileset. Replacing one changes it everywhere it's used. Dr
 | [ ] | `icon_kind_spell` | 16x16 | 16x16 white shape with dark outline | center | pack: res: |  |
 | [ ] | `icon_kind_basic` | 16x16 | 16x16 white shape with dark outline | center | pack: res: |  |
 | [ ] | `icon_kind_item` | 16x16 | 16x16 white shape with dark outline | center | pack: res: |  |
+| [ ] | `icon_intent_attack` | 16x16 | 16x16 white shape with dark outline; drawn over an enemy's head | center | pack: res: |  |
+| [ ] | `icon_intent_special` | 16x16 | 16x16 white shape with dark outline; drawn over an enemy's head | center | pack: res: |  |
+| [ ] | `icon_intent_buff` | 16x16 | 16x16 white shape with dark outline; drawn over an enemy's head | center | pack: res: |  |
+| [ ] | `icon_intent_defend` | 16x16 | 16x16 white shape with dark outline; drawn over an enemy's head | center | pack: res: |  |
+| [ ] | `icon_intent_move` | 16x16 | 16x16 white shape with dark outline; drawn over an enemy's head | center | pack: res: |  |
+| [ ] | `icon_intent_tracking` | 16x16 | 16x16 white shape with dark outline; drawn over an enemy's head | center | pack: res: |  |
 
 ## Card art (11)
 

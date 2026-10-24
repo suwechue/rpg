@@ -10,6 +10,8 @@
   "defaultDisposition": { "courage": 40, "loyalty": 40, "kindness": 20 },
   "advanceBase": 2.0,
   "guardBase": 0.6,
+  "dodgeWeight": 1.2,
+  "rangedSpacing": 0.6,
   "attack":  { "courage": 0.6, "greed": 0.2 },
   "retreat": { "courage": -1.0, "loyalty": -0.2 },
   "advance": { "courage": 0.8, "pride": 0.3 },

@@ -2,9 +2,14 @@
 ## Reads its setup from GameState.pending_combat; when the fight ends it hands
 ## the summary to GameState.finish_combat() and returns to the previous scene.
 ## Controls: click (or arrows + E) to move and target, 1-7 pick a card,
-## S Strike, G Guard, V Vector Wheel, F Flee, Space end turn, Esc cancel.
+## Q / Tab (pad LB / RB) highlight cards to preview them, S Strike, G Guard,
+## V Vector Wheel, F Flee, Space end turn, Esc cancel (or undo the move),
+## hold Shift (pad X) to fast-forward enemy turns.
+## Each turn is Move + 1 Action (CU, docs/COMBAT_REWORK.md); the player's turn
+## is a small state machine: idle -> card selected -> target hovered -> confirm.
 extends Node2D
 
+const GridScript := preload("res://src/core/combat/grid.gd")
 const StateScript := preload("res://src/core/combat/combat_state.gd")
 const UnitScript := preload("res://src/core/combat/unit.gd")
 const AI := preload("res://src/core/combat/enemy_ai.gd")
@@ -47,6 +52,10 @@ var _float_slots: Dictionary = {}   # unit view -> floating texts currently show
 var _hover_info: PanelContainer
 var _hover_label: Label
 var _hover_card := -1                # card in hand under the mouse: preview without selecting
+var _focus_card := -1                # card highlighted with the keyboard or pad (card_prev / card_next)
+var _log_scroll: ScrollContainer
+var _log_box: VBoxContainer
+var _last_turn_team := ""
 
 
 func _ready() -> void:
@@ -136,14 +145,41 @@ func _sync_views() -> void:
 		v.highlight = u == state.current and not _done
 		v.face(u.facing)
 		v.statuses = state.status_list(u)
+		v.intent_icon = _intent_icon(u)
+		v.charge = int(u.intent.get("charge", 0))
+		v.friend_link = false
+		if u.team == "party" and u.alive():
+			for a in state.allies_of(u):
+				if a != u and GridScript.manhattan(a.cell, u.cell) == 1 and state._bond_friendly(u, a):
+					v.friend_link = true
 		v.queue_redraw()
 	var gl: Array = []
 	for g in state.glyphs:
 		if str(g["team"]) == "party":
 			gl.append(g["cell"])
 	field.glyph_cells = gl
+	var threats := {}
+	var all := state.threats()
+	for c in all:
+		var total := 0
+		var charge := 0
+		for h in all[c]:
+			total += int(h["damage"])
+			charge = maxi(charge, int(h["charge"]))
+		threats[c] = { "damage": total, "charge": charge }
+	field.threat_cells = threats
 	_refresh_overlays()
 	_refresh_hud()
+
+
+func _intent_icon(u: UnitScript) -> String:
+	if u.team != "enemy" or u.intent.is_empty() or not u.alive():
+		return ""
+	var icons: Dictionary = DataDB.table("ui").get("intentIcons", {})
+	var kind := str(u.intent.get("kind", ""))
+	if str(u.intent.get("mode", "")) == "tracking" and kind == "attack":
+		kind = "tracking"
+	return str(icons.get(kind, ""))
 
 
 # --- UI -----------------------------------------------------------------------------------
@@ -188,15 +224,28 @@ func _build_ui() -> void:
 	col.position = Vector2(view.x - 82, hand_y)
 	col.theme_type_variation = "CompactGrid"
 	_ui.add_child(col)
-	for spec in [["end", "End", "End turn [Space]"], ["strike", "Strike", "Free basic Strike: adjacent, STR [S]"],
-			["guard", "Guard", "Free basic Guard: +Defense until your next turn [G]"],
-			["wheel", "Wheel", "Vector Wheel: improvise a spell [V]"], ["flee", "Flee", "Flee when everyone stands on an exit tile [F]"]]:
+	for spec in [["end", "End", "End turn [Space]"], ["strike", "Strike", "Basic Strike: adjacent, STR. Uses your action [S]"],
+			["guard", "Guard", "Basic Guard: +Defense until your next turn. Uses your action [G]"],
+			["wheel", "Wheel", "Vector Wheel: improvise a spell. Uses your action [V]"], ["flee", "Flee", "Flee when everyone stands on an exit tile [F]"],
+			["undo", "Undo", "Undo this turn's move (before you act) [Esc]"]]:
 		var key: String = spec[0]
 		var b := UiTheme.button(spec[1], func() -> void: _on_button(key))
 		b.custom_minimum_size = Vector2(39, 18)
 		b.tooltip_text = spec[2]
 		col.add_child(b)
 		_buttons[key] = b
+	# The combat log: everything that happened, scrollable, newest at the bottom.
+	var lp := PanelContainer.new()
+	lp.position = Vector2(2, 64)
+	lp.custom_minimum_size = Vector2(112, 0)
+	_ui.add_child(lp)
+	_log_scroll = ScrollContainer.new()
+	_log_scroll.custom_minimum_size = Vector2(108, Display.base.y * 0.26)
+	_log_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	lp.add_child(_log_scroll)
+	_log_box = VBoxContainer.new()
+	_log_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_log_scroll.add_child(_log_box)
 	# Hover info: what's on the tile under the mouse (unit, HP, statuses).
 	_hover_info = PanelContainer.new()
 	_hover_info.theme_type_variation = "Tooltip"
@@ -210,18 +259,27 @@ func _build_ui() -> void:
 func _refresh_hud() -> void:
 	for c in _timeline.get_children():
 		c.queue_free()
+	# This round, a round marker, then the next round.
 	var tl: Dictionary = DataDB.table("ui").get("timeline", {})
-	for u in state.timeline(int(tl.get("count", 12))):
-		var box := PanelContainer.new()
-		box.theme_type_variation = "TimelineCurrent" if u == state.current else ("TimelineParty" if u.team == "party" else "TimelineEnemy")
-		box.add_child(_portrait(u, int(tl.get("portrait", 20))))
-		box.tooltip_text = "%s (init %d)" % [u.name, u.initiative]
-		_timeline.add_child(box)
+	var rounds := state.timeline_rounds()
+	var left := int(tl.get("count", 12))
+	for group in [["now", int(rounds["round"])], ["next", int(rounds["round"]) + 1]]:
+		var list: Array = rounds[group[0]]
+		if list.is_empty() or left <= 0:
+			continue
+		_timeline.add_child(UiTheme.label("R%d" % group[1], UiTheme.DIM))
+		for u in list.slice(0, left):
+			var box := PanelContainer.new()
+			box.theme_type_variation = "TimelineCurrent" if u == state.current and group[0] == "now" else ("TimelineParty" if u.team == "party" else "TimelineEnemy")
+			box.add_child(_portrait(u, int(tl.get("portrait", 20))))
+			box.tooltip_text = "%s (init %d)" % [u.name, u.initiative]
+			_timeline.add_child(box)
+			left -= 1
 	var u := state.current
 	if u != null:
 		var lines: Array = ["%s%s" % [u.name, " (AI)" if u.ai_controlled else ""], "HP %d/%d  MP %d/%d" % [u.hp, u.max_hp, u.mp, u.max_mp]]
 		if u.team == "party" and not u.ai_controlled:
-			lines.append("Move %d  %s" % [u.move_left, "basic used" if u.free_action_used else "basic ready"])
+			lines.append("Move %d  %s" % [u.move_left, "action used" if u.action_used else "action ready"])
 			if u.deck != null:
 				lines.append("Deck %d  Discard %d" % [u.deck.draw_pile.size(), u.deck.discard.size()])
 		if u.shield > 0:
@@ -230,16 +288,35 @@ func _refresh_hud() -> void:
 	_refresh_hand()
 	var player_turn := _player_turn()
 	_buttons["end"].disabled = not player_turn
-	_buttons["strike"].disabled = not player_turn or u.free_action_used
-	_buttons["guard"].disabled = not player_turn or u.free_action_used
-	_buttons["wheel"].disabled = not player_turn or u.known_vectors.is_empty()
+	_buttons["strike"].disabled = not player_turn or u.action_used
+	_buttons["guard"].disabled = not player_turn or u.action_used
+	_buttons["wheel"].disabled = not player_turn or u.action_used or u.known_vectors.is_empty()
 	_buttons["flee"].disabled = not player_turn or not state.can_flee()
-	if _info.text == "" or mode == "idle":
-		_info.text = "\n".join(PackedStringArray(_log.slice(maxi(0, _log.size() - 5))))
+	_buttons["undo"].disabled = not player_turn or not state.can_undo_move(u)
+	if mode == "idle" and _hover_card < 0:
+		_info.text = _turn_hint()
+
+
+## What the player can still do this turn.
+func _turn_hint() -> String:
+	var u := state.current
+	if not _player_turn() or u == null:
+		return ""
+	if u.action_used and u.move_left <= 0:
+		_buttons["end"].grab_focus.call_deferred()
+		return "Turn done. End turn [Space]."
+	var parts: Array = []
+	if u.move_left > 0:
+		parts.append("Move %d" % u.move_left)
+	parts.append("action used" if u.action_used else "1 action")
+	if not u.quick_used:
+		parts.append("1 quick card")
+	return "This turn: %s.\nRed tiles: enemy attacks. Step off them to dodge." % ", ".join(PackedStringArray(parts))
 
 
 func _refresh_hand() -> void:
 	for c in _hand.get_children():
+		_hand.remove_child(c)
 		c.queue_free()
 	var u := state.current
 	if u == null or u.deck == null or u.team != "party" or u.ai_controlled:
@@ -250,9 +327,12 @@ func _refresh_hand() -> void:
 		var cost := state.card_cost(u, card)
 		b.setup(card, cost)
 		b.selected = (mode == "card" and selected_hand == i) or (mode == "wheel_target" and wheel_fuel == i)
-		b.disabled = not _player_turn() or (cost > u.mp and mode != "fuel")
-		if b.disabled and _player_turn() and cost > u.mp:
-			b.tooltip_text += "\nNeeds %d MP" % cost
+		var block := state.card_block(u, card)
+		b.disabled = not _player_turn() or (block != "" and mode != "fuel")
+		if _player_turn() and block != "":
+			b.tooltip_text += "\n" + block
+		elif bool(card.get("quick", false)):
+			b.tooltip_text += "\nQuick: doesn't use your action (once a turn)."
 		var idx := i
 		b.pressed.connect(func() -> void: _on_card(idx))
 		b.mouse_entered.connect(func() -> void: _hover_card_changed(idx))
@@ -260,6 +340,8 @@ func _refresh_hand() -> void:
 		b.mouse_exited.connect(func() -> void: _hover_card_changed(-1))
 		b.focus_exited.connect(func() -> void: _hover_card_changed(-1))
 		_hand.add_child(b)
+	if _focus_card >= 0 and _focus_card < _hand.get_child_count():
+		(_hand.get_child(_focus_card) as Control).grab_focus.call_deferred()
 
 
 ## A small picture of a unit for the timeline: their portrait if they have one,
@@ -330,6 +412,8 @@ func _refresh_overlays() -> void:
 	field.reach_cells = []
 	field.target_cells = []
 	field.footprint_cells = []
+	field.push_marks = []
+	field.preview_labels = {}
 	field.hover_cell = hover_cell
 	field.cursor_cell = cursor_cell
 	if _player_turn():
@@ -358,21 +442,48 @@ func _refresh_overlays() -> void:
 ## hovered in hand (`guess`), at the nearest target tile with an enemy on it.
 func _preview(card: Dictionary, improvised: bool, guess: bool = false) -> void:
 	var target := hover_cell if hover_cell.x >= 0 else cursor_cell
-	if guess and not field.target_cells.has(target):
-		target = _likely_target(field.target_cells)
+	if guess:
+		# Only a tile the mouse is actually on counts; otherwise aim at the likely target.
+		target = hover_cell if field.target_cells.has(hover_cell) else _likely_target(field.target_cells)
 	if not field.target_cells.has(target):
 		return
 	var p := state.preview(state.current, card, target, improvised)
 	field.footprint_cells = p["cells"]
 	field.footprint_heal = CardRules.heals(card)
+	var axes := CardRules.ordered_vectors(DataDB.all(), card.get("vectors", {}))
+	var fc := UiTheme.vector_color(str(axes[0])) if not axes.is_empty() else UiTheme.color("bad")
+	fc.a = 0.5
+	field.footprint_color = fc
+	field.push_marks = p.get("pushes", [])
+	var hostile := 0
 	var lines: Array = ["%s: %d MP" % [card.get("name", ""), int(p["cost"])]]
 	for h in p["hits"]:
 		var t := state.unit_by_id(str(h["unit"]))
 		var nm: String = t.name if t != null else str(h["unit"])
+		var tag := ""
 		if h.has("damage"):
-			lines.append("%s -%d" % [nm, int(h["damage"])])
+			hostile += 1
+			tag = "-%d" % int(h["damage"])
+			for s in h.get("status", []):
+				tag += " " + str(UiTheme.status_info(str(s)).get("name", s))
 		else:
-			lines.append("%s +%d" % [nm, int(h["heal"])])
+			tag = "+%d" % int(h["heal"])
+		lines.append("%s %s" % [nm, tag])
+		if t != null:
+			field.preview_labels[t.cell] = tag
+	if hostile > 1:
+		lines.append("Hits %d enemies" % hostile)
+	for m in p.get("pushes", []):
+		var t := state.unit_by_id(str(m["unit"]))
+		var what := "lands in a hazard" if bool(m["hazard"]) else ("slides on ice" if bool(m["slide"]) else "")
+		if bool(m["collide"]):
+			what = "slams into something (-%d)" % int(m["damage"])
+		if what != "" and t != null:
+			lines.append("%s %s" % [t.name, what])
+	for i in p.get("interrupts", []):
+		var t := state.unit_by_id(str(i["unit"]))
+		if t != null:
+			lines.append("%s: %s!" % [t.name, i["effect"]])
 	lines.append("Stable: %d%%" % roundi(float(p["chance"]) * 100.0))
 	_info.text = "\n".join(PackedStringArray(lines))
 
@@ -417,12 +528,20 @@ func _unhandled_input(event: InputEvent) -> void:
 		_refresh_overlays()
 		get_viewport().set_input_as_handled()
 		return
+	if event.is_action_pressed("card_next") or event.is_action_pressed("card_prev"):
+		_cycle_card(1 if event.is_action_pressed("card_next") else -1)
+		get_viewport().set_input_as_handled()
+		return
 	if event.is_action_pressed("interact") and cursor_cell.x >= 0:
 		_click_cell(cursor_cell)
 	elif event.is_action_pressed("end_part"):
 		_on_button("end")
 	elif event.is_action_pressed("cancel"):
-		_cancel()
+		# Esc / B: deselect first; from idle it undoes the move.
+		if mode == "idle" and _player_turn() and state.can_undo_move(state.current):
+			_on_button("undo")
+		else:
+			_cancel()
 	elif event is InputEventKey and event.pressed and not event.echo:
 		var k: int = event.physical_keycode
 		if k >= KEY_1 and k <= KEY_7:
@@ -437,16 +556,52 @@ func _unhandled_input(event: InputEvent) -> void:
 			_on_button("flee")
 
 
-## The tooltip for whoever stands on the hovered tile: name, HP and each status.
+## Highlight the next or previous card with the keyboard or pad; it previews like a hover.
+func _cycle_card(step: int) -> void:
+	if not _player_turn() or _hand.get_child_count() == 0:
+		return
+	var n := _hand.get_child_count()
+	_focus_card = (maxi(_focus_card, 0 if step > 0 else 1) + step + n) % n if _focus_card >= 0 else (0 if step > 0 else n - 1)
+	(_hand.get_child(_focus_card) as Control).grab_focus()
+
+
+## The tooltip for the hovered tile: who's there (HP, statuses, intent), the
+## terrain and tile effects, and which enemies threaten it.
 func _update_hover_info(at: Vector2) -> void:
-	var t := state.unit_at(hover_cell) if hover_cell.x >= 0 else null
-	if t == null or t.dead or t.is_prop():
+	if hover_cell.x < 0:
 		_hover_info.visible = false
 		return
-	var lines: Array = ["%s  HP %d/%d" % [t.name, t.hp, t.max_hp]]
-	for s in state.status_list(t):
-		var info := UiTheme.status_info(str(s))
-		lines.append("%s: %s" % [info.get("name", s), info.get("text", "")])
+	var lines: Array = []
+	var t := state.unit_at(hover_cell)
+	if t != null and not t.dead:
+		lines.append("%s  HP %d/%d%s" % [t.name, t.hp, t.max_hp, "  MP %d/%d" % [t.mp, t.max_mp] if t.max_mp > 0 else ""])
+		for s in state.status_list(t):
+			var info := UiTheme.status_info(str(s))
+			lines.append("%s: %s" % [info.get("name", s), info.get("text", "")])
+		if not t.intent.is_empty():
+			var act: Dictionary = t.intent.get("action", {})
+			var plan := str(t.intent.get("kind", ""))
+			if act.has("name"):
+				plan = str(act["name"])
+			if int(t.intent.get("charge", 0)) > 0:
+				plan += " (charging, %d turn)" % int(t.intent["charge"])
+			if str(t.intent.get("mode", "")) == "tracking":
+				plan += " (follows its target)"
+			lines.append("Next: " + plan)
+	var ter := state.grid.get_terrain(hover_cell)
+	if ter != GridScript.FLOOR:
+		lines.append(ter.capitalize())
+	if state.grid.burning.has(hover_cell):
+		lines.append("Burning")
+	if state.grid.steam.has(hover_cell):
+		lines.append("Steam (blocks sight)")
+	for h in state.threats().get(hover_cell, []):
+		var src := state.unit_by_id(str(h["unit"]))
+		if src != null:
+			lines.append("Threatened by %s: %d" % [src.name, int(h["damage"])])
+	if lines.is_empty():
+		_hover_info.visible = false
+		return
 	_hover_label.text = "\n".join(PackedStringArray(lines))
 	_hover_info.reset_size()
 	var pos := at + Vector2(10, 10)
@@ -481,9 +636,13 @@ func _on_card(i: int) -> void:
 		_refresh_overlays()
 		_refresh_hud()
 		return
+	if mode == "card" and selected_hand == i:
+		_cancel()
+		return
 	var card := state.card_of(u, i)
-	if state.card_cost(u, card) > u.mp:
-		_note("Not enough MP for %s." % card.get("name", ""))
+	var block := state.card_block(u, card)
+	if block != "":
+		_info.text = "%s: %s" % [card.get("name", ""), block]
 		return
 	mode = "card"
 	selected_hand = i
@@ -505,7 +664,7 @@ func _on_button(key: String) -> void:
 			state.end_turn()
 			_after_action()
 		"strike":
-			if not u.free_action_used:
+			if not u.action_used:
 				mode = "strike"
 				_refresh_overlays()
 		"guard":
@@ -516,8 +675,15 @@ func _on_button(key: String) -> void:
 		"flee":
 			if state.flee():
 				_after_action()
+		"undo":
+			_cancel()
+			if state.undo_move(u):
+				_after_action()
 
 
+## Idle: a reachable tile moves you. With a card (or Strike, or an aimed
+## improvised spell) selected: a valid target confirms it, and any other tile
+## just deselects, so a misclick never does something unexpected.
 func _click_cell(c: Vector2i) -> void:
 	if not _player_turn():
 		return
@@ -532,15 +698,21 @@ func _click_cell(c: Vector2i) -> void:
 				mode = "idle"
 				selected_hand = -1
 				_after_action()
+			else:
+				_cancel()
 		"strike":
 			if state.strike(u, c):
 				mode = "idle"
 				_after_action()
+			else:
+				_cancel()
 		"wheel_target":
 			if state.improvise(u, wheel_vectors, wheel_form, wheel_magnitude, wheel_fuel, c):
 				mode = "idle"
 				wheel_fuel = -1
 				_after_action()
+			else:
+				_cancel()
 
 
 func _after_action() -> void:
@@ -655,10 +827,33 @@ func _run_ai() -> void:
 		return
 	_busy = true
 	_sync_views()
-	await get_tree().create_timer(0.35).timeout
+	await _wait(0.3)
 	AI.take_turn(state, state.current)
 	_busy = false
 	await _play_events()
+
+
+## Combat speed (data/ui.json "combatSpeed"), times the fast-forward key while held.
+func _speed() -> float:
+	var cs: Dictionary = DataDB.table("ui").get("combatSpeed", {})
+	var s := float(cs.get(str(cs.get("setting", "normal")), 1.0))
+	if Input.is_action_pressed("fast_forward"):
+		s *= float(cs.get("holdMul", 0.2))
+	return s
+
+
+## Pause between beats of an animation, scaled by combat speed.
+func _wait(seconds: float) -> void:
+	var t := seconds * _speed()
+	if t <= 0.01:
+		await get_tree().process_frame
+		return
+	await get_tree().create_timer(t).timeout
+
+
+## Tween durations scaled by combat speed (never zero, so tweens still finish).
+func _dur(seconds: float) -> float:
+	return maxf(0.01, seconds * _speed())
 
 
 func _unit_view(id: String) -> Node2D:
@@ -670,48 +865,116 @@ func _unit_view(id: String) -> Node2D:
 	return views.get(u, null)
 
 
+func _uname(id: String) -> String:
+	var u := state.unit_by_id(id)
+	return u.name if u != null else id
+
+
+## Nudge the battlefield a little toward the acting unit, then back.
+func _nudge_to(v: Node2D) -> void:
+	var center := Display.size_f() / 2.0
+	var offset := (center - v.position) * 0.06
+	var tw := create_tween()
+	tw.tween_property(self, "position", offset, _dur(0.2))
+	await tw.finished
+
+
+func _nudge_back() -> void:
+	if position == Vector2.ZERO:
+		return
+	var tw := create_tween()
+	tw.tween_property(self, "position", Vector2.ZERO, _dur(0.15))
+	await tw.finished
+
+
 func _play_event(e: Dictionary) -> void:
 	match str(e["t"]):
+		"round":
+			_say_banner("Round %d" % int(e["n"]))
+			_note("-- Round %d --" % int(e["n"]))
+			await _wait(0.4)
 		"turn":
+			await _nudge_back()
 			var u := state.unit_by_id(str(e["unit"]))
 			if u != null:
-				_note("%s's turn." % u.name)
-				if u.team == "party" and not u.ai_controlled:
+				if u.team == "party" and not _is_ai(u):
 					cursor_cell = u.cell
+					_focus_card = -1
+				elif u.team == "enemy":
+					if _last_turn_team != "enemy":
+						_say_banner("Enemy turn")
+						await _wait(0.4)
+					_sync_views()
+					var v := _view_for_id(u.id)
+					if v != null:
+						await _nudge_to(v)
+					await _wait(0.25)
+				_last_turn_team = u.team
 			_sync_views()
+		"intent":
+			pass
 		"move":
 			var v := _view_for_id(str(e["unit"]))
 			if v == null:
 				return
 			for cell in e["path"]:
 				var tw := create_tween()
-				tw.tween_property(v, "position", proj.cell_center(cell), 0.09)
+				tw.tween_property(v, "position", proj.cell_center(cell), _dur(0.1))
 				v.z_index = 10 + int(cell.y)
-				v.walk_tick(0.09)
+				v.walk_tick(0.1)
 				await tw.finished
 			v.stop_walk()
-		"push":
+		"push", "slide":
 			var v := _view_for_id(str(e["unit"]))
 			if v != null:
 				var tw := create_tween()
-				tw.tween_property(v, "position", proj.cell_center(e["to"]), 0.12)
+				tw.tween_property(v, "position", proj.cell_center(e["to"]), _dur(0.14 if str(e["t"]) == "push" else 0.25))
 				v.z_index = 10 + int(e["to"].y)
 				await tw.finished
+			if str(e["t"]) == "slide":
+				_note("%s slides across the ice." % _uname(str(e["unit"])))
+		"undo":
+			_sync_views()
 		"cast":
 			var u := state.unit_by_id(str(e["unit"]))
 			_say_banner("%s: %s" % [u.name if u != null else "?", e["name"]])
-			Audio.play_sfx("cast")
-			await get_tree().create_timer(0.25).timeout
+			var v := _view_for_id(str(e["unit"]))
+			if u != null and u.team == "enemy" and v != null:
+				# Wind-up: a flash before the hit lands.
+				var tw := create_tween()
+				v.modulate = Color(2.2, 2.2, 2.2)
+				tw.tween_property(v, "modulate", Color.WHITE, _dur(0.3))
+				Audio.play_sfx("cast")
+				await _wait(0.45)
+			else:
+				Audio.play_sfx("cast")
+				await _wait(0.25)
+		"charge":
+			var u := state.unit_by_id(str(e["unit"]))
+			var line := "%s is charging %s!" % [u.name if u != null else "?", e.get("name", "something big")]
+			_say_banner(line)
+			_note(line)
+			Audio.play_sfx("fail")
+			var v := _view_for_id(str(e["unit"]))
+			if v != null:
+				var tw := create_tween()
+				tw.tween_property(v, "scale", Vector2(1.15, 1.15), _dur(0.2))
+				tw.tween_property(v, "scale", Vector2.ONE, _dur(0.2))
+			await _wait(0.6)
+		"interrupt":
+			_say_banner(str(e["text"]))
+			_note(str(e["text"]))
+			await _wait(0.4)
 		"area":
 			field.flash_cells = e["cells"]
 			var axis := ""
 			for k in e["vectors"]:
 				axis = str(k)
-			var c := UiTheme.vector_color(axis)
+			var c := UiTheme.vector_color(axis) if axis != "" else UiTheme.color("bad")
 			c.a = 0.5
 			field.flash_color = c
 			field.queue_redraw()
-			await get_tree().create_timer(0.18).timeout
+			await _wait(0.2)
 			field.flash_cells = []
 			field.queue_redraw()
 		"damage":
@@ -723,41 +986,49 @@ func _play_event(e: Dictionary) -> void:
 			if bool(e.get("crit", false)):
 				txt += "!"
 			_float_text(v, txt, UiTheme.color("damage") if not bool(e.get("crit", false)) else UiTheme.color("crit"))
+			_note(_damage_line(e))
 			Audio.play_sfx("hit")
 			if v != null:
 				var tw := create_tween()
 				v.modulate = Color(2, 2, 2)
-				tw.tween_property(v, "modulate", Color.WHITE, 0.15)
+				tw.tween_property(v, "modulate", Color.WHITE, _dur(0.15))
 			if amt >= 10 or bool(e.get("crit", false)):
 				await _shake(3.0)
 			else:
-				await get_tree().create_timer(0.12).timeout
+				await _wait(0.15)
 		"heal":
 			_float_text(_view_for_id(str(e["unit"])), "+%d%s" % [int(e["amount"]), " up!" if bool(e.get("revived", false)) else ""], UiTheme.color("heal"))
+			_note("%s recovers %d HP%s." % [_uname(str(e["unit"])), int(e["amount"]), " and gets back up" if bool(e.get("revived", false)) else ""])
 			Audio.play_sfx("heal")
-			await get_tree().create_timer(0.12).timeout
+			await _wait(0.15)
 		"shield":
 			_float_text(_view_for_id(str(e["unit"])), "+%d shield" % int(e["amount"]), UiTheme.color("shield"))
 		"status":
-			_float_text(_view_for_id(str(e["unit"])), str(UiTheme.status_info(str(e["status"])).get("name", e["status"])), UiTheme.ACCENT)
+			var sname := str(UiTheme.status_info(str(e["status"])).get("name", e["status"]))
+			_float_text(_view_for_id(str(e["unit"])), sname, UiTheme.ACCENT)
+			_note("%s: %s." % [_uname(str(e["unit"])), sname])
 		"guard":
 			_float_text(_view_for_id(str(e["unit"])), "guard", UiTheme.DIM)
+			_note("%s guards." % _uname(str(e["unit"])))
 		"miss":
 			_float_text(_view_for_id(str(e["unit"])), "miss", UiTheme.DIM)
+			_note("The attack on %s misses." % _uname(str(e["unit"])))
 		"collide":
+			_note("%s slams into something." % _uname(str(e["unit"])))
 			await _shake(2.0)
 		"down":
-			var u := state.unit_by_id(str(e["unit"]))
-			_note("%s is down!" % (u.name if u != null else "?"))
+			_note("%s is down!" % _uname(str(e["unit"])))
 		"death", "vanish":
 			var u: UnitScript = null
 			for x in state.units:
 				if x.id == str(e["unit"]) and x.dead and views.has(x):
 					u = x
 			if u != null:
+				if str(e["t"]) == "death":
+					_note("%s is defeated." % u.name)
 				var v: Node2D = views[u]
 				var tw := create_tween()
-				tw.tween_property(v, "modulate", Color(1, 1, 1, 0), 0.25)
+				tw.tween_property(v, "modulate", Color(1, 1, 1, 0), _dur(0.25))
 				await tw.finished
 				v.queue_free()
 				views.erase(u)
@@ -767,7 +1038,7 @@ func _play_event(e: Dictionary) -> void:
 			var u := state.unit_by_id(str(e["unit"]))
 			_say_banner("%s: \"%s\"" % [u.name if u != null else "?", e["text"]])
 			_note("%s: %s" % [u.name if u != null else "?", e["text"]])
-			await get_tree().create_timer(0.9).timeout
+			await _wait(0.9)
 		"instability":
 			_say_banner(str(e["text"]))
 			_note(str(e["text"]))
@@ -777,15 +1048,51 @@ func _play_event(e: Dictionary) -> void:
 			_say_banner(str(e["text"]))
 			_note(str(e["text"]))
 			await _shake(4.0)
-			await get_tree().create_timer(0.6).timeout
+			await _wait(0.6)
 		"log":
 			_note(str(e["text"]))
 		"glyph":
 			_note("A glyph flares!")
 		"tiles":
+			if str(e.get("kind", "")) == "hazard":
+				_note("The floor breaks open. New hazards!")
 			field.queue_redraw()
 		"end":
-			pass
+			await _nudge_back()
+
+
+## "Frost Wolf hit New Kid for 6 (Cold, resisted)."
+func _damage_line(e: Dictionary) -> String:
+	var why: Array = []
+	var vec := str(e.get("vector", ""))
+	if vec != "":
+		why.append(vec.capitalize())
+	if str(e.get("note", "")) != "":
+		why.append(str(e["note"]))
+	if bool(e.get("crit", false)):
+		why.append("critical")
+	if int(e.get("absorbed", 0)) > 0:
+		why.append("%d absorbed" % int(e["absorbed"]))
+	var cause := str(e.get("cause", "hit"))
+	var target := _uname(str(e["unit"]))
+	var line := ""
+	match cause:
+		"burn":
+			line = "%s burns for %d" % [target, int(e["amount"])]
+		"hazard":
+			line = "%s takes %d from the hazard" % [target, int(e["amount"])]
+		"collision":
+			line = "%s takes %d from the collision" % [target, int(e["amount"])]
+		"fatigue":
+			line = "%s takes %d Fatigue" % [target, int(e["amount"])]
+		"backlash":
+			line = "The spell backlashes on %s for %d" % [target, int(e["amount"])]
+		_:
+			var src := str(e.get("source", ""))
+			line = "%s hit %s for %d" % [_uname(src) if src != "" else "Something", target, int(e["amount"])]
+	if not why.is_empty():
+		line += " (%s)" % ", ".join(PackedStringArray(why))
+	return line + "."
 
 
 func _view_for_id(id: String) -> Node2D:
@@ -836,10 +1143,19 @@ func _say_banner(text: String) -> void:
 
 func _note(text: String) -> void:
 	_log.append(text)
-	if _log.size() > 30:
+	if _log.size() > 200:
 		_log.remove_at(0)
-	if mode == "idle":
-		_info.text = "\n".join(PackedStringArray(_log.slice(maxi(0, _log.size() - 5))))
+		if _log_box.get_child_count() > 0:
+			_log_box.get_child(0).queue_free()
+	var l := UiTheme.label(text, UiTheme.DIM if text.begins_with("--") else UiTheme.TEXT)
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	l.custom_minimum_size = Vector2(100, 0)
+	_log_box.add_child(l)
+	_scroll_log.call_deferred()
+
+
+func _scroll_log() -> void:
+	_log_scroll.scroll_vertical = int(_log_scroll.get_v_scroll_bar().max_value)
 
 
 # --- End -------------------------------------------------------------------------------------------

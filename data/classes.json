@@ -14,7 +14,7 @@
         "cha": 6
       },
       "hpBonus": 0,
-      "mpBonus": 6,
+      "mpBonus": 2,
       "hpPerLevel": 1,
       "startStats": {
         "str": 4,
@@ -176,7 +176,7 @@
         "wil": 6
       },
       "hpBonus": 4,
-      "mpBonus": 2,
+      "mpBonus": 1,
       "hpPerLevel": 2,
       "startStats": {
         "str": 5,
@@ -259,7 +259,7 @@
         "dex": 5
       },
       "hpBonus": 4,
-      "mpBonus": 4,
+      "mpBonus": 1,
       "hpPerLevel": 2,
       "startStats": {
         "str": 3,
@@ -343,7 +343,7 @@
         "con": 5
       },
       "hpBonus": 2,
-      "mpBonus": 3,
+      "mpBonus": 1,
       "hpPerLevel": 2,
       "startStats": {
         "str": 4,
@@ -434,7 +434,7 @@
         "cha": 6
       },
       "hpBonus": 2,
-      "mpBonus": 10,
+      "mpBonus": 3,
       "hpPerLevel": 1,
       "mods": {
         "combat": {
@@ -478,7 +478,7 @@
         "cha": 5
       },
       "hpBonus": 4,
-      "mpBonus": 8,
+      "mpBonus": 3,
       "hpPerLevel": 2,
       "mods": {},
       "grantForms": [
@@ -517,7 +517,7 @@
         "cha": 5
       },
       "hpBonus": 8,
-      "mpBonus": 5,
+      "mpBonus": 2,
       "hpPerLevel": 3,
       "mods": {
         "combat": {
@@ -556,7 +556,7 @@
         "cha": 5
       },
       "hpBonus": 18,
-      "mpBonus": 2,
+      "mpBonus": 1,
       "hpPerLevel": 4,
       "mods": {
         "derived": {
@@ -595,7 +595,7 @@
         "wil": 6
       },
       "hpBonus": 5,
-      "mpBonus": 4,
+      "mpBonus": 1,
       "hpPerLevel": 2,
       "mods": {
         "derived": {
@@ -637,7 +637,7 @@
         "dex": 2
       },
       "hpBonus": 6,
-      "mpBonus": 8,
+      "mpBonus": 3,
       "hpPerLevel": 2,
       "mods": {
         "combat": {
@@ -680,7 +680,7 @@
         "con": 5
       },
       "hpBonus": 4,
-      "mpBonus": 6,
+      "mpBonus": 2,
       "hpPerLevel": 2,
       "mods": {
         "derived": {
@@ -720,7 +720,7 @@
         "cha": 5
       },
       "hpBonus": 14,
-      "mpBonus": 4,
+      "mpBonus": 1,
       "hpPerLevel": 3,
       "mods": {
         "derived": {
@@ -768,7 +768,7 @@
         "cha": 5
       },
       "hpBonus": 8,
-      "mpBonus": 6,
+      "mpBonus": 2,
       "hpPerLevel": 2,
       "mods": {
         "combat": {
@@ -806,7 +806,7 @@
         "cha": 5
       },
       "hpBonus": 6,
-      "mpBonus": 12,
+      "mpBonus": 4,
       "hpPerLevel": 2,
       "mods": {
         "combat": {

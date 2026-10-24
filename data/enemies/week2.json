@@ -1,7 +1,7 @@
 {
   "enemies": [
     {
-      "id": "frost_wolf",
+      "id": "frost_wolf", "intent": "tracking",
       "name": "Frost Wolf",
       "tier": "normal",
       "weeks": [

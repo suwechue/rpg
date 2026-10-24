@@ -1,6 +1,6 @@
 {
   "perks": [
-    { "id": "arcane_reserve", "class": "mage", "level": 3, "name": "Arcane Reserve", "text": "+6 Max MP.", "mods": { "derived": { "maxMp": 6 } } },
+    { "id": "arcane_reserve", "class": "mage", "level": 3, "name": "Arcane Reserve", "text": "+3 Max MP.", "mods": { "derived": { "maxMp": 3 } } },
     { "id": "steady_hands", "class": "mage", "level": 3, "name": "Steady Hands", "text": "+3 Stability.", "mods": { "derived": { "stability": 3 } } },
     { "id": "deep_channel", "class": "mage", "level": 6, "name": "Deep Channel", "text": "+1 MP regen per turn.", "mods": { "derived": { "mpRegen": 1 } } },
     { "id": "spell_focus", "class": "mage", "level": 6, "name": "Spell Focus", "text": "Spells deal +10% damage.", "mods": { "combat": { "spellDamagePct": 0.1 } } },

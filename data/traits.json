@@ -1,6 +1,6 @@
 {
   "traits": [
-    { "id": "night_owl", "name": "Night Owl", "rarity": "common", "text": "+2 Max MP. Mornings are a rumor.", "mods": { "derived": { "maxMp": 2 } } },
+    { "id": "night_owl", "name": "Night Owl", "rarity": "common", "text": "+1 Max MP. Mornings are a rumor.", "mods": { "derived": { "maxMp": 1 } } },
     { "id": "early_bird", "name": "Early Bird", "rarity": "common", "text": "+1 Initiative.", "mods": { "derived": { "initiative": 1 } } },
     { "id": "sturdy_frame", "name": "Sturdy Frame", "rarity": "common", "text": "+1 CON.", "mods": { "stats": { "con": 1 } } },
     { "id": "bookworm", "name": "Bookworm", "rarity": "common", "text": "+1 INT.", "mods": { "stats": { "int": 1 } } },

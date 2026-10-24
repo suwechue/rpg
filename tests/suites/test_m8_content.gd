@@ -110,7 +110,7 @@ func test_signature_perks_in_combat() -> void:
 	var au = st2.unit_by_id("ally")
 	au.cell = gu.cell + Vector2i(0, 1)
 	st2.current = gu
-	gu.free_action_used = false
+	gu.action_used = false
 	st2.guard(gu)
 	check(au.shield >= 5, "Bulwark: Guard shields adjacent allies")
 	var sb: Dictionary = fresh("fighter")["player"]

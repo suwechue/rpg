@@ -347,7 +347,7 @@ func _smoke_combat() -> void:
 	if scene.call("_player_turn"):
 		scene.call("_on_button", "guard")
 		await create_timer(0.5).timeout
-		check(bool(u.get("free_action_used")), "guard uses the free basic action")
+		check(bool(u.get("action_used")), "guard uses the action")
 		scene.call("_on_button", "wheel")
 		check(scene.get("_wheel") != null, "the Vector Wheel opens")
 		scene.call("_cancel")
@@ -457,3 +457,80 @@ func smoke_ui_skin_restyles_everything() -> void:
 	ui.set("colorblind", false)
 	check(not cb.is_equal_approx(ui.call("vector_color", "vitality")), "the colorblind palette changes Vector colors")
 	ui.set("colorblind", was)
+
+
+## CU: in the real combat scene, a Force push lands an enemy in a hazard and a
+## second push sends one sliding across ice; hovering a card previews it and
+## enemies show telegraphs. Every action goes through the scene's own input code.
+func smoke_cu_push_and_slide() -> void:
+	var gs: Node = _root_node("GameState")
+	gs.call("new_run", 777, "mage")
+	var db: Dictionary = _root_node("DataDB").call("all")
+	var ch: Dictionary = preload("res://src/core/character.gd").create(db, "mage", RandomNumberGenerator.new(), {
+		"isPlayer": true, "knownVectors": ["force", "cold"], "stats": { "str": 5, "dex": 40, "con": 8, "int": 9, "per": 40, "wil": 6, "cha": 4 } })
+	ch["mp"] = 30
+	var idx := preload("res://src/core/data_tables.gd").index_under(db, "enemies/", "enemies")
+	var tough: Dictionary = idx["bleacher_creeper"].duplicate(true)
+	tough["hp"] = 200
+	tough["maxHp"] = 200
+	var tough2: Dictionary = tough.duplicate(true)
+	gs.set("pending_combat", { "layout": { "map": [
+		"P.Eh.....",
+		".........",
+		"P.Eiii...",
+	] }, "party": [{ "char": ch }, { "char": ch.duplicate(true) }], "enemies": [tough, tough2] })
+	var scene: Node = await _goto("res://src/scenes/combat/combat.tscn")
+	var st: Object = scene.get("state")
+	var guard := 0
+	while not scene.call("_player_turn") and guard < 200:
+		await create_timer(0.05).timeout
+		guard += 1
+	check(scene.call("_player_turn"), "CU: the player acts first")
+	var planned := 0
+	var attacking := 0
+	for x in st.get("units"):
+		if str(x.get("team")) == "enemy":
+			var it: Dictionary = x.get("intent")
+			if not it.is_empty():
+				planned += 1
+			if str(it.get("kind", "")) in ["attack", "special"]:
+				attacking += 1
+	check(planned == 2, "CU: every enemy shows an intent before the player's turn")
+	var field: Object = scene.get("field")
+	check((field.get("threat_cells") as Dictionary).size() >= attacking, "CU: attack telegraphs are drawn on the grid")
+	var pushes := 0
+	var slides := 0
+	for turn in 2:
+		var u: Object = st.get("current")
+		u.get("deck").set("hand", ["sp:force:bolt:standard"])
+		u.set("mp", 30)
+		var foe_cell := Vector2i(2, 0) if turn == 0 else Vector2i(2, 2)
+		scene.set("hover_cell", Vector2i(-1, -1))
+		scene.call("_hover_card_changed", 0)
+		check(not (field.get("target_cells") as Array).is_empty(), "CU: hovering a card shows its range (turn %d)" % turn)
+		check(not (field.get("push_marks") as Array).is_empty(), "CU: hovering a Force card shows where the target lands")
+		scene.call("_hover_card_changed", -1)
+		scene.call("_on_card", 0)
+		scene.call("_on_card", 0)
+		check(str(scene.get("mode")) == "idle", "CU: clicking the selected card again deselects it")
+		scene.call("_on_card", 0)
+		scene.set("hover_cell", foe_cell)
+		scene.call("_click_cell", foe_cell)
+		var waited := 0
+		while bool(scene.get("_busy")) and waited < 200:
+			await create_timer(0.05).timeout
+			waited += 1
+		for line in scene.get("_log"):
+			if str(line).contains("from the hazard"):
+				pushes += 1
+			if str(line).contains("slides across the ice"):
+				slides += 1
+		check(bool(u.get("action_used")), "CU: the card used the turn's action")
+		if turn == 0:
+			scene.call("_on_button", "end")
+			waited = 0
+			while not scene.call("_player_turn") and waited < 400 and str(st.get("result")) == "":
+				await create_timer(0.05).timeout
+				waited += 1
+	check(pushes > 0, "CU: a push lands an enemy in a hazard")
+	check(slides > 0, "CU: an enemy slides across ice")

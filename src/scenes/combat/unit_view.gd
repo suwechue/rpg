@@ -14,6 +14,9 @@ var shield := 0
 var downed := false
 var highlight := false
 var statuses: Array = []   # status ids; icons and colors come from data/ui.json
+var intent_icon := ""      # enemies: what they'll do next (data/ui.json "intentIcons")
+var charge := 0            # turns left charging a big attack
+var friend_link := false   # next to a Friend-tier ally (+5% damage)
 var _frame := Vector2i.ONE
 var _walker := false
 var _bob := 0.0
@@ -106,6 +109,19 @@ func _draw() -> void:
 		var tex := Assets.texture(str(info.get("icon", "")))
 		draw_texture_rect(tex, Rect2(x, 3, icon_w, icon_w), false, Color(str(info.get("color", "#ffffff"))))
 		x += icon_w
+	if friend_link:
+		var link := Assets.texture("icon_vector_binding")
+		draw_texture_rect(link, Rect2(Display.tile * 0.35, -Display.tile * 0.3, Display.tile / 2.0, Display.tile / 2.0), false, UiTheme.GOOD)
+	if intent_icon != "" and not downed:
+		var ic := Assets.texture(intent_icon)
+		var at := Vector2(-ic.get_width() / 2.0, top - ic.get_height() - 2)
+		var tint := UiTheme.color("bad") if charge > 0 or intent_icon.ends_with("attack") or intent_icon.ends_with("tracking") else UiTheme.TEXT
+		draw_texture(ic, at, tint)
+		if charge > 0:
+			var f := UiTheme.font
+			var p := at + Vector2(ic.get_width() + 1, UiTheme.FONT_SIZE)
+			draw_string_outline(f, p, str(charge), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, 3, UiTheme.color("outline"))
+			draw_string(f, p, str(charge), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, UiTheme.ACCENT)
 	if downed and sprite != null:
 		sprite.modulate = Color(0.5, 0.5, 0.6, 0.6)
 		sprite.rotation = PI / 2.0 if team == "party" else -PI / 2.0

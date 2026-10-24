@@ -8,7 +8,7 @@
     { "id": "chainmail_hoodie", "name": "Chainmail Hoodie", "kind": "equipment", "slot": "armor", "price": 80, "fromWeek": 3, "defense": 3, "mods": { "derived": { "maxHp": 8 } }, "text": "+3 Defense, +8 Max HP. Comfortable, somehow." },
     { "id": "ember_charm", "name": "Ember Charm", "kind": "equipment", "slot": "trinket", "price": 30, "mods": { "affinity": { "heat": 10 } }, "text": "+10% Heat affinity." },
     { "id": "frost_charm", "name": "Frost Charm", "kind": "equipment", "slot": "trinket", "price": 30, "mods": { "affinity": { "cold": 10 } }, "text": "+10% Cold affinity." },
-    { "id": "focus_pendant", "name": "Focus Pendant", "kind": "equipment", "slot": "trinket", "price": 40, "fromWeek": 2, "mods": { "derived": { "maxMp": 6, "stability": 2 } }, "text": "+6 Max MP, +2 Stability." },
+    { "id": "focus_pendant", "name": "Focus Pendant", "kind": "equipment", "slot": "trinket", "price": 40, "fromWeek": 2, "mods": { "derived": { "maxMp": 3, "stability": 2 } }, "text": "+3 Max MP, +2 Stability." },
     { "id": "lucky_coin", "name": "Lucky Coin", "kind": "equipment", "slot": "trinket", "price": 35, "mods": { "derived": { "critChancePct": 5 } }, "text": "+5% crit chance. Always lands on its edge." },
 
     { "id": "good_coffee", "name": "Actually Good Coffee", "kind": "gift", "price": 5, "tags": ["coffee"], "text": "Not the cafeteria stuff." },

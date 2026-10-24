@@ -194,7 +194,8 @@ static func derived(db: Dictionary, ch: Dictionary) -> Dictionary:
 	var out := {}
 	out["maxHp"] = int(_lin(f.get("maxHp", {}), st)) + int(cls.get("hpBonus", 0)) \
 		+ int(cls.get("hpPerLevel", 0)) * (level - 1) + int(mod(mods, "derived", "maxHp"))
-	out["maxMp"] = int(_lin(f.get("maxMp", {}), st)) + int(cls.get("mpBonus", 0)) + int(mod(mods, "derived", "maxMp"))
+	out["maxMp"] = int(_lin(f.get("maxMp", {}), st)) + int(cls.get("mpBonus", 0)) + int(mod(mods, "derived", "maxMp")) \
+		+ floori(float(f.get("maxMp", {}).get("perLevel", 0.0)) * float(level - 1))
 	var mv: Dictionary = f.get("movement", {})
 	out["movement"] = int(mv.get("base", 3)) + floori(float(st["dex"]) / float(mv.get("dexDivisor", 5))) + int(mod(mods, "derived", "movement"))
 	out["initiative"] = int(floor(_lin(f.get("initiative", {}), st))) + int(mod(mods, "derived", "initiative"))
@@ -203,7 +204,8 @@ static func derived(db: Dictionary, ch: Dictionary) -> Dictionary:
 	out["stability"] = int(floor(_lin(f.get("stability", {}), st))) + int(mod(mods, "derived", "stability"))
 	out["critChancePct"] = _lin(f.get("critChancePct", {}), st) + mod(mods, "derived", "critChancePct")
 	var rg: Dictionary = f.get("mpRegen", {})
-	out["mpRegen"] = int(rg.get("base", 2)) + floori(float(st["wil"]) / float(rg.get("wilDivisor", 5))) + int(mod(mods, "derived", "mpRegen"))
+	var wil_div := float(rg.get("wilDivisor", 0))
+	out["mpRegen"] = int(rg.get("base", 1)) + (floori(float(st["wil"]) / wil_div) if wil_div > 0.0 else 0) + int(mod(mods, "derived", "mpRegen"))
 	out["maxHp"] = maxi(1, int(out["maxHp"]))
 	out["maxMp"] = maxi(0, int(out["maxMp"]))
 	out["movement"] = maxi(1, int(out["movement"]))

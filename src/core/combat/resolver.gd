@@ -53,12 +53,20 @@ static func is_flanking(attacker: UnitScript, target: UnitScript) -> bool:
 	return attacker.cell.y != target.cell.y and absi(dx) <= 1
 
 
+## Attacker on the side the target faces away from.
+static func is_behind(attacker: UnitScript, target: UnitScript) -> bool:
+	var dx := attacker.cell.x - target.cell.x
+	return dx != 0 and signi(dx) == -target.facing
+
+
 ## Multipliers that apply to every hit from this attacker on this target.
 static func shared_mult(db: Dictionary, attacker: UnitScript, target: UnitScript, ranged: bool, target_on_cover: bool, friend_adjacent: bool) -> float:
 	var cfg := combat_cfg(db)
 	var m := 1.0 + attacker.rally_bonus
 	if (attacker.perk == "backstab" or attacker.perk == "sleight") and is_flanking(attacker, target):
 		m *= float(cfg.get("flankMul", 1.5))
+	elif is_behind(attacker, target):
+		m *= float(cfg.get("backMul", 1.15))
 	if ranged and target_on_cover:
 		m *= float(cfg.get("halfCoverRangedMul", 0.75))
 	if friend_adjacent:
