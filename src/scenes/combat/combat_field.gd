@@ -19,6 +19,7 @@ var footprint_color := Color(1.0, 0.35, 0.3, 0.45)
 var threat_cells: Dictionary = {}    # cell -> { "damage": n, "charge": n }
 var push_marks: Array = []           # [{ "from", "to", "collide", "hazard", "slide" }]
 var preview_labels: Dictionary = {}  # cell -> text drawn above the unit there
+var support_cells: Array = []        # enemy heals and summons (green)
 var hover_cell := Vector2i(-1, -1)
 var cursor_cell := Vector2i(-1, -1)
 var glyph_cells: Array = []
@@ -46,6 +47,7 @@ func _draw() -> void:
 			_draw_cell(Vector2i(c, r))
 	_draw_overlay(reach_cells, Color(0.45, 0.75, 1.0, 0.28))
 	_draw_threats()
+	_draw_overlay(support_cells, Color(UiTheme.GOOD, 0.3))
 	_draw_overlay(target_cells, Color(1.0, 0.85, 0.4, 0.22))
 	_draw_overlay(footprint_cells, Color(0.55, 1.0, 0.6, 0.45) if footprint_heal else footprint_color)
 	_draw_overlay(flash_cells, flash_color)

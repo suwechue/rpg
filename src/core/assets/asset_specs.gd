@@ -66,7 +66,20 @@ static func to_target(img: Image, sp: Dictionary) -> Image:
 	elif float(sp.get("scale", 1)) != 1.0:
 		var s := float(sp["scale"])
 		out.resize(roundi(out.get_width() * s), roundi(out.get_height() * s), Image.INTERPOLATE_NEAREST)
+	if sp.has("tint"):
+		tint_image(out, Color(str(sp["tint"])))
 	return out
+
+
+## Palette swap: multiply every pixel by a color (pack art reused for a new enemy).
+static func tint_image(img: Image, tint: Color) -> void:
+	if img.get_format() != Image.FORMAT_RGBA8:
+		img.convert(Image.FORMAT_RGBA8)
+	for y in img.get_height():
+		for x in img.get_width():
+			var c := img.get_pixel(x, y)
+			if c.a > 0.0:
+				img.set_pixel(x, y, Color(c.r * tint.r, c.g * tint.g, c.b * tint.b, c.a))
 
 
 ## The size a missing asset's placeholder is drawn at.
@@ -175,6 +188,8 @@ static func referenced_ids(db: Dictionary) -> Dictionary:
 		out[str(k)] = "ui kindIcons"
 	for k in db.get("ui", {}).get("intentIcons", {}).values():
 		out[str(k)] = "ui intentIcons"
+	for a in db.get("ui", {}).get("affixes", {}).values():
+		out[str(a.get("icon", ""))] = "ui affixes"
 	return out
 
 

@@ -148,6 +148,8 @@ func _sync_views() -> void:
 		v.face(u.facing)
 		v.statuses = state.status_list(u)
 		v.intent_icon = _intent_icon(u)
+		v.affixes = u.source.get("affixes", [])
+		v.burrowed = u.statuses.has("burrowed")
 		v.charge = int(u.intent.get("charge", 0))
 		v.friend_link = false
 		if u.team == "party" and u.alive():
@@ -170,6 +172,7 @@ func _sync_views() -> void:
 			charge = maxi(charge, int(h["charge"]))
 		threats[c] = { "damage": total, "charge": charge }
 	field.threat_cells = threats
+	field.support_cells = state.support_cells()
 	_refresh_overlays()
 	_refresh_hud()
 

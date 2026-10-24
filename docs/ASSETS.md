@@ -18,7 +18,7 @@ Sizes: tiles 32x32, characters 32x32 (up to 32x48 for tall ones), portraits 64x6
 
 Pack art is a placeholder: the 16x16 packs are scaled up 2x (nearest neighbour) to fit the 32x32 grid until you replace them.
 
-Replaced so far: Characters (walk sheets) 0/39, Portraits 0/35, Enemies and bosses 0/30, Tilesets 0/4, Single tiles 0/120, UI 0/16, Icons 0/26, Card art 0/11, VFX 0/0, Music 0/13, Sound effects 0/13.
+Replaced so far: Characters (walk sheets) 0/39, Portraits 0/35, Enemies and bosses 0/52, Tilesets 0/4, Single tiles 0/120, UI 0/16, Icons 0/26, Card art 0/11, VFX 0/0, Music 0/13, Sound effects 0/13.
 
 ## Characters (walk sheets) (39)
 
@@ -108,7 +108,7 @@ Faces shown when you talk to someone.
 | [ ] | `portrait_theo` | 64x64 | - | top left | pack: ninja_adventure | Face and shoulders, readable at 1x. |
 | [ ] | `portrait_todd` | 64x64 | - | top left | pack: ninja_adventure | Face and shoulders, readable at 1x. |
 
-## Enemies and bosses (30)
+## Enemies and bosses (52)
 
 Walk sheets: 4 columns (facing down, up, left, right), 4 rows (the walk cycle), each frame the target size, feet at the bottom center. Bosses are one row of idle frames.
 
@@ -144,6 +144,28 @@ Walk sheets: 4 columns (facing down, up, left, right), 4 rows (the walk cycle), 
 | [ ] | `enemy_glass_hound` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure |  |
 | [ ] | `enemy_town_echo` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure |  |
 | [ ] | `enemy_mr_b_aide` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure |  |
+| [ ] | `enemy_hall_rusher` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure |  |
+| [ ] | `enemy_firecracker_imp` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure |  |
+| [ ] | `enemy_nurse_moth` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure |  |
+| [ ] | `enemy_locker_hive` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure |  |
+| [ ] | `enemy_riot_shield` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure |  |
+| [ ] | `enemy_pothole` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure |  |
+| [ ] | `enemy_bell_tower_eye` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure |  |
+| [ ] | `enemy_split_slime` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure |  |
+| [ ] | `enemy_ember_crawler` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure |  |
+| [ ] | `enemy_mirror_mime` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure |  |
+| [ ] | `enemy_static_leech` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure |  |
+| [ ] | `enemy_anchor_golem` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure |  |
+| [ ] | `enemy_dust_gremlin` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure |  |
+| [ ] | `enemy_paper_wasp` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure | Palette swap of the pack sprite (tint #c9a66b) until you draw your own. |
+| [ ] | `enemy_frost_mite` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure | Palette swap of the pack sprite (tint #9fdcff) until you draw your own. |
+| [ ] | `enemy_slimelet` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure |  |
+| [ ] | `enemy_spark_imp` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure |  |
+| [ ] | `enemy_rust_mite` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure | Palette swap of the pack sprite (tint #c97a4a) until you draw your own. |
+| [ ] | `enemy_pill_bug` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure |  |
+| [ ] | `enemy_bandage_wisp` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure | Palette swap of the pack sprite (tint #f2f2e6) until you draw your own. |
+| [ ] | `enemy_glass_shard` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure | Palette swap of the pack sprite (tint #b8f0ff) until you draw your own. |
+| [ ] | `enemy_echo_kid` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure |  |
 
 ## Tilesets (4)
 

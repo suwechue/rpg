@@ -78,6 +78,7 @@ func _validate() -> void:
 	var form_axes: Array = _tables["spaces"].get("forms", {}).get("axes", [])
 	_validate_cards(arcane)
 	_validate_card_effects()
+	_validate_behaviors()
 	_validate_assets()
 	var perk_ids := {}
 	for p in records_under("perks", "perks"):
@@ -219,6 +220,21 @@ func _validate_card_effects() -> void:
 			errors.append("card %s: unknown targeting '%s'" % [id, c["targeting"].get("type", "")])
 		if str(c.get("kind", "")) == "spell" and DT.record(_tables, "forms", str(c.get("form", ""))).is_empty():
 			errors.append("card %s: unknown form '%s'" % [id, c.get("form", "")])
+
+
+## AR enemies: known behaviors, and summons and splits that exist.
+func _validate_behaviors() -> void:
+	var known := ["charger", "bomber", "healer", "summoner", "shield_bearer", "burrower", "sniper", "splitter", "hazard_maker", "mirror", "leech", "anchor"]
+	var ids := _enemy_ids()
+	for e in records_under("enemies/", "enemies"):
+		if e.has("behavior") and not known.has(str(e["behavior"])):
+			errors.append("enemy %s: unknown behavior '%s'" % [e.get("id"), e["behavior"]])
+		for k in ["summons", "splitInto"]:
+			if e.has(k) and not ids.has(str(e[k])):
+				errors.append("enemy %s: %s '%s' is not an enemy" % [e.get("id"), k, e[k]])
+		for a in e.get("affixes", []):
+			if not table("enemy_affixes").get("affixes", {}).has(str(a)):
+				errors.append("enemy %s: unknown affix '%s'" % [e.get("id"), a])
 
 
 ## Asset ids: the manifest is well formed, data only names listed ids, and

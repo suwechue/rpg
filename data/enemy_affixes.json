@@ -1,0 +1,11 @@
+{
+  "comment": "Elite affixes (docs/ARENA.md Part 4). 'add' adds to record numbers, 'set' replaces record fields, 'actionVector' adds a Vector to every attack. Icons and names are in data/ui.json 'affixes'.",
+  "affixes": {
+    "hasted": { "add": { "movement": 2, "initiative": 4 }, "set": { "moveAndAct": true } },
+    "armored": { "add": { "physDefense": 4, "magicResist": 3 } },
+    "burning": { "set": { "trail": "burning" }, "actionVector": "heat" },
+    "vampiric": { "set": { "vampiric": 0.3 } },
+    "shielded": { "set": { "startShieldPct": 0.3 } },
+    "explosive": { "set": { "explodeOnDeath": 8 } }
+  }
+}

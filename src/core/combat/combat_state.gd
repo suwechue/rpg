@@ -18,6 +18,7 @@ const GridScript := preload("res://src/core/combat/grid.gd")
 const Forms := preload("res://src/core/combat/forms.gd")
 const UnitScript := preload("res://src/core/combat/unit.gd")
 const Res := preload("res://src/core/combat/resolver.gd")
+const EnemyMods := preload("res://src/core/combat/enemy_mods.gd")
 
 var db: Dictionary = {}
 var rng: RandomNumberGenerator
@@ -49,6 +50,7 @@ var delayed: Array = []            # telegraphed strikes that land later: [{ cel
 var revealed := 0                  # rounds Reveal keeps every plan visible
 var _pending_decoys: Array = []    # decoys that appear where a unit stood once it moves away
 var _fx: GDScript = null           # card_effects.gd, loaded lazily
+var last_party_card: Dictionary = {}  # the last card a party member played (Mirror enemies copy it)
 
 
 func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) -> void:
@@ -71,9 +73,12 @@ func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) ->
 		_place(u, grid.party_spawns, i, true)
 	var enemies: Array = setup.get("enemies", [])
 	for i in enemies.size():
-		var rec: Dictionary = enemies[i]
+		var rec: Dictionary = EnemyMods.apply(db, enemies[i])
 		var u := UnitScript.from_enemy(rec, float(rec.get("scale", 1.0)))
 		_place(u, grid.enemy_spawns, i, false)
+		if float(rec.get("startShieldPct", 0.0)) > 0.0:
+			u.shield = roundi(float(u.max_hp) * float(rec["startShieldPct"]))
+			u.shield_turns = 99
 	for p in grid.prop_spawns:
 		var crate := UnitScript.make_prop("crate", int(Res.combat_cfg(db).get("crateHp", 8)))
 		crate.cell = p["cell"]
@@ -188,7 +193,7 @@ func is_hostile(a: UnitScript, b: UnitScript) -> bool:
 func opponents_of(u: UnitScript) -> Array:
 	var out: Array = []
 	for o in units:
-		if o.alive() and is_hostile(u, o):
+		if o.alive() and is_hostile(u, o) and not o.statuses.has("burrowed"):
 			out.append(o)
 	return out
 
@@ -369,6 +374,11 @@ func _start_turn(u: UnitScript) -> void:
 		u.defense_shred += 1
 	for s in ["parry", "brace", "dash"]:
 		u.statuses.erase(s)
+	if bool(u.source.get("anchorRoot", false)) and u.alive():
+		for o in opponents_of(u):
+			if GridScript.manhattan(o.cell, u.cell) == 1 and not o.statuses.has("root"):
+				o.statuses["root"] = 1
+				_emit({ "t": "status", "unit": o.id, "status": "root" })
 	if u.statuses.has("regen") and u.alive():
 		_heal(u, u, int(str(u.links.get("regen", "3"))))
 	if not u.alive():
@@ -487,6 +497,7 @@ func move(u: UnitScript, dest: Vector2i) -> bool:
 			break
 		prev = cell
 	_emit({ "t": "move", "unit": u.id, "path": walked })
+	_leave_trail(u, [u.start_cell] + walked.slice(0, walked.size() - 1))
 	for pd in _pending_decoys.duplicate():
 		if pd["cell"] != u.cell and unit_at(pd["cell"]) == null:
 			_pending_decoys.erase(pd)
@@ -502,6 +513,27 @@ func move(u: UnitScript, dest: Vector2i) -> bool:
 		u.intent["move"] = u.cell
 	_check_end()
 	return true
+
+
+## Hazard makers (data "trail") leave fire, ice or glyphs behind them.
+func _leave_trail(u: UnitScript, cells: Array) -> void:
+	var kind := str(u.source.get("trail", ""))
+	if kind == "" or cells.is_empty():
+		return
+	for c in cells:
+		var cell: Vector2i = c
+		if unit_at(cell) != null and unit_at(cell) != u:
+			continue
+		match kind:
+			"burning":
+				grid.burning[cell] = 2
+			"ice":
+				if grid.get_terrain(cell) == GridScript.FLOOR:
+					grid.set_terrain(cell, GridScript.ICE)
+			"glyph":
+				glyphs.append({ "cell": cell, "spec": action_spec(u, { "form": "touch", "vectors": { "binding": 1.0 }, "power": 3, "name": "Snare Trail" }),
+					"team": u.team, "caster": u, "turns": 3 })
+	_emit({ "t": "tiles", "kind": kind, "cells": cells })
 
 
 ## Ice: a unit that steps or is pushed onto ice keeps going until something stops it.
@@ -610,7 +642,7 @@ func _generic_targets(u: UnitScript, tg: Dictionary) -> Array:
 		var t := unit_at(cell)
 		match kind:
 			"enemy":
-				if t != null and is_hostile(u, t) and t.alive():
+				if t != null and is_hostile(u, t) and t.alive() and not t.statuses.has("burrowed"):
 					out.append(cell)
 			"ally":
 				if t != null and t.team == u.team and not t.is_prop() and (t.alive() or bool(tg.get("downed", false))):
@@ -648,7 +680,7 @@ func _adjacent_hostiles(u: UnitScript, reach: int) -> Array:
 	for o in units:
 		if o.dead or o.downed or o == u:
 			continue
-		if (is_hostile(u, o) or o.is_prop()) and GridScript.manhattan(o.cell, u.cell) <= reach:
+		if (is_hostile(u, o) or o.is_prop()) and not o.statuses.has("burrowed") and GridScript.manhattan(o.cell, u.cell) <= reach:
 			out.append(o.cell)
 	return out
 
@@ -690,6 +722,8 @@ func play_card(u: UnitScript, hand_index: int, target: Vector2i) -> bool:
 		return false
 	_use_slot(u, card)
 	u.mp -= cost
+	if u.team == "party" and CardRules.is_spell(card):
+		last_party_card = card
 	u.deck.play(hand_index, bool(card.get("consumable", false)) or bool(card.get("oncePerFight", false)))
 	var cells := effect_cells(u, card, target)
 	if CardRules.is_spell(card) and not bool(card.get("effectsOnly", false)):
@@ -947,6 +981,10 @@ func _spell_spec(u: UnitScript, card: Dictionary) -> Dictionary:
 
 func _expected_hit(u: UnitScript, t: UnitScript, spec: Dictionary) -> float:
 	var area := float(spec.get("areaMul", 1.0))
+	# Shield bearers block hits from the front; flank them or push them around.
+	var guard := float(t.source.get("frontGuard", 0.0))
+	if guard > 0.0 and u.cell.x != t.cell.x and signi(u.cell.x - t.cell.x) == t.facing:
+		area *= 1.0 - guard
 	# Shatter and friends: bonus against targets with certain statuses.
 	var bonus: Dictionary = spec.get("bonusVs", {})
 	for s in bonus.get("statuses", []):
@@ -1131,10 +1169,21 @@ func _hit_unit(u: UnitScript, t: UnitScript, spec: Dictionary, can_miss: bool) -
 	var dmg := Res.finalize(db, _expected_hit(u, t, spec), u, rng, float(spec.get("critBonus", 0.0)))
 	_note = hit_note(u, t, spec["vectors"])
 	_damage(t, int(dmg["amount"]), u, VO.dominant_axis(spec["vectors"], CardRules.arcane_axes(db)), "hit", bool(dmg["crit"]))
+	_after_hit(u, t, int(dmg["amount"]))
 	if spec["vectors"].has("vitality") and u.alive():
 		_heal(u, u, maxi(1, roundi(float(dmg["amount"]) * float(Res.combat_cfg(db).get("vitalityDrainPct", 0.5)))))
 	_note_support_attack(u, t)
 	return true
+
+
+## Leech enemies drain MP; vampiric ones heal from the hit.
+func _after_hit(u: UnitScript, t: UnitScript, amount: int) -> void:
+	if float(u.source.get("leech", 0.0)) > 0.0 and t.max_mp > 0 and t.mp > 0:
+		var drained := mini(t.mp, maxi(1, ceili(float(amount) * float(u.source["leech"]))))
+		t.mp -= drained
+		_emit({ "t": "log", "text": "%s drains %d MP from %s." % [u.name, drained, t.name] })
+	if float(u.source.get("vampiric", 0.0)) > 0.0 and u.alive() and amount > 0:
+		_heal(u, u, maxi(1, roundi(float(amount) * float(u.source["vampiric"]))))
 
 
 func _basic(u: UnitScript, card: Dictionary, target: Vector2i) -> void:
@@ -1380,7 +1429,7 @@ func _note_support_attack(u: UnitScript, t: UnitScript) -> void:
 func _damage(t: UnitScript, amount: int, source: UnitScript, vector: String, cause: String, crit: bool = false) -> void:
 	if t.dead or amount <= 0:
 		return
-	if t.downed:
+	if t.downed or t.statuses.has("burrowed"):
 		return
 	if cause == "hit":
 		# Pact: an ally shares half; Tether: the linked enemy takes half too.
@@ -1431,6 +1480,36 @@ func _on_zero_hp(t: UnitScript, source: UnitScript) -> void:
 	xp_total += t.xp
 	money_total += t.money
 	_emit({ "t": "death", "unit": t.id })
+	_on_enemy_death(t)
+
+
+## Splitters split; explosive ones blow up next to them.
+func _on_enemy_death(t: UnitScript) -> void:
+	var boom := int(t.source.get("explodeOnDeath", 0))
+	if boom > 0:
+		_emit({ "t": "area", "cells": pattern_cells(t, "square_self", t.cell), "vectors": { "force": 1.0 } })
+		_emit({ "t": "log", "text": "%s explodes!" % t.name })
+		for c in pattern_cells(t, "square_self", t.cell):
+			var o := unit_at(c)
+			if o != null and o.alive():
+				_damage(o, boom, null, "force", "hazard")
+	var split := str(t.source.get("splitInto", ""))
+	if split != "":
+		var rec: Dictionary = DT.index_under(db, "enemies/", "enemies").get(split, {})
+		var made := 0
+		for d in GridScript.DIRS:
+			if made >= int(t.source.get("splitCount", 2)) or rec.is_empty():
+				break
+			var c: Vector2i = t.cell + d
+			if grid.in_bounds(c) and grid.walkable_terrain(c) and unit_at(c) == null:
+				var s := UnitScript.from_enemy(EnemyMods.apply(db, rec), 1.0)
+				s.cell = c
+				_add_unit(s)
+				_emit({ "t": "spawn", "unit": s.id, "cell": c, "prop": false })
+				made += 1
+		if made > 0:
+			_emit({ "t": "log", "text": "%s splits apart!" % t.name })
+			_build_order_keep_current()
 
 
 func _heal(u: UnitScript, t: UnitScript, amount: int) -> void:
@@ -1575,12 +1654,21 @@ func refresh_intents() -> void:
 ## Tiles an intent threatens right now (tracking intents follow their target).
 func intent_cells(u: UnitScript) -> Array:
 	var it: Dictionary = u.intent
-	if it.is_empty() or not str(it.get("kind", "")) in ["attack", "special"]:
+	if it.is_empty() or not str(it.get("kind", "")) in ["attack", "special"] or bool(it.get("summon", false)):
 		return []
 	if str(it.get("mode", "locked")) == "tracking":
 		var t := unit_by_id(str(it.get("unit", "")))
 		return [t.cell] if t != null and t.alive() else []
 	return it.get("cells", [])
+
+
+## Tiles enemies plan to heal or summon onto (shown in green, not red).
+func support_cells() -> Array:
+	var out: Array = []
+	for u in units:
+		if u.team == "enemy" and u.alive() and (str(u.intent.get("kind", "")) == "buff" or bool(u.intent.get("summon", false))):
+			out.append_array(u.intent.get("cells", []))
+	return out
 
 
 ## The resolution spec of an intent's action. Telegraphed attacks can be
@@ -1665,6 +1753,20 @@ func pattern_cells(u: UnitScript, pattern: String, target: Vector2i) -> Array:
 			"line":
 				if cell.y == u.cell.y and signi(cell.x - u.cell.x) == signi(target.x - u.cell.x):
 					out.append(cell)
+			"square_self":
+				if absi(cell.x - u.cell.x) <= 1 and absi(cell.y - u.cell.y) <= 1:
+					out.append(cell)
+			"resurface":
+				if GridScript.manhattan(cell, target) <= 1:
+					out.append(cell)
+	if pattern == "charge_line":
+		# A straight run toward the target until a wall or the edge.
+		out = []
+		var dir := Forms.direction_to(u.cell, target)
+		var c := u.cell + dir
+		while grid.in_bounds(c) and grid.walkable_terrain(c):
+			out.append(c)
+			c += dir
 	return out
 
 
@@ -1755,9 +1857,32 @@ func execute_intent(u: UnitScript) -> bool:
 ## the caster's own side.
 func _resolve_locked(u: UnitScript, it: Dictionary) -> void:
 	u.action_used = true
-	var spec := intent_spec(u, it.get("action", {}))
+	var act: Dictionary = it.get("action", {})
+	var spec := intent_spec(u, act)
 	var cells: Array = it.get("cells", [])
 	var target: Vector2i = it.get("target", u.cell)
+	if bool(act.get("burrow", false)):
+		_burrow(u, target)
+		return
+	if bool(act.get("summon", false)):
+		_summon(u, cells)
+		return
+	if bool(act.get("resurface", false)):
+		u.statuses.erase("burrowed")
+		var land := target if unit_at(target) == null or unit_at(target) == u else _free_near(target)
+		var from := u.cell
+		u.cell = land
+		_emit({ "t": "blink", "unit": u.id, "from": from, "to": land })
+	if bool(act.get("run", false)):
+		# Chargers run the whole line, stopping before the first thing in the way.
+		var from := u.cell
+		for c in cells:
+			var cell: Vector2i = c
+			if unit_at(cell) != null and unit_at(cell) != u:
+				break
+			u.cell = cell
+		if u.cell != from:
+			_emit({ "t": "push", "unit": u.id, "from": from, "to": u.cell })
 	_face_toward(u, target)
 	_emit({ "t": "cast", "unit": u.id, "name": spec["name"], "target": target, "improvised": false })
 	_emit({ "t": "area", "cells": cells, "vectors": spec["vectors"] })
@@ -1775,7 +1900,49 @@ func _resolve_locked(u: UnitScript, it: Dictionary) -> void:
 			hit.append(t)
 	if not bool(spec["heal"]):
 		_apply_vector_effects(u, spec, cells, hit)
+	if bool(act.get("selfDestruct", false)) and u.alive():
+		u.hp = 0
+		_on_zero_hp(u, null)
 	_check_end()
+
+
+## Burrowers dig in (can't be hurt) and telegraph where they'll come up.
+func _burrow(u: UnitScript, target: Vector2i) -> void:
+	u.statuses["burrowed"] = 99
+	_emit({ "t": "log", "text": "%s burrows underground." % u.name })
+	var victim: UnitScript = null
+	for o in opponents_of(u):
+		if victim == null or GridScript.manhattan(o.cell, u.cell) < GridScript.manhattan(victim.cell, u.cell):
+			victim = o
+	var spot := victim.cell if victim != null else target
+	var rise := { "id": "resurface", "name": "Resurface", "form": "touch", "power": float(u.source.get("resurfacePower", 9)), "vectors": { "force": 1.0 }, "resurface": true }
+	u.intent = { "kind": "special", "action": rise, "move": u.cell, "target": spot, "cells": pattern_cells(u, "resurface", spot), "mode": "locked", "charge": 0 }
+
+
+## Summoners call a minion onto a telegraphed tile.
+func _summon(u: UnitScript, cells: Array) -> void:
+	var rec: Dictionary = DT.index_under(db, "enemies/", "enemies").get(str(u.source.get("summons", "")), {})
+	if rec.is_empty():
+		return
+	for c in cells:
+		var cell: Vector2i = c
+		if grid.walkable_terrain(cell) and unit_at(cell) == null:
+			var s := UnitScript.from_enemy(EnemyMods.apply(db, rec), 1.0)
+			s.cell = cell
+			_add_unit(s)
+			_emit({ "t": "spawn", "unit": s.id, "cell": cell, "prop": false })
+			_emit({ "t": "log", "text": "%s calls %s." % [u.name, s.name] })
+			_build_order_keep_current()
+			return
+
+
+func _free_near(cell: Vector2i) -> Vector2i:
+	for r in range(1, 4):
+		for c in grid.all_cells():
+			var x: Vector2i = c
+			if GridScript.manhattan(x, cell) == r and grid.walkable_terrain(x) and unit_at(x) == null:
+				return x
+	return cell
 
 
 # --- End of fight -------------------------------------------------------------------

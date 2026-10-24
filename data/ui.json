@@ -66,6 +66,14 @@
     "empowered": { "name": "Empowered", "text": "Its next card of a Vector hits harder.", "icon": "icon_status_infusion", "color": "#e8663c" },
     "corroded": { "name": "Corroded", "text": "Defense and Resistance shredded.", "icon": "icon_vector_corrosion", "color": "#8a9b3c" }
   },
+  "affixes": {
+    "hasted": { "name": "Hasted", "text": "Moves and acts in one turn, and moves far.", "icon": "icon_status_haste", "color": "#9be36d" },
+    "armored": { "name": "Armored", "text": "Extra Defense and Resistance.", "icon": "icon_status_guard", "color": "#c9c9c9" },
+    "burning": { "name": "Burning", "text": "Leaves fire where it walks; attacks burn.", "icon": "icon_vector_heat", "color": "#e8663c" },
+    "vampiric": { "name": "Vampiric", "text": "Heals from the damage it deals.", "icon": "icon_vector_vitality", "color": "#e8746a" },
+    "shielded": { "name": "Shielded", "text": "Starts with a big Shield.", "icon": "icon_status_shield", "color": "#7cc7e8" },
+    "explosive": { "name": "Explosive", "text": "Explodes when it dies, hurting everyone next to it.", "icon": "icon_intent_special", "color": "#ffd966" }
+  },
   "kindIcons": { "spell": "icon_kind_spell", "basic": "icon_kind_basic", "item": "icon_kind_item" },
   "intentIcons": { "attack": "icon_intent_attack", "special": "icon_intent_special", "buff": "icon_intent_buff", "defend": "icon_intent_defend", "move": "icon_intent_move", "tracking": "icon_intent_tracking" },
   "combatSpeed": { "comment": "Seconds of enemy-turn pauses are multiplied by the chosen speed; holding Fast-forward (Shift, pad X) multiplies again.", "setting": "normal", "normal": 1.0, "fast": 0.45, "instant": 0.0, "holdMul": 0.2 },

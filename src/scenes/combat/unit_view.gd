@@ -17,6 +17,8 @@ var statuses: Array = []   # status ids; icons and colors come from data/ui.json
 var intent_icon := ""      # enemies: what they'll do next (data/ui.json "intentIcons")
 var charge := 0            # turns left charging a big attack
 var friend_link := false   # next to a Friend-tier ally (+5% damage)
+var affixes: Array = []    # elite affix ids (icons from data/ui.json "affixes")
+var burrowed := false
 var _frame := Vector2i.ONE
 var _walker := false
 var _bob := 0.0
@@ -112,6 +114,13 @@ func _draw() -> void:
 	if friend_link:
 		var link := Assets.texture("icon_vector_binding")
 		draw_texture_rect(link, Rect2(Display.tile * 0.35, -Display.tile * 0.3, Display.tile / 2.0, Display.tile / 2.0), false, UiTheme.GOOD)
+	var ax := -float(affixes.size()) * Display.tile / 4.0
+	for a in affixes:
+		var info: Dictionary = DataDB.table("ui").get("affixes", {}).get(str(a), {})
+		draw_texture_rect(Assets.texture(str(info.get("icon", ""))), Rect2(ax, top - Display.tile / 2.0 - 1, Display.tile / 2.0, Display.tile / 2.0), false, Color(str(info.get("color", "#ffffff"))))
+		ax += Display.tile / 2.0
+	if sprite != null and not downed:
+		sprite.modulate.a = 0.25 if burrowed else 1.0
 	if intent_icon != "" and not downed:
 		var ic := Assets.texture(intent_icon)
 		var at := Vector2(-ic.get_width() / 2.0, top - ic.get_height() - 2)

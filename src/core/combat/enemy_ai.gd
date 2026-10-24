@@ -140,6 +140,9 @@ static func choose(state: StateScript, u: UnitScript) -> Dictionary:
 ## An enemy's telegraphed next action (CU), chosen like a normal turn and
 ## then frozen: the tiles it will hit, where it will stand, any charge-up.
 static func plan_intent(state: StateScript, u: UnitScript) -> Dictionary:
+	var special := _behavior_intent(state, u)
+	if not special.is_empty():
+		return special
 	# Planned during someone else's turn: score moves with next turn's Movement.
 	var saved_move := u.move_left
 	u.move_left = 0 if u.statuses.has("root") else maxi(0, u.movement - (1 if u.statuses.has("slow") else 0))
@@ -157,7 +160,7 @@ static func plan_intent(state: StateScript, u: UnitScript) -> Dictionary:
 	var m: Vector2i = plan["move"]
 	var target: Vector2i = plan["target"]
 	if bool(spec["heal"]):
-		return { "kind": "buff", "action": action, "move": m, "target": target, "cells": [] }
+		return { "kind": "buff", "action": action, "move": m, "target": target, "cells": [target] }
 	var charge := int(action.get("charge", 0))
 	if charge > 0:
 		# Charging attacks are aimed from where the unit stands now.
@@ -178,6 +181,33 @@ static func plan_intent(state: StateScript, u: UnitScript) -> Dictionary:
 	var mode := str(action.get("intent", u.source.get("intent", "locked")))
 	return { "kind": "special" if charge > 0 or action.has("pattern") else "attack", "action": action, "move": m, "target": target,
 		"cells": cells, "mode": mode, "unit": tracked.id if tracked != null else "", "charge": charge }
+
+
+## Behaviors that plan differently from "pick the best action" (docs/ARENA.md Part 4).
+static func _behavior_intent(state: StateScript, u: UnitScript) -> Dictionary:
+	var src: Dictionary = u.source
+	match str(src.get("behavior", "")):
+		"summoner":
+			var every := maxi(1, int(src.get("summonEvery", 2)))
+			if u.turns_taken % every == 0:
+				var spot := Vector2i(-1, -1)
+				for d in GridScript.DIRS:
+					var c: Vector2i = u.cell + d
+					if state.grid.walkable_terrain(c) and state.unit_at(c) == null:
+						spot = c
+						break
+				if spot.x >= 0:
+					return { "kind": "special", "action": { "id": "summon", "name": "Summon", "summon": true, "form": "touch" }, "move": u.cell,
+						"target": spot, "cells": [spot], "mode": "locked", "charge": 0, "summon": true }
+		"burrower":
+			if not u.statuses.has("burrowed"):
+				var near := false
+				for o in state.opponents_of(u):
+					near = near or GridScript.manhattan(o.cell, u.cell) == 1
+				if not near:
+					return { "kind": "special", "action": { "id": "burrow", "name": "Burrow", "burrow": true, "form": "touch" }, "move": u.cell,
+						"target": u.cell, "cells": [], "mode": "locked", "charge": 0 }
+	return {}
 
 
 ## Run a whole AI turn: carry out the intent (enemies) or choose, move, act, end turn.
@@ -228,7 +258,14 @@ static func _actions(state: StateScript, u: UnitScript) -> Array:
 	var out: Array = []
 	var c := cfg(state)
 	if u.team == "enemy":
-		for a in u.actions:
+		var actions: Array = u.actions.duplicate()
+		# Mirrors copy the last card the party played.
+		if str(u.source.get("behavior", "")) == "mirror" and not state.last_party_card.is_empty():
+			var card: Dictionary = state.last_party_card
+			actions.append({ "id": "mirror", "name": "Mirror: %s" % card.get("name", "?"), "form": str(card.get("form", "bolt")),
+				"vectors": card.get("vectors", {}), "power": CardRules.power(state.db, card), "magnitude": str(card.get("magnitude", "standard")),
+				"profile": { "curiosity": 1.0 } })
+		for a in actions:
 			out.append({ "kind": "action", "action": a, "spec": state.action_spec(u, a),
 				"profile": a.get("profile", c.get("attack", { "courage": 0.6 })), "strongest": str(a.get("target", "")) == "strongest" })
 		return out
