@@ -37,8 +37,8 @@ func header() -> void:
 	var bond := float(GameState.bonds.get(npc_id, 0.0))
 	var tier := Dlg.bond_tier(DataDB.all(), bond)
 	var mood := Dlg.mood(DataDB.all(), GameState.run, npc_id, int(GameState.run.get("day_count", 0)))
-	var info := UiTheme.label("%s\nBond %d (%s). They %s." % [rec.get("role", ""), roundi(bond), tier,
-		str(_social("moodText", {}).get(mood, ""))], UiTheme.DIM)
+	var info := UiTheme.label("%s\nBond %d (%s). %s" % [rec.get("role", ""), roundi(bond), tier,
+		Dlg.mood_line(DataDB.all(), npc_id, mood)], UiTheme.DIM)
 	r.add_child(info)
 
 
@@ -73,7 +73,7 @@ func _menu() -> void:
 	if BondRules.can_hang_out(db, GameState.run, npc_id):
 		var hang_ap := int(_social("hangoutAp", 2))
 		add_button("Hang out (%d AP)" % hang_ap, func() -> void:
-			if Calendar.spend_ap(hang_ap):
+			if Calendar.spend_ap(hang_ap, "hangout"):
 				show_result(BondRules.hang_out(DataDB.all(), GameState.run, npc_id, Rng.stream("dialogue"))), Calendar.ap() < hang_ap)
 	if bool(rec.get("recruitable", false)) and GameState.character(npc_id).is_empty():
 		var block := BondRules.recruit_block(db, GameState.run, npc_id, Calendar.week())
@@ -87,7 +87,7 @@ func _menu() -> void:
 
 
 func _say(topic: Dictionary) -> void:
-	if not Calendar.spend_ap(int(_social("topicAp", 1))):
+	if not Calendar.spend_ap(int(_social("topicAp", 1)), "talk"):
 		return
 	var r := Dlg.say(DataDB.all(), GameState.run, npc_id, topic, Rng.stream("dialogue"), GameState.ctx())
 	var lines: Array = []
@@ -134,7 +134,7 @@ func _gift_menu() -> void:
 		if str(it.get("kind", "")) != "gift":
 			continue
 		add_button("%s x%d" % [it.get("name", iid), int(GameState.run["inventory"][id])], func() -> void:
-			if Calendar.spend_ap(int(_social("giftAp", 1))):
+			if Calendar.spend_ap(int(_social("giftAp", 1)), "gift"):
 				var r := BondRules.give_gift(DataDB.all(), GameState.run, npc_id, iid)
 				show_result(r["lines"]))
 	add_button("Back", _menu)
@@ -142,7 +142,7 @@ func _gift_menu() -> void:
 
 
 func _recruit() -> void:
-	if not Calendar.spend_ap(1):
+	if not Calendar.spend_ap(1, "recruit"):
 		return
 	var ch := BondRules.recruit(DataDB.all(), GameState.run, npc_id, Rng.stream("npc"))
 	var rec: Dictionary = DataDB.table("npcs/" + npc_id)

@@ -14,9 +14,25 @@ Claude Code updates this at the end of every milestone and before stopping, so a
 | M7 The Upside-Down | Done | Weekly signature from data + town events, seeded floors Mon-Thu, Friday boss floor with fled-first returning fights, The Hollow Mascot (3 phases), rooms (combat, elite, treasure, rest, event, merchant, exit), shards, party scaling, woods-edge party pick, Narrator's Journal, death summary; week 1 plays end to end |
 | M8 Alpha content and polish | Done | Weeks 2-5 (18 more enemies, 4 bosses with phases), 10 advanced classes with Class Change at 5/12 and working signature perks, perk picks, Mr. B's arc and the week 3/4 choices, NARRATOR_REVEAL_TBD finale with a branching alpha ending, 4 crafting minigames, audio pass, balance pass. A full 5-week run completes in the real scenes |
 
+## Phase 2 (docs/ROADMAP.md)
+
+| Milestone | Status | Notes |
+| --- | --- | --- |
+| M9 Stabilize | Done | GitHub has every commit (LFS included); fixed "They seems fine" (mood line uses the name, `social.json` "moodText"), stacked status labels in combat (colored chips under the feet, floating numbers stack per unit), crowded name tags (only the nearest NPC shows one); `docs/PLAYTEST.md`; local gameplay log (`PlayLog` autoload, `user://gameplay_log.jsonl`: AP per action type, fights won/lost, seconds per day; `tools/play_log_report.gd` prints totals) |
+
+### Phase 2 default decisions (from docs/PROMPT_phase2.md)
+- Art sizes are decided: 32x32 tiles at 640x360, 32x32 characters (up to 32x48), 64x64 portraits; no hardcoded sizes (M10).
+- The narrator stays `NARRATOR_REVEAL_TBD`.
+- The parent is chosen at character creation: mom, dad or guardian (M15).
+- Act 2 is a design stub only (M21, `docs/ACT2.md`).
+- Permadeath stays the default; Narrator's Mercy is offered at new run (M19).
+
+### Phase 2 notes
+- M9: `Calendar.spend_ap(amount, kind)` now takes an action kind ("talk", "gift", "hangout", "recruit", "craft", "copy", "shop:<id>", "activity:<location>") and emits `EventBus.ap_spent`. The log is off in headless runs so tests don't write it. Pure tallies in `src/core/run/play_log.gd`.
+
 ## Next step
 
-Start M7 (the Upside-Down: weekly signature shaped by town events, seeded floors Mon to Thu, Friday boss floor with returning fled-first enemies, The Hollow Mascot with phases, permadeath restart, Narrator's Journal between runs, autosave; week 1 playable end to end). The Monday evening already runs as a scripted story floor (`data/story/week1_monday.json`); the M7 dungeon should keep using it for week 1 Monday.
+M10: replaceable art pipeline and the 32x32 / 640x360 switch (docs/ROADMAP.md).
 
 ## How to check
 

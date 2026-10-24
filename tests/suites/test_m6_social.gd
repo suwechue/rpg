@@ -66,6 +66,13 @@ func test_misheard_chance() -> void:
 	check_near(Dlg.misheard_chance(db(), run, 0.2, "neutral"), 0.08, "Clear Speaker halves it")
 
 
+func test_mood_line_grammar() -> void:
+	check(Dlg.mood_line(db(), "kelly", "neutral") == "Kelly seems fine.", "named, singular verb")
+	check(Dlg.mood_line(db(), "ms_g", "good") == "Ms. G seems in a good mood.", "titles stay")
+	check(Dlg.mood_line(db(), "mayor", "bad") == "The Mayor seems off today.", "'The' names stay whole")
+	check(Dlg.mood_line(db(), "innocent_bystander", "neutral") == "Innocent Bystander seems fine.", "two-word names stay whole")
+
+
 func test_reception_by_match() -> void:
 	var run := fresh()
 	var kind := { "kindness": 1.0 }

@@ -13,7 +13,9 @@ var hp_ratio := 1.0
 var shield := 0
 var downed := false
 var highlight := false
-var status_text := ""
+var statuses: Array = []   # short codes: RO, SL, BL, HA, RA, IN, GD
+
+const STATUS_COLORS := { "RO": "#b07ce8", "SL": "#7cc7e8", "BL": "#f5e27a", "HA": "#9be36d", "RA": "#e87cc9", "IN": "#e8663c", "GD": "#c9c9c9" }
 var _frame_w := 16
 var _frame_h := 16
 var _walker := false
@@ -102,8 +104,13 @@ func _draw() -> void:
 	draw_rect(Rect2(-bar_w / 2.0, top, bar_w * clampf(hp_ratio, 0.0, 1.0), 3), col)
 	if shield > 0:
 		draw_rect(Rect2(-bar_w / 2.0, top - 2, bar_w, 1), Color("7cc7e8"))
-	if status_text != "":
-		draw_string(UiTheme.font, Vector2(-bar_w / 2.0, top - 3), status_text, HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, Color("f5e27a"))
+	# Status chips sit in one row under the feet, clear of floating texts above.
+	var chip_x := -float(statuses.size()) * 5.0
+	for code in statuses:
+		var c := Color(str(STATUS_COLORS.get(str(code), "#ffffff")))
+		draw_rect(Rect2(chip_x, 5, 8, 4), c)
+		draw_rect(Rect2(chip_x, 5, 8, 4), Color(0, 0, 0, 0.6), false, 1.0)
+		chip_x += 10.0
 	if downed and sprite != null:
 		sprite.modulate = Color(0.5, 0.5, 0.6, 0.6)
 		sprite.rotation = PI / 2.0 if team == "party" else -PI / 2.0

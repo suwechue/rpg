@@ -369,3 +369,25 @@ func _smoke_combat() -> void:
 		guard += 1
 	check(scene.get("_result_panel") != null, "result panel shows")
 	gs.set("dev_autoplay", false)
+
+
+func smoke_gameplay_log() -> void:
+	var pl := _root_node("PlayLog")
+	var bus := _root_node("EventBus")
+	var test_path := "user://smoke_gameplay_log.jsonl"
+	if FileAccess.file_exists(test_path):
+		DirAccess.remove_absolute(test_path)
+	var was: bool = pl.get("enabled")
+	var old_path: String = pl.get("path")
+	pl.set("enabled", true)
+	pl.set("path", test_path)
+	bus.emit_signal("day_part_changed", 9, "Monday", "morning")
+	bus.emit_signal("ap_spent", 2, "talk")
+	bus.emit_signal("combat_finished", { "result": "win" })
+	bus.emit_signal("day_part_changed", 9, "Tuesday", "morning")
+	pl.set("enabled", was)
+	pl.set("path", old_path)
+	var text := FileAccess.get_file_as_string(test_path)
+	var rec: Variant = JSON.parse_string(text.get_slice("\n", 0))
+	check(rec is Dictionary and int(rec["ap"]["talk"]) == 2 and int(rec["won"]) == 1 and str(rec["day"]) == "Monday", "gameplay log writes a day line: %s" % text.strip_edges())
+	DirAccess.remove_absolute(test_path)

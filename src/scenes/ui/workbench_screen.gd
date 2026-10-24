@@ -93,7 +93,7 @@ func _design() -> void:
 
 
 func _play_minigame() -> void:
-	if not Calendar.spend_ap(craft_ap):
+	if not Calendar.spend_ap(craft_ap, "craft"):
 		return
 	var db: Dictionary = DataDB.all()
 	var arch := Crafting.archetype(db, Crafting.input_vector(db, _vectors, _magnitude))
@@ -136,7 +136,7 @@ func _copy_menu() -> void:
 			continue
 		var cid := str(id)
 		add_button("%s x%d (%d MP)" % [card.get("name", id), int(coll[id]), CardRules.cost(db, card)], func() -> void:
-			if Calendar.spend_ap(copy_ap) and Crafting.copy(GameState.run, cid):
+			if Calendar.spend_ap(copy_ap, "copy") and Crafting.copy(GameState.run, cid):
 				Narrator.say("Another %s for the pile." % card.get("name", cid))
 			_copy_menu(), Calendar.ap() < copy_ap)
 	add_button("Back", _menu)

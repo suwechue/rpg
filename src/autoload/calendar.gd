@@ -51,10 +51,12 @@ func max_ap() -> int:
 	return logic.max_ap()
 
 
-func spend_ap(amount: int) -> bool:
+## Spend AP. `kind` says what for ("talk", "shop:deli", ...), for the gameplay log.
+func spend_ap(amount: int, kind: String = "other") -> bool:
 	var ok: bool = logic.spend_ap(amount)
 	if ok:
 		EventBus.ap_changed.emit(logic.ap)
+		EventBus.ap_spent.emit(amount, kind)
 	return ok
 
 

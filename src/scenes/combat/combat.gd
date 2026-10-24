@@ -45,6 +45,7 @@ var _buttons: Dictionary = {}
 var _wheel: PanelContainer
 var _result_panel: PanelContainer
 var _fx: Node2D
+var _float_slots: Dictionary = {}   # unit view -> floating texts currently shown
 
 
 func _ready() -> void:
@@ -135,7 +136,7 @@ func _sync_views() -> void:
 			tags.append("IN")
 		if u.guard_active:
 			tags.append("GD")
-		v.status_text = " ".join(PackedStringArray(tags))
+		v.statuses = tags
 		v.queue_redraw()
 	var gl: Array = []
 	for g in state.glyphs:
@@ -738,12 +739,18 @@ func _float_text(v: Node2D, text: String, color: Color) -> void:
 	l.add_theme_color_override("font_color", color)
 	l.add_theme_color_override("font_outline_color", Color.BLACK)
 	l.add_theme_constant_override("outline_size", 2)
-	l.position = v.position + Vector2(-10, -v.sprite_height() - 16)
+	# Texts on the same unit at the same time stack upward instead of overlapping.
+	var slot := int(_float_slots.get(v, 0))
+	_float_slots[v] = slot + 1
+	l.position = v.position + Vector2(-10, -v.sprite_height() - 16 - 10 * slot)
 	_fx.add_child(l)
 	var tw := create_tween()
 	tw.tween_property(l, "position:y", l.position.y - 12, 0.6)
 	tw.parallel().tween_property(l, "modulate:a", 0.0, 0.6).set_delay(0.3)
-	tw.tween_callback(l.queue_free)
+	tw.tween_callback(func() -> void:
+		l.queue_free()
+		if is_instance_valid(v) and _float_slots.has(v):
+			_float_slots[v] = maxi(0, int(_float_slots[v]) - 1))
 
 
 func _shake(amount: float) -> void:

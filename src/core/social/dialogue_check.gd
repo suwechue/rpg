@@ -40,6 +40,12 @@ static func mood(db: Dictionary, run: Dictionary, id: String, day_count: int) ->
 	return VO.sample(w, rng, MOODS)
 
 
+## "Kelly seems fine.": the person's name with a singular verb (data/social.json "moodText").
+static func mood_line(db: Dictionary, id: String, mood_name: String) -> String:
+	var tpl := str(cfg(db).get("moodText", {}).get(mood_name, "{name} seems fine."))
+	return tpl.replace("{name}", str(npc(db, id).get("name", id.capitalize())))
+
+
 ## The listener's current disposition (run state, falling back to data).
 static func disposition(db: Dictionary, run: Dictionary, id: String) -> Dictionary:
 	var st: Dictionary = run.get("npcs", {}).get(id, {})

@@ -3,7 +3,7 @@
   "defaultRisk": 0.05,
   "moodWeights": { "good": 3, "neutral": 5, "bad": 2 },
   "moodShift": { "good": 0.15, "neutral": 0.0, "bad": -0.15 },
-  "moodText": { "good": "seem in a good mood", "neutral": "seem fine", "bad": "seem off today" },
+  "moodText": { "good": "{name} seems in a good mood.", "neutral": "{name} seems fine.", "bad": "{name} seems off today." },
   "bondDivisor": 400,
   "riskUpside": 1.5,
   "goodAt": 0.2, "badAt": -0.05, "neutralBond": 1,

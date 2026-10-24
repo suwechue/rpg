@@ -267,10 +267,17 @@ func _place_npc(id: String, at: Vector2i) -> void:
 # --- Movement -------------------------------------------------------------------------------
 
 func _process(_delta: float) -> void:
+	# Only the closest person within reach shows a name tag, so crowds stay readable.
+	var nearest: Node2D = null
+	var best := TILE * 3.5
+	for w in _npc_nodes:
+		var d: float = w.position.distance_to(player.position)
+		if d <= best:
+			best = d
+			nearest = w
 	for w in _npc_nodes:
 		if w.get_child_count() > 0:
-			var near: bool = w.position.distance_to(player.position) <= TILE * 3.5
-			w.get_child(w.get_child_count() - 1).visible = near
+			w.get_child(w.get_child_count() - 1).visible = w == nearest
 	if _moving or Flow.is_busy() or map == null:
 		_update_prompt()
 		return
@@ -467,7 +474,7 @@ func location_menu(loc: String) -> void:
 	var p: Dictionary = picked
 	if p.has("act"):
 		var act: Dictionary = p["act"]
-		if not Calendar.spend_ap(int(act.get("ap", 1))):
+		if not Calendar.spend_ap(int(act.get("ap", 1)), "activity:" + loc):
 			return
 		if int(act.get("money", 0)) > 0:
 			GameState.spend_money(int(act["money"]))
@@ -475,7 +482,7 @@ func location_menu(loc: String) -> void:
 		Narrator.say(("%s %s" % [str(act.get("say", "")), " ".join(PackedStringArray(lines))]).strip_edges())
 	elif p.has("shop"):
 		var visit := int(DataDB.table("town/shops").get("rules", {}).get("visitAp", 1))
-		if Calendar.spend_ap(visit):
+		if Calendar.spend_ap(visit, "shop:" + str(p["shop"])):
 			var s := ShopScreen.new()
 			s.shop_id = str(p["shop"])
 			await Flow.show_modal(s)
