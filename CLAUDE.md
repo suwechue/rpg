@@ -4,14 +4,17 @@ Read `docs/DESIGN.md` before starting any task. The Vector system reference is `
 
 ## Current state
 
-M0 (skeleton) and most of M1 (Vector core) are in place:
+M0 to M2 are done:
 - `src/core/vector_ops.gd` — all 8 operations plus total/spread/complexity/dominant_axis. Cosine "Match" is named `similarity()` because `match` is a GDScript keyword.
+- `src/core/data_tables.gd` — pure JSON loader shared by `DataDB` and the tests; core functions take the whole tables Dictionary as `db`.
 - `src/core/rng_streams.gd`, `src/core/calendar_logic.gd` — seeded streams, day parts and AP.
-- `src/autoload/` — EventBus, InputSetup (input map registered in code), DataDB, Rng, Narrator, Calendar, GameState, SaveSystem, SceneRouter.
-- `src/scenes/main.tscn` — a placeholder town sandbox exercising the day-part/AP loop.
-- `tests/run_tests.gd` — headless tests, including the three worked examples from the Vector doc.
+- `src/core/character.gd`, `card.gd`, `deck.gd`, `progression/leveling.gd` — characters as Dictionaries, derived stats, card costs and Tier caps, deck with Fatigue, leveling with pity.
+- `src/autoload/` — EventBus, InputSetup, DataDB, Rng, Narrator, Calendar, GameState, SaveSystem, SceneRouter, UiTheme (project theme + UI helpers), DebugMenu (F1, plus the `--shot` screenshot hook).
+- `tests/run_tests.gd` runs its own tests, then every suite in `tests/suites/` (each extends `tests/suite.gd`).
 
-Next: M2. Progress, decisions and stubs are tracked in `docs/PROGRESS.md`; the full alpha instructions are in `docs/PROMPT_alpha_run.md`. Final design decisions are in DESIGN.md Section 18. The cast is in `docs/characters.md` and the town plan in `docs/TOWN.md`; both are sources of truth.
+Gotchas: JSON numbers load as floats, so `[3.0].has(3)` is false; compare with `int()`. New `class_name`s are not visible until the editor rescans, so reference scripts with `preload` constants. The UI font's native size is 9px (`UiTheme.FONT_SIZE`).
+
+Next: M3. Progress, decisions and stubs are tracked in `docs/PROGRESS.md`; the full alpha instructions are in `docs/PROMPT_alpha_run.md`. Final design decisions are in DESIGN.md Section 18. The cast is in `docs/characters.md` and the town plan in `docs/TOWN.md`; both are sources of truth.
 
 ## How this project is built
 
