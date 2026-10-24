@@ -8,6 +8,13 @@
   "magnitudeOrder": ["minor", "standard", "major", "grand"],
   "hybridExtraCost": 1,
   "improvise": { "costMultiplier": 1.5, "flatExtra": 1, "discardCards": 1, "instabilityBonus": 3 },
+  "failures": { "fizzle": 4, "backlash": 3, "misfire": 2, "wild_surge": 1 },
+  "failureText": {
+    "fizzle": "Fizzle: the spell sputters out. MP spent, nothing happens.",
+    "backlash": "Backlash: the spell bites back for half damage.",
+    "misfire": "Misfire: the spell lands somewhere else in range.",
+    "wild_surge": "Wild Surge: a random Vector tears through the spell."
+  },
   "names": {
     "heat": "Ember", "cold": "Frost", "force": "Force", "motion": "Swift", "binding": "Binding",
     "light": "Radiant", "transmutation": "Shifting", "vitality": "Living", "corrosion": "Rotting"

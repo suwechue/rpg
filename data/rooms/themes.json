@@ -1,0 +1,10 @@
+{
+  "themes": [
+    { "id": "school",   "name": "Twisted Classrooms", "skyTop": "#1a1030", "skyBottom": "#4a2c5e", "floor": "#3b3552", "floorAlt": "#343049", "line": "#6d6391", "horizon": "#251b38", "accent": "#f5e27a" },
+    { "id": "deli",     "name": "The Frozen Deli",    "skyTop": "#0b1a2e", "skyBottom": "#2c5470", "floor": "#38506a", "floorAlt": "#32485f", "line": "#7cc7e8", "horizon": "#14283d", "accent": "#bfe9ff" },
+    { "id": "forge",    "name": "The Burning Forge",  "skyTop": "#1e0a06", "skyBottom": "#6b2412", "floor": "#4a2e24", "floorAlt": "#42281f", "line": "#e8663c", "horizon": "#2e120a", "accent": "#ffb347" },
+    { "id": "hospital", "name": "The Night Ward",     "skyTop": "#071512", "skyBottom": "#1f4a40", "floor": "#2f4a46", "floorAlt": "#2a423e", "line": "#5fd98a", "horizon": "#0f2420", "accent": "#a8f0c6" },
+    { "id": "town",     "name": "The Mirror Town",    "skyTop": "#120c18", "skyBottom": "#3d2f48", "floor": "#3f3a46", "floorAlt": "#38343f", "line": "#b07ce8", "horizon": "#201a28", "accent": "#e87cc9" },
+    { "id": "boss",     "name": "Center Stage",       "skyTop": "#16061a", "skyBottom": "#5e1440", "floor": "#45253d", "floorAlt": "#3d2036", "line": "#e87cc9", "horizon": "#26091f", "accent": "#ffd966" }
+  ]
+}

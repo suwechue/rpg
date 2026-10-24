@@ -1,0 +1,34 @@
+{
+  "musicVolumeDb": -10,
+  "sfxVolumeDb": -6,
+  "music": {
+    "title": "res://assets/packs/ninja_adventure/Audio/Musics/38 - Intro.ogg",
+    "town": "res://assets/packs/ninja_adventure/Audio/Musics/33 - Calm Village.ogg",
+    "school": "res://assets/packs/ninja_adventure/Audio/Musics/31 - Sunny.ogg",
+    "weekend": "res://assets/packs/ninja_adventure/Audio/Musics/20 - Good Time.ogg",
+    "night": "res://assets/packs/ninja_adventure/Audio/Musics/9 - Quiet.ogg",
+    "dungeon": "res://assets/packs/ninja_adventure/Audio/Musics/21 - Dungeon.ogg",
+    "dungeon_boss_floor": "res://assets/packs/ninja_adventure/Audio/Musics/28 - Tension.ogg",
+    "battle": "res://assets/packs/ninja_adventure/Audio/Musics/17 - Fight.ogg",
+    "battle_boss": "res://assets/packs/ninja_adventure/Audio/Musics/34  - Fight.ogg",
+    "death": "res://assets/packs/ninja_adventure/Audio/Musics/29 - Lament.ogg",
+    "story": "res://assets/packs/ninja_adventure/Audio/Musics/6 - Story.ogg",
+    "reveal": "res://assets/packs/ninja_adventure/Audio/Musics/3 - Revelation.ogg",
+    "ending": "res://assets/packs/ninja_adventure/Audio/Musics/8 - End Theme.ogg"
+  },
+  "sfx": {
+    "cast": "res://assets/packs/ninja_adventure/Audio/Sounds/Magic & Skill/Magic1.wav",
+    "hit": "res://assets/packs/ninja_adventure/Audio/Sounds/Hit & Impact/Hit2.wav",
+    "heal": "res://assets/packs/ninja_adventure/Audio/Sounds/Magic & Skill/Heal.wav",
+    "fail": "res://assets/packs/ninja_adventure/Audio/Sounds/Magic & Skill/Strange.wav",
+    "win": "res://assets/packs/ninja_adventure/Audio/Jingles/Success1.wav",
+    "lose": "res://assets/packs/ninja_adventure/Audio/Jingles/GameOver.wav",
+    "levelup": "res://assets/packs/ninja_adventure/Audio/Jingles/LevelUp1.wav",
+    "click": "res://assets/packs/ninja_adventure/Audio/Sounds/Menu/Accept.wav",
+    "cancel": "res://assets/packs/ninja_adventure/Audio/Sounds/Menu/Cancel.wav",
+    "coin": "res://assets/packs/ninja_adventure/Audio/Sounds/Bonus/Coin.wav",
+    "door": "res://assets/packs/ninja_adventure/Audio/Sounds/Menu/Menu5.wav",
+    "step": "res://assets/packs/ninja_adventure/Audio/Sounds/Jump & Bounce/Bounce.wav",
+    "secret": "res://assets/packs/ninja_adventure/Audio/Jingles/Secret1.wav"
+  }
+}

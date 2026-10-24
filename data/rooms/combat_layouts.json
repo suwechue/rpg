@@ -1,0 +1,77 @@
+{
+  "layouts": [
+    { "id": "open_field", "theme": "school", "weight": 3,
+      "map": [
+        "<P.....E.",
+        "<P..c..E.",
+        "<P......E",
+        "<P..c..E.",
+        "<P.....E."
+      ] },
+    { "id": "bleachers", "theme": "school", "weight": 2,
+      "map": [
+        "<P..##.E.",
+        "<P.....E.",
+        "<P..x..EE",
+        "<P.....E.",
+        "<P..##.E."
+      ] },
+    { "id": "locker_hall", "theme": "school", "weight": 2,
+      "map": [
+        "<P.#...E.",
+        "<P.#.x.E.",
+        "<P.....EE",
+        "<P...#.E.",
+        "<P.x.#.E."
+      ] },
+    { "id": "flooded_gym", "theme": "school", "weight": 1,
+      "map": [
+        "<P..ww.E.",
+        "<P..ww.E.",
+        "<P.....EE",
+        "<P.hh..E.",
+        "<P.....E."
+      ] },
+    { "id": "frozen_deli", "theme": "deli", "weight": 2,
+      "map": [
+        "<P..ii.E.",
+        "<P.#ww.E.",
+        "<P..ww.EE",
+        "<P.#...E.",
+        "<P..x..E."
+      ] },
+    { "id": "forge_floor", "theme": "forge", "weight": 2,
+      "map": [
+        "<P..h..E.",
+        "<P.#h#.E.",
+        "<P.....EE",
+        "<P.#h#.E.",
+        "<P..h..E."
+      ] },
+    { "id": "night_ward", "theme": "hospital", "weight": 2,
+      "map": [
+        "<P.x..xE.",
+        "<P.....E.",
+        "<P..c..EE",
+        "<P.....E.",
+        "<P.x..xE."
+      ] },
+    { "id": "boss_stage", "theme": "boss", "weight": 0,
+      "map": [
+        "<P.......E",
+        "<P..c...EE",
+        "<P......E.",
+        "<P..c...EE",
+        "<P.......E"
+      ] },
+    { "id": "wide_square", "theme": "town", "weight": 1,
+      "map": [
+        "<P..c....E.",
+        "<P.......E.",
+        "<P..#.#..EE",
+        "<P.......E.",
+        "<P..c....E.",
+        "<P.......E."
+      ] }
+  ]
+}

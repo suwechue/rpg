@@ -1,10 +1,100 @@
 {
   "enemies": [
-    { "id": "frost_wolf", "name": "Frost Wolf", "hp": 24, "movement": 4,
-      "weakTo": ["heat"], "strongAgainst": ["cold"],
-      "disposition": { "courage": 40, "greed": 10, "pride": 0 } },
-    { "id": "pom_pom_wisp", "name": "Pom-Pom Wisp", "hp": 14, "movement": 5,
+    { "id": "pom_pom_wisp", "name": "Pom-Pom Wisp", "tier": "normal", "weeks": [1],
+      "text": "A ball of nervous glitter that cheers at you, then flees.",
+      "hp": 14, "movement": 5, "initiative": 9, "physDefense": 0, "magicResist": 1, "stability": 4,
+      "stats": { "str": 3, "dex": 8 },
       "weakTo": ["binding"], "strongAgainst": ["light"],
-      "disposition": { "courage": -30, "curiosity": 60 } }
+      "signature": { "light": 0.7, "motion": 0.3 },
+      "disposition": { "courage": -40, "curiosity": 60, "pride": 10 },
+      "actions": [
+        { "id": "glitter_spark", "name": "Glitter Spark", "form": "bolt", "vectors": { "light": 1 }, "power": 4, "profile": { "curiosity": 0.6, "courage": 0.2 } },
+        { "id": "pom_slap", "name": "Pom Slap", "kind": "strike", "stat": "dex", "mult": 0.6, "profile": { "courage": 0.8 } }
+      ],
+      "xp": 7, "money": 2,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Butterfly/SpriteSheet.png" },
+
+    { "id": "megaphone_mimic", "name": "Megaphone Mimic", "tier": "normal", "weeks": [1],
+      "text": "It repeats everything you say, louder, and slightly meaner.",
+      "hp": 18, "movement": 3, "initiative": 6, "physDefense": 1, "magicResist": 2, "stability": 6,
+      "stats": { "str": 5, "dex": 4 },
+      "weakTo": ["cold"], "strongAgainst": ["force"],
+      "signature": { "force": 0.8, "light": 0.2 },
+      "disposition": { "courage": 20, "pride": 70, "curiosity": 20 },
+      "actions": [
+        { "id": "feedback_blast", "name": "Feedback Blast", "form": "line", "vectors": { "force": 1 }, "power": 5, "profile": { "pride": 0.7, "courage": 0.3 } },
+        { "id": "call_out", "name": "Call Out", "form": "bolt", "vectors": { "force": 1 }, "power": 5, "target": "strongest", "profile": { "pride": 1.0 } }
+      ],
+      "xp": 9, "money": 3,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Eye/Eye.png" },
+
+    { "id": "bleacher_creeper", "name": "Bleacher Creeper", "tier": "normal", "weeks": [1],
+      "text": "Lives under the bleachers. Grabs ankles. Has opinions about your shoes.",
+      "hp": 20, "movement": 3, "initiative": 4, "physDefense": 2, "magicResist": 1, "stability": 5,
+      "stats": { "str": 6, "dex": 3 },
+      "weakTo": ["heat"], "strongAgainst": ["binding"],
+      "signature": { "binding": 0.6, "force": 0.4 },
+      "disposition": { "courage": 40, "greed": 40, "loyalty": 20 },
+      "actions": [
+        { "id": "ankle_grab", "name": "Ankle Grab", "kind": "strike", "stat": "str", "mult": 0.9, "vectors": { "binding": 1 }, "profile": { "greed": 0.6, "courage": 0.4 } },
+        { "id": "creak", "name": "Creak", "form": "touch", "vectors": { "force": 1 }, "power": 4, "profile": { "courage": 0.7 } }
+      ],
+      "xp": 9, "money": 4,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Larva/Larva.png" },
+
+    { "id": "locker_lurker", "name": "Locker Lurker", "tier": "normal", "weeks": [1],
+      "text": "Something that got stuck in a locker in 1987 and stayed out of spite.",
+      "hp": 22, "movement": 4, "initiative": 5, "physDefense": 2, "magicResist": 0, "stability": 4,
+      "stats": { "str": 7, "dex": 4 },
+      "weakTo": ["light"], "strongAgainst": ["cold"],
+      "signature": { "force": 0.7, "cold": 0.3 },
+      "disposition": { "courage": 60, "greed": 20, "kindness": -40 },
+      "actions": [
+        { "id": "slam", "name": "Locker Slam", "kind": "strike", "stat": "str", "mult": 1.0, "vectors": { "force": 1 }, "power": 2, "profile": { "courage": 0.9 } }
+      ],
+      "xp": 10, "money": 5,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Mole/Mole.png" },
+
+    { "id": "spirit_stick", "name": "Spirit Stick", "tier": "normal", "weeks": [1, 2],
+      "text": "A baton that remembers every pep rally. It wants you to BELIEVE.",
+      "hp": 16, "movement": 4, "initiative": 7, "physDefense": 1, "magicResist": 3, "stability": 6,
+      "stats": { "str": 4, "dex": 6 },
+      "weakTo": ["corrosion", "cold"], "strongAgainst": ["light"],
+      "signature": { "light": 0.6, "force": 0.4 },
+      "disposition": { "courage": 30, "loyalty": 60, "kindness": 20 },
+      "actions": [
+        { "id": "rally_beam", "name": "Rally Beam", "form": "projectile", "vectors": { "light": 1 }, "power": 5, "profile": { "loyalty": 0.6, "courage": 0.4 } },
+        { "id": "team_spirit", "name": "Team Spirit", "form": "shield", "vectors": { "light": 1 }, "power": 6, "profile": { "loyalty": 1.0, "kindness": 0.4 } }
+      ],
+      "xp": 9, "money": 3,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/LanternRed/SpriteSheet.png" },
+
+    { "id": "detention_slip", "name": "Detention Slip", "tier": "normal", "weeks": [1, 2, 3],
+      "text": "A pink slip that drifts toward whoever looks most guilty.",
+      "hp": 12, "movement": 5, "initiative": 8, "physDefense": 0, "magicResist": 2, "stability": 5,
+      "stats": { "str": 3, "dex": 7 },
+      "weakTo": ["heat"], "strongAgainst": ["motion"],
+      "signature": { "binding": 0.8, "motion": 0.2 },
+      "disposition": { "courage": 10, "pride": 40, "greed": 30 },
+      "actions": [
+        { "id": "write_up", "name": "Write-Up", "form": "bolt", "vectors": { "binding": 1 }, "power": 4, "profile": { "pride": 0.6, "greed": 0.4 } }
+      ],
+      "xp": 7, "money": 2,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Skull/SpriteSheet.png" },
+
+    { "id": "varsity_shade", "name": "Varsity Shade", "tier": "elite", "weeks": [1],
+      "text": "The ghost of every senior who peaked in high school. Elite.",
+      "hp": 40, "movement": 4, "initiative": 8, "physDefense": 3, "magicResist": 4, "stability": 8,
+      "stats": { "str": 8, "dex": 6 },
+      "weakTo": ["cold", "binding"], "strongAgainst": ["force", "light"],
+      "signature": { "force": 0.6, "light": 0.4 },
+      "disposition": { "courage": 70, "pride": 80, "kindness": -30 },
+      "actions": [
+        { "id": "touchdown", "name": "Touchdown", "kind": "strike", "stat": "str", "mult": 1.0, "vectors": { "force": 1 }, "power": 3, "profile": { "courage": 0.8, "pride": 0.4 } },
+        { "id": "glory_days", "name": "Glory Days", "form": "burst", "vectors": { "light": 1 }, "power": 7, "profile": { "pride": 0.9 } },
+        { "id": "target_star", "name": "Target the Star", "form": "bolt", "vectors": { "force": 1 }, "power": 7, "target": "strongest", "profile": { "pride": 1.0, "courage": 0.3 } }
+      ],
+      "xp": 25, "money": 12,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Cyclope/SpriteSheet.png" }
   ]
 }

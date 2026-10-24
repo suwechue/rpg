@@ -95,6 +95,7 @@ func _validate() -> void:
 		for entry in cls.get("starterDeck", []):
 			if entry.has("basic") and CardRules.resolve(_tables, str(entry["basic"])).is_empty():
 				errors.append("class %s: unknown starter card '%s'" % [id, entry["basic"]])
+	_validate_combat(arcane)
 	for t in records_under("traits", "traits"):
 		for s in t.get("mods", {}).get("stats", {}):
 			if not stat_axes.has(s):
@@ -121,3 +122,33 @@ func _validate_cards(arcane: Array) -> void:
 		var expected := CardRules.spell_cost(_tables, card)
 		if int(card.get("cost", -1)) != expected:
 			errors.append("card %s: cost %s but rules say %d" % [id, str(card.get("cost")), expected])
+
+
+func _validate_combat(arcane: Array) -> void:
+	var seen := {}
+	for e in records_under("enemies/", "enemies"):
+		var id := str(e.get("id", "?"))
+		if seen.has(id):
+			errors.append("enemy %s: duplicate id" % id)
+		seen[id] = true
+		for list_key in ["weakTo", "strongAgainst"]:
+			for axis in e.get(list_key, []):
+				if not arcane.has(axis):
+					errors.append("enemy %s: unknown Vector '%s' in %s" % [id, axis, list_key])
+		if e.has("sprite") and not ResourceLoader.exists(str(e["sprite"])):
+			errors.append("enemy %s: missing sprite %s" % [id, e["sprite"]])
+		var actions: Array = e.get("actions", []).duplicate()
+		for ph in e.get("phases", []):
+			actions.append_array(ph.get("actions", []))
+		for a in actions:
+			if str(a.get("kind", "attack")) != "strike" and DT.record(_tables, "forms", str(a.get("form", "bolt"))).is_empty():
+				errors.append("enemy %s action %s: unknown form '%s'" % [id, a.get("id"), a.get("form")])
+			for axis in a.get("vectors", {}):
+				if not arcane.has(axis):
+					errors.append("enemy %s action %s: unknown Vector '%s'" % [id, a.get("id"), axis])
+	for l in table("rooms/combat_layouts").get("layouts", []):
+		var map: Array = l.get("map", [])
+		for row in map:
+			if str(row).length() != str(map[0]).length():
+				errors.append("layout %s: rows have different lengths" % l.get("id"))
+				break

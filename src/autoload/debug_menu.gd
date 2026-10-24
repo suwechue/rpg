@@ -34,17 +34,23 @@ func _ready() -> void:
 	left.add_child(UiTheme.label("DEBUG (F1)", UiTheme.ACCENT))
 	add_section("Character", _show_character, left)
 	add_section("Leveling", _show_leveling, left)
+	add_section("Fights", _show_fights, left)
 	_dev_args.call_deferred()
 
 
 ## Dev hook for screenshots from the command line (after `--`):
 ##   --scene=res://path.tscn  --debug  --shot=C:/out.png  --frames=30
+##   --autoplay (AI plays the party)  --seed=N --class=mage (fresh run first)
 ## --debug opens this menu; --shot saves the viewport after N frames and quits.
 func _dev_args() -> void:
 	var args := {}
 	for a in OS.get_cmdline_user_args():
 		var kv := str(a).trim_prefix("--").split("=", true, 1)
 		args[kv[0]] = kv[1] if kv.size() > 1 else "true"
+	if args.has("autoplay"):
+		GameState.dev_autoplay = true
+	if args.has("seed"):
+		GameState.new_run(int(args["seed"]), str(args.get("class", "mage")))
 	if args.has("scene"):
 		SceneRouter.goto(str(args["scene"]))
 	if args.has("debug"):
@@ -140,3 +146,52 @@ func _level_text(reports: Array) -> String:
 			text += ", learned " + ", ".join(PackedStringArray(r["learned"]))
 		parts.append(text)
 	return ". ".join(PackedStringArray(parts))
+
+
+func _show_fights(box: VBoxContainer) -> void:
+	box.add_child(UiTheme.label("Spawn a fight (party: you + roster picks for tonight)", UiTheme.ACCENT))
+	var ally_row := HBoxContainer.new()
+	box.add_child(ally_row)
+	ally_row.add_child(UiTheme.button("Add a debug Fighter ally", func() -> void:
+		GameState.add_debug_ally("fighter")
+		_open(_show_fights)))
+	ally_row.add_child(UiTheme.button("Clear allies", func() -> void:
+		GameState.party_ids = []
+		_open(_show_fights)))
+	box.add_child(UiTheme.label("Party: you%s" % ("" if GameState.party_ids.is_empty() else " + " + ", ".join(PackedStringArray(GameState.party_ids)))))
+	var layouts: Array = []
+	for l in DataDB.table("rooms/combat_layouts").get("layouts", []):
+		layouts.append(str(l["id"]))
+	var enemies: Array = []
+	for e in DataDB.records_under("enemies/", "enemies"):
+		enemies.append(e)
+	var groups := [
+		["Week 1 trio", ["pom_pom_wisp", "megaphone_mimic", "bleacher_creeper"], "open_field"],
+		["Locker hall brawl", ["locker_lurker", "detention_slip", "spirit_stick", "pom_pom_wisp"], "locker_hall"],
+		["Elite: Varsity Shade", ["varsity_shade", "pom_pom_wisp"], "bleachers"],
+		["Flooded gym", ["megaphone_mimic", "spirit_stick"], "flooded_gym"],
+	]
+	for g in groups:
+		var ids: Array = g[1]
+		var lay: String = g[2]
+		box.add_child(UiTheme.button("%s (%s)" % [g[0], lay], func() -> void:
+			toggle()
+			GameState.start_combat(GameState.combat_setup(ids, lay))))
+	var bosses: Array = []
+	for e in enemies:
+		if str(e.get("tier", "")) == "boss":
+			bosses.append(e)
+	for b in bosses:
+		var bid := str(b["id"])
+		box.add_child(UiTheme.button("Boss: %s" % b["name"], func() -> void:
+			toggle()
+			GameState.start_combat(GameState.combat_setup([bid], "boss_stage", { "boss": true }))))
+	box.add_child(UiTheme.label("Single enemy:", UiTheme.DIM))
+	var flow := HFlowContainer.new()
+	flow.custom_minimum_size = Vector2(380, 0)
+	box.add_child(flow)
+	for e in enemies:
+		var eid := str(e["id"])
+		flow.add_child(UiTheme.button(str(e["name"]), func() -> void:
+			toggle()
+			GameState.start_combat(GameState.combat_setup([eid], "open_field"))))
