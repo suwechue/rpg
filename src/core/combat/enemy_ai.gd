@@ -53,6 +53,7 @@ static func options(state: StateScript, u: UnitScript) -> Array:
 						"action": act.get("action", {}), "hand": act.get("hand", -1), "card": act.get("card", {}) }
 		if not best.is_empty():
 			out.append(best)
+	# Long fights: running away stops looking like a plan (no endless kiting).
 	var nearest_dist := 999
 	for o in opponents:
 		nearest_dist = mini(nearest_dist, GridScript.manhattan(o.cell, u.cell))
@@ -68,7 +69,8 @@ static func options(state: StateScript, u: UnitScript) -> Array:
 			far_cell = m
 	if far_cell != u.cell:
 		out.append({ "kind": "move", "move": far_cell, "target": far_cell, "profile": c.get("retreat", { "courage": -1.0 }),
-			"ev": float(c.get("retreatBase", 2.0)) + float(c.get("retreatHurt", 10.0)) * (1.0 - u.hp_ratio()) })
+			"ev": (float(c.get("retreatBase", 2.0)) + float(c.get("retreatHurt", 10.0)) * (1.0 - u.hp_ratio()))
+				* maxf(0.05, 1.0 - float(state.round_num) / float(c.get("retreatFadeRounds", 12))) })
 	# Advance: the reachable cell closest to the nearest opponent.
 	var near_cell := u.cell
 	var near_score := 999

@@ -208,4 +208,6 @@ func test_story_triggers() -> void:
 	check(StoryRules.due(db(), run, { "week": 1, "day": "mon", "part": "evening" }, false) == ["w1_evening"], "the evening floor is due")
 	RM.set_flag(run, "story_done_w1_evening")
 	check(StoryRules.due(db(), run, { "week": 1, "day": "mon", "part": "evening" }, false).is_empty(), "once only")
-	check(StoryRules.due(db(), run, { "week": 1, "day": "tue", "part": "lunch" }, true).is_empty(), "not on Tuesday")
+	check(not StoryRules.due(db(), run, { "week": 1, "day": "tue", "part": "lunch" }, true).has("w1_lunch"), "not on Tuesday")
+	check(StoryRules.due(db(), run, { "week": 1, "day": "tue", "part": "lunch" }, true) == ["s1_glimpse"], "Mr. B is glimpsed on Tuesday")
+	check(StoryRules.due(db(), run, { "week": 3, "day": "wed", "part": "after_school" }, true).has("s3_coverup"), "week 3's cover-up choice")

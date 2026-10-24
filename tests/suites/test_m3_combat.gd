@@ -254,6 +254,36 @@ func test_ai_disposition_bias() -> void:
 	check(AI.profile_weight(st, brave, adv) > AI.profile_weight(st, coward, adv), "the brave like advancing")
 
 
+func test_turn_start_deaths_end_the_fight() -> void:
+	var st := fight(["P...E"], [mage()], [enemy("pom_pom_wisp")])
+	var wisp = st.units[1]
+	wisp.hp = 1
+	st.grid.burning[wisp.cell] = 2
+	var g := 0
+	while st.result == "" and g < 10:
+		st.end_turn()
+		g += 1
+	check(st.result == "win", "an enemy burning to death at the start of its turn ends the fight (%s after %d turns)" % [st.result, g])
+
+
+func test_retreat_fades_in_long_fights() -> void:
+	var st := fight(["P...E..", "......."], [mage()], [enemy("pom_pom_wisp")])
+	var wisp = st.units[1]
+	wisp.hp = 3
+	wisp.move_left = 5
+	st.current = wisp
+	var early := 0.0
+	for o in AI.options(st, wisp):
+		if o["kind"] == "move" and o["profile"] == db()["ai"]["retreat"]:
+			early = float(o["ev"])
+	st.round_num = 20
+	var late := 0.0
+	for o in AI.options(st, wisp):
+		if o["kind"] == "move" and o["profile"] == db()["ai"]["retreat"]:
+			late = float(o["ev"])
+	check(early > 0.0 and late < early * 0.2, "running away loses its appeal as a fight drags on (%.2f -> %.2f)" % [early, late])
+
+
 func auto_fight(seed_value: int) -> Dictionary:
 	var ally := Char.create(db(), "fighter", seeded(seed_value + 1), { "id": "ally" })
 	var p := mage(seed_value)

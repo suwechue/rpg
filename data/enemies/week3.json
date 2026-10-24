@@ -1,0 +1,315 @@
+{
+  "enemies": [
+    {
+      "id": "slag_imp",
+      "name": "Slag Imp",
+      "tier": "normal",
+      "weeks": [
+        3
+      ],
+      "text": "A blob of molten metal with a grin hammered into it.",
+      "hp": 22,
+      "movement": 4,
+      "initiative": 7,
+      "physDefense": 2,
+      "magicResist": 1,
+      "stability": 6,
+      "stats": {
+        "str": 6,
+        "dex": 6
+      },
+      "weakTo": [
+        "cold"
+      ],
+      "strongAgainst": [
+        "heat"
+      ],
+      "signature": {
+        "heat": 0.8,
+        "force": 0.2
+      },
+      "disposition": {
+        "courage": 60,
+        "kindness": -30
+      },
+      "actions": [
+        {
+          "id": "splash",
+          "name": "Slag Splash",
+          "form": "burst",
+          "vectors": {
+            "heat": 1
+          },
+          "power": 6,
+          "profile": {
+            "courage": 0.7
+          }
+        },
+        {
+          "id": "sear",
+          "name": "Sear",
+          "kind": "strike",
+          "stat": "str",
+          "mult": 1.0,
+          "power": 2,
+          "vectors": {
+            "heat": 1
+          },
+          "profile": {
+            "courage": 0.8
+          }
+        }
+      ],
+      "xp": 11,
+      "money": 5,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Flam/SpriteSheet.png"
+    },
+    {
+      "id": "chain_wraith",
+      "name": "Chain Wraith",
+      "tier": "normal",
+      "weeks": [
+        3
+      ],
+      "text": "Forge chains that learned to wriggle. They want to keep you.",
+      "hp": 24,
+      "movement": 3,
+      "initiative": 5,
+      "physDefense": 2,
+      "magicResist": 3,
+      "stability": 6,
+      "stats": {
+        "str": 6,
+        "dex": 5
+      },
+      "weakTo": [
+        "light"
+      ],
+      "strongAgainst": [
+        "binding"
+      ],
+      "signature": {
+        "binding": 0.8,
+        "heat": 0.2
+      },
+      "disposition": {
+        "loyalty": 50,
+        "greed": 40
+      },
+      "actions": [
+        {
+          "id": "bind",
+          "name": "Bind",
+          "form": "bolt",
+          "vectors": {
+            "binding": 1
+          },
+          "power": 6,
+          "profile": {
+            "greed": 0.7
+          }
+        },
+        {
+          "id": "lash",
+          "name": "Lash",
+          "form": "line",
+          "vectors": {
+            "binding": 1
+          },
+          "power": 5,
+          "profile": {
+            "loyalty": 0.6
+          }
+        }
+      ],
+      "xp": 11,
+      "money": 5,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Snake2/Snake2.png"
+    },
+    {
+      "id": "ember_moth",
+      "name": "Ember Moth",
+      "tier": "normal",
+      "weeks": [
+        3
+      ],
+      "text": "A moth that ate a spark and never stopped glowing.",
+      "hp": 16,
+      "movement": 5,
+      "initiative": 10,
+      "physDefense": 0,
+      "magicResist": 2,
+      "stability": 6,
+      "stats": {
+        "str": 3,
+        "dex": 9
+      },
+      "weakTo": [
+        "cold"
+      ],
+      "strongAgainst": [
+        "heat",
+        "light"
+      ],
+      "signature": {
+        "heat": 0.6,
+        "light": 0.4
+      },
+      "disposition": {
+        "courage": -20,
+        "curiosity": 70
+      },
+      "actions": [
+        {
+          "id": "ember_dust",
+          "name": "Ember Dust",
+          "form": "bolt",
+          "vectors": {
+            "heat": 1
+          },
+          "power": 5,
+          "profile": {
+            "curiosity": 0.8
+          }
+        }
+      ],
+      "xp": 8,
+      "money": 3,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/ButterflyBlue/SpriteSheet.png"
+    },
+    {
+      "id": "anvil_crab",
+      "name": "Anvil Crab",
+      "tier": "normal",
+      "weeks": [
+        3,
+        4
+      ],
+      "text": "Shell of iron, temper of a smith on deadline.",
+      "hp": 32,
+      "movement": 2,
+      "initiative": 3,
+      "physDefense": 4,
+      "magicResist": 1,
+      "stability": 6,
+      "stats": {
+        "str": 8,
+        "dex": 2
+      },
+      "weakTo": [
+        "corrosion",
+        "motion"
+      ],
+      "strongAgainst": [
+        "force",
+        "heat"
+      ],
+      "signature": {
+        "force": 0.6,
+        "binding": 0.4
+      },
+      "disposition": {
+        "courage": 50,
+        "loyalty": 40
+      },
+      "actions": [
+        {
+          "id": "pinch",
+          "name": "Pinch",
+          "kind": "strike",
+          "stat": "str",
+          "mult": 1.0,
+          "power": 3,
+          "vectors": {
+            "force": 1
+          },
+          "profile": {
+            "courage": 0.7
+          }
+        }
+      ],
+      "xp": 12,
+      "money": 6,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Mollusc/Mollusc.png"
+    },
+    {
+      "id": "foreman_ghost",
+      "name": "The Foreman",
+      "tier": "elite",
+      "weeks": [
+        3
+      ],
+      "text": "The forge's first owner. Elite. Never clocked out.",
+      "hp": 54,
+      "movement": 4,
+      "initiative": 7,
+      "physDefense": 4,
+      "magicResist": 4,
+      "stability": 6,
+      "stats": {
+        "str": 9,
+        "dex": 6
+      },
+      "weakTo": [
+        "cold"
+      ],
+      "strongAgainst": [
+        "heat",
+        "binding"
+      ],
+      "signature": {
+        "heat": 0.5,
+        "binding": 0.5
+      },
+      "disposition": {
+        "courage": 70,
+        "pride": 60,
+        "kindness": -40
+      },
+      "actions": [
+        {
+          "id": "hammerfall",
+          "name": "Hammerfall",
+          "kind": "strike",
+          "stat": "str",
+          "mult": 1.0,
+          "power": 5,
+          "vectors": {
+            "heat": 0.5,
+            "force": 0.5
+          },
+          "profile": {
+            "courage": 0.9
+          }
+        },
+        {
+          "id": "quota",
+          "name": "Meet Your Quota",
+          "form": "burst",
+          "vectors": {
+            "binding": 1
+          },
+          "power": 9,
+          "profile": {
+            "pride": 0.8
+          }
+        },
+        {
+          "id": "overtime",
+          "name": "Overtime",
+          "form": "line",
+          "vectors": {
+            "heat": 1
+          },
+          "power": 9,
+          "profile": {
+            "pride": 1.0
+          }
+        }
+      ],
+      "xp": 36,
+      "money": 16,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Cyclope/SpriteSheet.png"
+    }
+  ]
+}

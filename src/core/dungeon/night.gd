@@ -62,6 +62,16 @@ static func rest(db: Dictionary, run: Dictionary, room: Dictionary) -> Array:
 	return lines
 
 
+## Catch your breath after a won fight: everyone standing regains a share of max HP.
+static func recover(db: Dictionary, run: Dictionary, share: float) -> void:
+	if share <= 0.0:
+		return
+	for ch in party_chars(run):
+		var d := Char.derived(db, ch)
+		if int(ch.get("hp", 0)) > 0:
+			ch["hp"] = mini(int(d["maxHp"]), int(ch.get("hp", 0)) + roundi(float(d["maxHp"]) * share))
+
+
 static func party_chars(run: Dictionary) -> Array:
 	var out: Array = [run["player"]]
 	for id in run.get("party_ids", []):
@@ -120,6 +130,7 @@ static func after_combat(db: Dictionary, run: Dictionary, room: Dictionary, summ
 		Gen.log_encounter(run, week, day, room, result)
 	if result == "win":
 		room["cleared"] = true
+		recover(db, run, float(cfg(db).get("afterFightHpPct", 0.0)))
 		if rng.randf() < float(cfg(db).get("combatLoot", {}).get("shardChance", 0.15)):
 			lines.append_array(add_shard(db, run, shard_axis(db, run, week, rng)))
 	elif result == "flee":

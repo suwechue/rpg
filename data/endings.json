@@ -3,5 +3,41 @@
     "default": "The Upside-Down keeps what it takes. The town wakes up one kid short, and doesn't quite remember why the desk is empty.",
     "combat": "You fell in the Upside-Down. The town will say you moved away. The town always says that.",
     "kelly": "Kelly made it out. You didn't. She never tells anyone what happened, and she never laughs at a new kid again."
+  },
+  "alpha": {
+    "reveal": "NARRATOR_REVEAL_TBD\n\n(Placeholder for the week 5 reveal. The narrator's identity is still open by design: maybe you, later; maybe what's left of Mr. B; maybe the Innocent Bystander, years on; maybe nothing human at all.)\n\nThe voice that has narrated every step you took walks out of the woods at last. You almost see its face. The page turns before you can.",
+    "branches": [
+      {
+        "cond": {
+          "flag": "exposed_mr_b"
+        },
+        "text": "The town remembers this time. Diane's notebook is on the front page of the paper nobody reads, and somehow everybody reads it. Mr. B's office is empty by Monday. The files are still there. All of them have names now."
+      },
+      {
+        "cond": {
+          "flag": "told_mayor"
+        },
+        "text": "The Mayor finally opens the drawer. His hands shake, but he reads the names out loud at the next town meeting. It isn't enough. It's a start."
+      },
+      {
+        "cond": {
+          "flag": "went_along"
+        },
+        "text": "The town wakes up and forgets, the way it always does. Except you. And four kids at a lunch table who don't laugh at the transfer announcements anymore."
+      },
+      {
+        "cond": {},
+        "text": "Morning comes, ordinary and a little scuffed. The town will pretend nothing happened. You won't."
+      }
+    ],
+    "bondLines": {
+      "kelly": "Kelly walks you to school on Monday. She says it's because it's on her way. It isn't.",
+      "theo": "Theo publishes his theory in the school paper. Ms. G gives it an A and a page of excited margin notes.",
+      "mara": "Mara gives you a drawing of the Mirror Town, cracked down the middle, with the two of you standing in the crack.",
+      "dex": "Dex doesn't make a joke for almost a whole minute. Then he makes four.",
+      "priya": "Priya wins the debate tournament, then tells you the real win was this. She doesn't say it twice.",
+      "gary": "Gary's freezer is quiet. He gives you the recipe. Then he takes it back. Then he gives you a sandwich instead."
+    },
+    "credits": "PROJECT VECTOR (alpha)\n\nA small town. A big week. Five of them.\n\nArt: Kenney (Tiny Town, Tiny City, Tiny Dungeon, Tiny Battle) and Pixel-boy & AAA (Ninja Adventure), CC0.\nMusic and sound: Ninja Adventure, CC0.\n\nThank you for playing. The narrator will remember."
   }
 }

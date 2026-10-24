@@ -865,3 +865,8 @@ These answers override anything marked "proposed" or "open" earlier in this doc.
 | Recruitment pacing | Stagger recruits across the run: Kelly and the Core Four can be recruited from week 1 to 2; side students become available in waves through weeks 2 to 4 (Jake after his forge questline, Phase after deli shifts). Max party of 3 plus the player. |
 | Town | docs/TOWN.md is the source of truth: every named character has a home on the map; most homes and several buildings are EXTERIOR or CLOSED in the alpha and get interiors later. |
 | Out of alpha scope | Schoolamon (lunch card minigame), Sam, Unmasked, the classroom-scheme minigame, interiors marked EXTERIOR, places marked CLOSED. Leave hooks (data entries, door lines) for all of them. |
+| Kelly's first night (alpha build) | Week 1 Monday's floor is a scripted tutorial floor (lantern, first fight with Kelly as an AI guest who calls for help, the shortcut, the panic moment), not a generated one. Risk sources are exactly the Section 13 table. |
+| Party size scaling (alpha build) | Smaller parties face fewer, weaker enemies (solo: half the enemies at 75% power). Bosses always appear. |
+| HP across a night (alpha build) | HP carries between fights like MP, but everyone standing recovers 20% of max HP after a won fight. Rest rooms restore everything. |
+| Leveling pace (alpha build) | 45 x level XP per level, tuned so a run ends around level 12 to 14. |
+| Recruit pacing (alpha build) | Core Four from week 1 (week 2 brings them to your table); Sam, Baxter, Jon week 2; Kris, Diane, Penny, Jake (after the forge), Phase (after 3 deli shifts) week 3; Mel week 4; Kelly at Bond 60 after a kind first night. |

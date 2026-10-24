@@ -41,6 +41,7 @@ static func night(db: Dictionary, run: Dictionary, week: int, day: String, rng: 
 		if s["result"] != "win":
 			return { "alive": false, "fights": fights, "xp": xp, "hpEnd": 0.0, "diedIn": t }
 		xp += int(s["xp"])
+		Night.recover(db, run, float(db["dungeon"].get("afterFightHpPct", 0.0)))
 		for p in [run["player"]] + run["roster"]:
 			Lv.add_xp(db, p, int(s["xp"]), rng)
 			Lv.auto_perks(db, p)

@@ -1,32 +1,739 @@
 {
   "enemies": [
-    { "id": "hollow_mascot", "name": "The Hollow Mascot", "tier": "boss", "weeks": [1],
+    {
+      "id": "hollow_mascot",
+      "name": "The Hollow Mascot",
+      "tier": "boss",
+      "weeks": [
+        1
+      ],
       "text": "The school mascot costume, stood up by the town's collective anxiety about being liked. There is nobody inside. There never was.",
-      "hp": 90, "movement": 3, "initiative": 7, "physDefense": 1, "magicResist": 3, "stability": 10,
-      "stats": { "str": 8, "dex": 6 },
-      "weakTo": ["cold", "binding"], "strongAgainst": ["force", "light"],
-      "signature": { "force": 0.5, "light": 0.5 },
-      "disposition": { "courage": 60, "pride": 90, "kindness": -50 },
+      "hp": 90,
+      "movement": 3,
+      "initiative": 7,
+      "physDefense": 1,
+      "magicResist": 3,
+      "stability": 10,
+      "stats": {
+        "str": 8,
+        "dex": 6
+      },
+      "weakTo": [
+        "cold",
+        "binding"
+      ],
+      "strongAgainst": [
+        "force",
+        "light"
+      ],
+      "signature": {
+        "force": 0.5,
+        "light": 0.5
+      },
+      "disposition": {
+        "courage": 60,
+        "pride": 90,
+        "kindness": -50
+      },
       "actions": [
-        { "id": "team_spirit_slam", "name": "Team Spirit Slam", "kind": "strike", "stat": "str", "mult": 1.0, "power": 3, "vectors": { "force": 1 }, "profile": { "pride": 0.6, "courage": 0.6 } },
-        { "id": "megaphone_roar", "name": "Megaphone Roar", "form": "line", "vectors": { "force": 1 }, "power": 6, "profile": { "pride": 0.9 } }
+        {
+          "id": "team_spirit_slam",
+          "name": "Team Spirit Slam",
+          "kind": "strike",
+          "stat": "str",
+          "mult": 1.0,
+          "power": 3,
+          "vectors": {
+            "force": 1
+          },
+          "profile": {
+            "pride": 0.6,
+            "courage": 0.6
+          }
+        },
+        {
+          "id": "megaphone_roar",
+          "name": "Megaphone Roar",
+          "form": "line",
+          "vectors": {
+            "force": 1
+          },
+          "power": 6,
+          "profile": {
+            "pride": 0.9
+          }
+        }
       ],
       "phases": [
-        { "hpBelow": 1.0 },
-        { "hpBelow": 0.66, "say": "The Hollow Mascot does a cartwheel it should not be able to do. \"GIVE ME AN F!\" A Pom-Pom Wisp bursts out of its head.",
-          "summon": ["pom_pom_wisp"],
+        {
+          "hpBelow": 1.0
+        },
+        {
+          "hpBelow": 0.66,
+          "say": "The Hollow Mascot does a cartwheel it should not be able to do. \"GIVE ME AN F!\" A Pom-Pom Wisp bursts out of its head.",
+          "summon": [
+            "pom_pom_wisp"
+          ],
           "actions": [
-            { "id": "spotlight", "name": "Spotlight", "form": "burst", "vectors": { "light": 1 }, "power": 7, "profile": { "pride": 1.0 } },
-            { "id": "team_spirit_slam", "name": "Team Spirit Slam", "kind": "strike", "stat": "str", "mult": 1.1, "power": 4, "vectors": { "force": 1 }, "profile": { "courage": 0.8 } }
-          ] },
-        { "hpBelow": 0.33, "say": "The costume tears. Inside: nothing but noise and a single blinking light. It stops pretending to be friendly.", "movement": 4,
-          "disposition": { "courage": 90, "pride": 100, "kindness": -90 },
+            {
+              "id": "spotlight",
+              "name": "Spotlight",
+              "form": "burst",
+              "vectors": {
+                "light": 1
+              },
+              "power": 7,
+              "profile": {
+                "pride": 1.0
+              }
+            },
+            {
+              "id": "team_spirit_slam",
+              "name": "Team Spirit Slam",
+              "kind": "strike",
+              "stat": "str",
+              "mult": 1.1,
+              "power": 4,
+              "vectors": {
+                "force": 1
+              },
+              "profile": {
+                "courage": 0.8
+              }
+            }
+          ]
+        },
+        {
+          "hpBelow": 0.33,
+          "say": "The costume tears. Inside: nothing but noise and a single blinking light. It stops pretending to be friendly.",
+          "movement": 4,
+          "disposition": {
+            "courage": 90,
+            "pride": 100,
+            "kindness": -90
+          },
           "actions": [
-            { "id": "crowd_crush", "name": "Crowd Crush", "form": "burst", "vectors": { "force": 0.6, "light": 0.4 }, "power": 9, "profile": { "courage": 1.0 } },
-            { "id": "target_the_star", "name": "Target the Star", "form": "bolt", "vectors": { "light": 1 }, "power": 9, "target": "strongest", "profile": { "pride": 1.0 } }
-          ] }
+            {
+              "id": "crowd_crush",
+              "name": "Crowd Crush",
+              "form": "burst",
+              "vectors": {
+                "force": 0.6,
+                "light": 0.4
+              },
+              "power": 9,
+              "profile": {
+                "courage": 1.0
+              }
+            },
+            {
+              "id": "target_the_star",
+              "name": "Target the Star",
+              "form": "bolt",
+              "vectors": {
+                "light": 1
+              },
+              "power": 9,
+              "target": "strongest",
+              "profile": {
+                "pride": 1.0
+              }
+            }
+          ]
+        }
       ],
-      "xp": 60, "money": 30,
-      "sprite": "res://assets/packs/ninja_adventure/Actor/Boss/GiantRacoon/Idle.png", "spriteFrame": [60, 60] }
+      "xp": 60,
+      "money": 30,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Boss/GiantRacoon/Idle.png",
+      "spriteFrame": [
+        60,
+        60
+      ]
+    },
+    {
+      "id": "cold_cut",
+      "name": "The Cold Cut",
+      "tier": "boss",
+      "weeks": [
+        2
+      ],
+      "text": "Frozen deli meat with bad intentions, wearing Gary's apron. It's colder than anything should be.",
+      "hp": 140,
+      "movement": 3,
+      "initiative": 8,
+      "physDefense": 3,
+      "magicResist": 4,
+      "stability": 12,
+      "stats": {
+        "str": 9,
+        "dex": 6
+      },
+      "weakTo": [
+        "heat"
+      ],
+      "strongAgainst": [
+        "cold",
+        "force"
+      ],
+      "signature": {
+        "cold": 0.6,
+        "force": 0.4
+      },
+      "disposition": {
+        "courage": 60,
+        "greed": 70
+      },
+      "actions": [
+        {
+          "id": "slab_slam",
+          "name": "Slab Slam",
+          "kind": "strike",
+          "stat": "str",
+          "mult": 1.0,
+          "power": 5,
+          "vectors": {
+            "force": 1
+          },
+          "profile": {
+            "courage": 0.8
+          }
+        },
+        {
+          "id": "cold_snap",
+          "name": "Cold Snap",
+          "form": "line",
+          "vectors": {
+            "cold": 1
+          },
+          "power": 9,
+          "profile": {
+            "greed": 0.7
+          }
+        }
+      ],
+      "phases": [
+        {
+          "hpBelow": 1.0
+        },
+        {
+          "hpBelow": 0.66,
+          "say": "The Cold Cut slices itself thinner. Two Freezer Burns slop off the counter.",
+          "summon": [
+            "freezer_burn",
+            "freezer_burn"
+          ],
+          "actions": [
+            {
+              "id": "deep_freeze",
+              "name": "Deep Freeze",
+              "form": "burst",
+              "vectors": {
+                "cold": 1
+              },
+              "power": 11,
+              "profile": {
+                "greed": 0.9
+              }
+            },
+            {
+              "id": "slab_slam",
+              "name": "Slab Slam",
+              "kind": "strike",
+              "stat": "str",
+              "mult": 1.0,
+              "power": 6,
+              "vectors": {
+                "force": 1
+              },
+              "profile": {
+                "courage": 0.8
+              }
+            }
+          ]
+        },
+        {
+          "hpBelow": 0.33,
+          "say": "The freezer door slams behind you. The Cold Cut's breath fogs the whole room. It wants the recipe.",
+          "movement": 4,
+          "actions": [
+            {
+              "id": "whiteout",
+              "name": "Whiteout",
+              "form": "burst",
+              "vectors": {
+                "cold": 0.7,
+                "force": 0.3
+              },
+              "power": 13,
+              "profile": {
+                "courage": 1.0
+              }
+            },
+            {
+              "id": "cleaver",
+              "name": "Cleaver",
+              "form": "bolt",
+              "vectors": {
+                "force": 1
+              },
+              "power": 13,
+              "target": "strongest",
+              "profile": {
+                "pride": 1.0
+              }
+            }
+          ]
+        }
+      ],
+      "xp": 80,
+      "money": 45,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Boss/GiantSlime2/Idle.png",
+      "spriteFrame": [
+        62,
+        52
+      ]
+    },
+    {
+      "id": "forge_revenant",
+      "name": "The Forge Revenant",
+      "tier": "boss",
+      "weeks": [
+        3
+      ],
+      "text": "What the forge wanted to become: fire with the blacksmith's shoulders and none of his patience.",
+      "hp": 180,
+      "movement": 3,
+      "initiative": 8,
+      "physDefense": 4,
+      "magicResist": 5,
+      "stability": 12,
+      "stats": {
+        "str": 9,
+        "dex": 6
+      },
+      "weakTo": [
+        "cold"
+      ],
+      "strongAgainst": [
+        "heat",
+        "binding"
+      ],
+      "signature": {
+        "heat": 0.6,
+        "binding": 0.4
+      },
+      "disposition": {
+        "courage": 80,
+        "pride": 60
+      },
+      "actions": [
+        {
+          "id": "hammer",
+          "name": "Hammer",
+          "kind": "strike",
+          "stat": "str",
+          "mult": 1.0,
+          "power": 6,
+          "vectors": {
+            "heat": 1
+          },
+          "profile": {
+            "courage": 0.9
+          }
+        },
+        {
+          "id": "chains",
+          "name": "Chains",
+          "form": "line",
+          "vectors": {
+            "binding": 1
+          },
+          "power": 11,
+          "profile": {
+            "pride": 0.7
+          }
+        }
+      ],
+      "phases": [
+        {
+          "hpBelow": 1.0
+        },
+        {
+          "hpBelow": 0.66,
+          "say": "The Revenant plunges its arm into its own chest and pulls out a glowing ingot. Slag Imps drip from it.",
+          "summon": [
+            "slag_imp",
+            "slag_imp"
+          ],
+          "actions": [
+            {
+              "id": "pour",
+              "name": "Pour",
+              "form": "burst",
+              "vectors": {
+                "heat": 1
+              },
+              "power": 13,
+              "profile": {
+                "courage": 0.9
+              }
+            },
+            {
+              "id": "chains",
+              "name": "Chains",
+              "form": "line",
+              "vectors": {
+                "binding": 1
+              },
+              "power": 12,
+              "profile": {
+                "pride": 0.7
+              }
+            }
+          ]
+        },
+        {
+          "hpBelow": 0.33,
+          "say": "It goes white-hot. 'IT WILL HOLD,' it roars, in a voice like the blacksmith's. 'PROBABLY.'",
+          "movement": 4,
+          "actions": [
+            {
+              "id": "temper",
+              "name": "Temper",
+              "form": "burst",
+              "vectors": {
+                "heat": 0.6,
+                "binding": 0.4
+              },
+              "power": 15,
+              "profile": {
+                "courage": 1.0
+              }
+            },
+            {
+              "id": "quench",
+              "name": "Quench",
+              "form": "bolt",
+              "vectors": {
+                "heat": 1
+              },
+              "power": 15,
+              "target": "strongest",
+              "profile": {
+                "pride": 1.0
+              }
+            }
+          ]
+        }
+      ],
+      "xp": 100,
+      "money": 60,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Boss/GiantFlam/Idle.png",
+      "spriteFrame": [
+        50,
+        50
+      ]
+    },
+    {
+      "id": "night_ward",
+      "name": "The Night Ward",
+      "tier": "boss",
+      "weeks": [
+        4
+      ],
+      "text": "The closed wing, standing up. A doctor's coat, a clipboard, no face. It has been on call for forty years.",
+      "hp": 210,
+      "movement": 3,
+      "initiative": 8,
+      "physDefense": 4,
+      "magicResist": 7,
+      "stability": 12,
+      "stats": {
+        "str": 9,
+        "dex": 6
+      },
+      "weakTo": [
+        "force",
+        "heat"
+      ],
+      "strongAgainst": [
+        "binding",
+        "vitality"
+      ],
+      "signature": {
+        "binding": 0.5,
+        "vitality": 0.5
+      },
+      "disposition": {
+        "loyalty": 80,
+        "kindness": -70,
+        "pride": 60
+      },
+      "actions": [
+        {
+          "id": "sedate",
+          "name": "Sedate",
+          "form": "bolt",
+          "vectors": {
+            "binding": 1
+          },
+          "power": 12,
+          "profile": {
+            "loyalty": 0.8
+          }
+        },
+        {
+          "id": "bloodwork",
+          "name": "Bloodwork",
+          "form": "touch",
+          "vectors": {
+            "vitality": 1
+          },
+          "power": 12,
+          "profile": {
+            "greed": 0.6
+          }
+        }
+      ],
+      "phases": [
+        {
+          "hpBelow": 1.0
+        },
+        {
+          "hpBelow": 0.66,
+          "say": "Every bed sits up. Night Nurses wheel out of the dark.",
+          "summon": [
+            "night_nurse",
+            "iv_wisp"
+          ],
+          "actions": [
+            {
+              "id": "rounds",
+              "name": "Rounds",
+              "form": "burst",
+              "vectors": {
+                "vitality": 1
+              },
+              "power": 13,
+              "profile": {
+                "loyalty": 0.8
+              }
+            },
+            {
+              "id": "sedate",
+              "name": "Sedate",
+              "form": "bolt",
+              "vectors": {
+                "binding": 1
+              },
+              "power": 13,
+              "profile": {
+                "loyalty": 0.8
+              }
+            }
+          ]
+        },
+        {
+          "hpBelow": 0.33,
+          "say": "The Ward reads from its clipboard: every name the town forgot. One of them is yours, dated next week.",
+          "actions": [
+            {
+              "id": "flatline",
+              "name": "Flatline",
+              "form": "line",
+              "vectors": {
+                "vitality": 0.6,
+                "binding": 0.4
+              },
+              "power": 16,
+              "profile": {
+                "courage": 1.0
+              }
+            },
+            {
+              "id": "discharge_papers",
+              "name": "Discharge Papers",
+              "form": "burst",
+              "vectors": {
+                "binding": 1
+              },
+              "power": 15,
+              "profile": {
+                "pride": 1.0
+              }
+            }
+          ]
+        }
+      ],
+      "xp": 120,
+      "money": 70,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Boss/GiantSpirit/Idle.png",
+      "spriteFrame": [
+        50,
+        50
+      ]
+    },
+    {
+      "id": "mirror_town",
+      "name": "The Mirror Town",
+      "tier": "boss",
+      "weeks": [
+        5
+      ],
+      "text": "The whole town, folded into a shape. It wears Mr. B's face like a badge, and the narrator's voice like a coat.",
+      "hp": 230,
+      "movement": 3,
+      "initiative": 8,
+      "physDefense": 5,
+      "magicResist": 8,
+      "stability": 12,
+      "stats": {
+        "str": 9,
+        "dex": 6
+      },
+      "weakTo": [
+        "corrosion"
+      ],
+      "strongAgainst": [
+        "light",
+        "binding"
+      ],
+      "signature": {
+        "heat": 0.2,
+        "cold": 0.2,
+        "force": 0.2,
+        "motion": 0.2,
+        "binding": 0.2,
+        "light": 0.2
+      },
+      "disposition": {
+        "pride": 100,
+        "greed": 80,
+        "kindness": -80,
+        "courage": 70
+      },
+      "actions": [
+        {
+          "id": "policy",
+          "name": "This Is Policy",
+          "form": "line",
+          "vectors": {
+            "binding": 1
+          },
+          "power": 13,
+          "profile": {
+            "pride": 0.9
+          }
+        },
+        {
+          "id": "reflect",
+          "name": "Reflection",
+          "form": "burst",
+          "vectors": {
+            "light": 1
+          },
+          "power": 12,
+          "profile": {
+            "pride": 0.7
+          }
+        },
+        {
+          "id": "expel",
+          "name": "Expulsion",
+          "form": "bolt",
+          "vectors": {
+            "force": 1
+          },
+          "power": 14,
+          "target": "strongest",
+          "profile": {
+            "pride": 1.0
+          }
+        }
+      ],
+      "phases": [
+        {
+          "hpBelow": 1.0
+        },
+        {
+          "hpBelow": 0.7,
+          "say": "\"You'll find the Upside-Down is remarkably good at making problems disappear.\" Mr. B's reflection summons a Hall Monitor.",
+          "summon": [
+            "mr_b_aide"
+          ],
+          "actions": [
+            {
+              "id": "all_vectors",
+              "name": "Every Vector",
+              "form": "burst",
+              "vectors": {
+                "heat": 0.25,
+                "cold": 0.25,
+                "force": 0.25,
+                "light": 0.25
+              },
+              "power": 14,
+              "profile": {
+                "pride": 0.9
+              }
+            },
+            {
+              "id": "policy",
+              "name": "This Is Policy",
+              "form": "line",
+              "vectors": {
+                "binding": 1
+              },
+              "power": 14,
+              "profile": {
+                "pride": 0.9
+              }
+            }
+          ]
+        },
+        {
+          "hpBelow": 0.35,
+          "say": "The town folds tighter. Every building you've walked past is in it. A Mirror Kid peels off its walls.",
+          "summon": [
+            "mirror_kid"
+          ],
+          "actions": [
+            {
+              "id": "final_bell",
+              "name": "The Final Bell",
+              "form": "burst",
+              "vectors": {
+                "force": 0.5,
+                "binding": 0.5
+              },
+              "power": 17,
+              "profile": {
+                "courage": 1.0
+              }
+            },
+            {
+              "id": "expel",
+              "name": "Expulsion",
+              "form": "bolt",
+              "vectors": {
+                "corrosion": 1
+              },
+              "power": 17,
+              "target": "strongest",
+              "profile": {
+                "pride": 1.0
+              }
+            }
+          ]
+        }
+      ],
+      "xp": 0,
+      "money": 0,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Boss/DemonCyclop/Idle.png",
+      "spriteFrame": [
+        50,
+        50
+      ]
+    }
   ]
 }

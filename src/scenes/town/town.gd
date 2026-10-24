@@ -105,7 +105,7 @@ func _load_map(id: String, is_int: bool, loc: String, at: Vector2i) -> void:
 	_refresh_people()
 	_save_pos()
 	if not interior:
-		Audio.play_music(str(DataDB.table("town/zones/" + id).get("music", "town")))
+		Audio.play_music("weekend" if Calendar.is_weekend() else str(DataDB.table("town/zones/" + id).get("music", "town")))
 
 
 func _cell_pos(c: Vector2i) -> Vector2:

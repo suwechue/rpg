@@ -70,7 +70,7 @@ func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) ->
 		_add_unit(crate)
 	var hype := false
 	for u in units:
-		if u.team == "party" and u.perk == "hype":
+		if u.team == "party" and (u.perk == "hype" or u.perk == "encore"):
 			hype = true
 	if hype:
 		for u in units:
@@ -175,7 +175,9 @@ func card_of(u: UnitScript, hand_index: int) -> Dictionary:
 ## MP cost of a card for this caster (Triage makes heals cheaper on hurt allies).
 func card_cost(u: UnitScript, card: Dictionary, target: Vector2i = Vector2i(-1, -1)) -> int:
 	var c := CardRules.cost(db, card)
-	if u.perk == "triage" and CardRules.heals(card):
+	if u.perk == "prism" and CardRules.is_spell(card) and CardRules.ordered_vectors(db, card.get("vectors", {})).size() > 1:
+		c = maxi(0, c - int(db.get("vectors", {}).get("hybridExtraCost", 1)))
+	if (u.perk == "triage" or u.perk == "lifeline") and CardRules.heals(card):
 		var t := unit_at(target)
 		if t != null and t.team == u.team and t.hp_ratio() < 0.5:
 			c = maxi(0, c - 1)
@@ -225,6 +227,7 @@ func timeline(count: int = 12) -> Array:
 
 
 func end_turn() -> void:
+	_check_end()
 	if result != "" or current == null:
 		return
 	_end_cleanup(current)
@@ -245,6 +248,8 @@ func _advance() -> void:
 			continue
 		current = u
 		_start_turn(u)
+		# Burning tiles, hazards, auras and Fatigue can end the fight here.
+		_check_end()
 		if result != "":
 			return
 		if not u.alive():
@@ -485,7 +490,19 @@ func guard(u: UnitScript) -> bool:
 	u.free_action_used = true
 	u.guard_active = true
 	_emit({ "t": "guard", "unit": u.id })
+	_guard_aura(u)
 	return true
+
+
+## Guardian: Guard also shields every adjacent ally for 5.
+func _guard_aura(u: UnitScript) -> void:
+	if u.perk != "bulwark_aura":
+		return
+	for a in allies_of(u):
+		if a != u and GridScript.manhattan(a.cell, u.cell) == 1:
+			a.shield += 5
+			a.shield_turns = maxi(a.shield_turns, 1)
+			_emit({ "t": "shield", "unit": a.id, "amount": 5 })
 
 
 ## Improvise with the Vector Wheel: any legal spell from known Vectors and Forms.
@@ -549,7 +566,7 @@ func preview(u: UnitScript, card: Dictionary, target: Vector2i, improvised: bool
 		var cost := improvise_cost(u, card) if improvised else card_cost(u, card, target)
 		out["cost"] = cost
 		var spec := _spell_spec(u, card)
-		out["chance"] = Res.stability_chance(db, u.stability + int(spec.get("stabilityBonus", 0)), cost, u.mp, improvised)
+		out["chance"] = Res.stability_chance(db, u.stability + int(spec.get("stabilityBonus", 0)), cost, u.mp, improvised and u.perk != "unstable")
 		for c in cells:
 			var t := unit_at(c)
 			if t == null:
@@ -639,7 +656,7 @@ func _cast(u: UnitScript, card: Dictionary, target: Vector2i, improvised: bool, 
 	uses[key] = int(uses.get(key, 0)) + 1
 	if u.team == "party":
 		u.source["pairUses"] = uses
-	var roll := Res.roll_stability(db, u.stability + int(spec.get("stabilityBonus", 0)), cost, mp_before, improvised, rng)
+	var roll := Res.roll_stability(db, u.stability + int(spec.get("stabilityBonus", 0)), cost, mp_before, improvised and u.perk != "unstable", rng)
 	if not bool(roll["ok"]):
 		var failure := Res.roll_failure(db, rng)
 		_emit({ "t": "instability", "unit": u.id, "result": failure, "roll": roll["roll"], "need": roll["target"],
@@ -672,7 +689,7 @@ func _resolve_spec(u: UnitScript, spec: Dictionary, target: Vector2i) -> void:
 	var fid := str(form.get("id", ""))
 	match fid:
 		"weapon_infusion":
-			u.infusion = { "vectors": spec["vectors"], "power": float(spec["power"]), "strikes": int(form.get("strikes", 2)) }
+			u.infusion = { "vectors": spec["vectors"], "power": float(spec["power"]), "strikes": int(form.get("strikes", 2)) + (1 if u.perk == "spellsteel" else 0) }
 			_emit({ "t": "status", "unit": u.id, "status": "infused" })
 			return
 		"shield":
@@ -702,7 +719,9 @@ func _resolve_spec(u: UnitScript, spec: Dictionary, target: Vector2i) -> void:
 			if occupied().has(target):
 				return
 			var hp_value := maxi(4, roundi(float(spec["power"]) * float(Res.combat_cfg(db).get("constructHpPerPower", 1))))
-			var prop := UnitScript.make_prop("construct", hp_value, int(form.get("turns", 3)))
+			if u.perk == "constructor":
+				hp_value *= 2
+			var prop := UnitScript.make_prop("construct", hp_value, int(form.get("turns", 3)) + (2 if u.perk == "constructor" else 0))
 			prop.cell = target
 			prop.name = "%s Construct" % str(spec["name"]).split(" ")[0]
 			_add_unit(prop)
@@ -771,12 +790,13 @@ func _basic(u: UnitScript, card: Dictionary, target: Vector2i) -> void:
 		"guard":
 			u.guard_active = true
 			_emit({ "t": "guard", "unit": u.id })
+			_guard_aura(u)
 		"dash":
 			u.move_left += int(card.get("amount", 2))
 			_emit({ "t": "status", "unit": u.id, "status": "dash" })
 		"rally":
 			for a in allies_of(u):
-				if GridScript.manhattan(a.cell, u.cell) <= int(card.get("range", 3)):
+				if GridScript.manhattan(a.cell, u.cell) <= int(card.get("range", 3)) or u.perk == "encore":
 					a.rally_bonus = float(card.get("amount", 0.2))
 					if a == u:
 						a.statuses["rally"] = 2
@@ -790,7 +810,7 @@ func _basic(u: UnitScript, card: Dictionary, target: Vector2i) -> void:
 			var t := unit_at(target)
 			if t == null:
 				return
-			_heal(u, t, Res.heal_amount(float(card.get("amount", 10)), u))
+			_heal(u, t, Res.heal_amount(float(card.get("amount", 10)) * float(u.mods.get("combat", {}).get("foodMul", 1.0)), u))
 			if t.alive() and int(card.get("mp", 0)) > 0:
 				t.mp = mini(t.max_mp, t.mp + int(card.get("mp", 0)))
 			_note_support(u, t)
@@ -864,7 +884,7 @@ func _apply_vector_effects(u: UnitScript, spec: Dictionary, cells: Array, hit: A
 			_emit({ "t": "status", "unit": t.id, "status": "corroded" })
 	if v.has("force"):
 		var share := float(VO.normalize_sum(v).get("force", 1.0))
-		var steps := maxi(1, floori(power * share / 10.0))
+		var steps := maxi(1, floori(power * share / 10.0)) + (1 if u.perk == "momentum" else 0)
 		for t in hit:
 			if t.alive():
 				_push(u, t, Forms.direction_to(u.cell, t.cell) if u.cell != t.cell else Vector2i(u.facing, 0), steps)
@@ -882,7 +902,7 @@ func _push(u: UnitScript, t: UnitScript, dir: Vector2i, steps: int, collide: boo
 		var blocker := unit_at(next)
 		if not grid.in_bounds(next) or not grid.walkable_terrain(next) or blocker != null:
 			if collide:
-				var dmg := int(Res.combat_cfg(db).get("collisionDamage", 4))
+				var dmg := int(Res.combat_cfg(db).get("collisionDamage", 4)) + (4 if u.perk == "momentum" else 0)
 				_emit({ "t": "collide", "unit": t.id, "cell": next })
 				_damage(t, dmg, u, "force", "collision")
 				if blocker != null and blocker.alive():

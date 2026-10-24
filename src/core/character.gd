@@ -138,6 +138,7 @@ static func collect_mods(db: Dictionary, ch: Dictionary) -> Dictionary:
 			sources.append(items[str(item_id)].get("mods", {}))
 	if ch.has("extraMods"):
 		sources.append(ch["extraMods"])
+	sources.append(class_data(db, str(ch.get("class", ""))).get("mods", {}))
 	return merge_mods(sources)
 
 

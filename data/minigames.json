@@ -1,13 +1,13 @@
 {
   "archetypes": [
-    { "id": "thermal",   "name": "Thermal",   "vectors": ["heat", "cold"],
+    { "id": "thermal",   "name": "Thermal",   "vectors": ["heat", "cold"], "script": "res://src/scenes/minigames/thermal_minigame.gd",
       "text": "Keep the temperature needle inside the band as it drifts. Hold to heat, release to cool." },
-    { "id": "precision", "name": "Precision", "vectors": ["force", "motion"],
+    { "id": "precision", "name": "Precision", "vectors": ["force", "motion"], "script": "res://src/scenes/minigames/precision_minigame.gd",
       "text": "Stop the swinging marker on the target line. Three swings." },
-    { "id": "alignment", "name": "Alignment", "vectors": ["binding", "light"],
+    { "id": "alignment", "name": "Alignment", "vectors": ["binding", "light"], "script": "res://src/scenes/minigames/alignment_minigame.gd",
       "text": "Line up the rotating rings so the gaps meet." },
-    { "id": "chemical",  "name": "Chemical",  "vectors": ["transmutation", "vitality", "corrosion"],
-      "text": "Add reagents in the right order before the mix turns." }
+    { "id": "chemical",  "name": "Chemical",  "vectors": ["transmutation", "vitality", "corrosion"], "script": "res://src/scenes/minigames/chemical_minigame.gd",
+      "text": "Press the arrows in the shown order before the mix turns." }
   ],
   "defaultArchetype": "precision",
   "propertyPicks": [ { "below": 0.35, "picks": 0 }, { "below": 0.8, "picks": 1 }, { "picks": 2 } ],

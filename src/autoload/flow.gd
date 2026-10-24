@@ -60,6 +60,10 @@ func _on_part_started() -> void:
 	var screens := GameState.part_screens()
 	for id in StoryRules.due(DataDB.all(), GameState.run, GameState.ctx(), true):
 		screens.push_front("story:" + str(id))
+	if GameState.player.has("pendingClassChange") and not screens.has("class") and not screens.has("dungeon"):
+		screens.push_front("class_change")
+	if not GameState.player.get("pendingPerks", []).is_empty() and not screens.has("dungeon"):
+		screens.push_front("perk_pick")
 	if Calendar.day_name() == "sun" and Calendar.part_id() == "weekend_evening":
 		var tease := str(preload("res://src/core/dungeon/signature.gd").week_rec(DataDB.all(), Calendar.week()).get("sundayTease", ""))
 		if tease != "":
@@ -109,6 +113,15 @@ func _next() -> void:
 			await s.closed
 			_busy = false
 			GameState.advance_part()
+		"perk_pick":
+			_drop_empty_perk_levels()
+			while not GameState.player.get("pendingPerks", []).is_empty():
+				await show_modal(preload("res://src/scenes/ui/perk_screen.gd").new())
+				_drop_empty_perk_levels()
+			_next()
+		"class_change":
+			await show_modal(preload("res://src/scenes/ui/class_change_screen.gd").new())
+			_next()
 		_ when screen.begins_with("story:"):
 			await play_inline_story(screen.substr(6))
 			_next()
@@ -254,3 +267,11 @@ func _at_woods_edge() -> bool:
 	var c: Array = pos.get("cell", [0, 0])
 	var spot: Array = DataDB.table("town/zones/outskirts").get("spots", {}).get("park", [34, 25])
 	return absi(int(c[0]) - int(spot[0])) + absi(int(c[1]) - int(spot[1])) <= 6
+
+
+## Pending perk levels with no options (no perk list for the class) are dropped.
+func _drop_empty_perk_levels() -> void:
+	var p: Dictionary = GameState.player
+	var pending: Array = p.get("pendingPerks", [])
+	while not pending.is_empty() and preload("res://src/core/progression/leveling.gd").perk_options(DataDB.all(), p, int(pending[0])).is_empty():
+		pending.remove_at(0)

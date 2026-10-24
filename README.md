@@ -4,32 +4,36 @@ Top-down pixel-art school-life RPG with Vector spell cards, tactical grid fights
 
 ## Open it in Godot
 
-1. Install **Godot 4.3 or newer** (standard build, not .NET) from https://godotengine.org/download
+1. Install **Godot 4.7** (4.7.2 is what the project is built with) (standard build, not .NET) from https://godotengine.org/download
 2. Godot Project Manager → **Import** → pick `project.godot` in this folder → **Import & Edit**.
 3. Press **F5** (Run Project).
 
 The first import takes a few seconds while Godot builds its `.godot/` cache.
 
-## What runs right now (milestone M0 sandbox)
+## Playing the alpha
 
-A placeholder town on a 16px grid that runs the day-part and Action Point loop:
+Title screen: **New run** (pick a class, optional seed), **Continue** (one autosave per run), **Narrator's Journal**.
 
-| Key | Does |
+| Where | Keys |
 | --- | --- |
-| WASD / arrows | Walk (free) |
-| E / Enter | Interact with a place (costs AP), attend class, enter the Upside-Down |
-| Space | End the day part early / skip class |
-| F5 / F9 | Save / load the run |
+| Town and dungeon | WASD / arrows walk (free), E / Enter interact (doors, people, places), Space ends the day part |
+| Menus | Mouse, or arrows + Enter; Esc closes |
+| Combat | Click a cell to move, click a card then a target; 1-7 pick cards, S Strike, G Guard, V Vector Wheel, F Flee, Space end turn, right click / Esc cancel; arrows + E move a cursor |
+| Anywhere | F1 debug menu (time travel, stats, fights, town teleports, Bonds, recruits) |
 
-Places open and close by day part (see `data/locations.json`). Classes follow `defaultSchedule` in `data/school_classes.json`. The Output panel prints the Vector system worked examples as a smoke test.
+A week: pick classes on Monday, attend or skip periods, spend AP before school, at lunch and after school (talk, shop, train, work shifts), go into the Upside-Down every weekday evening (Friday is the boss), craft cards at night, then a free weekend. Dying ends the run. Five weeks end at the `NARRATOR_REVEAL_TBD` finale.
 
 ## Run the tests
 
 From this folder (use the path to your Godot executable):
 
 ```
-godot --headless --path . -s res://tests/run_tests.gd
+godot --headless --path . -s res://tests/run_tests.gd      # core rules (pure)
+godot --headless --path . -s res://tests/smoke_scenes.gd   # real scenes, about 5 minutes
+godot --headless --path . -s res://tests/smoke_full_run.gd # a whole 5-week run, a few minutes
 ```
+
+Balance tools: `tools/sim_nights.gd` and `tools/sim_run.gd` (same command shape).
 
 On Windows, for example: `"C:\Godot\Godot_v4.x-stable_win64_console.exe" --headless --path . -s res://tests/run_tests.gd`
 

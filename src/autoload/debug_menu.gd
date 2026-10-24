@@ -38,6 +38,7 @@ func _ready() -> void:
 	add_section("Time", _show_time, left)
 	add_section("Stats/Flags", _show_stats, left)
 	add_section("Town", _show_town, left)
+	add_section("Social", _show_social, left)
 	_dev_args.call_deferred()
 
 
@@ -63,6 +64,8 @@ func _dev_args() -> void:
 		var t := str(args["town"]).split(":")
 		var xy := t[1].split(",")
 		GameState.run["town_pos"] = { "map": t[0], "interior": false, "loc": "", "cell": [int(xy[0]), int(xy[1])] }
+	if args.has("fight"):
+		GameState.pending_combat = GameState.combat_setup(str(args["fight"]).split(","), str(args.get("layout", "boss_stage")), { "boss": true })
 	if args.has("scene"):
 		SceneRouter.goto(str(args["scene"]))
 	if args.has("talk"):
@@ -312,3 +315,39 @@ func _show_town(box: VBoxContainer) -> void:
 			if l.has("storyFlag"):
 				GameState.set_flag(str(l["storyFlag"]))
 		_open(_show_town)))
+
+
+func _show_social(box: VBoxContainer) -> void:
+	box.add_child(UiTheme.label("Bonds (click to +20) and recruitment. Kelly Risk: %d" % int(GameState.run.get("kelly_risk", 0)), UiTheme.ACCENT))
+	var row := HBoxContainer.new()
+	box.add_child(row)
+	row.add_child(UiTheme.button("Kelly Risk +1", func() -> void:
+		GameState.run["kelly_risk"] = int(GameState.run.get("kelly_risk", 0)) + 1
+		_open(_show_social)))
+	row.add_child(UiTheme.button("Kelly Risk -1", func() -> void:
+		GameState.run["kelly_risk"] = int(GameState.run.get("kelly_risk", 0)) - 1
+		_open(_show_social)))
+	var flow := HFlowContainer.new()
+	flow.custom_minimum_size = Vector2(380, 0)
+	box.add_child(flow)
+	for key in DataDB.all():
+		if not str(key).begins_with("npcs/"):
+			continue
+		var rec: Dictionary = DataDB.table(str(key))
+		if bool(rec.get("hidden", false)):
+			continue
+		var id := str(rec["id"])
+		flow.add_child(UiTheme.button("%s %d" % [str(rec.get("name", id)).split(" ")[0], roundi(float(GameState.bonds.get(id, 0)))], func() -> void:
+			GameState.apply_effects({ "bond": { id: 20 } })
+			_open(_show_social)))
+	box.add_child(UiTheme.label("Recruit now (ignores Gates):", UiTheme.DIM))
+	var rflow := HFlowContainer.new()
+	rflow.custom_minimum_size = Vector2(380, 0)
+	box.add_child(rflow)
+	for key in DataDB.all():
+		if str(key).begins_with("npcs/") and bool(DataDB.table(str(key)).get("recruitable", false)):
+			var rid := str(DataDB.table(str(key))["id"])
+			if GameState.character(rid).is_empty():
+				rflow.add_child(UiTheme.button(rid.capitalize(), func() -> void:
+					preload("res://src/core/social/bonds.gd").recruit(DataDB.all(), GameState.run, rid, Rng.stream("npc"))
+					_open(_show_social)))

@@ -1,80 +1,823 @@
 {
   "classes": [
-    { "id": "mage", "name": "Mage", "tier": 1,
-      "growth": { "int": 35, "wil": 25, "per": 15, "str": 5, "dex": 7, "con": 7, "cha": 6 },
-      "hpBonus": 0, "mpBonus": 6, "hpPerLevel": 1,
-      "startStats": { "str": 4, "dex": 5, "con": 5, "int": 7, "per": 5, "wil": 6, "cha": 4 },
-      "vectorAffinity": { "heat": 20, "cold": 20, "force": 15, "motion": 15, "binding": 15, "light": 15 },
-      "formAffinity": { "bolt": 20, "burst": 15, "shield": 15, "line": 10, "projectile": 10, "sphere": 8, "glyph": 8, "touch": 5, "aura": 5, "construct": 4 },
-      "startVectors": 2, "startForms": ["bolt", "shield"],
-      "starterDeck": [
-        { "form": "bolt", "magnitude": "standard", "vectorSlot": 0, "count": 3 },
-        { "form": "bolt", "magnitude": "standard", "vectorSlot": 1, "count": 2 },
-        { "form": "shield", "magnitude": "minor", "vectorSlot": 0, "count": 2 },
-        { "basic": "card_strike", "count": 1 },
-        { "basic": "card_guard", "count": 2 }
+    {
+      "id": "mage",
+      "name": "Mage",
+      "tier": 1,
+      "growth": {
+        "int": 35,
+        "wil": 25,
+        "per": 15,
+        "str": 5,
+        "dex": 7,
+        "con": 7,
+        "cha": 6
+      },
+      "hpBonus": 0,
+      "mpBonus": 6,
+      "hpPerLevel": 1,
+      "startStats": {
+        "str": 4,
+        "dex": 5,
+        "con": 5,
+        "int": 7,
+        "per": 5,
+        "wil": 6,
+        "cha": 4
+      },
+      "vectorAffinity": {
+        "heat": 20,
+        "cold": 20,
+        "force": 15,
+        "motion": 15,
+        "binding": 15,
+        "light": 15
+      },
+      "formAffinity": {
+        "bolt": 20,
+        "burst": 15,
+        "shield": 15,
+        "line": 10,
+        "projectile": 10,
+        "sphere": 8,
+        "glyph": 8,
+        "touch": 5,
+        "aura": 5,
+        "construct": 4
+      },
+      "startVectors": 2,
+      "startForms": [
+        "bolt",
+        "shield"
       ],
-      "perk": { "id": "overchannel", "text": "Once per fight, improvise at normal card cost" } },
-    { "id": "fighter", "name": "Fighter", "tier": 1,
-      "growth": { "str": 35, "con": 30, "dex": 15, "int": 5, "per": 5, "wil": 5, "cha": 5 },
-      "hpBonus": 10, "mpBonus": 0, "hpPerLevel": 3,
-      "startStats": { "str": 7, "dex": 5, "con": 7, "int": 3, "per": 4, "wil": 5, "cha": 4 },
-      "vectorAffinity": { "heat": 20, "cold": 15, "force": 25, "motion": 15, "binding": 15, "light": 10 },
-      "formAffinity": { "weapon_infusion": 25, "touch": 20, "shield": 15, "burst": 10, "line": 10, "aura": 8, "construct": 7, "bolt": 5 },
-      "startVectors": 1, "startForms": ["weapon_infusion", "touch"],
       "starterDeck": [
-        { "basic": "card_strike", "count": 3 },
-        { "basic": "card_heavy_swing", "count": 2 },
-        { "form": "weapon_infusion", "magnitude": "standard", "vectorSlot": 0, "count": 2 },
-        { "form": "touch", "magnitude": "minor", "vectorSlot": 0, "count": 1 },
-        { "basic": "card_guard", "count": 2 }
+        {
+          "form": "bolt",
+          "magnitude": "standard",
+          "vectorSlot": 0,
+          "count": 3
+        },
+        {
+          "form": "bolt",
+          "magnitude": "standard",
+          "vectorSlot": 1,
+          "count": 2
+        },
+        {
+          "form": "shield",
+          "magnitude": "minor",
+          "vectorSlot": 0,
+          "count": 2
+        },
+        {
+          "basic": "card_strike",
+          "count": 1
+        },
+        {
+          "basic": "card_guard",
+          "count": 2
+        }
       ],
-      "perk": { "id": "second_wind", "text": "Heal 20% HP once per fight under 30% HP" } },
-    { "id": "rogue", "name": "Rogue", "tier": 1,
-      "growth": { "dex": 35, "per": 25, "cha": 10, "str": 10, "con": 8, "int": 6, "wil": 6 },
-      "hpBonus": 4, "mpBonus": 2, "hpPerLevel": 2,
-      "startStats": { "str": 5, "dex": 8, "con": 5, "int": 4, "per": 7, "wil": 4, "cha": 5 },
-      "vectorAffinity": { "heat": 15, "cold": 15, "force": 15, "motion": 25, "binding": 20, "light": 10 },
-      "formAffinity": { "bolt": 20, "projectile": 20, "touch": 15, "glyph": 15, "line": 10, "weapon_infusion": 10, "burst": 5, "shield": 5 },
-      "startVectors": 1, "startForms": ["bolt", "projectile"],
+      "perk": {
+        "id": "overchannel",
+        "text": "Once per fight, improvise at normal card cost"
+      }
+    },
+    {
+      "id": "fighter",
+      "name": "Fighter",
+      "tier": 1,
+      "growth": {
+        "str": 35,
+        "con": 30,
+        "dex": 15,
+        "int": 5,
+        "per": 5,
+        "wil": 5,
+        "cha": 5
+      },
+      "hpBonus": 10,
+      "mpBonus": 0,
+      "hpPerLevel": 3,
+      "startStats": {
+        "str": 7,
+        "dex": 5,
+        "con": 7,
+        "int": 3,
+        "per": 4,
+        "wil": 5,
+        "cha": 4
+      },
+      "vectorAffinity": {
+        "heat": 20,
+        "cold": 15,
+        "force": 25,
+        "motion": 15,
+        "binding": 15,
+        "light": 10
+      },
+      "formAffinity": {
+        "weapon_infusion": 25,
+        "touch": 20,
+        "shield": 15,
+        "burst": 10,
+        "line": 10,
+        "aura": 8,
+        "construct": 7,
+        "bolt": 5
+      },
+      "startVectors": 1,
+      "startForms": [
+        "weapon_infusion",
+        "touch"
+      ],
       "starterDeck": [
-        { "basic": "card_strike", "count": 2 },
-        { "basic": "card_quick_stab", "count": 2 },
-        { "basic": "card_dash", "count": 2 },
-        { "form": "bolt", "magnitude": "standard", "vectorSlot": 0, "count": 2 },
-        { "form": "projectile", "magnitude": "minor", "vectorSlot": 0, "count": 1 },
-        { "basic": "card_guard", "count": 1 }
+        {
+          "basic": "card_strike",
+          "count": 3
+        },
+        {
+          "basic": "card_heavy_swing",
+          "count": 2
+        },
+        {
+          "form": "weapon_infusion",
+          "magnitude": "standard",
+          "vectorSlot": 0,
+          "count": 2
+        },
+        {
+          "form": "touch",
+          "magnitude": "minor",
+          "vectorSlot": 0,
+          "count": 1
+        },
+        {
+          "basic": "card_guard",
+          "count": 2
+        }
       ],
-      "perk": { "id": "backstab", "text": "+50% damage from behind or flank" } },
-    { "id": "healer", "name": "Healer", "tier": 1,
-      "growth": { "wil": 30, "con": 20, "int": 20, "per": 10, "cha": 10, "str": 5, "dex": 5 },
-      "hpBonus": 4, "mpBonus": 4, "hpPerLevel": 2,
-      "startStats": { "str": 3, "dex": 4, "con": 6, "int": 6, "per": 5, "wil": 8, "cha": 5 },
-      "vectorAffinity": { "light": 30, "binding": 20, "heat": 10, "cold": 15, "force": 10, "motion": 15 },
-      "formAffinity": { "shield": 25, "aura": 25, "touch": 15, "bolt": 10, "sphere": 10, "glyph": 10, "burst": 5 },
-      "startVectors": 1, "startForms": ["shield", "aura", "bolt"], "forcedVectors": ["light"],
+      "perk": {
+        "id": "second_wind",
+        "text": "Heal 20% HP once per fight under 30% HP"
+      }
+    },
+    {
+      "id": "rogue",
+      "name": "Rogue",
+      "tier": 1,
+      "growth": {
+        "dex": 35,
+        "per": 25,
+        "cha": 10,
+        "str": 10,
+        "con": 8,
+        "int": 6,
+        "wil": 6
+      },
+      "hpBonus": 4,
+      "mpBonus": 2,
+      "hpPerLevel": 2,
+      "startStats": {
+        "str": 5,
+        "dex": 8,
+        "con": 5,
+        "int": 4,
+        "per": 7,
+        "wil": 4,
+        "cha": 5
+      },
+      "vectorAffinity": {
+        "heat": 15,
+        "cold": 15,
+        "force": 15,
+        "motion": 25,
+        "binding": 20,
+        "light": 10
+      },
+      "formAffinity": {
+        "bolt": 20,
+        "projectile": 20,
+        "touch": 15,
+        "glyph": 15,
+        "line": 10,
+        "weapon_infusion": 10,
+        "burst": 5,
+        "shield": 5
+      },
+      "startVectors": 1,
+      "startForms": [
+        "bolt",
+        "projectile"
+      ],
       "starterDeck": [
-        { "form": "shield", "magnitude": "standard", "vectorSlot": 0, "count": 3 },
-        { "form": "aura", "magnitude": "minor", "vectorSlot": 0, "count": 1 },
-        { "form": "bolt", "magnitude": "standard", "vectorSlot": 0, "count": 3 },
-        { "basic": "card_strike", "count": 1 },
-        { "basic": "card_guard", "count": 2 }
+        {
+          "basic": "card_strike",
+          "count": 2
+        },
+        {
+          "basic": "card_quick_stab",
+          "count": 2
+        },
+        {
+          "basic": "card_dash",
+          "count": 2
+        },
+        {
+          "form": "bolt",
+          "magnitude": "standard",
+          "vectorSlot": 0,
+          "count": 2
+        },
+        {
+          "form": "projectile",
+          "magnitude": "minor",
+          "vectorSlot": 0,
+          "count": 1
+        },
+        {
+          "basic": "card_guard",
+          "count": 1
+        }
       ],
-      "perk": { "id": "triage", "text": "Healing cards cost 1 less MP on allies under half HP" } },
-    { "id": "bard", "name": "Bard", "tier": 1,
-      "growth": { "cha": 35, "wil": 20, "dex": 15, "int": 10, "per": 10, "str": 5, "con": 5 },
-      "hpBonus": 2, "mpBonus": 3, "hpPerLevel": 2,
-      "startStats": { "str": 4, "dex": 6, "con": 5, "int": 5, "per": 5, "wil": 5, "cha": 8 },
-      "vectorAffinity": { "light": 20, "force": 20, "motion": 15, "binding": 15, "heat": 15, "cold": 15 },
-      "formAffinity": { "burst": 25, "aura": 20, "shield": 15, "line": 10, "bolt": 10, "sphere": 10, "glyph": 10 },
-      "startVectors": 1, "startForms": ["burst", "bolt"],
+      "perk": {
+        "id": "backstab",
+        "text": "+50% damage from behind or flank"
+      }
+    },
+    {
+      "id": "healer",
+      "name": "Healer",
+      "tier": 1,
+      "growth": {
+        "wil": 30,
+        "con": 20,
+        "int": 20,
+        "per": 10,
+        "cha": 10,
+        "str": 5,
+        "dex": 5
+      },
+      "hpBonus": 4,
+      "mpBonus": 4,
+      "hpPerLevel": 2,
+      "startStats": {
+        "str": 3,
+        "dex": 4,
+        "con": 6,
+        "int": 6,
+        "per": 5,
+        "wil": 8,
+        "cha": 5
+      },
+      "vectorAffinity": {
+        "light": 30,
+        "binding": 20,
+        "heat": 10,
+        "cold": 15,
+        "force": 10,
+        "motion": 15
+      },
+      "formAffinity": {
+        "shield": 25,
+        "aura": 25,
+        "touch": 15,
+        "bolt": 10,
+        "sphere": 10,
+        "glyph": 10,
+        "burst": 5
+      },
+      "startVectors": 1,
+      "startForms": [
+        "shield",
+        "aura",
+        "bolt"
+      ],
+      "forcedVectors": [
+        "light"
+      ],
       "starterDeck": [
-        { "form": "burst", "magnitude": "minor", "vectorSlot": 0, "count": 2 },
-        { "form": "bolt", "magnitude": "standard", "vectorSlot": 0, "count": 2 },
-        { "basic": "card_rally", "count": 2 },
-        { "basic": "card_strike", "count": 2 },
-        { "basic": "card_guard", "count": 2 }
+        {
+          "form": "shield",
+          "magnitude": "standard",
+          "vectorSlot": 0,
+          "count": 3
+        },
+        {
+          "form": "aura",
+          "magnitude": "minor",
+          "vectorSlot": 0,
+          "count": 1
+        },
+        {
+          "form": "bolt",
+          "magnitude": "standard",
+          "vectorSlot": 0,
+          "count": 3
+        },
+        {
+          "basic": "card_strike",
+          "count": 1
+        },
+        {
+          "basic": "card_guard",
+          "count": 2
+        }
       ],
-      "perk": { "id": "hype", "text": "Party gains initiative and +1 draw on turn 1" } }
+      "perk": {
+        "id": "triage",
+        "text": "Healing cards cost 1 less MP on allies under half HP"
+      }
+    },
+    {
+      "id": "bard",
+      "name": "Bard",
+      "tier": 1,
+      "growth": {
+        "cha": 35,
+        "wil": 20,
+        "dex": 15,
+        "int": 10,
+        "per": 10,
+        "str": 5,
+        "con": 5
+      },
+      "hpBonus": 2,
+      "mpBonus": 3,
+      "hpPerLevel": 2,
+      "startStats": {
+        "str": 4,
+        "dex": 6,
+        "con": 5,
+        "int": 5,
+        "per": 5,
+        "wil": 5,
+        "cha": 8
+      },
+      "vectorAffinity": {
+        "light": 20,
+        "force": 20,
+        "motion": 15,
+        "binding": 15,
+        "heat": 15,
+        "cold": 15
+      },
+      "formAffinity": {
+        "burst": 25,
+        "aura": 20,
+        "shield": 15,
+        "line": 10,
+        "bolt": 10,
+        "sphere": 10,
+        "glyph": 10
+      },
+      "startVectors": 1,
+      "startForms": [
+        "burst",
+        "bolt"
+      ],
+      "starterDeck": [
+        {
+          "form": "burst",
+          "magnitude": "minor",
+          "vectorSlot": 0,
+          "count": 2
+        },
+        {
+          "form": "bolt",
+          "magnitude": "standard",
+          "vectorSlot": 0,
+          "count": 2
+        },
+        {
+          "basic": "card_rally",
+          "count": 2
+        },
+        {
+          "basic": "card_strike",
+          "count": 2
+        },
+        {
+          "basic": "card_guard",
+          "count": 2
+        }
+      ],
+      "perk": {
+        "id": "hype",
+        "text": "Party gains initiative and +1 draw on turn 1"
+      }
+    },
+    {
+      "id": "elementalist",
+      "name": "Elementalist",
+      "tier": 2,
+      "from": "mage",
+      "requires": {
+        "classes": [
+          "mage"
+        ],
+        "stats": {
+          "int": 9
+        },
+        "knownVectorsAll": [
+          "heat",
+          "cold"
+        ]
+      },
+      "growth": {
+        "int": 35,
+        "wil": 25,
+        "per": 15,
+        "str": 5,
+        "dex": 7,
+        "con": 7,
+        "cha": 6
+      },
+      "hpBonus": 2,
+      "mpBonus": 10,
+      "hpPerLevel": 1,
+      "mods": {
+        "combat": {
+          "spellDamagePct": 0.1
+        }
+      },
+      "grantForms": [
+        "burst"
+      ],
+      "perk": {
+        "id": "prism",
+        "text": "Hybrid spells don't pay the extra hybrid cost; spells +10% damage."
+      },
+      "text": "Two-Vector hybrid cards, bigger area Forms."
+    },
+    {
+      "id": "kinetic_logician",
+      "name": "Kinetic Logician",
+      "tier": 2,
+      "from": "mage",
+      "requires": {
+        "classes": [
+          "mage",
+          "fighter"
+        ],
+        "knownVectorsAny": [
+          "force",
+          "motion"
+        ],
+        "attended": {
+          "physics": 8
+        }
+      },
+      "growth": {
+        "int": 30,
+        "dex": 20,
+        "wil": 15,
+        "per": 15,
+        "str": 8,
+        "con": 7,
+        "cha": 5
+      },
+      "hpBonus": 4,
+      "mpBonus": 8,
+      "hpPerLevel": 2,
+      "mods": {},
+      "grantForms": [
+        "line"
+      ],
+      "perk": {
+        "id": "momentum",
+        "text": "Force pushes 1 tile further and collisions hit 4 harder."
+      },
+      "text": "Knockback and push combos on the grid."
+    },
+    {
+      "id": "spellblade",
+      "name": "Spellblade",
+      "tier": 2,
+      "from": "fighter",
+      "requires": {
+        "classes": [
+          "fighter",
+          "rogue"
+        ],
+        "stats": {
+          "int": 7
+        },
+        "knownForms": [
+          "weapon_infusion"
+        ]
+      },
+      "growth": {
+        "str": 25,
+        "int": 20,
+        "dex": 20,
+        "con": 15,
+        "wil": 10,
+        "per": 5,
+        "cha": 5
+      },
+      "hpBonus": 8,
+      "mpBonus": 5,
+      "hpPerLevel": 3,
+      "mods": {
+        "combat": {
+          "strikeDamagePct": 0.15
+        }
+      },
+      "grantForms": [
+        "weapon_infusion"
+      ],
+      "perk": {
+        "id": "spellsteel",
+        "text": "Weapon Infusion lasts 3 Strikes; Strikes +15% damage."
+      },
+      "text": "Infuses melee cards with Vectors."
+    },
+    {
+      "id": "guardian",
+      "name": "Guardian",
+      "tier": 2,
+      "from": "fighter",
+      "requires": {
+        "classes": [
+          "fighter"
+        ],
+        "stats": {
+          "con": 10
+        }
+      },
+      "growth": {
+        "con": 35,
+        "str": 25,
+        "wil": 15,
+        "dex": 10,
+        "int": 5,
+        "per": 5,
+        "cha": 5
+      },
+      "hpBonus": 18,
+      "mpBonus": 2,
+      "hpPerLevel": 4,
+      "mods": {
+        "derived": {
+          "physDefense": 2
+        }
+      },
+      "grantForms": [
+        "shield"
+      ],
+      "perk": {
+        "id": "bulwark_aura",
+        "text": "Guard also shields every adjacent ally for 5. +2 Defense."
+      },
+      "text": "Taunt, zone control, ally shielding."
+    },
+    {
+      "id": "trickster",
+      "name": "Trickster",
+      "tier": 2,
+      "from": "rogue",
+      "requires": {
+        "classes": [
+          "rogue"
+        ],
+        "stats": {
+          "cha": 8
+        }
+      },
+      "growth": {
+        "dex": 30,
+        "cha": 20,
+        "per": 20,
+        "int": 10,
+        "str": 8,
+        "con": 6,
+        "wil": 6
+      },
+      "hpBonus": 5,
+      "mpBonus": 4,
+      "hpPerLevel": 2,
+      "mods": {
+        "derived": {
+          "critChancePct": 10
+        },
+        "combat": {
+          "rootBonus": 1
+        }
+      },
+      "grantForms": [
+        "glyph"
+      ],
+      "perk": {
+        "id": "sleight",
+        "text": "Backstab still applies; +10% crit; roots last longer."
+      },
+      "text": "Card tricks, status effects, misdirection."
+    },
+    {
+      "id": "medic",
+      "name": "Medic",
+      "tier": 2,
+      "from": "healer",
+      "requires": {
+        "classes": [
+          "healer"
+        ],
+        "counters": {
+          "hospital_shifts": 5
+        }
+      },
+      "growth": {
+        "wil": 30,
+        "int": 25,
+        "con": 20,
+        "per": 10,
+        "cha": 10,
+        "str": 3,
+        "dex": 2
+      },
+      "hpBonus": 6,
+      "mpBonus": 8,
+      "hpPerLevel": 2,
+      "mods": {
+        "combat": {
+          "healPct": 0.3
+        }
+      },
+      "grantForms": [
+        "touch"
+      ],
+      "perk": {
+        "id": "lifeline",
+        "text": "Healing +30%; healing cards on allies under half HP cost 1 less."
+      },
+      "text": "Strong single-target healing, revives."
+    },
+    {
+      "id": "idol",
+      "name": "Idol",
+      "tier": 2,
+      "from": "bard",
+      "requires": {
+        "classes": [
+          "bard"
+        ],
+        "stats": {
+          "cha": 11
+        },
+        "minBond": {
+          "kara": 20,
+          "kayla": 20
+        }
+      },
+      "growth": {
+        "cha": 35,
+        "wil": 20,
+        "dex": 15,
+        "int": 10,
+        "per": 10,
+        "str": 5,
+        "con": 5
+      },
+      "hpBonus": 4,
+      "mpBonus": 6,
+      "hpPerLevel": 2,
+      "mods": {
+        "derived": {
+          "initiative": 2
+        }
+      },
+      "grantForms": [
+        "aura"
+      ],
+      "perk": {
+        "id": "encore",
+        "text": "The whole party gains initiative and +1 draw on turn 1; Rally reaches everyone."
+      },
+      "text": "Party-wide buffs, crowd control by charm."
+    },
+    {
+      "id": "deli_knight",
+      "name": "Deli Knight",
+      "tier": 2,
+      "hidden": true,
+      "from": "any",
+      "requires": {
+        "counters": {
+          "deli_shifts": 10
+        },
+        "minBond": {
+          "gary": 41
+        }
+      },
+      "growth": {
+        "con": 30,
+        "str": 25,
+        "wil": 15,
+        "dex": 10,
+        "int": 10,
+        "per": 5,
+        "cha": 5
+      },
+      "hpBonus": 14,
+      "mpBonus": 4,
+      "hpPerLevel": 3,
+      "mods": {
+        "derived": {
+          "maxHp": 10,
+          "physDefense": 1
+        },
+        "combat": {
+          "foodMul": 2
+        }
+      },
+      "grantVectors": [
+        "heat",
+        "force"
+      ],
+      "grantForms": [
+        "shield"
+      ],
+      "perk": {
+        "id": "brunch",
+        "text": "Food items heal twice as much; +10 Max HP; Heat-and-Force tank."
+      },
+      "text": "Food items in combat, a Heat-and-Force tank."
+    },
+    {
+      "id": "smith_mage",
+      "name": "Smith-Mage",
+      "tier": 2,
+      "hidden": true,
+      "from": "any",
+      "requires": {
+        "attended": {
+          "shop": 8
+        },
+        "flags": [
+          "forge_apprentice_started"
+        ]
+      },
+      "growth": {
+        "str": 25,
+        "int": 25,
+        "dex": 15,
+        "con": 15,
+        "wil": 10,
+        "per": 5,
+        "cha": 5
+      },
+      "hpBonus": 8,
+      "mpBonus": 6,
+      "hpPerLevel": 2,
+      "mods": {
+        "combat": {
+          "strikePower": 2
+        }
+      },
+      "grantForms": [
+        "construct"
+      ],
+      "perk": {
+        "id": "constructor",
+        "text": "Constructs have double HP and last 2 rounds longer; +2 Strike power."
+      },
+      "text": "Builds constructs and gear mid-fight."
+    },
+    {
+      "id": "upside_touched",
+      "name": "Upside-Touched",
+      "tier": 3,
+      "hidden": true,
+      "from": "any",
+      "requires": {
+        "wildSurges": 5,
+        "stats": {
+          "wil": 12
+        }
+      },
+      "growth": {
+        "wil": 30,
+        "int": 25,
+        "per": 15,
+        "con": 10,
+        "dex": 10,
+        "str": 5,
+        "cha": 5
+      },
+      "hpBonus": 6,
+      "mpBonus": 12,
+      "hpPerLevel": 2,
+      "mods": {
+        "combat": {
+          "spellDamagePct": 0.2
+        }
+      },
+      "perk": {
+        "id": "unstable",
+        "text": "Improvised casts skip the +3 Instability penalty; spells +20% damage."
+      },
+      "text": "Unstable, very strong improvised casts."
+    }
   ]
 }

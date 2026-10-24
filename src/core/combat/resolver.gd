@@ -57,7 +57,7 @@ static func is_flanking(attacker: UnitScript, target: UnitScript) -> bool:
 static func shared_mult(db: Dictionary, attacker: UnitScript, target: UnitScript, ranged: bool, target_on_cover: bool, friend_adjacent: bool) -> float:
 	var cfg := combat_cfg(db)
 	var m := 1.0 + attacker.rally_bonus
-	if attacker.perk == "backstab" and is_flanking(attacker, target):
+	if (attacker.perk == "backstab" or attacker.perk == "sleight") and is_flanking(attacker, target):
 		m *= float(cfg.get("flankMul", 1.5))
 	if ranged and target_on_cover:
 		m *= float(cfg.get("halfCoverRangedMul", 0.75))

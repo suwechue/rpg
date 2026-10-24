@@ -1,0 +1,246 @@
+{
+  "enemies": [
+    {
+      "id": "iv_wisp",
+      "name": "IV Drip Wisp",
+      "tier": "normal",
+      "weeks": [
+        4
+      ],
+      "text": "A floating IV bag that drains the wrong direction.",
+      "hp": 20,
+      "movement": 4,
+      "initiative": 8,
+      "physDefense": 1,
+      "magicResist": 3,
+      "stability": 6,
+      "stats": {
+        "str": 4,
+        "dex": 7
+      },
+      "weakTo": [
+        "heat"
+      ],
+      "strongAgainst": [
+        "vitality"
+      ],
+      "signature": {
+        "vitality": 0.7,
+        "binding": 0.3
+      },
+      "disposition": {
+        "greed": 60,
+        "courage": 10
+      },
+      "actions": [
+        {
+          "id": "drain",
+          "name": "Drain",
+          "form": "bolt",
+          "vectors": {
+            "vitality": 1
+          },
+          "power": 6,
+          "profile": {
+            "greed": 0.8
+          }
+        }
+      ],
+      "xp": 11,
+      "money": 4,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Spirit2/SpriteSheet.png"
+    },
+    {
+      "id": "gurney_ghoul",
+      "name": "Gurney Ghoul",
+      "tier": "normal",
+      "weeks": [
+        4
+      ],
+      "text": "A hospital gurney that rolls uphill and runs you over.",
+      "hp": 28,
+      "movement": 5,
+      "initiative": 6,
+      "physDefense": 3,
+      "magicResist": 2,
+      "stability": 6,
+      "stats": {
+        "str": 7,
+        "dex": 6
+      },
+      "weakTo": [
+        "light"
+      ],
+      "strongAgainst": [
+        "binding"
+      ],
+      "signature": {
+        "force": 0.5,
+        "binding": 0.5
+      },
+      "disposition": {
+        "courage": 60,
+        "kindness": -40
+      },
+      "actions": [
+        {
+          "id": "run_over",
+          "name": "Run Over",
+          "kind": "strike",
+          "stat": "str",
+          "mult": 1.0,
+          "power": 4,
+          "vectors": {
+            "force": 1
+          },
+          "profile": {
+            "courage": 0.9
+          }
+        }
+      ],
+      "xp": 12,
+      "money": 5,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Mole2/Mole2.png"
+    },
+    {
+      "id": "night_nurse",
+      "name": "Night Nurse",
+      "tier": "normal",
+      "weeks": [
+        4
+      ],
+      "text": "Her shift never ended. Her bedside manner has curdled.",
+      "hp": 24,
+      "movement": 4,
+      "initiative": 7,
+      "physDefense": 2,
+      "magicResist": 4,
+      "stability": 6,
+      "stats": {
+        "str": 5,
+        "dex": 6
+      },
+      "weakTo": [
+        "force"
+      ],
+      "strongAgainst": [
+        "light",
+        "binding"
+      ],
+      "signature": {
+        "binding": 0.6,
+        "light": 0.4
+      },
+      "disposition": {
+        "loyalty": 70,
+        "kindness": -20
+      },
+      "actions": [
+        {
+          "id": "restrain",
+          "name": "Restrain",
+          "form": "bolt",
+          "vectors": {
+            "binding": 1
+          },
+          "power": 7,
+          "profile": {
+            "loyalty": 0.7
+          }
+        },
+        {
+          "id": "bedrest",
+          "name": "Bedrest",
+          "form": "shield",
+          "vectors": {
+            "light": 1
+          },
+          "power": 8,
+          "profile": {
+            "loyalty": 1.0
+          }
+        }
+      ],
+      "xp": 12,
+      "money": 5,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Owl2/Owl2.png"
+    },
+    {
+      "id": "chief_of_staff",
+      "name": "Chief of Staff",
+      "tier": "elite",
+      "weeks": [
+        4
+      ],
+      "text": "An eye on a lanyard. It signs every form. Elite.",
+      "hp": 58,
+      "movement": 3,
+      "initiative": 8,
+      "physDefense": 4,
+      "magicResist": 6,
+      "stability": 6,
+      "stats": {
+        "str": 7,
+        "dex": 7
+      },
+      "weakTo": [
+        "force",
+        "heat"
+      ],
+      "strongAgainst": [
+        "binding",
+        "vitality"
+      ],
+      "signature": {
+        "binding": 0.5,
+        "vitality": 0.5
+      },
+      "disposition": {
+        "pride": 80,
+        "greed": 60
+      },
+      "actions": [
+        {
+          "id": "paperwork",
+          "name": "Paperwork",
+          "form": "line",
+          "vectors": {
+            "binding": 1
+          },
+          "power": 9,
+          "profile": {
+            "pride": 0.8
+          }
+        },
+        {
+          "id": "triage_drain",
+          "name": "Triage",
+          "form": "burst",
+          "vectors": {
+            "vitality": 1
+          },
+          "power": 9,
+          "profile": {
+            "greed": 0.8
+          }
+        },
+        {
+          "id": "discharge",
+          "name": "Discharge",
+          "form": "bolt",
+          "vectors": {
+            "force": 1
+          },
+          "power": 10,
+          "target": "strongest",
+          "profile": {
+            "pride": 1.0
+          }
+        }
+      ],
+      "xp": 40,
+      "money": 18,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Eye2/Eye2.png"
+    }
+  ]
+}

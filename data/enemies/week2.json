@@ -1,0 +1,326 @@
+{
+  "enemies": [
+    {
+      "id": "frost_wolf",
+      "name": "Frost Wolf",
+      "tier": "normal",
+      "weeks": [
+        2
+      ],
+      "text": "A wolf made of freezer frost. Weak to Heat, smug about Cold.",
+      "hp": 24,
+      "movement": 4,
+      "initiative": 7,
+      "physDefense": 1,
+      "magicResist": 2,
+      "stability": 6,
+      "stats": {
+        "str": 6,
+        "dex": 6
+      },
+      "weakTo": [
+        "heat"
+      ],
+      "strongAgainst": [
+        "cold"
+      ],
+      "signature": {
+        "cold": 0.8,
+        "force": 0.2
+      },
+      "disposition": {
+        "courage": 40,
+        "greed": 10
+      },
+      "actions": [
+        {
+          "id": "frost_bite",
+          "name": "Frost Bite",
+          "kind": "strike",
+          "stat": "str",
+          "mult": 1.0,
+          "power": 2,
+          "vectors": {
+            "cold": 1
+          },
+          "profile": {
+            "courage": 0.8
+          }
+        },
+        {
+          "id": "howl",
+          "name": "Cold Howl",
+          "form": "burst",
+          "vectors": {
+            "cold": 1
+          },
+          "power": 5,
+          "profile": {
+            "pride": 0.5,
+            "courage": 0.4
+          }
+        }
+      ],
+      "xp": 10,
+      "money": 4,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Beast/Beast.png"
+    },
+    {
+      "id": "freezer_burn",
+      "name": "Freezer Burn",
+      "tier": "normal",
+      "weeks": [
+        2
+      ],
+      "text": "A puddle of something that was soup. It has opinions about your temperature.",
+      "hp": 20,
+      "movement": 3,
+      "initiative": 4,
+      "physDefense": 2,
+      "magicResist": 1,
+      "stability": 6,
+      "stats": {
+        "str": 5,
+        "dex": 3
+      },
+      "weakTo": [
+        "heat"
+      ],
+      "strongAgainst": [
+        "cold",
+        "binding"
+      ],
+      "signature": {
+        "cold": 0.7,
+        "binding": 0.3
+      },
+      "disposition": {
+        "courage": 20,
+        "greed": 50
+      },
+      "actions": [
+        {
+          "id": "cling",
+          "name": "Cling",
+          "kind": "strike",
+          "stat": "str",
+          "mult": 1.0,
+          "power": 5,
+          "vectors": {
+            "binding": 1
+          },
+          "profile": {
+            "greed": 0.7
+          }
+        },
+        {
+          "id": "chill",
+          "name": "Chill",
+          "form": "touch",
+          "vectors": {
+            "cold": 1
+          },
+          "power": 5,
+          "profile": {
+            "courage": 0.6
+          }
+        }
+      ],
+      "xp": 9,
+      "money": 3,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Slime2/Slime2.png"
+    },
+    {
+      "id": "meat_hook",
+      "name": "Meat Hook Specter",
+      "tier": "normal",
+      "weeks": [
+        2
+      ],
+      "text": "A floating hook that remembers every sandwich. It pulls.",
+      "hp": 18,
+      "movement": 4,
+      "initiative": 8,
+      "physDefense": 0,
+      "magicResist": 2,
+      "stability": 6,
+      "stats": {
+        "str": 5,
+        "dex": 7
+      },
+      "weakTo": [
+        "light"
+      ],
+      "strongAgainst": [
+        "force"
+      ],
+      "signature": {
+        "force": 0.6,
+        "motion": 0.4
+      },
+      "disposition": {
+        "courage": 50,
+        "pride": 30
+      },
+      "actions": [
+        {
+          "id": "hook",
+          "name": "Hook",
+          "form": "projectile",
+          "vectors": {
+            "motion": 1
+          },
+          "power": 5,
+          "profile": {
+            "courage": 0.7
+          }
+        },
+        {
+          "id": "swing",
+          "name": "Swing",
+          "form": "line",
+          "vectors": {
+            "force": 1
+          },
+          "power": 5,
+          "profile": {
+            "pride": 0.6
+          }
+        }
+      ],
+      "xp": 10,
+      "money": 4,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/SkullBlue/SpriteSheet.png"
+    },
+    {
+      "id": "ice_larva",
+      "name": "Ice Larva",
+      "tier": "normal",
+      "weeks": [
+        2,
+        3
+      ],
+      "text": "It's small. It's cold. It's surprisingly fast for a grub.",
+      "hp": 14,
+      "movement": 5,
+      "initiative": 9,
+      "physDefense": 0,
+      "magicResist": 1,
+      "stability": 6,
+      "stats": {
+        "str": 3,
+        "dex": 8
+      },
+      "weakTo": [
+        "heat",
+        "force"
+      ],
+      "strongAgainst": [
+        "cold"
+      ],
+      "signature": {
+        "cold": 0.6,
+        "motion": 0.4
+      },
+      "disposition": {
+        "courage": -30,
+        "curiosity": 50
+      },
+      "actions": [
+        {
+          "id": "frost_spit",
+          "name": "Frost Spit",
+          "form": "bolt",
+          "vectors": {
+            "cold": 1
+          },
+          "power": 4,
+          "profile": {
+            "curiosity": 0.6
+          }
+        }
+      ],
+      "xp": 7,
+      "money": 2,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Larva2/Larva2.png"
+    },
+    {
+      "id": "head_chef",
+      "name": "Head Chef Shade",
+      "tier": "elite",
+      "weeks": [
+        2
+      ],
+      "text": "The ghost of a cook who never got a day off. Elite. Very sharp knives.",
+      "hp": 46,
+      "movement": 4,
+      "initiative": 8,
+      "physDefense": 3,
+      "magicResist": 4,
+      "stability": 6,
+      "stats": {
+        "str": 8,
+        "dex": 7
+      },
+      "weakTo": [
+        "heat"
+      ],
+      "strongAgainst": [
+        "cold",
+        "force"
+      ],
+      "signature": {
+        "cold": 0.5,
+        "force": 0.5
+      },
+      "disposition": {
+        "courage": 70,
+        "pride": 70
+      },
+      "actions": [
+        {
+          "id": "cleave",
+          "name": "Cleave",
+          "kind": "strike",
+          "stat": "str",
+          "mult": 1.0,
+          "power": 4,
+          "vectors": {
+            "force": 1
+          },
+          "profile": {
+            "courage": 0.8
+          }
+        },
+        {
+          "id": "flash_freeze",
+          "name": "Flash Freeze",
+          "form": "burst",
+          "vectors": {
+            "cold": 1
+          },
+          "power": 8,
+          "profile": {
+            "pride": 0.9
+          }
+        },
+        {
+          "id": "order_up",
+          "name": "Order Up!",
+          "form": "bolt",
+          "vectors": {
+            "force": 1
+          },
+          "power": 8,
+          "target": "strongest",
+          "profile": {
+            "pride": 1.0
+          }
+        }
+      ],
+      "xp": 30,
+      "money": 14,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Cyclope2/SpriteSheet.png"
+    }
+  ]
+}

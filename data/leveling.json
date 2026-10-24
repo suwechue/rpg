@@ -1,6 +1,6 @@
 {
   "maxLevel": 20,
-  "xpPerLevel": 20,
+  "xpPerLevel": 45,
   "statPointsPerLevel": 3,
   "pityDryRolls": 3,
   "affinityRaiseOnKnown": 2,

@@ -345,6 +345,9 @@ func _end_night() -> void:
 	Night.end_night(GameState.run)
 	GameState.run.erase("floor_pos")
 	GameState.run.erase("resume_scene")
+	if GameState.flag("week%d_cleared" % int(DataDB.table("calendar").get("totalWeeks", 5))):
+		SceneRouter.goto("res://src/scenes/story/narrator_reveal_tbd.tscn")
+		return
 	Narrator.say("You climb out into the real night. The woods let you go. This time.")
 	GameState.advance_part()
 	SceneRouter.goto(TOWN)

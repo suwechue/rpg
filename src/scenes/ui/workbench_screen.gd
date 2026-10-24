@@ -4,7 +4,6 @@ extends "res://src/scenes/ui/modal.gd"
 
 const Crafting := preload("res://src/core/progression/crafting.gd")
 const CardRules := preload("res://src/core/card.gd")
-const Minigame := preload("res://src/scenes/minigames/timing_minigame.gd")
 const Char := preload("res://src/core/character.gd")
 
 var craft_ap := 1
@@ -99,10 +98,10 @@ func _play_minigame() -> void:
 	var db: Dictionary = DataDB.all()
 	var arch := Crafting.archetype(db, Crafting.input_vector(db, _vectors, _magnitude))
 	var rec := DataDB.record("minigames", arch)
-	var mg := Minigame.new()
-	mg.archetype = arch
-	mg.title = str(rec.get("name", arch.capitalize()))
-	mg.hint = str(rec.get("text", ""))
+	var mg: Control = (load(str(rec.get("script", "res://src/scenes/minigames/precision_minigame.gd"))) as GDScript).new()
+	mg.set("archetype", arch)
+	mg.set("title", str(rec.get("name", arch.capitalize())))
+	mg.set("hint", str(rec.get("text", "")))
 	visible = false
 	get_parent().add_child(mg)
 	var perf: float = await mg.finished

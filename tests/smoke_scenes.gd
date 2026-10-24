@@ -5,7 +5,7 @@ extends SceneTree
 
 var _passes := 0
 var _failures := 0
-var _dungeon_busy := false
+var _last_dungeon_step := 0
 
 
 func _initialize() -> void:
@@ -199,19 +199,21 @@ func smoke_town() -> void:
 
 
 ## One step of auto-exploring a dungeon floor: fight, loot, rest, then leave.
+## Never awaits the scene's own coroutines: leaving at the exit frees the
+## scene mid-call, and an awaited coroutine on a freed scene never resumes.
+## A step is taken at most every 0.3 s (real time) instead.
 func _dungeon_step(sc: Node) -> void:
-	if _dungeon_busy or sc.get("_moving") or _root_node("Flow").call("is_busy"):
+	var now := Time.get_ticks_msec()
+	if now - _last_dungeon_step < 300 or sc.get("_moving") or _root_node("Flow").call("is_busy"):
 		return
-	_dungeon_busy = true
+	_last_dungeon_step = now
 	var r: Dictionary = sc.call("next_room")
 	if not r.is_empty():
 		var t := str(r["type"])
 		if t in ["combat", "elite", "boss"]:
 			sc.call("visit_room", int(r["id"]))
 		else:
-			await sc.call("use_feature", int(r["id"]))
-	await process_frame
-	_dungeon_busy = false
+			sc.call("use_feature", int(r["id"]))
 
 
 ## Press through modals (choosing by needle where given) and combat result
@@ -280,6 +282,34 @@ func smoke_kelly_monday() -> void:
 	gs.set("dev_autoplay", false)
 
 
+## Each crafting minigame finishes with a Performance score in 0..1.
+func smoke_minigames() -> void:
+	for arch in ["thermal", "precision", "alignment", "chemical"]:
+		var rec: Dictionary = _root_node("DataDB").call("record", "minigames", arch)
+		var mg: Control = (load(str(rec["script"])) as GDScript).new()
+		mg.set("title", str(rec["name"]))
+		root.add_child(mg)
+		var result := { "perf": -1.0 }
+		mg.connect("finished", func(p: float) -> void: result["perf"] = p)
+		await process_frame
+		var start := Time.get_ticks_msec()
+		while float(result["perf"]) < 0.0 and Time.get_ticks_msec() - start < 20000:
+			if arch == "chemical":
+				var seq: Array = mg.get("_seq")
+				var step := int(mg.get("_step"))
+				if step < seq.size():
+					var ev := InputEventAction.new()
+					ev.action = ["move_up", "move_right", "move_down", "move_left"][int(seq[step])]
+					ev.pressed = true
+					mg.call("other_input", ev)
+			elif arch != "thermal":
+				mg.call("action_pressed")
+			await create_timer(0.2).timeout
+		check(float(result["perf"]) >= 0.0 and float(result["perf"]) <= 1.0, "%s minigame returns a Performance (%.2f)" % [arch, result["perf"]])
+		if arch == "chemical":
+			check(float(result["perf"]) > 0.5, "a correct chemical sequence scores well")
+
+
 func _smoke_combat() -> void:
 	var gs: Node = _root_node("GameState")
 	gs.call("new_run", 4242, "mage")
@@ -326,10 +356,12 @@ func _smoke_combat() -> void:
 		check(st.get("current") != u or str(st.get("result")) != "", "end turn passes the turn")
 	gs.set("dev_autoplay", true)
 	scene.call("_play_events")
-	guard = 0
-	while str(st.get("result")) == "" and guard < 600:
+	var t0 := Time.get_ticks_msec()
+	while str(st.get("result")) == "" and Time.get_ticks_msec() - t0 < 90000:
 		await create_timer(0.05).timeout
-		guard += 1
+	if str(st.get("result")) == "":
+		var cur: Object = st.get("current")
+		printerr("combat stuck: round=%d busy=%s current=%s ai=%s" % [st.get("round_num"), scene.get("_busy"), cur.get("name") if cur != null else "-", scene.call("_is_ai", cur) if cur != null else "-"])
 	check(str(st.get("result")) != "", "the fight reaches a result on autopilot (%s)" % st.get("result"))
 	guard = 0
 	while scene.get("_result_panel") == null and guard < 100:

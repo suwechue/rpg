@@ -1,0 +1,266 @@
+{
+  "enemies": [
+    {
+      "id": "mirror_kid",
+      "name": "Mirror Kid",
+      "tier": "normal",
+      "weeks": [
+        5
+      ],
+      "text": "A student-shaped reflection. It has your shoes.",
+      "hp": 26,
+      "movement": 4,
+      "initiative": 9,
+      "physDefense": 2,
+      "magicResist": 4,
+      "stability": 6,
+      "stats": {
+        "str": 6,
+        "dex": 8
+      },
+      "weakTo": [
+        "corrosion"
+      ],
+      "strongAgainst": [
+        "light"
+      ],
+      "signature": {
+        "light": 0.4,
+        "motion": 0.3,
+        "force": 0.3
+      },
+      "disposition": {
+        "courage": 50,
+        "curiosity": 50
+      },
+      "actions": [
+        {
+          "id": "copy",
+          "name": "Copycat",
+          "form": "bolt",
+          "vectors": {
+            "light": 1
+          },
+          "power": 8,
+          "profile": {
+            "curiosity": 0.8
+          }
+        },
+        {
+          "id": "shove",
+          "name": "Shove",
+          "kind": "strike",
+          "stat": "str",
+          "mult": 1.0,
+          "power": 3,
+          "vectors": {
+            "force": 1
+          },
+          "profile": {
+            "courage": 0.7
+          }
+        }
+      ],
+      "xp": 13,
+      "money": 6,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Spirit/SpriteSheet.png"
+    },
+    {
+      "id": "glass_hound",
+      "name": "Glass Hound",
+      "tier": "normal",
+      "weeks": [
+        5
+      ],
+      "text": "A dog made of shop windows. It barks in reflections.",
+      "hp": 30,
+      "movement": 5,
+      "initiative": 8,
+      "physDefense": 3,
+      "magicResist": 3,
+      "stability": 6,
+      "stats": {
+        "str": 8,
+        "dex": 7
+      },
+      "weakTo": [
+        "force"
+      ],
+      "strongAgainst": [
+        "cold",
+        "heat"
+      ],
+      "signature": {
+        "cold": 0.4,
+        "heat": 0.3,
+        "force": 0.3
+      },
+      "disposition": {
+        "courage": 70,
+        "loyalty": 60
+      },
+      "actions": [
+        {
+          "id": "shatter_bite",
+          "name": "Shatter Bite",
+          "kind": "strike",
+          "stat": "str",
+          "mult": 1.0,
+          "power": 4,
+          "vectors": {
+            "cold": 1
+          },
+          "profile": {
+            "courage": 0.9
+          }
+        }
+      ],
+      "xp": 13,
+      "money": 6,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Racoon/SpriteSheet.png"
+    },
+    {
+      "id": "town_echo",
+      "name": "Town Echo",
+      "tier": "normal",
+      "weeks": [
+        5
+      ],
+      "text": "Something that says 'have a nice day' until you don't.",
+      "hp": 24,
+      "movement": 3,
+      "initiative": 6,
+      "physDefense": 2,
+      "magicResist": 5,
+      "stability": 6,
+      "stats": {
+        "str": 5,
+        "dex": 5
+      },
+      "weakTo": [
+        "light"
+      ],
+      "strongAgainst": [
+        "binding",
+        "motion"
+      ],
+      "signature": {
+        "binding": 0.5,
+        "motion": 0.5
+      },
+      "disposition": {
+        "kindness": -50,
+        "pride": 40
+      },
+      "actions": [
+        {
+          "id": "small_talk",
+          "name": "Small Talk",
+          "form": "burst",
+          "vectors": {
+            "binding": 1
+          },
+          "power": 8,
+          "profile": {
+            "pride": 0.7
+          }
+        },
+        {
+          "id": "pull",
+          "name": "Pull",
+          "form": "projectile",
+          "vectors": {
+            "motion": 1
+          },
+          "power": 7,
+          "profile": {
+            "courage": 0.5
+          }
+        }
+      ],
+      "xp": 12,
+      "money": 6,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Bamboo/SpriteSheet.png"
+    },
+    {
+      "id": "mr_b_aide",
+      "name": "Hall Monitor",
+      "tier": "elite",
+      "weeks": [
+        5
+      ],
+      "text": "Mr. B's reflection's assistant. It has a clipboard and your name. Elite.",
+      "hp": 64,
+      "movement": 4,
+      "initiative": 8,
+      "physDefense": 4,
+      "magicResist": 6,
+      "stability": 6,
+      "stats": {
+        "str": 8,
+        "dex": 7
+      },
+      "weakTo": [
+        "light",
+        "heat"
+      ],
+      "strongAgainst": [
+        "binding",
+        "corrosion"
+      ],
+      "signature": {
+        "binding": 0.6,
+        "corrosion": 0.4
+      },
+      "disposition": {
+        "pride": 90,
+        "greed": 70,
+        "kindness": -70
+      },
+      "actions": [
+        {
+          "id": "write_you_up",
+          "name": "Write You Up",
+          "form": "bolt",
+          "vectors": {
+            "binding": 1
+          },
+          "power": 11,
+          "target": "strongest",
+          "profile": {
+            "pride": 1.0
+          }
+        },
+        {
+          "id": "rot",
+          "name": "Policy Rot",
+          "form": "burst",
+          "vectors": {
+            "corrosion": 1
+          },
+          "power": 10,
+          "profile": {
+            "greed": 0.8
+          }
+        },
+        {
+          "id": "detain",
+          "name": "Detain",
+          "kind": "strike",
+          "stat": "str",
+          "mult": 1.0,
+          "power": 5,
+          "vectors": {
+            "binding": 1
+          },
+          "profile": {
+            "courage": 0.8
+          }
+        }
+      ],
+      "xp": 46,
+      "money": 20,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Monster/Cyclope2/SpriteSheet.png"
+    }
+  ]
+}

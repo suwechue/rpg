@@ -1,0 +1,62 @@
+{
+  "comment": "Main story beats weeks 1-5 (DESIGN.md Section 13 and 18). Mr. B is in the background in week 1, escalates through weeks 2-4 and is revealed in week 5. Week 3's choice is about his cover-up. The narrator's identity stays open: lines hint at two candidates without confirming either.",
+  "stories": [
+    { "id": "s1_glimpse", "trigger": { "week": 1, "day": "tue", "part": "lunch" }, "inline": true,
+      "steps": [ { "type": "event", "event": { "title": "The front office window",
+        "text": "At lunch you notice the vice principal, Mr. B, standing at his office window, watching the cafeteria. He writes something down every time Kelly laughs. When he sees you looking, he smiles with exactly none of his face.",
+        "choices": [ { "label": "Look away", "effects": { "flag": "mr_b_seen" } }, { "label": "Wave", "effects": { "flag": "mr_b_seen", "bond": { "mr_b": -2 } }, "result": "He doesn't wave back. He writes something else down." } ] } } ] },
+
+    { "id": "s2_not_alone", "trigger": { "week": 2, "day": "mon", "part": "lunch" }, "inline": true,
+      "steps": [ { "type": "event", "event": { "title": "You're not the only one",
+        "text": "At lunch, Theo slides into the seat across from you, followed by Mara, then Dex, then Priya, like they rehearsed it. Theo whispers: \"You go there too. At night. Don't you.\" They all do now. The spark is pulling more of you in.",
+        "choices": [
+          { "label": "\"Every night. Stick together?\"", "effects": { "bond": { "theo": 10, "mara": 10, "dex": 10, "priya": 10 }, "flag": "core_four_met" }, "result": "Four nods. Dex: \"Okay but hear me out: team name.\"" },
+          { "label": "\"I can handle it alone.\"", "effects": { "bond": { "theo": 4, "mara": 4, "dex": 4, "priya": 4 }, "flag": "core_four_met" }, "result": "\"Sure,\" says Priya. \"Offer stands.\"" }
+        ] } } ] },
+    { "id": "s2_office", "trigger": { "week": 2, "day": "wed", "part": "before_school" }, "inline": true,
+      "steps": [ { "type": "event", "event": { "title": "Called to the office", "speaker": "Mr. B",
+        "text": "\"Sit.\" Mr. B's office has no pictures, only files. One has your name. \"Transfer students do very well here when they keep their heads down. The ones who wander at night...\" He lets it hang. \"This isn't personal. It's policy.\"",
+        "choices": [
+          { "label": "\"Understood, sir.\"", "effects": { "flag": "mr_b_warned", "bond": { "mr_b": 3 } }, "result": "\"Good.\" The file goes back in the drawer. Not the trash. The drawer." },
+          { "label": "\"Do a lot of students wander at night?\"", "cond": { "minStat": { "cha": 7 } }, "lockedHint": "CHA 7", "effects": { "flag": ["mr_b_warned", "mr_b_suspicious"], "bond": { "mr_b": -8 } }, "result": "He stops writing. \"Fewer every year.\"" }
+        ] } } ] },
+
+    { "id": "s3_coverup", "trigger": { "week": 3, "day": "wed", "part": "after_school" }, "inline": true,
+      "steps": [ { "type": "event", "event": { "title": "Transfers", "speaker": "Diane",
+        "text": "A school-wide announcement: three more students 'transferred' this week. Diane catches you at the lockers and opens her notebook. Every name has the same signature on the paperwork: Mr. B. \"I'm documenting this. I'm not necessarily SENDING it anywhere. Unless you think I should.\"",
+        "choices": [
+          { "label": "\"Post it. The whole town should see this.\"", "effects": { "flag": ["exposed_mr_b", "mr_b_evidence"], "bond": { "diane": 8, "mr_b": -20 }, "signature": { "binding": 3 } },
+            "result": "By the end of the day it's on the town square notice board. By morning it's gone. But people saw it. Mr. B saw that people saw it." },
+          { "label": "\"Keep it quiet. He's dangerous.\"", "effects": { "flag": ["went_along", "mr_b_evidence"], "bond": { "diane": 3 } },
+            "result": "Diane closes the notebook. \"Agreed. For now.\" The announcements keep coming." },
+          { "label": "\"Give it to me. I'll take it to the Mayor.\"", "effects": { "flag": ["told_mayor", "mr_b_evidence"], "bond": { "mayor": -4, "diane": 5 } },
+            "result": "The Mayor reads it, goes pale, and puts it in a drawer. 'I'll look into it.' He won't. He can't." }
+        ] } } ] },
+    { "id": "s3_narrator", "trigger": { "week": 3, "day": "sat", "part": "afternoon" }, "inline": true,
+      "steps": [ { "type": "event", "event": { "title": "The narrator, briefly", "speaker": "The narrator",
+        "text": "\"Funny thing about narrators,\" says the voice, closer than usual. \"We always know how the story ends. That's either very comforting or very sinister. I go back and forth.\" For a second it sounds a lot like you. Then, for a second, it sounds like someone with a file on everyone.",
+        "choices": [ { "label": "\"Who ARE you?\"", "effects": { "narratorBond": 2, "flag": "narrator_teased" }, "result": "\"Week five,\" says the narrator. \"Probably.\"" } ] } } ] },
+
+    { "id": "s4_trust", "trigger": { "week": 4, "day": "thu", "part": "lunch" }, "inline": true,
+      "steps": [ { "type": "event", "event": { "title": "What you know",
+        "text": "Dr. Reyes's private log, Ms. Nonsense's cut-up yearbook, Diane's notebook, the chart from the closed wing: you finally have the shape of it. Mr. B has been feeding 'inconvenient' people to the Upside-Down for thirty years. You can't carry this alone.",
+        "choices": [
+          { "label": "Trust Dr. Reyes", "effects": { "flag": "trusted_reyes", "bond": { "dr_reyes": 10 } }, "result": "\"I've known for years,\" she says. \"I needed someone to say it out loud.\"" },
+          { "label": "Trust Ms. Nonsense", "effects": { "flag": "trusted_nonsense", "bond": { "ms_nonsense": 12 } }, "result": "\"I'm not telling you this because I like you,\" she says, and tells you everything." },
+          { "label": "Trust your party", "effects": { "flag": "trusted_party", "bond": { "theo": 5, "mara": 5, "dex": 5, "priya": 5 } }, "result": "Nobody laughs. Not even Dex." },
+          { "label": "Keep it to yourself", "effects": { "flag": "trusted_nobody" }, "result": "You carry it. It's heavy. The narrator says nothing, which is new." }
+        ] } } ] },
+
+    { "id": "s5_mirror", "trigger": { "week": 5, "day": "mon", "part": "before_school" }, "inline": true,
+      "steps": [ { "type": "event", "event": { "title": "The Mirror Town",
+        "text": "You wake up and the town is wrong. Not Upside-Down wrong: reflected wrong. Signs read backwards. The Innocent Bystander says \"Sure. Why not.\" to nobody. The woods have come one street closer. It isn't under the town anymore. It's the town.",
+        "choices": [ { "label": "Go to school anyway", "effects": { "flag": "mirror_town_started" } } ] } } ] },
+    { "id": "s5_reveal_mr_b", "trigger": { "week": 5, "day": "wed", "part": "after_school" }, "inline": true,
+      "steps": [ { "type": "event", "event": { "title": "Mr. B stops pretending", "speaker": "Mr. B",
+        "text": "Mr. B is waiting on the front steps, alone, in the rain that only falls on him. \"You were supposed to be inconvenient quietly.\" He doesn't raise his voice. \"Thirty years. Do you know how much paperwork it takes to make a town forget a child? Friday, the Upside-Down takes the whole town. And the town will thank me for the quiet.\"",
+        "choices": [
+          { "label": "\"Not if we stop it.\"", "effects": { "flag": "mr_b_revealed" }, "result": "\"Policy,\" he says, and walks into the rain, and the rain walks with him." },
+          { "label": "\"Everyone knows what you did.\"", "cond": { "flag": "exposed_mr_b" }, "lockedHint": "If you exposed him", "effects": { "flag": ["mr_b_revealed", "mr_b_shaken"] }, "result": "For the first time, his pen stops. \"They forget,\" he says. He doesn't sound sure." }
+        ] } } ] }
+  ]
+}

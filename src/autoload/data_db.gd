@@ -177,6 +177,19 @@ func _validate_events() -> void:
 		if not table("school_classes").get("professors", {}).has(str(c.get("professor", ""))):
 			errors.append("class %s: unknown professor '%s'" % [c["id"], c.get("professor")])
 	for key in _tables:
+		if str(key).begins_with("story/"):
+			for st in _tables[key].get("stories", []):
+				for step in st.get("steps", []):
+					var ev: Dictionary = step.get("event", {})
+					for ch in ev.get("choices", []):
+						_validate_effects("%s/%s" % [key, st.get("id")], ch.get("effects", {}))
+						if ch.has("misheard"):
+							_validate_effects("%s/%s misheard" % [key, st.get("id")], ch["misheard"].get("effects", {}))
+				for step in st.get("steps", []):
+					if str(step.get("type", "")) == "combat":
+						for e in step.get("enemies", []):
+							if not _enemy_ids().has(str(e)):
+								errors.append("%s/%s: unknown enemy '%s'" % [key, st.get("id"), e])
 		if not str(key).begins_with("events/"):
 			continue
 		for e in _tables[key].get("events", []):
@@ -209,3 +222,10 @@ func _validate_town() -> void:
 		for e in s.get("entries", []):
 			if str(e.get("type", "")) == "item" and record("items", str(e.get("item", ""))).is_empty():
 				errors.append("shop %s: unknown item '%s'" % [s.get("id"), e.get("item")])
+
+
+func _enemy_ids() -> Dictionary:
+	var out := {}
+	for e in records_under("enemies/", "enemies"):
+		out[str(e["id"])] = true
+	return out

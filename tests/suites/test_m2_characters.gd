@@ -10,6 +10,8 @@ const VO := preload("res://src/core/vector_ops.gd")
 
 func test_create_every_class() -> void:
 	for cls in db()["classes"]["classes"]:
+		if int(cls.get("tier", 1)) != 1:
+			continue
 		var ch := Char.create(db(), str(cls["id"]), seeded(5))
 		check(ch["class"] == cls["id"], "class set for %s" % cls["id"])
 		check(ch["knownVectors"].size() == int(cls.get("startVectors", 1)), "%s knows its starting Vectors" % cls["id"])
@@ -115,9 +117,10 @@ func test_deck_shuffle_is_seeded() -> void:
 
 
 func test_xp_curve() -> void:
-	check(Lv.xp_to_next(db(), 1) == 20 and Lv.xp_to_next(db(), 4) == 80, "level n needs 20 x n")
+	var per := int(db()["leveling"]["xpPerLevel"])
+	check(Lv.xp_to_next(db(), 1) == per and Lv.xp_to_next(db(), 4) == per * 4, "level n needs xpPerLevel x n")
 	var ch := Char.create(db(), "fighter", seeded(2))
-	var reports := Lv.add_xp(db(), ch, 20 + 40 + 5, seeded(2))
+	var reports := Lv.add_xp(db(), ch, per + per * 2 + 5, seeded(2))
 	check(reports.size() == 2 and ch["level"] == 3 and ch["xp"] == 5, "XP carries over across levels")
 	var gained := 0
 	for r in reports:

@@ -41,6 +41,11 @@ static func end_day(db: Dictionary, run: Dictionary) -> Array:
 	var lines: Array = []
 	Char.full_restore(db, run["player"])
 	for m in run.get("roster", []):
+		if m.has("pendingClassChange"):
+			var cls := preload("res://src/core/progression/class_change.gd").auto_advance(db, run, m)
+			if cls != "":
+				var cname := str(db.get("classes", {}).get("classes", []).filter(func(c: Variant) -> bool: return str(c["id"]) == cls)[0].get("name", cls))
+				lines.append("%s grew into %s %s." % [m.get("name", "?"), "an" if "AEIOU".contains(cname.left(1)) else "a", cname])
 		Char.full_restore(db, m)
 		if int(m.get("injured", 0)) > 0:
 			m["injured"] = int(m["injured"]) - 1

@@ -105,6 +105,7 @@ func label(text: String, color: Color = TEXT, size: int = FONT_SIZE) -> Label:
 func button(text: String, callback: Callable) -> Button:
 	var b := Button.new()
 	b.text = text
+	b.pressed.connect(func() -> void: Audio.play_sfx("click"))
 	b.pressed.connect(callback)
 	b.focus_mode = Control.FOCUS_ALL
 	return b

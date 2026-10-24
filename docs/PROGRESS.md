@@ -12,7 +12,7 @@ Claude Code updates this at the end of every milestone and before stopping, so a
 | M5 Town | Done | 4 walkable zones built from data with Kenney tiles, 72 locations with status/hours/door lines, 13 interiors, 35 NPC records with homes and schedules, doorstep talks, shops (deli, forge, hospital, corner store), items and gear |
 | M6 Social system | Done | 134 topics across 34 characters with CHA Gates, reception by Match, misheard lines, moods, gifts, hangouts, staggered recruitment, party screen, narrator Bond tone, the week 1 Monday Kelly scenario (lunch, disruption, evening tutorial floor with guest Kelly) with Kelly Risk and both outcomes |
 | M7 The Upside-Down | Done | Weekly signature from data + town events, seeded floors Mon-Thu, Friday boss floor with fled-first returning fights, The Hollow Mascot (3 phases), rooms (combat, elite, treasure, rest, event, merchant, exit), shards, party scaling, woods-edge party pick, Narrator's Journal, death summary; week 1 plays end to end |
-| M8 Alpha content and polish | Not started | |
+| M8 Alpha content and polish | Done | Weeks 2-5 (18 more enemies, 4 bosses with phases), 10 advanced classes with Class Change at 5/12 and working signature perks, perk picks, Mr. B's arc and the week 3/4 choices, NARRATOR_REVEAL_TBD finale with a branching alpha ending, 4 crafting minigames, audio pass, balance pass. A full 5-week run completes in the real scenes |
 
 ## Next step
 
@@ -74,6 +74,16 @@ Start M7 (the Upside-Down: weekly signature shaped by town events, seeded floors
 - Balance tool: `tools/sim_nights.gd` (`-- --allies=N`) simulates nights with the AI.
 - Smoke: a full week 1 runs end to end in the real scenes (Hollow Mascot beaten, week 2 reached).
 
+### M8 (done)
+- Classes: 10 advanced classes in `data/classes.json` (requirements, growth, mods, granted Forms/Vectors, signature perk). `src/core/progression/class_change.gd` (options, requirement reasons, apply keeping one perk, recruits auto-advance into their dossier class overnight). Screens: `class_change_screen.gd`, `perk_screen.gd` (Flow shows them at the next part start). Perks in combat: prism, momentum, spellsteel, bulwark_aura, sleight, lifeline, encore, brunch, constructor, unstable.
+- Content: `data/enemies/week2..5.json` (18 normals and elites), bosses The Cold Cut, The Forge Revenant, The Night Ward, The Mirror Town; `data/story/main_story.json` (Mr. B glimpsed week 1, warns you week 2, cover-up choice week 3, trust choice week 4, the Mirror Town and his reveal week 5, the narrator teasing identities). `src/scenes/story/narrator_reveal_tbd.tscn` is the marked placeholder finale; `data/endings.json` "alpha" branches on exposed/told/went along and Friend-or-better Bonds, then credits; the Journal records "alpha_complete".
+- Minigames: `src/scenes/minigames/` thermal (hold to heat, stay in the band), precision (timing bar), alignment (lock spinning rings), chemical (arrow sequence); chosen by archetype from `data/minigames.json`.
+- Audio: button clicks, weekend music, music per scene (title, town, school, night, dungeon, boss floor, battle, boss battle, death, reveal, ending).
+- Balance: `tools/sim_run.gd` simulates all dungeon nights of a run. Result after tuning (AI plays, 4 runs per class): 12 of 20 runs finish, all at level 14.
+- Done when: `tests/smoke_full_run.gd` plays a whole 5-week run in the real scenes and records the alpha ending (Fighter seed 5150 and Mage seed 777 both complete, 93 fights each, about 3 minutes at 8x).
+- Fixed late: a fight whose last enemy died at the start of a turn (burning tile, hazard, aura, Fatigue) never ended. AI retreat now fades over ~12 rounds so cowardly enemies can't kite forever. `tests/smoke_full_run.gd` has a stall watchdog (fails after 60 s without progress or a fight past 40 rounds). The week 5 boss was eased (230 HP, one Mirror Kid).
+- Debug (F1) Social section: +Bond, recruit anyone, Kelly Risk. Dev flag `--fight=boss_id --layout=...` opens a fight.
+
 ## Decisions made during development
 
 - **Git:** `origin` is https://github.com/suwechue/rpg.git; every milestone commit is pushed. Art and audio under `assets/` are tracked with Git LFS.
@@ -120,6 +130,12 @@ Start M7 (the Upside-Down: weekly signature shaped by town events, seeded floors
 - **The Healer starts with a Light Bolt** (3 copies instead of 2 Light Jabs and 1 Aura) so a solo Healer can finish fights.
 - **Journal unlocks** are sidegrade starting traits (Night Owl, Clear Speaker, Early Bird, Warm Hands, Cold Feet), never raw power.
 - **Balance snapshot (AI plays, 20 seeds, week 1 nights, Tue/Wed/Thu/Fri survival):** solo Fighter 16/17/17/15, solo Mage 9/13/10/3, with one ally most classes 12-20 on weekdays and 5-15 on Friday. The AI never flees or leaves early; a player can.
+- **XP curve:** 45 x level XP per level (was 20 in Nexus) so a run ends around level 12 to 14, as DESIGN.md targets.
+- **After a won fight** everyone standing recovers 20% of max HP (MP still doesn't refill, per Section 18). Without it the AI party died on about 10% of nights.
+- **Encounter scaling** is gentler by week (x1, x1, x1.15, x1.35, x1.55, x1.75 for weeks 0-5) and by party size (solo 75% power, two 82%, three 90%, four 100%).
+- **Advanced classes:** Kinetic Logician also accepts Fighters (Kris's dossier), Idol's "befriended the cheer squad" is Bond 20 with Kara and Kayla, Deli Knight's "Gary bond tier 3" is Friend (41+), Smith-Mage's apprentice flag comes from offering to help the blacksmith. At level 12 you can take Upside-Touched or any Tier 2 class you skipped. Perk levels 6 and 9 keep offering your starting class's perk list.
+- **Week 2 story beat** brings the Core Four to your lunch table (+10 Bond each if you ask them to stick together), which keeps recruitment reachable in week 2 as Section 18 asks.
+- **The finale** goes straight from week 5's boss floor to NARRATOR_REVEAL_TBD and the ending; the run is over and the save is cleared.
 - **Magic Resistance as a percent:** each point of Magic Resistance is 2% spell damage reduction, capped at 60% (`stats.json` combat block).
 
 ## Stubs and known issues
@@ -129,4 +145,8 @@ Start M7 (the Upside-Down: weekly signature shaped by town events, seeded floors
 
 - Town art: interior furniture is drawn rectangles; water is drawn; road intersections reuse the horizontal road tile.
 - Floors use generic rooms with a theme tint, not ~10 hand-built chunks per theme.
-- The crafting minigame is one timing bar for all 4 archetypes (M8 makes distinct ones).
+- Not authored yet: Close-tier combo cards, Unbreakable personal arcs and unique cards, Schoolamon, the classroom-scheme minigame, interiors for EXTERIOR places, CLOSED places (hooks exist in data).
+- Class events are week-agnostic (64 events, about 7 per class); weeks 2-5 rely on story beats, town events and dungeon events for variety.
+- The narrator's identity reveal is the NARRATOR_REVEAL_TBD placeholder by design.
+- Binding tethers and hidden enemies (Light's reveal) are not implemented.
+- `tests/smoke_full_run.gd` is not part of the regular smoke run (it takes a few minutes); run it before releases.

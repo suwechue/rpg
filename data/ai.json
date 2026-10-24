@@ -6,6 +6,7 @@
   "moveCostPerStep": 0.05,
   "retreatBase": 1.0,
   "retreatHurt": 6.0,
+  "retreatFadeRounds": 12,
   "defaultDisposition": { "courage": 40, "loyalty": 40, "kindness": 20 },
   "advanceBase": 2.0,
   "guardBase": 0.6,

@@ -47,6 +47,10 @@ static func level_up(db: Dictionary, ch: Dictionary, rng: RandomNumberGenerator)
 		_note_roll(report, f)
 	if update_knowledge_tier(db, ch):
 		report["tierUp"] = true
+	for l in cfg(db).get("classChangeLevels", [5, 12]):
+		if int(l) == level:
+			ch["pendingClassChange"] = level
+			report["classChange"] = true
 	var choices := perk_options(db, ch, level)
 	if not choices.is_empty():
 		report["perkChoices"] = choices
@@ -142,11 +146,16 @@ static func perk_options(db: Dictionary, ch: Dictionary, level: int) -> Array:
 		offered = offered or int(l) == level
 	if not offered:
 		return []
-	var out: Array = []
-	for p in DT.records_under(db, "perks", "perks"):
-		if str(p.get("class", "")) == str(ch.get("class", "")) and int(p.get("level", 0)) == level:
-			out.append(str(p["id"]))
-	return out
+	var history: Array = ch.get("classHistory", [ch.get("class", "")]).duplicate()
+	history.reverse()
+	for cls in history:
+		var out: Array = []
+		for p in DT.records_under(db, "perks", "perks"):
+			if str(p.get("class", "")) == str(cls) and int(p.get("level", 0)) == level:
+				out.append(str(p["id"]))
+		if not out.is_empty():
+			return out
+	return []
 
 
 ## Take a perk for the oldest pending perk level. Returns false if not offered.
