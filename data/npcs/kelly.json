@@ -51,5 +51,122 @@
       "weekend_evening": "home"
     }
   },
-  "greeting": "Wow, you're STILL here."
+  "greeting": "Wow, you're STILL here.",
+  "topics": [
+    {
+      "id": "kelly_cheer",
+      "label": "Compliment her cheer routine",
+      "tone": {
+        "kindness": 0.5,
+        "pride": 0.8
+      },
+      "line": "That routine was actually really impressive.",
+      "baseRisk": 0.2,
+      "goodText": "\"...Obviously.\" A pause. \"Thanks.\" It sounds like it cost her something.",
+      "badText": "\"Wow. Hilarious.\" She thinks you're mocking her.",
+      "misheard": [
+        {
+          "line": "That routine was actually... impressive?",
+          "tone": {
+            "pride": -0.8,
+            "kindness": -0.3
+          }
+        },
+        {
+          "line": "Is the routine always that long?",
+          "tone": {
+            "pride": -0.7
+          }
+        }
+      ]
+    },
+    {
+      "id": "kelly_upside",
+      "label": "Ask about the Upside-Down",
+      "tone": {
+        "curiosity": 0.6,
+        "courage": 0.6
+      },
+      "line": "That place last night. Are you okay?",
+      "baseRisk": 0.3,
+      "goodText": "\"I'm fine. I'm-- I was scared, okay?\" Then, fast: \"I didn't say that.\"",
+      "badText": "\"I don't know what you're talking about.\" She's lying, badly.",
+      "gate": {
+        "cha": 6
+      },
+      "cond": {
+        "flag": "survived_w1_monday"
+      },
+      "lockedHint": "After that first night"
+    },
+    {
+      "id": "kelly_joke",
+      "label": "Joke about the cheer squad",
+      "tone": {
+        "curiosity": 0.8
+      },
+      "line": "So is the pyramid structural, or emotional support?",
+      "baseRisk": 0.2,
+      "goodText": "She laughs. Despite herself. Then glares at you for making her laugh.",
+      "badText": "\"Funny. You should try out for the squad. As the mascot.\"",
+      "misheard": [
+        {
+          "line": "So is the squad structural, or just emotional?",
+          "tone": {
+            "pride": -0.8,
+            "kindness": -0.4
+          }
+        }
+      ]
+    },
+    {
+      "id": "kelly_walk",
+      "label": "Offer to walk her home",
+      "tone": {
+        "kindness": 1.0
+      },
+      "line": "It's getting dark early. I could walk you home.",
+      "baseRisk": 0.3,
+      "goodText": "\"I don't NEED-- ...fine. Whatever. Don't make it weird.\"",
+      "badText": "\"Pass.\" Flustered, deflecting hard.",
+      "gate": {
+        "cha": 8
+      },
+      "minTier": "Acquaintance"
+    },
+    {
+      "id": "kelly_squad",
+      "label": "Ask about Kara and Kayla",
+      "tone": {
+        "curiosity": 0.4,
+        "loyalty": 0.4
+      },
+      "line": "Kara and Kayla seem... a lot.",
+      "baseRisk": 0.05,
+      "goodText": "\"They're mine. Don't.\" Protective, and a little pleased you noticed.",
+      "badText": "\"Did they say something about me?\" Suddenly sharp."
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "squad",
+      "coffee",
+      "cheer"
+    ],
+    "dislikes": [
+      "chainfood",
+      "joke"
+    ],
+    "likeText": "\"These are literally our colors.\" She tries to hide how pleased she is. Fails.",
+    "dislikeText": "\"Is this... pity? Don't.\""
+  },
+  "hangouts": [
+    "You watch cheer practice from the bleachers. Kelly pretends not to notice. She notices.",
+    "You split fries at Gary's. She steals most of them. It feels like a privilege."
+  ],
+  "recruitBond": 60,
+  "recruitFlag": "kelly_survived_kind",
+  "recruitHint": "She needs to know you won't leave her behind again.",
+  "recruitText": "\"Fine. I'm in. But if you get me killed, I'm haunting you.\" She means: thank you.",
+  "helpLine": "HEY. New kid. A little help?!"
 }

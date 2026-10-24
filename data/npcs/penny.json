@@ -45,5 +45,81 @@
     },
     "weekend": {}
   },
-  "greeting": "We are not friends. We are rivals. There's a difference."
+  "greeting": "We are not friends. We are rivals. There's a difference.",
+  "topics": [
+    {
+      "id": "penny_challenge",
+      "label": "Challenge her academically",
+      "tone": {
+        "pride": 1.0
+      },
+      "line": "I bet I score higher than you on the next test.",
+      "baseRisk": 0.05,
+      "goodText": "She respects the challenge, even annoyed.",
+      "badText": "\"Adorable.\""
+    },
+    {
+      "id": "penny_baxter",
+      "label": "Ask about her rivalry with Baxter",
+      "tone": {
+        "curiosity": 0.9
+      },
+      "line": "What's the deal with you and Baxter?",
+      "baseRisk": 0.05,
+      "goodText": "A long, very specific rant she clearly needed to get out.",
+      "badText": "\"There is no deal.\"",
+      "gate": {
+        "cha": 8
+      }
+    },
+    {
+      "id": "penny_want",
+      "label": "Ask what she actually wants",
+      "tone": {
+        "kindness": 1.0
+      },
+      "line": "What do you actually want?",
+      "baseRisk": 0.3,
+      "goodText": "Real vulnerability, briefly. Then she redoes her ponytail.",
+      "badText": "\"To win.\"",
+      "gate": {
+        "cha": 14
+      },
+      "minTier": "Friend"
+    },
+    {
+      "id": "penny_same",
+      "label": "Point out she and Baxter are the same person",
+      "tone": {
+        "pride": 0.6
+      },
+      "line": "You and Baxter are basically the same person.",
+      "baseRisk": 0.3,
+      "goodText": "She stares. \"...that's the worst thing anyone has ever said to me.\" She laughs anyway.",
+      "badText": "She takes real offense.",
+      "misheard": [
+        {
+          "line": "You and Baxter would make a great couple.",
+          "tone": {
+            "pride": -1.0
+          }
+        }
+      ]
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "academic",
+      "precise",
+      "rare"
+    ],
+    "dislikes": [
+      "absurd"
+    ],
+    "likeText": "\"This is acceptable.\" Very high praise."
+  },
+  "hangouts": [
+    "You study with Penny. She redoes your answers five times. They're right now."
+  ],
+  "recruitText": "\"We are not friends. We are allies.\" She's in."
 }

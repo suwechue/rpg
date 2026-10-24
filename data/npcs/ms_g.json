@@ -34,5 +34,101 @@
       "sat"
     ]
   },
-  "greeting": "Okay but have you ever thought about momentum as a METAPHOR--"
+  "greeting": "Okay but have you ever thought about momentum as a METAPHOR--",
+  "topics": [
+    {
+      "id": "g_vectors",
+      "label": "Ask about the Vectors scientifically",
+      "tone": {
+        "curiosity": 1.0
+      },
+      "line": "Is magic just physics?",
+      "baseRisk": 0.05,
+      "goodText": "\"Okay but have you ever thought about momentum as a METAPHOR--\" Twenty minutes later you understand Force better.",
+      "badText": "She's distracted. \"Hm? Later.\"",
+      "outcomes": {
+        "onGood": {
+          "affinity": {
+            "force": 1,
+            "motion": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "g_tier3",
+      "label": "Ask about Tier 3 magic",
+      "tone": {
+        "curiosity": 1.0
+      },
+      "line": "Is there magic beyond Light and Binding?",
+      "baseRisk": 0.2,
+      "goodText": "\"Transmutation. Vitality. Corrosion. Don't tell anyone I said those words.\"",
+      "badText": "\"Let's stay in the syllabus.\"",
+      "gate": {
+        "cha": 14
+      },
+      "outcomes": {
+        "onGood": {
+          "flag": "tier3_hint"
+        }
+      }
+    },
+    {
+      "id": "g_redirect",
+      "label": "Try to redirect her to the lesson",
+      "tone": {
+        "pride": 0.6
+      },
+      "line": "So... about the assignment?",
+      "baseRisk": 0.2,
+      "goodText": "\"Right, right, the assignment. Anyway, entropy--\" It does not work.",
+      "badText": "She thinks you're into the tangent and gets MORE excited.",
+      "misheard": [
+        {
+          "line": "So... about entropy?",
+          "tone": {
+            "curiosity": 0.9
+          }
+        }
+      ]
+    },
+    {
+      "id": "g_experiment",
+      "label": "Offer to help with an experiment",
+      "tone": {
+        "loyalty": 0.5,
+        "curiosity": 0.6
+      },
+      "line": "Need help with an experiment?",
+      "baseRisk": 0.05,
+      "goodText": "\"YES. Goggles. Now.\" A sidequest begins. Possibly a fire.",
+      "badText": "\"Not today, it's volatile.\"",
+      "outcomes": {
+        "onGood": {
+          "flag": "ms_g_experiment"
+        }
+      }
+    },
+    {
+      "id": "g_grading",
+      "label": "Ask about the school's grading system",
+      "tone": {
+        "curiosity": 0.8
+      },
+      "line": "How does grading work here?",
+      "baseRisk": 0.05,
+      "goodText": "She gets weirdly excited about 'statistical outliers' on certain kids' transcripts.",
+      "badText": "She launches into her own grading curve instead."
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "lab",
+      "science",
+      "theory"
+    ],
+    "dislikes": [],
+    "likeText": "\"It BEEPS. Do you know what this MEANS?\" Neither of you do."
+  }
 }

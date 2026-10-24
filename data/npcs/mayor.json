@@ -28,5 +28,67 @@
       "afternoon": "town_square"
     }
   },
-  "greeting": "Great to see a young face! Vote-- er, welcome to town!"
+  "greeting": "Great to see a young face! Vote-- er, welcome to town!",
+  "topics": [
+    {
+      "id": "mayor_hello",
+      "label": "Ask how the town is doing",
+      "tone": {
+        "pride": 0.6,
+        "loyalty": 0.3
+      },
+      "line": "How's the town doing, Mayor?",
+      "baseRisk": 0.05,
+      "goodText": "\"Never better! Fine! Very fine!\" He wants the town to be fine so badly.",
+      "badText": "\"No comment-- I mean, great!\""
+    },
+    {
+      "id": "mayor_vp",
+      "label": "Ask about the vice principal's recommendations",
+      "tone": {
+        "courage": 0.9
+      },
+      "line": "Do you take a lot of advice from Mr. B?",
+      "baseRisk": 0.3,
+      "goodText": "He goes pale. \"He's... very helpful. With paperwork.\" Compromised.",
+      "badText": "\"I don't know what you're implying.\"",
+      "gate": {
+        "cha": 11
+      },
+      "outcomes": {
+        "onGood": {
+          "flag": "mayor_compromised_hint"
+        }
+      },
+      "cond": {
+        "minWeek": 2
+      }
+    },
+    {
+      "id": "mayor_missing",
+      "label": "Ask about people who 'moved away'",
+      "tone": {
+        "courage": 0.7,
+        "kindness": 0.3
+      },
+      "line": "A lot of people move away from this town.",
+      "baseRisk": 0.05,
+      "goodText": "\"Opportunity elsewhere! Big world!\" He avoids the question.",
+      "badText": "\"Next question!\"",
+      "gate": {
+        "cha": 9
+      },
+      "cond": {
+        "minWeek": 3
+      }
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "photo",
+      "food"
+    ],
+    "dislikes": [],
+    "likeText": "\"For the archives! Wonderful.\""
+  }
 }

@@ -30,5 +30,114 @@
       "weekend_evening": "garys_deli"
     }
   },
-  "greeting": "You want the good stuff or the MENU stuff?"
+  "greeting": "You want the good stuff or the MENU stuff?",
+  "topics": [
+    {
+      "id": "gary_recipe",
+      "label": "Ask for the recipe",
+      "tone": {
+        "curiosity": 0.7,
+        "greed": 0.3
+      },
+      "line": "So what's actually in the sandwich?",
+      "baseRisk": 0.05,
+      "goodText": "\"Love. And none of your business.\" He's delighted you asked.",
+      "badText": "\"Nice try.\" The recipe is sacred."
+    },
+    {
+      "id": "gary_gossip",
+      "label": "Ask about town gossip",
+      "tone": {
+        "curiosity": 0.8,
+        "loyalty": 0.2
+      },
+      "line": "Heard anything interesting lately?",
+      "baseRisk": 0.05,
+      "goodText": "\"Todd didn't come in for his usual order today. Third time this month. Kid's got the weirdest schedule I've ever seen.\"",
+      "badText": "\"Me? I don't gossip.\" He gossips constantly.",
+      "gate": {
+        "cha": 4
+      },
+      "outcomes": {
+        "onGood": {
+          "flag": "rumor_todd"
+        }
+      }
+    },
+    {
+      "id": "gary_shift",
+      "label": "Ask for a part-time shift",
+      "tone": {
+        "loyalty": 0.8,
+        "kindness": 0.2
+      },
+      "line": "Could you use an extra pair of hands?",
+      "baseRisk": 0.05,
+      "goodText": "\"You show up, you work, you eat. That's the deal.\" Deli shifts unlocked.",
+      "badText": "\"Come back when you mean it.\"",
+      "outcomes": {
+        "onGood": {
+          "flag": "deli_job"
+        }
+      }
+    },
+    {
+      "id": "gary_weird",
+      "label": "Mention you saw something weird last night",
+      "tone": {
+        "courage": 0.8,
+        "curiosity": 0.3
+      },
+      "line": "Something happened last night. Something... wrong.",
+      "baseRisk": 0.3,
+      "goodText": "He gets very quiet. \"I didn't see anything. I see everything. But I didn't see THIS.\" He's seen it too.",
+      "badText": "\"Get some sleep, kid.\"",
+      "gate": {
+        "cha": 7
+      },
+      "outcomes": {
+        "onGood": {
+          "flag": "gary_knows"
+        }
+      },
+      "minTier": "Acquaintance"
+    },
+    {
+      "id": "gary_freezer",
+      "label": "Ask about the freezer",
+      "tone": {
+        "curiosity": 0.6,
+        "courage": 0.2
+      },
+      "line": "Your freezer's making a noise.",
+      "baseRisk": 0.05,
+      "goodText": "\"It's been doing that. Colder every night. Like it's thinking.\"",
+      "badText": "\"It's fine. It's FINE.\"",
+      "outcomes": {
+        "onGood": {
+          "signature": {
+            "cold": 2
+          }
+        }
+      },
+      "cond": {
+        "minWeek": 2
+      }
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "spice",
+      "photo",
+      "history"
+    ],
+    "dislikes": [
+      "chainfood"
+    ],
+    "likeText": "\"Where'd you find this?\" He tucks it behind the counter like treasure.",
+    "dislikeText": "\"You brought THAT into MY deli?\""
+  },
+  "hangouts": [
+    "Gary teaches you to wrap a sandwich so tight it could survive a fall. \"Life skill.\""
+  ]
 }

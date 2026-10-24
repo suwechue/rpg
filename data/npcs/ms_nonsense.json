@@ -31,5 +31,122 @@
       "sun"
     ]
   },
-  "greeting": "Pay attention. I will not repeat myself twice in one century."
+  "greeting": "Pay attention. I will not repeat myself twice in one century.",
+  "topics": [
+    {
+      "id": "nonsense_history",
+      "label": "Ask about town history",
+      "tone": {
+        "curiosity": 0.8
+      },
+      "line": "What's the real history of this town?",
+      "baseRisk": 0.05,
+      "goodText": "\"I'm not telling you this because I like you.\" She tells you about the winter the records skip.",
+      "badText": "\"Read the textbook.\"",
+      "gate": {
+        "cha": 8
+      },
+      "outcomes": {
+        "onGood": {
+          "flag": "lore_nonsense_winter"
+        }
+      }
+    },
+    {
+      "id": "nonsense_compliment",
+      "label": "Compliment her teaching",
+      "tone": {
+        "pride": 0.9
+      },
+      "line": "Your lectures are actually really good.",
+      "baseRisk": 0.2,
+      "goodText": "\"Obviously.\" But she stands a little straighter.",
+      "badText": "\"Whatever you want, the answer is no.\" She thinks you're angling to skip an assignment.",
+      "misheard": [
+        {
+          "line": "Your lectures are actually really... long.",
+          "tone": {
+            "pride": -0.9
+          }
+        }
+      ]
+    },
+    {
+      "id": "nonsense_upside",
+      "label": "Ask directly about the Upside-Down",
+      "tone": {
+        "courage": 0.7,
+        "curiosity": 0.7
+      },
+      "line": "I know about the Upside-Down. You do too.",
+      "baseRisk": 0.3,
+      "goodText": "A long silence. Then a dense, reluctant, furious lore dump.",
+      "badText": "\"Get out of my classroom.\"",
+      "gate": {
+        "cha": 15
+      },
+      "outcomes": {
+        "onGood": {
+          "flag": "lore_nonsense_upside"
+        }
+      },
+      "cond": {
+        "minWeek": 3
+      },
+      "lockedHint": "Week 3+"
+    },
+    {
+      "id": "nonsense_apologize",
+      "label": "Apologize for something",
+      "tone": {
+        "kindness": 0.9
+      },
+      "line": "I'm sorry. For... everything, probably.",
+      "baseRisk": 0.05,
+      "goodText": "She doesn't forgive easily. She does notice.",
+      "badText": "\"Noted.\""
+    },
+    {
+      "id": "nonsense_sambaxter",
+      "label": "Ask about Sam and Baxter",
+      "tone": {
+        "pride": 0.5,
+        "curiosity": 0.5
+      },
+      "line": "Do Sam and Baxter ever get caught?",
+      "baseRisk": 0.2,
+      "goodText": "\"Those two think I don't notice. I notice. I simply have better things to do than prove it.\"",
+      "badText": "\"Are you accusing ME of something?\"",
+      "misheard": [
+        {
+          "line": "Do YOU ever get caught?",
+          "tone": {
+            "pride": -0.9
+          }
+        }
+      ]
+    },
+    {
+      "id": "nonsense_todd",
+      "label": "Ask about Todd",
+      "tone": {
+        "curiosity": 0.6
+      },
+      "line": "Is Todd in your class?",
+      "baseRisk": 0.05,
+      "goodText": "\"Todd missed another exam. I've stopped asking why. The excuse notes have gotten *creative*.\"",
+      "badText": "\"Don't remind me.\""
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "book",
+      "history",
+      "academic"
+    ],
+    "dislikes": [
+      "joke"
+    ],
+    "likeText": "\"Correct citations.\" The closest she gets to a smile."
+  }
 }

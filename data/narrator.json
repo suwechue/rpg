@@ -1,0 +1,36 @@
+{
+  "comment": "The narrator's tone depends on your Bond with them: Rival or worse is sarcastic, Stranger is dry, Acquaintance and up is warmer. Keys pick situations; tiers fall back to 'dry'.",
+  "lines": {
+    "misheard": {
+      "sarcastic": ["Bold strategy, saying that out loud.", "And THAT is why we practice in the mirror.", "I'd tell you to be careful, but you're not going to listen, so."],
+      "dry": ["That is not what you said. It is, however, what they heard.", "Communication: an ancient art you have not mastered.", "Somewhere between your mouth and their ears, the sentence took a wrong turn."],
+      "warm": ["Oof. You meant well. They didn't hear 'well'.", "Not your fault. Mostly. Try again tomorrow.", "Words are hard. You're getting there."]
+    },
+    "good_talk": {
+      "sarcastic": ["Even a broken clock.", "Huh. Look at you, being a person."],
+      "dry": ["That went well. Note it for later.", "A connection. How novel."],
+      "warm": ["See? People like you. Some of them. This one.", "Nicely done."]
+    },
+    "bad_talk": {
+      "sarcastic": ["Spectacular. Truly.", "I'm writing this one down."],
+      "dry": ["That could have gone better. It could also have gone worse. Barely.", "Noted. By everyone."],
+      "warm": ["Rough one. Shake it off.", "Not every line lands. That one really didn't."]
+    },
+    "foreshadow": {
+      "sarcastic": ["Keep being like this. See where it gets you. (Somewhere dark, small and collapsing.)", "Some people panic under pressure. Some people CAUSE the pressure. Guess which one you are."],
+      "dry": ["Remember this moment. Kelly will.", "People who panic tend to remember who stood next to them. And who didn't."],
+      "warm": ["Whatever happens tonight, she'll remember who was kind to her.", "Pressure does strange things to people. Be the steady one."]
+    },
+    "hint": {
+      "sarcastic": ["There's a gap behind the deli. You'd see it if you looked. You never look.", "Ever notice Earth Science predicts the weather down there too? No? Of course not."],
+      "dry": ["The alley behind the deli is worth a look, if your eyes are sharp enough.", "Earth Science class has opinions about tonight's weather. Listen to them."],
+      "warm": ["Psst: the alley behind Gary's. Sharp eyes, PER 7.", "The weather station in the Earth Science room tells you what tonight will be like."]
+    },
+    "greeting": {
+      "sarcastic": ["Oh good, you again.", "You again. Wonderful. Riveting."],
+      "dry": ["You found me. Most people don't look.", "I'm the voice. You're the protagonist. Allegedly."],
+      "warm": ["There you are. I was narrating to nobody.", "Hey, you. Sit. The woods are listening anyway."]
+    }
+  },
+  "tiers": { "Enemy": "sarcastic", "Rival": "sarcastic", "Stranger": "dry", "Acquaintance": "warm", "Friend": "warm", "Close": "warm", "Unbreakable": "warm" }
+}

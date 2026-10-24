@@ -29,5 +29,84 @@
       "morning": "gym"
     }
   },
-  "greeting": "Again."
+  "greeting": "Again.",
+  "topics": [
+    {
+      "id": "byrne_past",
+      "label": "Ask about her athletic past",
+      "tone": {
+        "pride": 0.6,
+        "curiosity": 0.5
+      },
+      "line": "Did you ever compete?",
+      "baseRisk": 0.2,
+      "goodText": "\"Almost went pro.\" She doesn't elaborate. Her jaw does.",
+      "badText": "\"Run a lap.\"",
+      "gate": {
+        "cha": 10
+      }
+    },
+    {
+      "id": "byrne_tips",
+      "label": "Ask for training tips",
+      "tone": {
+        "courage": 0.9
+      },
+      "line": "How do I get stronger?",
+      "baseRisk": 0.05,
+      "goodText": "\"Again. And again. And then again.\" You get a real program.",
+      "badText": "\"Show up.\"",
+      "outcomes": {
+        "onGood": {
+          "statXp": {
+            "str": 0.5,
+            "con": 0.5
+          }
+        }
+      }
+    },
+    {
+      "id": "byrne_kelly",
+      "label": "Ask about Kelly",
+      "tone": {
+        "loyalty": 0.9
+      },
+      "line": "Is Kelly okay?",
+      "baseRisk": 0.05,
+      "goodText": "\"She's tougher than she looks. Which is saying something.\" She worries about her.",
+      "badText": "\"Mind your own business.\"",
+      "gate": {
+        "cha": 6
+      }
+    },
+    {
+      "id": "byrne_joke",
+      "label": "Joke around during practice",
+      "tone": {
+        "curiosity": 0.8
+      },
+      "line": "Is this a gym or a hostage situation?",
+      "baseRisk": 0.2,
+      "goodText": "A tiny, involuntary snort. Coach Byrne LAUGHED.",
+      "badText": "\"You think this is a joke?\"",
+      "misheard": [
+        {
+          "line": "Is this a gym or a HOSTAGE situation, Coach?",
+          "tone": {
+            "pride": -0.8,
+            "courage": -0.3
+          }
+        }
+      ]
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "sports"
+    ],
+    "dislikes": [
+      "chainfood"
+    ],
+    "likeText": "\"...Good whistle.\" She tries it. Everyone in the gym flinches."
+  }
 }

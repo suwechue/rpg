@@ -9,6 +9,9 @@ const ClassScreen := preload("res://src/scenes/ui/class_screen.gd")
 const NightScreen := preload("res://src/scenes/ui/night_screen.gd")
 const EventScreen := preload("res://src/scenes/ui/event_screen.gd")
 const Hud := preload("res://src/scenes/ui/hud.gd")
+const StoryRules := preload("res://src/core/story/story.gd")
+const STORY_SCENE := "res://src/scenes/story/story_scene.tscn"
+const TITLE_SCENE := "res://src/scenes/title/title.tscn"
 
 const DUNGEON_SCENE := "res://src/scenes/dungeon/dungeon.tscn"
 
@@ -29,10 +32,7 @@ func _ready() -> void:
 	_hud.visible = false
 	add_child(_hud)
 	EventBus.part_started.connect(_on_part_started)
-	EventBus.run_ended.connect(func(_c: String) -> void:
-		_active = false
-		_queue.clear()
-		set_hud(false))
+	EventBus.run_ended.connect(_on_run_ended)
 
 
 func set_hud(on: bool) -> void:
@@ -46,13 +46,20 @@ func is_busy() -> bool:
 ## Start running the calendar from the current part (after a new run or a load).
 func begin() -> void:
 	_active = true
+	_queue.clear()
+	_busy = false
+	for c in get_children():
+		if c != _hud and c.has_signal("closed"):
+			c.queue_free()
 	_on_part_started()
 
 
 func _on_part_started() -> void:
-	if not _active or not GameState.has_run():
+	if not _active or not GameState.has_run() or _busy:
 		return
 	var screens := GameState.part_screens()
+	for id in StoryRules.due(DataDB.all(), GameState.run, GameState.ctx(), true):
+		screens.push_front("story:" + str(id))
 	for hook in part_hooks:
 		screens = hook.call(screens)
 	_queue = screens
@@ -98,6 +105,9 @@ func _next() -> void:
 			await s.closed
 			_busy = false
 			GameState.advance_part()
+		_ when screen.begins_with("story:"):
+			await play_inline_story(screen.substr(6))
+			_next()
 		_:
 			var custom: Callable = custom_screens.get(screen, Callable())
 			if custom.is_valid():
@@ -147,6 +157,12 @@ func _detention() -> void:
 
 ## The evening Upside-Down. Until the dungeon scene exists, it is skipped.
 func enter_dungeon() -> void:
+	var due := StoryRules.due(DataDB.all(), GameState.run, GameState.ctx(), false)
+	if not due.is_empty():
+		set_hud(false)
+		GameState.run["story_pos"] = { "id": str(due[0]), "step": 0, "combat": -1 }
+		SceneRouter.goto(STORY_SCENE)
+		return
 	if ResourceLoader.exists(DUNGEON_SCENE):
 		set_hud(false)
 		SceneRouter.goto(DUNGEON_SCENE)
@@ -178,3 +194,36 @@ func night_extras() -> Array:
 func run_night_extra(e: Dictionary) -> void:
 	var cb: Callable = e["run"]
 	await cb.call()
+
+
+## An inline story (no fights): its event steps play over the current scene.
+func play_inline_story(id: String) -> void:
+	var story := StoryRules.find(DataDB.all(), id)
+	GameState.set_flag("story_done_" + id)
+	for step in story.get("steps", []):
+		match str(step.get("type", "")):
+			"event":
+				await show_event(step["event"])
+			"narrate":
+				await show_event({ "title": "", "text": str(step["text"]) })
+			"foreshadow":
+				var l := Narrator.line("foreshadow")
+				Narrator.say(l)
+				await show_event({ "title": "The narrator", "text": l })
+
+
+## Permadeath: the save goes, the narrator gives the ending, back to the title.
+func _on_run_ended(cause: String) -> void:
+	_active = false
+	_queue.clear()
+	set_hud(false)
+	SaveSystem.delete_save()
+	var endings: Dictionary = DataDB.table("endings").get("deaths", {})
+	var text := str(endings.get(cause, endings.get("default", "And that was the end of that.")))
+	Audio.play_music("death")
+	_busy = false
+	await show_event({ "title": "The End (of this run)", "text": "%s
+
+Seed %d. The narrator closes the book. Then, after a moment, opens a new one." % [text, GameState.run_seed] })
+	EventBus.run_closed.emit(cause)
+	SceneRouter.goto(TITLE_SCENE)

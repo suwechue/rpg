@@ -1,0 +1,21 @@
+{
+  "topicAp": 1, "giftAp": 1, "hangoutAp": 2, "recruitAp": 1,
+  "defaultRisk": 0.05,
+  "moodWeights": { "good": 3, "neutral": 5, "bad": 2 },
+  "moodShift": { "good": 0.15, "neutral": 0.0, "bad": -0.15 },
+  "moodText": { "good": "seem in a good mood", "neutral": "seem fine", "bad": "seem off today" },
+  "bondDivisor": 400,
+  "riskUpside": 1.5,
+  "goodAt": 0.2, "badAt": -0.05, "neutralBond": 1,
+  "giftNeutral": 2, "giftDislike": -5, "giftLikePerTag": 5, "giftLikeMax": 15,
+  "giftText": { "like": "Their face lights up.", "neutral": "\"Oh. Thanks.\" They mean it, mostly.", "dislike": "They hold it like it might bite them." },
+  "hangoutMin": 6, "hangoutMax": 12,
+  "recruitBond": 41, "maxParty": 3, "fightBond": 2,
+  "dispositionDecay": 0.25,
+  "defaultReaction": { "good": "That landed.", "neutral": "They nod. Polite. Noncommittal.", "bad": "Oof. That did not land." },
+  "genericMisheard": [
+    { "line": "{line}... NOT.", "tone": { "kindness": -0.6, "pride": -0.5 } },
+    { "line": "(something that sounded a lot like an insult)", "tone": { "kindness": -0.8, "pride": -0.4 } },
+    { "line": "(the word 'whatever', somehow, very loudly)", "tone": { "loyalty": -0.6, "curiosity": -0.4 } }
+  ]
+}

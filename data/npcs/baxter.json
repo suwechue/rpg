@@ -48,5 +48,94 @@
       "midday": "library"
     }
   },
-  "greeting": "I have PREPARED for this conversation. Proceed."
+  "greeting": "I have PREPARED for this conversation. Proceed.",
+  "topics": [
+    {
+      "id": "baxter_debate",
+      "label": "Challenge him to a debate",
+      "tone": {
+        "pride": 1.0
+      },
+      "line": "Debate me.",
+      "baseRisk": 0.05,
+      "goodText": "He can't resist. \"I have PREPARED for this.\"",
+      "badText": "\"You are not WORTHY.\" But he's pleased."
+    },
+    {
+      "id": "baxter_grades",
+      "label": "Ask about his grades",
+      "tone": {
+        "pride": 0.6,
+        "curiosity": 0.3
+      },
+      "line": "What's your class rank?",
+      "baseRisk": 0.2,
+      "goodText": "\"First. Obviously.\" Satisfied.",
+      "badText": "He assumes you're comparing yourself to him and gets defensive.",
+      "misheard": [
+        {
+          "line": "Bet my rank's higher than yours.",
+          "tone": {
+            "pride": -0.9
+          }
+        }
+      ]
+    },
+    {
+      "id": "baxter_prep",
+      "label": "Compliment his preparation",
+      "tone": {
+        "pride": 1.0
+      },
+      "line": "You're the most prepared person I've ever met.",
+      "baseRisk": 0.05,
+      "goodText": "Rare warmth. \"...Thank you. Someone NOTICES.\"",
+      "badText": " \"Flattery is a debate tactic.\""
+    },
+    {
+      "id": "baxter_relax",
+      "label": "Tell him to relax",
+      "tone": {
+        "kindness": 1.0
+      },
+      "line": "Hey. Relax a little.",
+      "baseRisk": 0.3,
+      "goodText": "He tries. Badly. Charmingly.",
+      "badText": "\"I AM relaxed.\" He is not.",
+      "gate": {
+        "cha": 10
+      },
+      "minTier": "Friend"
+    },
+    {
+      "id": "baxter_incident",
+      "label": "Ask about 'the incident'",
+      "tone": {
+        "curiosity": 0.9
+      },
+      "line": "What was 'the incident'?",
+      "baseRisk": 0.2,
+      "goodText": "Instant defensiveness. Then, at length, something absurdly petty about a stapler.",
+      "badText": "\"There WAS no incident.\"",
+      "gate": {
+        "cha": 8
+      }
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "book",
+      "academic",
+      "rare"
+    ],
+    "dislikes": [
+      "joke",
+      "absurd"
+    ],
+    "likeText": "\"A first edition. You may stay.\""
+  },
+  "hangouts": [
+    "You study with Baxter. He color-codes your notes without asking. They're better now."
+  ],
+  "recruitText": "\"Very well. I have PREPARED for this. Mostly.\""
 }

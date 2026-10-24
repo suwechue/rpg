@@ -48,5 +48,78 @@
       "afternoon": "park"
     }
   },
-  "greeting": "...oh. Hi. Sorry, I was drawing you. Is that weird?"
+  "greeting": "...oh. Hi. Sorry, I was drawing you. Is that weird?",
+  "topics": [
+    {
+      "id": "mara_art",
+      "label": "Ask about her art",
+      "tone": {
+        "kindness": 0.6,
+        "curiosity": 0.6
+      },
+      "line": "Can I see what you're drawing?",
+      "baseRisk": 0.05,
+      "goodText": "\"It's not finished.\" She shows you anyway. It's you, drawn kinder than you feel.",
+      "badText": "She closes the sketchbook."
+    },
+    {
+      "id": "mara_eyes",
+      "label": "Ask about the thing with too many eyes",
+      "tone": {
+        "curiosity": 0.8,
+        "courage": 0.4
+      },
+      "line": "The creature in your sketches. Where do you see it?",
+      "baseRisk": 0.3,
+      "goodText": "\"In dreams. Or not dreams.\" She shows you a whole page of them.",
+      "badText": "\"It's just doodles.\"",
+      "gate": {
+        "cha": 8
+      },
+      "outcomes": {
+        "onGood": {
+          "flag": "mara_sketches"
+        }
+      }
+    },
+    {
+      "id": "mara_quiet",
+      "label": "Sit with her quietly",
+      "tone": {
+        "kindness": 1.0
+      },
+      "line": "(Just sit. Say nothing.)",
+      "baseRisk": 0.05,
+      "goodText": "After a while she smiles at her paper. It was the right call.",
+      "badText": "She seems uncomfortable."
+    },
+    {
+      "id": "mara_help",
+      "label": "Ask her to show you how to help people",
+      "tone": {
+        "kindness": 0.7,
+        "loyalty": 0.5
+      },
+      "line": "How do you always know what people need?",
+      "baseRisk": 0.05,
+      "goodText": "\"You watch. You wait. You make something.\" She gives you a small drawing.",
+      "badText": "\"I don't, really.\"",
+      "gate": {
+        "cha": 7
+      }
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "art",
+      "handmade",
+      "music"
+    ],
+    "dislikes": [],
+    "likeText": "\"I made you something too. It's not finished. Here.\""
+  },
+  "hangouts": [
+    "You sketch at the woods edge with Mara. Hers are better. She says yours have 'honest lines'."
+  ],
+  "recruitText": "\"...Can I just show you?\" She hands you a drawing of the two of you, together, in the dark. She's in."
 }

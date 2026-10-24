@@ -27,5 +27,38 @@
       "afternoon": "arcade"
     }
   },
-  "greeting": "...she definitely noticed."
+  "greeting": "...she definitely noticed.",
+  "topics": [
+    {
+      "id": "kayla_squad",
+      "label": "Ask how the squad is doing",
+      "tone": {
+        "curiosity": 0.5,
+        "loyalty": 0.5
+      },
+      "line": "How's the squad?",
+      "baseRisk": 0.05,
+      "goodText": "\"Kelly's been weird since Monday. Weirder.\" Grounded, worried.",
+      "badText": "\"...fine.\""
+    },
+    {
+      "id": "kayla_kara",
+      "label": "Ask about Kara",
+      "tone": {
+        "kindness": 0.6
+      },
+      "line": "Is Kara okay?",
+      "baseRisk": 0.05,
+      "goodText": "\"...she definitely noticed.\" A dry smile.",
+      "badText": "\"Ask her.\""
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "tea",
+      "music"
+    ],
+    "dislikes": [],
+    "likeText": "\"Huh. Thanks.\" Unbothered, but she keeps it."
+  }
 }

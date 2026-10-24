@@ -29,5 +29,46 @@
       "weekend_evening": "town_square"
     }
   },
-  "greeting": "Is this... normal here?"
+  "greeting": "Is this... normal here?",
+  "topics": [
+    {
+      "id": "bystander_normal",
+      "label": "Ask if this is normal",
+      "tone": {
+        "curiosity": 0.7,
+        "kindness": 0.3
+      },
+      "line": "Is this town... normal?",
+      "baseRisk": 0.05,
+      "goodText": "",
+      "badText": "",
+      "lines_by_week": true
+    },
+    {
+      "id": "bystander_todd",
+      "label": "Ask about Todd",
+      "tone": {
+        "curiosity": 0.7
+      },
+      "line": "You ever see that kid Todd?",
+      "baseRisk": 0.05,
+      "goodText": "\"Is it just me, or does that one kid just vanish sometimes? ...you know, never mind. Not my business.\"",
+      "badText": "\"Who?\""
+    }
+  ],
+  "weekLines": {
+    "1": "Is this... normal here? The lights flickered all night.",
+    "2": "My freezer froze solid. In October. Is that a thing?",
+    "3": "The forge went cold and the whole street smelled like snow. Okay.",
+    "4": "They closed a wing of the hospital. Again. Sure.",
+    "5": "Sure. Why not. The town's upside down. Sure."
+  },
+  "gifts": {
+    "likes": [
+      "food",
+      "snack"
+    ],
+    "dislikes": [],
+    "likeText": "\"Oh. Thanks. That's... normal. Nice and normal.\""
+  }
 }

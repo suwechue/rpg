@@ -28,5 +28,78 @@
       "afternoon": "hospital"
     }
   },
-  "greeting": "Oh, you're the new one. I already heard about you."
+  "greeting": "Oh, you're the new one. I already heard about you.",
+  "topics": [
+    {
+      "id": "patti_gossip",
+      "label": "Ask for the latest gossip",
+      "tone": {
+        "curiosity": 0.9
+      },
+      "line": "What's the latest?",
+      "baseRisk": 0.05,
+      "goodText": "\"You hear about Todd? No? Nobody ever does. That boy just... reappears. Always a little tired. Never says where.\"",
+      "badText": "\"Oh, honey, I couldn't possibly.\" She could.",
+      "outcomes": {
+        "onGood": {
+          "flag": "rumor_todd"
+        }
+      }
+    },
+    {
+      "id": "patti_trade",
+      "label": "Trade an item for information",
+      "tone": {
+        "greed": 0.8,
+        "curiosity": 0.2
+      },
+      "line": "What would it take for the GOOD gossip?",
+      "baseRisk": 0.05,
+      "goodText": "\"Good tea. Bring me good tea.\" She winks.",
+      "badText": "\"Information isn't cheap, sweetie.\""
+    },
+    {
+      "id": "patti_wing",
+      "label": "Ask about the hospital's closed wing",
+      "tone": {
+        "curiosity": 0.6,
+        "courage": 0.5
+      },
+      "line": "What's the deal with the closed wing?",
+      "baseRisk": 0.2,
+      "goodText": "\"Closed in the eighties. Officially for asbestos.\" She lowers her voice. \"Officially.\"",
+      "badText": "\"Don't you go poking around there.\"",
+      "gate": {
+        "cha": 9
+      },
+      "outcomes": {
+        "onGood": {
+          "flag": "rumor_closed_wing"
+        }
+      }
+    },
+    {
+      "id": "patti_story",
+      "label": "Ask how she ended up here",
+      "tone": {
+        "kindness": 0.9
+      },
+      "line": "How'd you end up at the hospital?",
+      "baseRisk": 0.05,
+      "goodText": "\"I ran the lunch counter at Gary's for a summer. Long story. Involves a goose.\" You need to know about the goose.",
+      "badText": "\"Oh, it's boring.\"",
+      "gate": {
+        "cha": 6
+      }
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "tea",
+      "baked",
+      "food"
+    ],
+    "dislikes": [],
+    "likeText": "\"Now THAT is the good tea. Sit. I have stories.\""
+  }
 }

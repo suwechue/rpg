@@ -65,6 +65,10 @@ func _dev_args() -> void:
 		GameState.run["town_pos"] = { "map": t[0], "interior": false, "loc": "", "cell": [int(xy[0]), int(xy[1])] }
 	if args.has("scene"):
 		SceneRouter.goto(str(args["scene"]))
+	if args.has("talk"):
+		for i in 10:
+			await get_tree().process_frame
+		Social.talk(str(args["talk"]))
 	if args.has("debug"):
 		toggle.call_deferred()
 	if args.has("shot"):

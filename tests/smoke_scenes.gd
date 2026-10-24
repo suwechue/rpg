@@ -20,6 +20,7 @@ func check(cond: bool, msg: String) -> void:
 
 
 func _run() -> void:
+	Engine.time_scale = 4.0
 	await process_frame
 	_parse_all("res://src")
 	await _smoke_combat()
@@ -79,28 +80,32 @@ func smoke_week_of_school() -> void:
 	var flow: Node = _root_node("Flow")
 	_root_node("SaveSystem").call("delete_save")
 	gs.call("new_run", 777, "bard")
+	gs.set("dev_autoplay", true)
 	await _goto("res://src/scenes/town/town.tscn")
 	var stats0: Dictionary = gs.get("player")["stats"].duplicate()
 	var guard := 0
 	var seen := {}
-	while int(cal.call("week")) == 1 and guard < 400:
+	var kind := ["Attend", "Go to sleep", "Confirm", "Ignore her", "Put it away", "Let her carry", "long way", "Look at me", "Continue"]
+	var start := Time.get_ticks_msec()
+	while int(cal.call("week")) == 1 and Time.get_ticks_msec() - start < 240000:
 		guard += 1
 		await process_frame
 		var m := _top_modal()
 		if m != null:
-			var script_name := str(m.get_script().resource_path.get_file())
-			seen[script_name] = true
-			if script_name == "class_screen.gd" and m.get("_event").is_empty() and m.find_children("*", "Button", true, false).size() >= 2 and not seen.has("attended_%d" % guard):
-				_press(m, "Attend")
-			elif script_name == "night_screen.gd":
-				_press(m, "Go to sleep")
-			elif script_name == "schedule_screen.gd":
-				_press(m, "Confirm")
-			else:
+			seen[str(m.get_script().resource_path.get_file())] = true
+			var pressed := false
+			for n in kind:
+				if _press(m, str(n)):
+					pressed = true
+					break
+			if not pressed:
 				_press(m)
 			await process_frame
 			continue
-		if not flow.call("is_busy"):
+		var sc := current_scene
+		if sc != null and sc.name == "Combat" and sc.get("_result_panel") != null:
+			_press(sc.get("_result_panel"))
+		if sc != null and sc.name == "Town" and not flow.call("is_busy"):
 			flow.call("end_part")
 	check(int(cal.call("week")) == 2, "a whole week passes through the UI (guard %d)" % guard)
 	check(seen.has("schedule_screen.gd") and seen.has("class_screen.gd") and seen.has("night_screen.gd"), "schedule, class and night screens appeared: %s" % str(seen.keys()))
@@ -110,6 +115,8 @@ func smoke_week_of_school() -> void:
 			changed += 1
 	check(changed >= 2, "stats changed over the week (%d)" % changed)
 	check(_root_node("SaveSystem").call("has_save"), "autosave written at part changes")
+	check(gs.call("flag", "story_done_w1_evening"), "Monday night's story played inside the week")
+	gs.set("dev_autoplay", false)
 
 
 func _wait_modal(needle_script: String, frames: int = 30) -> Node:
@@ -175,6 +182,70 @@ func smoke_town() -> void:
 	town.call("interact")
 	await process_frame
 	check(str(_root_node("Narrator").get("last_line")).find("renovations") >= 0, "the closed cinema gives its door line")
+
+
+## Press through modals (choosing by needle where given) and combat result
+## panels until `done` returns true or the guard runs out.
+func _drive(done: Callable, needles: Array, seconds: float = 60.0) -> bool:
+	var start := Time.get_ticks_msec()
+	while Time.get_ticks_msec() - start < int(seconds * 1000.0):
+		await process_frame
+		if done.call():
+			return true
+		var m := _top_modal()
+		if m != null:
+			var pressed := false
+			for n in needles:
+				if _press(m, str(n)):
+					pressed = true
+					break
+			if not pressed:
+				_press(m)
+			await process_frame
+			continue
+		var scene := current_scene
+		if OS.has_environment("SMOKE_TRACE") and (Time.get_ticks_msec() / 1000) % 3 == 0 and Engine.get_process_frames() % 60 == 0:
+			print("[trace] scene=%s modal=%s pos=%s" % [scene.name if scene != null else "-", _top_modal(), _root_node("GameState").get("run").get("story_pos", {})])
+			if scene != null and scene.name == "Combat":
+				var st: Object = scene.get("state")
+				print("[trace] result=%s busy=%s done=%s current=%s ai=%s round=%d" % [st.get("result"), scene.get("_busy"), scene.get("_done"), st.get("current").get("name"), scene.call("_is_ai", st.get("current")), st.get("round_num")])
+		if scene != null and scene.name == "Combat" and scene.get("_result_panel") != null:
+			_press(scene.get("_result_panel"))
+	return done.call()
+
+
+## M6 "Done when": the Kelly Monday scenario plays and tracks her Risk; both outcomes.
+func smoke_kelly_monday() -> void:
+	var gs: Node = _root_node("GameState")
+	var cal: Node = _root_node("Calendar")
+	var flow: Node = _root_node("Flow")
+	for outcome in ["survive", "death"]:
+		gs.call("new_run", 99 if outcome == "survive" else 98, "healer")
+		gs.get("run")["schedule_week"] = 1
+		gs.get("player")["stats"]["cha"] = 8
+		gs.set("dev_autoplay", true)
+		cal.call("reset", { "week": 1, "day_index": 0, "part_index": 3, "ap": -1 })
+		await _goto("res://src/scenes/town/town.tscn")
+		var kind := ["Your routine", "Let her carry", "long way", "Look at me", "Put it away", "Continue"]
+		var cruel := ["personality", "Keep the lantern", "shortcut", "Pull it together", "Laugh along", "Continue"]
+		var needles: Array = kind if outcome == "survive" else cruel
+		var lunch_done := await _drive(func() -> bool: return gs.call("flag", "story_done_w1_lunch") and _top_modal() == null, needles, 10.0)
+		check(lunch_done, "the Monday lunch scene plays (%s)" % outcome)
+		if outcome == "death":
+			gs.get("run")["kelly_risk"] = int(gs.get("run")["kelly_risk"]) + 3
+		cal.call("reset", { "week": 1, "day_index": 0, "part_index": 6, "ap": -1 })
+		flow.set("_busy", false)
+		flow.call("_on_part_started")
+		var ended := await _drive(func() -> bool:
+			return gs.call("flag", "story_done_w1_evening") or (current_scene != null and current_scene.name == "Title"), needles, 120.0)
+		check(ended, "the evening tutorial floor plays to the end (%s, Risk %d)" % [outcome, int(gs.get("run").get("kelly_risk", 0))])
+		if outcome == "survive":
+			check(gs.call("flag", "survived_w1_monday"), "kind night: you survive")
+			check(gs.get("run").get("guests", []).is_empty(), "Kelly goes home after the night")
+		else:
+			check(current_scene != null and current_scene.name == "Title", "Risk 4+: the run ends and the title returns")
+			check(not _root_node("SaveSystem").call("has_save"), "permadeath deletes the save")
+	gs.set("dev_autoplay", false)
 
 
 func _smoke_combat() -> void:

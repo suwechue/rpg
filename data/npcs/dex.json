@@ -49,5 +49,80 @@
       "weekend_evening": "arcade"
     }
   },
-  "greeting": "Okay but hear me out, what if we did the DANGEROUS version of this plan."
+  "greeting": "Okay but hear me out, what if we did the DANGEROUS version of this plan.",
+  "topics": [
+    {
+      "id": "dex_laugh",
+      "label": "Laugh at his joke",
+      "tone": {
+        "curiosity": 0.9
+      },
+      "line": "Ha! Okay, that was good.",
+      "baseRisk": 0.05,
+      "goodText": "He's delighted. \"FINALLY. An audience.\"",
+      "badText": "\"It wasn't that funny.\" It was."
+    },
+    {
+      "id": "dex_serious",
+      "label": "Ask him to be serious for a second",
+      "tone": {
+        "kindness": 1.0
+      },
+      "line": "Hey. Seriously. Are you okay?",
+      "baseRisk": 0.3,
+      "goodText": "A brief, genuine moment. Then a joke. But the moment was real.",
+      "badText": "\"Me? I'm always okay. Watch this--\"",
+      "gate": {
+        "cha": 12
+      },
+      "minTier": "Acquaintance"
+    },
+    {
+      "id": "dex_prank",
+      "label": "Challenge him to a prank war",
+      "tone": {
+        "curiosity": 0.6,
+        "pride": 0.6
+      },
+      "line": "Prank war. You and me.",
+      "baseRisk": 0.2,
+      "goodText": "\"Oh, it's ON.\" Immediate, enthusiastic escalation.",
+      "badText": "\"You don't want this smoke.\"",
+      "outcomes": {
+        "onGood": {
+          "flag": "dex_prank_war"
+        }
+      }
+    },
+    {
+      "id": "dex_callout",
+      "label": "Call him out for using humor to avoid things",
+      "tone": {
+        "courage": 1.0
+      },
+      "line": "You joke so you don't have to feel anything.",
+      "baseRisk": 0.3,
+      "goodText": "He actually sits with it. For once, no punchline.",
+      "badText": "\"Wow. Okay.\" He leaves.",
+      "gate": {
+        "cha": 15
+      },
+      "minTier": "Friend"
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "joke",
+      "absurd"
+    ],
+    "dislikes": [
+      "academic"
+    ],
+    "likeText": "\"A rubber chicken. You GET me.\""
+  },
+  "hangouts": [
+    "You lose to Dex at every arcade game. He narrates each loss like a sports commentator.",
+    "Dex shows you a prank he's been planning for weeks. It's art."
+  ],
+  "recruitText": "\"Okay but hear me out: what if I came WITH you? ...Yeah. I'm in.\""
 }

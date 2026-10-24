@@ -46,5 +46,79 @@
       "midday": "library"
     }
   },
-  "greeting": "I'm not saying you're wrong. I'm saying you haven't heard my rebuttal yet."
+  "greeting": "I'm not saying you're wrong. I'm saying you haven't heard my rebuttal yet.",
+  "topics": [
+    {
+      "id": "priya_debate",
+      "label": "Challenge her to a debate",
+      "tone": {
+        "pride": 1.0
+      },
+      "line": "I bet I could win a debate against you.",
+      "baseRisk": 0.05,
+      "goodText": "She takes it seriously and respects you more for trying.",
+      "badText": "\"Give me thirty seconds and a reason.\" She destroys you."
+    },
+    {
+      "id": "priya_advice",
+      "label": "Ask for public speaking advice",
+      "tone": {
+        "curiosity": 0.9
+      },
+      "line": "How do you make speaking look easy?",
+      "baseRisk": 0.05,
+      "goodText": "Genuinely useful, confident coaching.",
+      "badText": "\"Practice.\"",
+      "outcomes": {
+        "onGood": {
+          "statXp": {
+            "cha": 0.5
+          }
+        }
+      }
+    },
+    {
+      "id": "priya_future",
+      "label": "Ask what she wants after school",
+      "tone": {
+        "curiosity": 0.9
+      },
+      "line": "What do you want after all this?",
+      "baseRisk": 0.05,
+      "goodText": "An ambitious, specific answer. She's thought about this a lot.",
+      "badText": "\"Everything.\" Deflecting.",
+      "gate": {
+        "cha": 10
+      }
+    },
+    {
+      "id": "priya_lose",
+      "label": "Point out she never loses gracefully",
+      "tone": {
+        "pride": 0.8
+      },
+      "line": "You never lose gracefully, you know.",
+      "baseRisk": 0.3,
+      "goodText": "\"I never lose. So.\" She grins.",
+      "badText": "She takes it as a challenge and doubles down.",
+      "gate": {
+        "cha": 12
+      }
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "notebook",
+      "precise",
+      "book"
+    ],
+    "dislikes": [
+      "joke"
+    ],
+    "likeText": "\"This is beautifully made.\" She approves of quality."
+  },
+  "hangouts": [
+    "You prep arguments with Priya. She wins every practice round and coaches you through each one."
+  ],
+  "recruitText": "\"I'm not joining because I need you. I'm joining because we'll win.\""
 }

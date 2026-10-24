@@ -48,5 +48,74 @@
       "midday": "gym"
     }
   },
-  "greeting": "I know I look young. Doesn't mean I'm not good."
+  "greeting": "I know I look young. Doesn't mean I'm not good.",
+  "topics": [
+    {
+      "id": "mel_balance",
+      "label": "Ask about balancing basketball and school",
+      "tone": {
+        "kindness": 0.9
+      },
+      "line": "How do you balance it all?",
+      "baseRisk": 0.05,
+      "goodText": "Honest, a little tired, grateful to be asked.",
+      "badText": "\"I manage.\"",
+      "gate": {
+        "cha": 8
+      }
+    },
+    {
+      "id": "mel_dad",
+      "label": "Ask what his dad thinks",
+      "tone": {
+        "courage": 0.5,
+        "kindness": 0.5
+      },
+      "line": "What does your dad think about basketball?",
+      "baseRisk": 0.3,
+      "goodText": "Real tension, handled carefully.",
+      "badText": "\"Can we not.\"",
+      "gate": {
+        "cha": 12
+      },
+      "minTier": "Friend"
+    },
+    {
+      "id": "mel_game",
+      "label": "Challenge him to a one-on-one",
+      "tone": {
+        "pride": 0.9
+      },
+      "line": "One-on-one. Now.",
+      "baseRisk": 0.05,
+      "goodText": "Immediate, enthusiastic yes.",
+      "badText": "\"You sure? Okay.\" He destroys you."
+    },
+    {
+      "id": "mel_young",
+      "label": "Treat him like he's too young",
+      "tone": {
+        "pride": -0.5,
+        "kindness": 0.3
+      },
+      "line": "You're kind of young for all this, huh?",
+      "baseRisk": 0.3,
+      "goodText": "\"...yeah. Sometimes.\" A rare admission.",
+      "badText": "He takes real offense."
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "basketball",
+      "sports"
+    ],
+    "dislikes": [
+      "baked"
+    ],
+    "likeText": "\"Properly inflated. Respect.\""
+  },
+  "hangouts": [
+    "You shoot hoops with Mel until the streetlights come on. He's better than everyone says."
+  ],
+  "recruitText": "\"I know I look young. Doesn't mean I'm not good. I'm in.\""
 }

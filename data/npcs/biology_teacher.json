@@ -26,5 +26,63 @@
     },
     "weekend": {}
   },
-  "greeting": "Ah. A specimen. A student! I meant student."
+  "greeting": "Ah. A specimen. A student! I meant student.",
+  "topics": [
+    {
+      "id": "bio_cells",
+      "label": "Ask about cells",
+      "tone": {
+        "curiosity": 0.9
+      },
+      "line": "How do cells actually work?",
+      "baseRisk": 0.05,
+      "goodText": "Excessive jargon, delivered with real love. You follow most of it.",
+      "badText": "\"Please don't ask about blood.\""
+    },
+    {
+      "id": "bio_blood",
+      "label": "Ask if they're okay with blood",
+      "tone": {
+        "curiosity": 0.5,
+        "kindness": -0.3
+      },
+      "line": "You okay with blood?",
+      "baseRisk": 0.2,
+      "goodText": "\"I am FINE with sanguineous fluids.\" They are not.",
+      "badText": "They have to sit down."
+    },
+    {
+      "id": "bio_vitality",
+      "label": "Ask about 'living force'",
+      "tone": {
+        "curiosity": 0.8,
+        "courage": 0.3
+      },
+      "line": "You said living things want to keep living.",
+      "baseRisk": 0.05,
+      "goodText": "\"Hypothetically, that want is a force. Some people can borrow it.\" They swallow.",
+      "badText": "\"I said no such thing.\"",
+      "gate": {
+        "cha": 9
+      },
+      "outcomes": {
+        "onGood": {
+          "flag": "vitality_hint"
+        }
+      },
+      "cond": {
+        "minWeek": 3
+      }
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "science",
+      "academic"
+    ],
+    "dislikes": [
+      "food"
+    ],
+    "likeText": "\"A gadget! Bloodless! Wonderful.\""
+  }
 }

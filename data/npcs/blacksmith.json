@@ -29,5 +29,110 @@
       "weekend_evening": "forge"
     }
   },
-  "greeting": "Took you long enough."
+  "greeting": "Took you long enough.",
+  "topics": [
+    {
+      "id": "smith_cold",
+      "label": "Ask about the forge going cold",
+      "tone": {
+        "courage": 0.6,
+        "curiosity": 0.5
+      },
+      "line": "Why does the forge go cold some nights?",
+      "baseRisk": 0.3,
+      "goodText": "\"It went cold for a reason. Once. A long time ago.\" He stops. \"Ask me again when you've earned it.\"",
+      "badText": "\"It doesn't.\" It does.",
+      "gate": {
+        "cha": 10
+      },
+      "outcomes": {
+        "onGood": {
+          "flag": "lore_forge"
+        }
+      }
+    },
+    {
+      "id": "smith_help",
+      "label": "Offer to help around the forge",
+      "tone": {
+        "loyalty": 0.9
+      },
+      "line": "Need help with anything?",
+      "baseRisk": 0.05,
+      "goodText": "He hands you a broom without a word. Somehow that means yes.",
+      "badText": "\"No.\"",
+      "outcomes": {
+        "onGood": {
+          "flag": "forge_apprentice_started"
+        }
+      }
+    },
+    {
+      "id": "smith_compliment",
+      "label": "Compliment his work",
+      "tone": {
+        "pride": 0.9
+      },
+      "line": "This is beautiful work.",
+      "baseRisk": 0.05,
+      "goodText": "\"It'll hold.\" Pause. \"Probably.\" You're getting a discount and you both know it.",
+      "badText": "\"Flattery doesn't temper steel.\""
+    },
+    {
+      "id": "smith_impossible",
+      "label": "Ask him to make something impossible",
+      "tone": {
+        "curiosity": 0.9
+      },
+      "line": "Could you forge something that holds a spell?",
+      "baseRisk": 0.3,
+      "goodText": "He looks at you for a long time. \"...Come back tomorrow.\" He actually tries.",
+      "badText": "\"No such thing.\"",
+      "gate": {
+        "cha": 12
+      },
+      "outcomes": {
+        "onGood": {
+          "item": {
+            "rare_ore": 1
+          }
+        }
+      },
+      "minTier": "Friend"
+    },
+    {
+      "id": "smith_jake",
+      "label": "Mention Jake",
+      "tone": {
+        "kindness": 0.5,
+        "loyalty": 0.5
+      },
+      "line": "Jake says he wants to learn smithing.",
+      "baseRisk": 0.05,
+      "goodText": "\"The kid with all the hobbies.\" A grunt. \"Send him. One week. Then we'll see.\"",
+      "badText": "\"Everyone wants to learn. Nobody wants to sweep.\"",
+      "outcomes": {
+        "onGood": {
+          "flag": "jake_forge_started"
+        }
+      },
+      "cond": {
+        "minWeek": 2
+      }
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "ore",
+      "handmade",
+      "material"
+    ],
+    "dislikes": [
+      "chainfood"
+    ],
+    "likeText": "He weighs it in his palm. \"Good.\" High praise."
+  },
+  "hangouts": [
+    "You work the bellows in silence. It's the most comfortable silence you've had in town."
+  ]
 }

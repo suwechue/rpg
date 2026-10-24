@@ -27,5 +27,77 @@
     },
     "weekend": {}
   },
-  "greeting": "Nice, nice, just don't lose a finger."
+  "greeting": "Nice, nice, just don't lose a finger.",
+  "topics": [
+    {
+      "id": "j_building",
+      "label": "Ask what he's building",
+      "tone": {
+        "curiosity": 0.9
+      },
+      "line": "What's in the locked cabinet?",
+      "baseRisk": 0.3,
+      "goodText": "\"Something the town needs. Eventually.\" A half-answer.",
+      "badText": "\"...you weren't supposed to see that yet.\"",
+      "gate": {
+        "cha": 12
+      },
+      "outcomes": {
+        "onGood": {
+          "flag": "mr_j_hint"
+        }
+      }
+    },
+    {
+      "id": "j_crafting",
+      "label": "Ask for crafting help",
+      "tone": {
+        "loyalty": 0.9
+      },
+      "line": "Can you help me with my workbench?",
+      "baseRisk": 0.05,
+      "goodText": "\"Nice, nice. Hold it like this.\" Your next craft will go better.",
+      "badText": "\"Just don't lose a finger.\"",
+      "outcomes": {
+        "onGood": {
+          "flag": "mr_j_tips"
+        }
+      }
+    },
+    {
+      "id": "j_after",
+      "label": "Offer to help after hours",
+      "tone": {
+        "kindness": 0.5,
+        "curiosity": 0.5
+      },
+      "line": "I could stay late and help.",
+      "baseRisk": 0.05,
+      "goodText": "He considers it. \"Bring snacks.\" Trust, slowly.",
+      "badText": "\"Go home.\"",
+      "gate": {
+        "cha": 9
+      }
+    },
+    {
+      "id": "j_smith",
+      "label": "Mention the blacksmith",
+      "tone": {
+        "curiosity": 0.8
+      },
+      "line": "Do you know the blacksmith?",
+      "baseRisk": 0.05,
+      "goodText": "\"We go back.\" He doesn't say how far. It's further than you think.",
+      "badText": "\"Everyone knows him.\""
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "tools",
+      "material",
+      "ore"
+    ],
+    "dislikes": [],
+    "likeText": "\"Now THIS is useful.\" It disappears into the cabinet."
+  }
 }

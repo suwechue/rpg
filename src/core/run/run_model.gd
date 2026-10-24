@@ -66,6 +66,9 @@ static func character(run: Dictionary, id: String) -> Dictionary:
 	for m in run.get("roster", []):
 		if str(m.get("id", "")) == id:
 			return m
+	for g in run.get("guests", []):
+		if str(g.get("id", "")) == id:
+			return g
 	return {}
 
 

@@ -28,5 +28,86 @@
       "afternoon": "town_square"
     }
   },
-  "greeting": "I'm not going to lie to you. I'm also not going to tell you everything."
+  "greeting": "I'm not going to lie to you. I'm also not going to tell you everything.",
+  "topics": [
+    {
+      "id": "reyes_upside",
+      "label": "Ask what she knows about the Upside-Down",
+      "tone": {
+        "curiosity": 0.6,
+        "courage": 0.6
+      },
+      "line": "You know about the other place, don't you?",
+      "baseRisk": 0.3,
+      "goodText": "\"I'm not going to lie to you. I'm also not going to tell you everything.\" She tells you a little.",
+      "badText": "\"I don't know what you mean.\"",
+      "gate": {
+        "cha": 10
+      },
+      "outcomes": {
+        "onGood": {
+          "flag": "lore_reyes_log"
+        }
+      }
+    },
+    {
+      "id": "reyes_wing",
+      "label": "Ask about the closed wing",
+      "tone": {
+        "courage": 1.0
+      },
+      "line": "What's behind the closed wing?",
+      "baseRisk": 0.3,
+      "goodText": "\"Patients nobody came back for.\" She looks away. \"That's all for now.\"",
+      "badText": "\"Authorized personnel only. That includes curiosity.\"",
+      "gate": {
+        "cha": 12
+      },
+      "outcomes": {
+        "onGood": {
+          "flag": "week4_closed_wing_open"
+        }
+      },
+      "cond": {
+        "minWeek": 4
+      },
+      "lockedHint": "Week 4"
+    },
+    {
+      "id": "reyes_shift",
+      "label": "Offer to help with a shift",
+      "tone": {
+        "loyalty": 0.9
+      },
+      "line": "Need a volunteer?",
+      "baseRisk": 0.05,
+      "goodText": "\"Patti will put you to work. Thank you.\"",
+      "badText": "\"We're fine.\""
+    },
+    {
+      "id": "reyes_okay",
+      "label": "Ask if she's okay",
+      "tone": {
+        "kindness": 1.0
+      },
+      "line": "Are YOU okay?",
+      "baseRisk": 0.3,
+      "goodText": "Her composure cracks, just slightly. \"...No one asks me that.\"",
+      "badText": "\"Don't handle me.\" She dislikes being handled gently.",
+      "gate": {
+        "cha": 8
+      },
+      "minTier": "Acquaintance"
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "coffee",
+      "academic"
+    ],
+    "dislikes": [
+      "baked"
+    ],
+    "likeText": "\"Actual coffee. You might be my favorite patient.\""
+  }
 }

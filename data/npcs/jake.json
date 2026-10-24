@@ -60,5 +60,92 @@
       }
     ]
   },
-  "greeting": "Okay, hear me out--"
+  "greeting": "Okay, hear me out--",
+  "topics": [
+    {
+      "id": "jake_cause",
+      "label": "Ask about his current cause",
+      "tone": {
+        "curiosity": 0.9
+      },
+      "line": "What are you into this week?",
+      "baseRisk": 0.05,
+      "goodText": "An enthusiastic pitch. Lately it's always the forge.",
+      "badText": "\"Okay, hear me out--\" He loses you."
+    },
+    {
+      "id": "jake_smithing",
+      "label": "Ask how he got into smithing",
+      "tone": {
+        "curiosity": 0.8
+      },
+      "line": "How'd you get into smithing?",
+      "baseRisk": 0.05,
+      "goodText": "Genuine, a little surprised himself that it stuck.",
+      "badText": "\"It's whatever.\" It isn't.",
+      "gate": {
+        "cha": 8
+      }
+    },
+    {
+      "id": "jake_help",
+      "label": "Offer to help with his cause",
+      "tone": {
+        "loyalty": 1.0
+      },
+      "line": "I'll help. What do you need?",
+      "baseRisk": 0.05,
+      "goodText": "\"Talk to the blacksmith for me? He scares me.\" A sidequest.",
+      "badText": "\"I've got it handled.\"",
+      "outcomes": {
+        "onGood": {
+          "flag": "jake_needs_intro"
+        }
+      }
+    },
+    {
+      "id": "jake_hobbies",
+      "label": "Point out his hobbies never last",
+      "tone": {
+        "pride": 0.6
+      },
+      "line": "Your hobbies never last, though.",
+      "baseRisk": 0.2,
+      "goodText": "\"This one's different.\" He's right. He doesn't know it yet.",
+      "badText": "He gets defensive."
+    },
+    {
+      "id": "jake_done",
+      "label": "Ask how the apprenticeship is going",
+      "tone": {
+        "kindness": 0.5,
+        "curiosity": 0.5
+      },
+      "line": "How's the forge treating you?",
+      "baseRisk": 0.05,
+      "goodText": "\"He let me make a nail. A NAIL.\" He's never been prouder. The questline's done.",
+      "badText": "\"Hard.\"",
+      "outcomes": {
+        "onGood": {
+          "flag": "jake_forge_done"
+        }
+      },
+      "cond": {
+        "flag": "jake_forge_started"
+      }
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "material",
+      "ore",
+      "tools"
+    ],
+    "dislikes": [],
+    "likeText": "\"I'm gonna make something AMAZING with this.\""
+  },
+  "hangouts": [
+    "Jake shows you his garage full of abandoned hobbies. The new anvil is polished."
+  ],
+  "recruitText": "\"...I may have started something bigger than I meant to. I'm in.\""
 }

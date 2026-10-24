@@ -51,5 +51,76 @@
       "midday": "library"
     }
   },
-  "greeting": "I'm documenting this. I'm not necessarily SENDING it anywhere."
+  "greeting": "I'm documenting this. I'm not necessarily SENDING it anywhere.",
+  "topics": [
+    {
+      "id": "diane_notebook",
+      "label": "Ask what she's writing",
+      "tone": {
+        "curiosity": 0.9
+      },
+      "line": "What's in the notebook?",
+      "baseRisk": 0.05,
+      "goodText": "She shows you a lightly redacted page. You're in it.",
+      "badText": "\"Nothing.\"",
+      "gate": {
+        "cha": 8
+      }
+    },
+    {
+      "id": "diane_report",
+      "label": "Ask why she never reports anyone",
+      "tone": {
+        "kindness": 0.6,
+        "loyalty": 0.6
+      },
+      "line": "You never actually report anyone. Why?",
+      "baseRisk": 0.3,
+      "goodText": "An honest, slightly vulnerable answer about who gets hurt by reports in this town.",
+      "badText": "\"I'm documenting. Not sending.\"",
+      "gate": {
+        "cha": 10
+      },
+      "minTier": "Acquaintance"
+    },
+    {
+      "id": "diane_job",
+      "label": "Ask about her part-time job",
+      "tone": {
+        "curiosity": 0.7
+      },
+      "line": "Where do you work?",
+      "baseRisk": 0.05,
+      "goodText": "She's quietly proud of it. Filing, at the town hall. Interesting.",
+      "badText": "\"Boring stuff.\"",
+      "outcomes": {
+        "onGood": {
+          "flag": "diane_town_hall"
+        }
+      }
+    },
+    {
+      "id": "diane_sambaxter",
+      "label": "Ask about Sam and Baxter's antics",
+      "tone": {
+        "curiosity": 0.8
+      },
+      "line": "Ever catch Sam and Baxter at anything?",
+      "baseRisk": 0.2,
+      "goodText": "\"I have never once successfully caught them. I have a whole log of failed attempts.\"",
+      "badText": "She thinks you're accusing her of being in on it."
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "notebook",
+      "precise"
+    ],
+    "dislikes": [],
+    "likeText": "\"Numbered pages.\" She's moved."
+  },
+  "hangouts": [
+    "You 'observe' the town square with Diane. Her notes are better than any newspaper."
+  ],
+  "recruitText": "\"I'm documenting this.\" Pause. \"From the inside, now.\""
 }

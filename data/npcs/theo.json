@@ -47,5 +47,91 @@
       "afternoon": "library"
     }
   },
-  "greeting": "Statistically, you talking to me is... unexpected. Hi."
+  "greeting": "Statistically, you talking to me is... unexpected. Hi.",
+  "topics": [
+    {
+      "id": "theo_theories",
+      "label": "Ask about his theories",
+      "tone": {
+        "curiosity": 1.0
+      },
+      "line": "What are you working on?",
+      "baseRisk": 0.05,
+      "goodText": "A careful, detailed explanation. He's clearly relieved to be asked.",
+      "badText": "\"It's... not ready.\""
+    },
+    {
+      "id": "theo_speak",
+      "label": "Encourage him to speak up more",
+      "tone": {
+        "kindness": 1.0
+      },
+      "line": "You're right more often than anyone in that class. Say it louder.",
+      "baseRisk": 0.3,
+      "goodText": "Visible, earned confidence. \"...Okay. Next time.\"",
+      "badText": "He shrinks into his hoodie.",
+      "gate": {
+        "cha": 10
+      },
+      "minTier": "Acquaintance"
+    },
+    {
+      "id": "theo_try",
+      "label": "Ask him to just try something",
+      "tone": {
+        "courage": 1.0
+      },
+      "line": "What if you just tried it instead of planning?",
+      "baseRisk": 0.3,
+      "goodText": "\"...Statistically, that shouldn't work. Let's do it.\"",
+      "badText": "He thinks you're dismissing his caution.",
+      "gate": {
+        "cha": 8
+      },
+      "misheard": [
+        {
+          "line": "What if you stopped planning things?",
+          "tone": {
+            "pride": -0.7,
+            "kindness": -0.4
+          }
+        }
+      ]
+    },
+    {
+      "id": "theo_upside",
+      "label": "Ask what he thinks the Upside-Down is",
+      "tone": {
+        "curiosity": 1.0
+      },
+      "line": "What do YOU think the Upside-Down is?",
+      "baseRisk": 0.05,
+      "goodText": "\"A mirror with a delay. Whatever happens here echoes there, a week late.\" More accurate than he knows.",
+      "badText": "\"I have several working theories. None of them are good.\"",
+      "gate": {
+        "cha": 12
+      },
+      "outcomes": {
+        "onGood": {
+          "flag": "lore_theo_mirror"
+        }
+      }
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "theory",
+      "book",
+      "notebook"
+    ],
+    "dislikes": [
+      "joke"
+    ],
+    "likeText": "\"This has MARGIN NOTES.\" He's never been happier."
+  },
+  "hangouts": [
+    "You study with Theo at the library. He explains three things you didn't ask about. All three help.",
+    "You stargaze from his upstairs window. The telescope points at the woods. He doesn't say why."
+  ],
+  "recruitText": "\"I've run the numbers. You're... the best odds I have.\" He's in."
 }

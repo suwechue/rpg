@@ -4,7 +4,7 @@ Read `docs/DESIGN.md` before starting any task. The Vector system reference is `
 
 ## Current state
 
-M0 to M5 are done:
+M0 to M6 are done:
 - `src/core/vector_ops.gd` — all 8 operations plus total/spread/complexity/dominant_axis. Cosine "Match" is named `similarity()` because `match` is a GDScript keyword.
 - `src/core/data_tables.gd` — pure JSON loader shared by `DataDB` and the tests; core functions take the whole tables Dictionary as `db`.
 - `src/core/rng_streams.gd`, `src/core/calendar_logic.gd` — seeded streams, day parts and AP.
@@ -14,7 +14,7 @@ M0 to M5 are done:
 
 Gotchas: JSON numbers load as floats, so `[3.0].has(3)` is false; compare with `int()`. New `class_name`s are not visible until the editor rescans, so reference scripts with `preload` constants. The UI font's native size is 9px (`UiTheme.FONT_SIZE`). `:=` on a Variant (dict.get, array[i]) is a parse error in this project; cast or type it. Python on Windows writes CRLF unless you pass newline=''; keep files LF.
 
-Next: M6. Screenshots go in `tools/screenshots/` (gitignored). Push after every commit. Progress, decisions and stubs are tracked in `docs/PROGRESS.md`; the full alpha instructions are in `docs/PROMPT_alpha_run.md`. Final design decisions are in DESIGN.md Section 18. The cast is in `docs/characters.md` and the town plan in `docs/TOWN.md`; both are sources of truth.
+Next: M7. Screenshots go in `tools/screenshots/` (gitignored). Push after every commit. Progress, decisions and stubs are tracked in `docs/PROGRESS.md`; the full alpha instructions are in `docs/PROMPT_alpha_run.md`. Final design decisions are in DESIGN.md Section 18. The cast is in `docs/characters.md` and the town plan in `docs/TOWN.md`; both are sources of truth.
 
 ## How this project is built
 

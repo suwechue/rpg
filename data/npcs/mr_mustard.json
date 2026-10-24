@@ -28,5 +28,76 @@
     },
     "weekend": {}
   },
-  "greeting": "The structure is inside you, my guy."
+  "greeting": "The structure is inside you, my guy.",
+  "topics": [
+    {
+      "id": "mustard_argue",
+      "label": "Try to argue with him",
+      "tone": {
+        "pride": 0.5,
+        "curiosity": 0.5
+      },
+      "line": "I think you're wrong about the play.",
+      "baseRisk": 0.05,
+      "goodText": "\"I'm not gonna fight you on this. You're right. Doesn't change anything though.\"",
+      "badText": "\"Okay.\" He just agrees. Deflating."
+    },
+    {
+      "id": "mustard_coach",
+      "label": "Ask for performance coaching",
+      "tone": {
+        "curiosity": 0.9
+      },
+      "line": "Can you coach me?",
+      "baseRisk": 0.05,
+      "goodText": "\"The structure is inside you, my guy.\" Somehow, this helps.",
+      "badText": "\"Feel it out.\"",
+      "outcomes": {
+        "onGood": {
+          "statXp": {
+            "cha": 0.5
+          },
+          "flag": "idol_track"
+        }
+      }
+    },
+    {
+      "id": "mustard_before",
+      "label": "Ask what he did before teaching",
+      "tone": {
+        "curiosity": 0.9
+      },
+      "line": "What did you do before teaching?",
+      "baseRisk": 0.05,
+      "goodText": "\"Cruise ship magician. Then a shipwreck. Then this.\" Wholesome and undramatic.",
+      "badText": "\"This and that.\"",
+      "gate": {
+        "cha": 10
+      }
+    },
+    {
+      "id": "mustard_vent",
+      "label": "Vent about stress",
+      "tone": {
+        "kindness": 0.9
+      },
+      "line": "Everything is a lot right now.",
+      "baseRisk": 0.05,
+      "goodText": "He listens. Genuinely good, grounding advice.",
+      "badText": "\"Breathe, my guy.\"",
+      "outcomes": {
+        "onGood": {
+          "mp": 4
+        }
+      }
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "music",
+      "handmade"
+    ],
+    "dislikes": [],
+    "likeText": "\"Track seven is just breathing. That's art.\""
+  }
 }

@@ -36,5 +36,55 @@
       "morning": "park"
     }
   },
-  "greeting": "And here we see a student, approaching cautiously. Fascinating."
+  "greeting": "And here we see a student, approaching cautiously. Fascinating.",
+  "topics": [
+    {
+      "id": "es_weather",
+      "label": "Ask about the weather",
+      "tone": {
+        "curiosity": 0.9
+      },
+      "line": "What's the weather doing this week?",
+      "baseRisk": 0.05,
+      "goodText": "\"And here we see a cold front, behaving... strangely.\" A real hint about the week.",
+      "badText": "\"Weather is weather.\"",
+      "outcomes": {
+        "onGood": {
+          "flag": "signature_hint_teacher"
+        }
+      }
+    },
+    {
+      "id": "es_rocks",
+      "label": "Ask about rocks",
+      "tone": {
+        "curiosity": 0.8,
+        "kindness": 0.2
+      },
+      "line": "What's your favorite rock?",
+      "baseRisk": 0.05,
+      "goodText": "Forty minutes on a pebble from the woods. It's warm to the touch. That isn't normal.",
+      "badText": "\"All of them.\""
+    },
+    {
+      "id": "es_trip",
+      "label": "Ask about field trips",
+      "tone": {
+        "courage": 0.5,
+        "curiosity": 0.5
+      },
+      "line": "Can I come on a field trip?",
+      "baseRisk": 0.05,
+      "goodText": "\"Wednesday and Friday, the park, after school. Bring a notebook.\"",
+      "badText": "\"Permission slips required.\""
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "science",
+      "photo"
+    ],
+    "dislikes": [],
+    "likeText": "\"A historical cloud formation. Thank you.\""
+  }
 }

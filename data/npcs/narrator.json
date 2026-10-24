@@ -29,5 +29,98 @@
       "weekend_evening": "park"
     }
   },
-  "greeting": "Bold strategy, talking to the narrator. Go on."
+  "greeting": "Bold strategy, talking to the narrator. Go on.",
+  "topics": [
+    {
+      "id": "narrator_who",
+      "label": "Ask who they are",
+      "tone": {
+        "curiosity": 1.0
+      },
+      "line": "Who ARE you?",
+      "baseRisk": 0.2,
+      "goodText": "\"I'm the voice. You're the protagonist. Allegedly.\" They seem pleased you asked.",
+      "badText": "\"Rude. I'm narrating.\""
+    },
+    {
+      "id": "narrator_hint",
+      "label": "Ask for a hint",
+      "tone": {
+        "kindness": 0.4,
+        "curiosity": 0.6
+      },
+      "line": "Any advice?",
+      "baseRisk": 0.05,
+      "goodText": "",
+      "badText": "",
+      "hint": true
+    },
+    {
+      "id": "narrator_compliment",
+      "label": "Compliment their narration",
+      "tone": {
+        "pride": 1.0
+      },
+      "line": "You're a really good narrator.",
+      "baseRisk": 0.2,
+      "goodText": "\"I KNOW.\" The woods seem warmer.",
+      "badText": "\"Flattery. Noted. In the margins.\""
+    },
+    {
+      "id": "narrator_mrb",
+      "label": "Ask if they know Mr. B",
+      "tone": {
+        "courage": 0.8,
+        "curiosity": 0.4
+      },
+      "line": "Do you know the vice principal?",
+      "baseRisk": 0.3,
+      "goodText": "A long pause. \"We've... met. Next question.\"",
+      "badText": "\"Everyone knows everyone. Small town.\"",
+      "gate": {
+        "cha": 9
+      },
+      "outcomes": {
+        "onGood": {
+          "flag": "narrator_mrb_hint"
+        }
+      },
+      "cond": {
+        "minWeek": 2
+      }
+    },
+    {
+      "id": "narrator_future",
+      "label": "Ask if they're from the future",
+      "tone": {
+        "curiosity": 0.9
+      },
+      "line": "Are you... me? From later?",
+      "baseRisk": 0.3,
+      "goodText": "\"Wouldn't that be a twist.\" They don't say no.",
+      "badText": "\"Hah. No. Maybe. No.\"",
+      "gate": {
+        "cha": 11
+      },
+      "outcomes": {
+        "onGood": {
+          "flag": "narrator_future_hint"
+        }
+      },
+      "cond": {
+        "minWeek": 3
+      }
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "book",
+      "photo",
+      "music"
+    ],
+    "dislikes": [
+      "chainfood"
+    ],
+    "likeText": "\"For me? I'll mention this in the epilogue.\""
+  }
 }

@@ -10,13 +10,13 @@ Claude Code updates this at the end of every milestone and before stopping, so a
 | M3 Grid combat | Done | 2.5D grid combat: all 11 Forms, Vector effects, Contest, Instability, Vector Wheel, initiative timeline, disposition AI, flee, downed/death, MP carry-over. F1 > Fights |
 | M4 Calendar and AP | Done | Run as one Dictionary, Flow autoload runs day parts, schedule/class/night/detention screens, 64 class events, skipping and detention, Night workbench with a stub timing minigame, Property Bank crafting, deck editor, title screen |
 | M5 Town | Done | 4 walkable zones built from data with Kenney tiles, 72 locations with status/hours/door lines, 13 interiors, 35 NPC records with homes and schedules, doorstep talks, shops (deli, forge, hospital, corner store), items and gear |
-| M6 Social system | Not started | |
+| M6 Social system | Done | 134 topics across 34 characters with CHA Gates, reception by Match, misheard lines, moods, gifts, hangouts, staggered recruitment, party screen, narrator Bond tone, the week 1 Monday Kelly scenario (lunch, disruption, evening tutorial floor with guest Kelly) with Kelly Risk and both outcomes |
 | M7 The Upside-Down | Not started | |
 | M8 Alpha content and polish | Not started | |
 
 ## Next step
 
-Start M6 (social: dialogue topics, gifts, traits and disposition per character in data/npcs/, Charisma gates, reception by Match, misheard lines, Bonds and tiers, recruitment, portraits, narrator Bond tone, the week 1 Monday Kelly scenario with Kelly Risk, Todd and the Innocent Bystander as town flavor).
+Start M7 (the Upside-Down: weekly signature shaped by town events, seeded floors Mon to Thu, Friday boss floor with returning fled-first enemies, The Hollow Mascot with phases, permadeath restart, Narrator's Journal between runs, autosave; week 1 playable end to end). The Monday evening already runs as a scripted story floor (`data/story/week1_monday.json`); the M7 dungeon should keep using it for week 1 Monday.
 
 ## How to check
 
@@ -60,6 +60,12 @@ Start M6 (social: dialogue topics, gifts, traits and disposition per character i
 - `Social` autoload + `src/scenes/ui/dialogue_screen.gd` (portrait, Bond tier, greeting; M6 adds topics via `extra_options`).
 - The M4 hub (`main.tscn`, `data/locations.json`) is gone; the title goes to the town. F1 > Town teleports.
 
+### M6 (done)
+- Core: `src/core/social/dialogue_check.gd` (topic locks, seeded daily mood, reception = Match + mood + Bond/400, misheard chance and alternates, `say()`), `src/core/social/bonds.gd` (gifts by tags, hangouts, recruitment Gates, recruit to roster, party, fought-together Bond), `src/core/story/story.gd` (story triggers, misheard choices, Kelly Risk from the guest fight, panic check, guests).
+- Data: `data/npcs/*.json` now carry topics, gifts, hangouts, recruit text and Gates, `weekLines` (Innocent Bystander); `data/social.json`; `data/narrator.json` (lines by Bond tone); `data/story/week1_monday.json`; `data/endings.json`.
+- Scenes: `dialogue_screen.gd` (topics, "you meant / they heard", gifts, hang out, recruit), `party_screen.gd` (Night menu), `src/scenes/story/story_scene.tscn` (plays non-inline stories and resumes after fights). `Flow` plays inline stories at part start, sends the evening to a due story, and on `run_ended` deletes the save, shows the ending and returns to the title.
+- Dev flag `--talk=npc_id` opens a conversation (screenshots).
+
 ## Decisions made during development
 
 - **Git:** `origin` is https://github.com/suwechue/rpg.git; every milestone commit is pushed. Art and audio under `assets/` are tracked with Git LFS.
@@ -92,6 +98,11 @@ Start M6 (social: dialogue topics, gifts, traits and disposition per character i
 - **Interiors** are small rooms with Ninja Adventure floor/brick tiles and drawn placeholder furniture. School classrooms are rooms off one hallway interior. The corner store stays EXTERIOR but sells through a walk-up window, so it can be one of the four shops.
 - **Shops** cost 1 AP per visit. Price = base x (1 + keeper Greed / 200) x (1 - (CHA - 5) x 0.02). New gear auto-equips into an empty slot; combat item cards go straight into the deck if there's room. Weapons add Strike power (`strikePower` mod), armor adds Defense.
 - **Talking** across a counter or desk works (shopkeepers stand behind them).
+- **Reception:** score = Match(current disposition, the line's tone) + mood (good +0.15, bad -0.15) + Bond/400, clamped to -1..1. Good at 0.2+, bad at -0.05 or less; Bond change = score x 10 (x up to 1.45 for risky lines when it lands), neutral +1. A misheard line uses its alternate's tone (or the flipped tone) and can never land as good.
+- **Topics** cost 1 AP and can each be used once per week (some only once ever). Moods are seeded per NPC per day. Gifts: +5 per liked tag +5 (max 15), disliked -5, otherwise +2. Hanging out (2 AP, Acquaintance+) gives +6..+12.
+- **Recruitment pacing:** Core Four from week 1; Sam, Baxter and Jon from week 2; Kris, Diane, Penny from week 3 (Jake also needs his forge questline, Phase 3 deli shifts); Mel from week 4. Kelly needs Bond 60 and a kind first night (Risk 0 or less). Recruits join near your level minus one. The roster holds anyone; 3 come along each night.
+- **Kelly's first night:** the evening is a scripted tutorial floor (story scene) rather than a generated one. Risk sources match DESIGN.md exactly; the panic choice reassurances need CHA 5 or having defended her earlier. The tutorial fight is two Detention Slips so it stays short. Surviving sets Kelly's Bond by (3 - Risk) x 4 and, at Risk 0 or less, her Loyalty to 60 and her recruitment flag.
+- **Narrator tone:** Rival or worse = sarcastic, Stranger = dry, Acquaintance and up = warm. The narrator is an NPC at the park and woods edge with their own topics (two hint at identities without confirming).
 - **Magic Resistance as a percent:** each point of Magic Resistance is 2% spell damage reduction, capped at 60% (`stats.json` combat block).
 
 ## Stubs and known issues
@@ -100,6 +111,6 @@ Start M6 (social: dialogue topics, gifts, traits and disposition per character i
 - The combat timeline shows 2-letter name tags instead of portraits.
 
 - Town art: interior furniture is drawn rectangles; water is drawn; road intersections reuse the horizontal road tile.
-- Doorstep and in-town conversations only show a greeting until M6.
+- Death screen is a narrator event; M7 adds the Narrator's Journal and run summary.
 - The crafting minigame is one timing bar for all 4 archetypes (M8 makes distinct ones).
 - The evening dungeon is skipped with a narrator line until M7.

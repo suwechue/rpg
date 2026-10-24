@@ -60,5 +60,69 @@
       "midday": "garys_deli"
     }
   },
-  "greeting": "Wait, what happened? Hi!"
+  "greeting": "Wait, what happened? Hi!",
+  "topics": [
+    {
+      "id": "phase_shift",
+      "label": "Ask how his deli shift is going",
+      "tone": {
+        "curiosity": 0.8
+      },
+      "line": "How's working at Gary's?",
+      "baseRisk": 0.05,
+      "goodText": "An enthusiastic, slightly confused description of sandwich-making as a sport.",
+      "badText": "\"Wait, what happened?\""
+    },
+    {
+      "id": "phase_explain",
+      "label": "Explain what happened in a fight he won",
+      "tone": {
+        "kindness": 0.9
+      },
+      "line": "So, in that game, here's what you did...",
+      "baseRisk": 0.05,
+      "goodText": "Delighted to finally understand. Genuinely grateful.",
+      "badText": "\"...I think I won? Someone tell me if I won.\""
+    },
+    {
+      "id": "phase_invite",
+      "label": "Invite him to a game",
+      "tone": {
+        "courage": 0.9
+      },
+      "line": "Pickup game after school?",
+      "baseRisk": 0.05,
+      "goodText": "Immediate yes. Pure enthusiasm.",
+      "badText": "\"Can't, practice.\""
+    },
+    {
+      "id": "phase_social",
+      "label": "Explain something socially complicated",
+      "tone": {
+        "kindness": 0.8
+      },
+      "line": "So when Kelly says 'fine', she means--",
+      "baseRisk": 0.2,
+      "goodText": "He gets it! Mostly!",
+      "badText": "He takes it completely literally. It's very funny.",
+      "gate": {
+        "cha": 10
+      }
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "sports",
+      "snack",
+      "food"
+    ],
+    "dislikes": [
+      "academic"
+    ],
+    "likeText": "\"A BALL!\""
+  },
+  "hangouts": [
+    "You play one-on-one with Phase. You lose. He doesn't notice he won."
+  ],
+  "recruitText": "\"Wait, you want me? On the TEAM? YES.\""
 }

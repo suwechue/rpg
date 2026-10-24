@@ -50,5 +50,93 @@
       "afternoon": "@missing"
     }
   },
-  "greeting": "...five more minutes."
+  "greeting": "...five more minutes.",
+  "topics": [
+    {
+      "id": "sam_good",
+      "label": "Ask how he's so good at everything",
+      "tone": {
+        "curiosity": 0.9
+      },
+      "line": "How are you so good at everything?",
+      "baseRisk": 0.05,
+      "goodText": "A shrug. \"huh. worked.\" He genuinely doesn't know.",
+      "badText": "\"...five more minutes.\""
+    },
+    {
+      "id": "sam_wake",
+      "label": "Wake him up",
+      "tone": {
+        "courage": 0.3,
+        "curiosity": 0.3
+      },
+      "line": "Hey. Sam. Wake up.",
+      "baseRisk": 0.2,
+      "goodText": "\"...is it Tuesday?\" It's Thursday.",
+      "badText": "He assumes it's a different time of day entirely."
+    },
+    {
+      "id": "sam_family",
+      "label": "Ask about his family",
+      "tone": {
+        "kindness": 1.0
+      },
+      "line": "What's your family like?",
+      "baseRisk": 0.3,
+      "goodText": "\"...intense.\" It's more complicated than he lets on.",
+      "badText": "\"Fine.\"",
+      "gate": {
+        "cha": 12
+      },
+      "minTier": "Friend"
+    },
+    {
+      "id": "sam_bet",
+      "label": "Bet him he can't do something",
+      "tone": {
+        "pride": 0.8
+      },
+      "line": "Bet you can't hit that can from here.",
+      "baseRisk": 0.2,
+      "goodText": "He does it. Barely trying.",
+      "badText": "\"...don't feel like it.\""
+    },
+    {
+      "id": "sam_scarf",
+      "label": "Ask why he always wears the scarf",
+      "tone": {
+        "curiosity": 1.0
+      },
+      "line": "Why do you always wear the scarf?",
+      "baseRisk": 0.3,
+      "goodText": "\"...it's a whole thing, don't worry about it.\" The topic closes. Forever.",
+      "badText": "\"...\"",
+      "gate": {
+        "cha": 10
+      },
+      "outcomes": {
+        "onGood": {
+          "flag": "sam_scarf_asked"
+        },
+        "onBad": {
+          "flag": "sam_scarf_asked"
+        }
+      },
+      "once": true
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "snack",
+      "food"
+    ],
+    "dislikes": [
+      "academic"
+    ],
+    "likeText": "\"...snacks.\" He's asleep with it in his hand ten minutes later."
+  },
+  "hangouts": [
+    "You find Sam's nap spot. You nap too. It's the best sleep you've had since moving here."
+  ],
+  "recruitText": "\"...sure. wake me up when it's my turn.\""
 }

@@ -48,5 +48,99 @@
       "afternoon": "arcade"
     }
   },
-  "greeting": "Wait, wait, you have to see this combo--"
+  "greeting": "Wait, wait, you have to see this combo--",
+  "topics": [
+    {
+      "id": "jon_obsession",
+      "label": "Ask about his latest obsession",
+      "tone": {
+        "curiosity": 1.0
+      },
+      "line": "What are you into right now?",
+      "baseRisk": 0.05,
+      "goodText": "Enthusiastic info-dump. You understand maybe a third. He's thrilled.",
+      "badText": "\"You wouldn't get it.\""
+    },
+    {
+      "id": "jon_reference",
+      "label": "Make an obscure reference back at him",
+      "tone": {
+        "curiosity": 0.9,
+        "pride": 0.2
+      },
+      "line": "\"The combo was inside us all along.\"",
+      "baseRisk": 0.2,
+      "goodText": "He's delighted beyond reason.",
+      "badText": "\"...that's not how the quote goes.\""
+    },
+    {
+      "id": "jon_vectors",
+      "label": "Ask him to teach you about Vectors",
+      "tone": {
+        "curiosity": 1.0
+      },
+      "line": "Teach me about Vectors?",
+      "baseRisk": 0.05,
+      "goodText": "Tutorial-adjacent and genuinely useful. Hybrids are where it's at, apparently.",
+      "badText": "\"Later, I'm mid-combo.\"",
+      "gate": {
+        "cha": 6
+      },
+      "outcomes": {
+        "onGood": {
+          "affinity": {
+            "force": 1,
+            "motion": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "jon_focus",
+      "label": "Tell him to focus on the mission",
+      "tone": {
+        "pride": 0.7
+      },
+      "line": "Can we focus?",
+      "baseRisk": 0.2,
+      "goodText": "\"Right. Focus. Unless--\" He refocuses. Mostly.",
+      "badText": "He thinks you're into the tangent and gets MORE excited.",
+      "misheard": [
+        {
+          "line": "Can we focus on THAT?",
+          "tone": {
+            "curiosity": 0.9
+          }
+        }
+      ]
+    },
+    {
+      "id": "jon_schoolamon",
+      "label": "Ask him about Schoolamon",
+      "tone": {
+        "curiosity": 1.0
+      },
+      "line": "What's Schoolamon?",
+      "baseRisk": 0.05,
+      "goodText": "He lights up completely and offers to teach you. (The card game is coming later.)",
+      "badText": "\"It's not for casuals.\"",
+      "outcomes": {
+        "onGood": {
+          "flag": "schoolamon_hook"
+        }
+      }
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "collectible",
+      "rare"
+    ],
+    "dislikes": [],
+    "likeText": "\"IS THAT MINT IN BOX.\""
+  },
+  "hangouts": [
+    "Jon walks you through his entire collection. One figure is an artifact. He doesn't know which."
+  ],
+  "recruitText": "\"WAIT. You want ME? I've been WAITING for someone to ask me that.\""
 }

@@ -25,5 +25,25 @@
       "midday": "town_square"
     }
   },
-  "greeting": "...don't ask. Please. I'm so tired."
+  "greeting": "...don't ask. Please. I'm so tired.",
+  "topics": [
+    {
+      "id": "todd_where",
+      "label": "Ask where he goes",
+      "tone": {
+        "curiosity": 0.8
+      },
+      "line": "Where do you GO, Todd?",
+      "baseRisk": 0.05,
+      "goodText": "\"...don't ask. Please. I'm so tired.\"",
+      "badText": "\"...don't ask. Please. I'm so tired.\""
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "snack"
+    ],
+    "dislikes": []
+  },
+  "noHangout": true
 }

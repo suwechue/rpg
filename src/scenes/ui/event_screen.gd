@@ -4,6 +4,8 @@
 ##   "effects", "result" }], "speaker" }
 extends "res://src/scenes/ui/modal.gd"
 
+const StoryRules := preload("res://src/core/story/story.gd")
+
 var event: Dictionary = {}
 var extra_ctx: Dictionary = {}
 
@@ -28,8 +30,13 @@ func _ready() -> void:
 	focus_first()
 
 
-func _choose(ch: Dictionary) -> void:
+func _choose(picked: Dictionary) -> void:
+	var ch := StoryRules.resolve_choice(DataDB.all(), GameState.run, picked, Rng.stream("dialogue"))
 	clear_body()
+	if bool(ch.get("wasMisheard", false)):
+		var quip := Narrator.line("misheard")
+		if quip != "":
+			text("(%s)" % quip, UiTheme.DIM)
 	var lines := GameState.apply_effects(ch.get("effects", {}), extra_ctx)
 	if str(ch.get("result", "")) != "":
 		text(str(ch["result"]))

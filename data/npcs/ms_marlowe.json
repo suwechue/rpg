@@ -27,5 +27,87 @@
       "afternoon": "library"
     }
   },
-  "greeting": "It's in the back, third shelf. You're welcome."
+  "greeting": "It's in the back, third shelf. You're welcome.",
+  "topics": [
+    {
+      "id": "marlowe_book",
+      "label": "Ask for a book recommendation",
+      "tone": {
+        "curiosity": 0.9
+      },
+      "line": "What should I read?",
+      "baseRisk": 0.05,
+      "goodText": "\"Third shelf, back. The blue one.\" It's exactly what you needed.",
+      "badText": "\"Anything. Read anything.\"",
+      "outcomes": {
+        "onGood": {
+          "statXp": {
+            "int": 0.5
+          }
+        }
+      }
+    },
+    {
+      "id": "marlowe_history",
+      "label": "Ask about town history",
+      "tone": {
+        "curiosity": 1.0
+      },
+      "line": "Is there a real history of this town somewhere?",
+      "baseRisk": 0.05,
+      "goodText": "\"You want the real history, or the version the school board approved?\" She hands you a binder.",
+      "badText": "\"It's all on the shelves.\"",
+      "gate": {
+        "cha": 10
+      },
+      "outcomes": {
+        "onGood": {
+          "flag": "lore_marlowe"
+        }
+      }
+    },
+    {
+      "id": "marlowe_strange",
+      "label": "Ask if she's heard anything strange",
+      "tone": {
+        "courage": 0.8
+      },
+      "line": "Have you noticed anything strange lately?",
+      "baseRisk": 0.2,
+      "goodText": "She has. She's been documenting it, quietly, for years.",
+      "badText": "\"This is a library. It's all strange.\"",
+      "gate": {
+        "cha": 9
+      },
+      "outcomes": {
+        "onGood": {
+          "flag": "lore_marlowe_notes"
+        }
+      }
+    },
+    {
+      "id": "marlowe_self",
+      "label": "Ask why she never talks about herself",
+      "tone": {
+        "kindness": 1.0
+      },
+      "line": "You never talk about yourself.",
+      "baseRisk": 0.3,
+      "goodText": "A pause. \"I used to write. Before.\" That's all, and it's a lot.",
+      "badText": "\"Shh.\"",
+      "gate": {
+        "cha": 14
+      },
+      "minTier": "Friend"
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "book",
+      "rare",
+      "notebook"
+    ],
+    "dislikes": [],
+    "likeText": "\"Correctly cited. And not dog-eared.\" Approval."
+  }
 }

@@ -10,6 +10,7 @@ const DT := preload("res://src/core/data_tables.gd")
 const RM := preload("res://src/core/run/run_model.gd")
 const Fx := preload("res://src/core/run/effects.gd")
 const DayFlow := preload("res://src/core/run/day_flow.gd")
+const BondRules := preload("res://src/core/social/bonds.gd")
 
 const COMBAT_SCENE := "res://src/scenes/combat/combat.tscn"
 
@@ -145,10 +146,15 @@ func part_screens() -> Array:
 ## Characters who fight tonight: the player plus chosen roster members who are
 ## not injured, as combat setup entries.
 func combat_party() -> Array:
+	var ids := DayFlow.available_party(run)
+	player["partyBonds"] = BondRules.party_bonds(run, ids)
 	var out: Array = [{ "char": player }]
-	for id in DayFlow.available_party(run):
+	for id in ids:
 		var m := character(str(id))
+		m["partyBonds"] = { "player": RM.bond(run, str(id)) }
 		out.append({ "char": m, "ai": bool(m.get("guest", false)), "guest": bool(m.get("guest", false)) })
+	for g in run.get("guests", []):
+		out.append({ "char": g, "ai": true, "guest": true })
 	return out
 
 
@@ -232,6 +238,12 @@ func finish_combat(summary: Dictionary) -> Dictionary:
 				lines.append("%s reached level %d!" % [ch.get("name", "?"), int(r["level"])])
 	if result == "lose":
 		lines.append("The Upside-Down keeps you.")
+	else:
+		var survivors: Array = []
+		for p in summary.get("party", []):
+			if not bool(p.get("downed", false)) and not character(str(p["id"])).get("guest", false):
+				survivors.append(str(p["id"]))
+		BondRules.fought_together(DataDB.all(), run, survivors)
 	EventBus.combat_finished.emit(summary)
 	return { "lines": lines }
 

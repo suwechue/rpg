@@ -48,5 +48,81 @@
       "afternoon": "@nap"
     }
   },
-  "greeting": "...yeah."
+  "greeting": "...yeah.",
+  "topics": [
+    {
+      "id": "kris_obscure",
+      "label": "Ask him something obscure",
+      "tone": {
+        "curiosity": 0.9
+      },
+      "line": "Know anything about old maps of this town?",
+      "baseRisk": 0.05,
+      "goodText": "Surprisingly on-point, delivered with zero fanfare.",
+      "badText": "\"...nope.\"",
+      "gate": {
+        "cha": 8
+      },
+      "outcomes": {
+        "onGood": {
+          "flag": "lore_kris_maps"
+        }
+      }
+    },
+    {
+      "id": "kris_react",
+      "label": "Try to get a reaction out of him",
+      "tone": {
+        "curiosity": 0.8
+      },
+      "line": "(Make your weirdest face.)",
+      "baseRisk": 0.2,
+      "goodText": "Nothing. That's the joke.",
+      "badText": "Nothing. Also the joke."
+    },
+    {
+      "id": "kris_naps",
+      "label": "Ask where he naps",
+      "tone": {
+        "curiosity": 0.7
+      },
+      "line": "Where's the best nap spot?",
+      "baseRisk": 0.05,
+      "goodText": "He actually answers. Real information, for once.",
+      "badText": "\"...varies.\""
+    },
+    {
+      "id": "kris_teach",
+      "label": "Ask him to teach you something",
+      "tone": {
+        "curiosity": 0.9
+      },
+      "line": "Teach me something?",
+      "baseRisk": 0.05,
+      "goodText": "Efficient, surprisingly clear instruction.",
+      "badText": "\"...later.\"",
+      "gate": {
+        "cha": 10
+      },
+      "outcomes": {
+        "onGood": {
+          "statXp": {
+            "dex": 0.5
+          }
+        }
+      }
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "book",
+      "food"
+    ],
+    "dislikes": [],
+    "likeText": "\"...nice.\" From Kris, a parade."
+  },
+  "hangouts": [
+    "Kris cooks for you. It's incredible. He shrugs it off."
+  ],
+  "recruitText": "\"...it's handled.\" He's in."
 }

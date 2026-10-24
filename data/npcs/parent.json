@@ -26,5 +26,40 @@
       "weekend_evening": "home"
     }
   },
-  "greeting": "Did you eat? Eat something. Love you. Late shift tonight."
+  "greeting": "Did you eat? Eat something. Love you. Late shift tonight.",
+  "topics": [
+    {
+      "id": "parent_day",
+      "label": "Tell them about your day",
+      "tone": {
+        "kindness": 0.8,
+        "loyalty": 0.4
+      },
+      "line": "School was... interesting.",
+      "baseRisk": 0.05,
+      "goodText": "\"Interesting good or interesting bad? Both? Okay. I love you.\"",
+      "badText": "\"Mm-hm.\" They're on the phone with work."
+    },
+    {
+      "id": "parent_late",
+      "label": "Mention you've been out late",
+      "tone": {
+        "courage": 0.6,
+        "loyalty": 0.5
+      },
+      "line": "I've been out kind of late.",
+      "baseRisk": 0.2,
+      "goodText": "\"Just text me. That's all I ask.\" Loving, oblivious.",
+      "badText": "\"We'll talk later.\" Later never comes."
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "coffee",
+      "baked"
+    ],
+    "dislikes": [],
+    "likeText": "\"You bought me coffee? Who raised you? Oh. Me.\""
+  },
+  "noHangout": true
 }

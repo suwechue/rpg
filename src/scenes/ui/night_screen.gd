@@ -40,6 +40,13 @@ func _menu() -> void:
 		await holder.closed
 		visible = true
 		_menu())
+	add_button("Party (%d recruited)" % GameState.roster.size(), func() -> void:
+		var ps := preload("res://src/scenes/ui/party_screen.gd").new()
+		get_parent().add_child(ps)
+		visible = false
+		await ps.closed
+		visible = true
+		_menu())
 	for extra in Flow.night_extras():
 		var e: Dictionary = extra
 		add_button(str(e["label"]), func() -> void:

@@ -44,5 +44,103 @@
       "midday": "town_hall"
     }
   },
-  "greeting": "This isn't personal. It's policy."
+  "greeting": "This isn't personal. It's policy.",
+  "topics": [
+    {
+      "id": "b_dislike",
+      "label": "Ask why he dislikes you",
+      "tone": {
+        "courage": 1.0
+      },
+      "line": "Why don't you like me?",
+      "baseRisk": 0.3,
+      "goodText": "A cold, evasive non-answer. \"I like everyone equally. On paper.\"",
+      "badText": "\"This isn't personal. It's policy.\"",
+      "gate": {
+        "cha": 10
+      }
+    },
+    {
+      "id": "b_report",
+      "label": "Report something suspicious",
+      "tone": {
+        "loyalty": 0.9
+      },
+      "line": "Something weird is going on at night.",
+      "baseRisk": 0.2,
+      "goodText": "\"Thank you. I'll... handle it.\" He writes something down.",
+      "badText": "He quietly uses the report against a different student.",
+      "outcomes": {
+        "onGood": {
+          "flag": "mr_b_told"
+        },
+        "onBad": {
+          "flag": "mr_b_misused_report",
+          "bond": {
+            "dex": -4
+          }
+        }
+      }
+    },
+    {
+      "id": "b_confront",
+      "label": "Confront him about a disappearance",
+      "tone": {
+        "courage": 1.0,
+        "kindness": 0.2
+      },
+      "line": "Where did the missing students go?",
+      "baseRisk": 0.3,
+      "goodText": "He threatens expulsion instead of answering. Which is an answer.",
+      "badText": "\"Careful.\"",
+      "gate": {
+        "cha": 16
+      },
+      "outcomes": {
+        "onGood": {
+          "flag": "confronted_mr_b"
+        }
+      },
+      "cond": {
+        "flag": "mr_b_evidence"
+      },
+      "lockedHint": "Needs evidence"
+    },
+    {
+      "id": "b_flatter",
+      "label": "Try to flatter him",
+      "tone": {
+        "pride": 1.0
+      },
+      "line": "The school runs so well because of you.",
+      "baseRisk": 0.05,
+      "goodText": "Briefly effective. He's too paranoid to fully let his guard down.",
+      "badText": "\"Flattery is a tell.\"",
+      "gate": {
+        "cha": 8
+      }
+    },
+    {
+      "id": "b_sambaxter",
+      "label": "Ask about Sam and Baxter's disruptions",
+      "tone": {
+        "pride": 0.8
+      },
+      "line": "Do Sam and Baxter get away with a lot?",
+      "baseRisk": 0.05,
+      "goodText": "\"I have a file on both of them. I have a file on everyone. You'd be surprised what I've let slide, and what I haven't.\"",
+      "badText": "\"That's confidential.\""
+    }
+  ],
+  "gifts": {
+    "likes": [],
+    "dislikes": [
+      "joke",
+      "absurd",
+      "food"
+    ],
+    "likeText": "He accepts it like evidence.",
+    "dislikeText": "\"I'll log this.\""
+  },
+  "noHangout": true
 }

@@ -27,5 +27,41 @@
       "afternoon": "arcade"
     }
   },
-  "greeting": "Do you think she noticed? Oh no, she noticed."
+  "greeting": "Do you think she noticed? Oh no, she noticed.",
+  "topics": [
+    {
+      "id": "kara_kelly",
+      "label": "Ask what Kelly thinks of you",
+      "tone": {
+        "curiosity": 0.8
+      },
+      "line": "Does Kelly hate me?",
+      "baseRisk": 0.2,
+      "goodText": "\"She doesn't HATE you. She just... oh no, she's looking.\"",
+      "badText": "\"Do you think she noticed? Oh no, she noticed.\""
+    },
+    {
+      "id": "kara_crush",
+      "label": "Ask about her crush",
+      "tone": {
+        "kindness": 0.5,
+        "curiosity": 0.5
+      },
+      "line": "So who's the crush?",
+      "baseRisk": 0.3,
+      "goodText": "She turns bright red and tells you everything.",
+      "badText": "\"WHAT crush.\"",
+      "gate": {
+        "cha": 6
+      }
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "squad",
+      "music"
+    ],
+    "dislikes": [],
+    "likeText": "\"Our colors! Kelly's gonna-- oh no, should I tell Kelly?\""
+  }
 }
