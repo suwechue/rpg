@@ -1,0 +1,25 @@
+{
+  "locations": [
+    { "id": "home", "name": "Home", "tile": [3, 13], "ap": 1, "color": "#6fa8dc",
+      "openParts": ["before_school", "night", "morning", "weekend_evening"],
+      "action": "Sketch a spell card at your workbench (crafting arrives in M4)", "effects": {} },
+    { "id": "high_school", "name": "High School", "tile": [15, 4], "ap": 1, "color": "#c9c9c9",
+      "openParts": ["lunch"],
+      "action": "Sit with classmates at lunch (social system arrives in M6)", "effects": { "cha": 1 } },
+    { "id": "garys_deli", "name": "Gary's Deli", "tile": [24, 8], "ap": 1, "color": "#e69138",
+      "openParts": ["before_school", "lunch", "after_school", "morning", "midday", "afternoon"],
+      "action": "Gary's breakfast special. He says the freezer's been acting weird", "effects": {} },
+    { "id": "blacksmith", "name": "Blacksmith", "tile": [6, 7], "ap": 2, "color": "#cc4125",
+      "openParts": ["after_school", "morning", "midday", "afternoon"],
+      "action": "Work the bellows at the forge", "effects": { "str": 1 } },
+    { "id": "library", "name": "Library", "tile": [10, 11], "ap": 2, "color": "#8e7cc3",
+      "openParts": ["after_school", "morning", "midday", "afternoon"],
+      "action": "Study old town records", "effects": { "int": 1 } },
+    { "id": "hospital", "name": "Hospital", "tile": [24, 13], "ap": 2, "color": "#93c47d",
+      "openParts": ["after_school", "morning", "midday", "afternoon", "weekend_evening"],
+      "action": "Volunteer shift with Nurse Patti", "effects": { "wil": 1 } },
+    { "id": "woods_edge", "name": "Woods Edge", "tile": [28, 4], "ap": 1, "color": "#38761d",
+      "openParts": ["after_school", "afternoon", "weekend_evening"],
+      "action": "Someone is narrating your every step. Out loud", "effects": { "per": 1 } }
+  ]
+}

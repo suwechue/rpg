@@ -1,0 +1,19 @@
+{
+  "classes": [
+    { "id": "mage",    "name": "Mage",    "tier": 1, "growth": { "int": 35, "wil": 25, "per": 15, "str": 5, "dex": 7, "con": 7, "cha": 6 },
+      "hpBonus": 0, "mpBonus": 6, "startVectors": 2, "startForms": ["bolt", "shield"],
+      "perk": { "id": "overchannel", "text": "Once per fight, improvise at normal card cost" } },
+    { "id": "fighter", "name": "Fighter", "tier": 1, "growth": { "str": 35, "con": 30, "dex": 15, "int": 5, "per": 5, "wil": 5, "cha": 5 },
+      "hpBonus": 10, "mpBonus": 0, "startVectors": 1, "startForms": ["weapon_infusion"],
+      "perk": { "id": "second_wind", "text": "Heal 20% HP once per fight under 30% HP" } },
+    { "id": "rogue",   "name": "Rogue",   "tier": 1, "growth": { "dex": 35, "per": 25, "cha": 10, "str": 10, "con": 8, "int": 6, "wil": 6 },
+      "hpBonus": 4, "mpBonus": 2, "startVectors": 1, "startForms": ["bolt"],
+      "perk": { "id": "backstab", "text": "+50% damage from behind or flank" } },
+    { "id": "healer",  "name": "Healer",  "tier": 1, "growth": { "wil": 30, "con": 20, "int": 20, "per": 10, "cha": 10, "str": 5, "dex": 5 },
+      "hpBonus": 4, "mpBonus": 4, "startVectors": 1, "startForms": ["shield", "aura"], "forcedVectors": ["light"],
+      "perk": { "id": "triage", "text": "Healing cards cost 1 less MP on allies under half HP" } },
+    { "id": "bard",    "name": "Bard",    "tier": 1, "growth": { "cha": 35, "wil": 20, "dex": 15, "int": 10, "per": 10, "str": 5, "con": 5 },
+      "hpBonus": 2, "mpBonus": 3, "startVectors": 1, "startForms": ["burst"],
+      "perk": { "id": "hype", "text": "Party gains initiative and +1 draw on turn 1" } }
+  ]
+}

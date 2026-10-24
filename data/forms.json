@@ -1,0 +1,15 @@
+{
+  "forms": [
+    { "id": "touch",           "cost": 0, "range": 1, "multiplier": 1.5, "footprint": "adjacent" },
+    { "id": "bolt",            "cost": 0, "range": 5, "multiplier": 1.0, "footprint": "single_los" },
+    { "id": "weapon_infusion", "cost": 0, "range": 0, "multiplier": 1.0, "footprint": "self_next_2_strikes" },
+    { "id": "projectile",      "cost": 1, "range": 7, "multiplier": 1.0, "footprint": "first_in_line" },
+    { "id": "shield",          "cost": 1, "range": 3, "multiplier": 0.0, "footprint": "ally_absorb_2_turns" },
+    { "id": "line",            "cost": 1, "range": 4, "multiplier": 0.8, "footprint": "line" },
+    { "id": "burst",           "cost": 2, "range": 4, "multiplier": 0.7, "footprint": "square_3x3" },
+    { "id": "sphere",          "cost": 2, "range": 0, "multiplier": 0.7, "footprint": "diamond_r2_self" },
+    { "id": "aura",            "cost": 2, "range": 0, "multiplier": 0.4, "footprint": "zone_r1_self_3_turns" },
+    { "id": "construct",       "cost": 3, "range": 3, "multiplier": 1.0, "footprint": "place_object_3_turns" },
+    { "id": "glyph",           "cost": 3, "range": 4, "multiplier": 1.2, "footprint": "trap_tile" }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "tiers": [
+    { "min": -100, "name": "Enemy" },
+    { "min": -50,  "name": "Rival" },
+    { "min": -10,  "name": "Stranger" },
+    { "min": 11,   "name": "Acquaintance" },
+    { "min": 41,   "name": "Friend" },
+    { "min": 71,   "name": "Close" },
+    { "min": 86,   "name": "Unbreakable" }
+  ]
+}

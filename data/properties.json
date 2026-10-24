@@ -1,0 +1,7 @@
+{
+  "properties": [
+    { "id": "searing_edge", "name": "Searing Edge", "signature": { "heat": 0.7, "force": 0.3 },  "gate": { "heat": 5 },  "weight": 1.0 },
+    { "id": "keen_balance", "name": "Keen Balance", "signature": { "force": 0.6, "motion": 0.4 }, "gate": { "force": 4 }, "weight": 0.8 },
+    { "id": "frostbite",    "name": "Frostbite",    "signature": { "cold": 0.8, "force": 0.2 },  "gate": { "cold": 5 },  "weight": 1.0 }
+  ]
+}

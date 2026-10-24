@@ -1,0 +1,15 @@
+{
+  "statMin": 1,
+  "statMax": 20,
+  "derived": {
+    "maxHp":        { "base": 20, "con": 4 },
+    "maxMp":        { "base": 10, "int": 2, "wil": 1 },
+    "movement":     { "base": 3, "dexDivisor": 5 },
+    "initiative":   { "dex": 1, "per": 0.5 },
+    "physDefense":  { "con": 0.5 },
+    "magicResist":  { "wil": 0.5 },
+    "stability":    { "wil": 1, "int": 0.5 },
+    "critChancePct":{ "base": 5, "dex": 0.5 }
+  },
+  "misinterpretation": { "chaDivisor": 25, "badMoodMultiplier": 1.5, "minimum": 0.02 }
+}

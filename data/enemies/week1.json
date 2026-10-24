@@ -1,0 +1,10 @@
+{
+  "enemies": [
+    { "id": "frost_wolf", "name": "Frost Wolf", "hp": 24, "movement": 4,
+      "weakTo": ["heat"], "strongAgainst": ["cold"],
+      "disposition": { "courage": 40, "greed": 10, "pride": 0 } },
+    { "id": "pom_pom_wisp", "name": "Pom-Pom Wisp", "hp": 14, "movement": 5,
+      "weakTo": ["binding"], "strongAgainst": ["light"],
+      "disposition": { "courage": -30, "curiosity": 60 } }
+  ]
+}

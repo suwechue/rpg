@@ -1,0 +1,32 @@
+{
+  "arcane": {
+    "axes": ["heat", "cold", "force", "motion", "binding", "light", "transmutation", "vitality", "corrosion"],
+    "tiers": { "heat": 1, "cold": 1, "force": 1, "motion": 1, "binding": 2, "light": 2, "transmutation": 3, "vitality": 3, "corrosion": 3 },
+    "signed": false,
+    "tieBreak": "axisOrder"
+  },
+  "forms": {
+    "axes": ["bolt", "burst", "shield", "weapon_infusion", "line", "sphere", "projectile", "touch", "aura", "construct", "glyph"],
+    "signed": false
+  },
+  "stats": {
+    "axes": ["str", "dex", "con", "int", "per", "wil", "cha"],
+    "signed": false,
+    "min": 1,
+    "max": 20
+  },
+  "disposition": {
+    "axes": ["courage", "greed", "curiosity", "loyalty", "kindness", "pride"],
+    "signed": true,
+    "min": -100,
+    "max": 100
+  },
+  "bond": {
+    "axes": ["bond"],
+    "signed": true,
+    "min": -100,
+    "max": 100,
+    "weeklyDecay": 0.05,
+    "noDecayAt": 86
+  }
+}

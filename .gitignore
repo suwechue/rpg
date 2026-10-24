@@ -1,0 +1,12 @@
+# Godot 4
+.godot/
+*.tmp
+export_presets.cfg
+/build/
+
+# local test output
+tools/*.log
+
+# downloaded pack archives (unpacked copies live next to them)
+assets/packs/*.zip
+tools/apply_town_update.py

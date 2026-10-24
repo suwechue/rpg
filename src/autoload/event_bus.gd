@@ -1,0 +1,19 @@
+## Global signals. Scenes connect here instead of reaching into each other.
+extends Node
+
+@warning_ignore("unused_signal")
+signal run_started(run_seed: int)
+@warning_ignore("unused_signal")
+signal run_ended(cause: String)
+@warning_ignore("unused_signal")
+signal day_part_changed(week: int, day: String, part_id: String)
+@warning_ignore("unused_signal")
+signal ap_changed(ap: int)
+@warning_ignore("unused_signal")
+signal stats_changed(character_id: String)
+@warning_ignore("unused_signal")
+signal bond_changed(a: String, b: String, value: float)
+@warning_ignore("unused_signal")
+signal card_played(caster_id: String, card_id: String)
+@warning_ignore("unused_signal")
+signal game_saved(ok: bool)

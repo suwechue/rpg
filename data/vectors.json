@@ -1,0 +1,18 @@
+{
+  "magnitudes": {
+    "minor":    { "power": 5,  "cost": 1, "minTier": 1 },
+    "standard": { "power": 10, "cost": 2, "minTier": 1 },
+    "major":    { "power": 20, "cost": 4, "minTier": 2 },
+    "grand":    { "power": 35, "cost": 7, "minTier": 3 }
+  },
+  "hybridExtraCost": 1,
+  "improvise": { "costMultiplier": 1.5, "flatExtra": 1, "discardCards": 1, "instabilityBonus": 3 },
+  "gridEffects": {
+    "heat": "Burning tiles for 2 turns; water becomes sight-blocking steam",
+    "cold": "Slow (-1 Movement); freezes water into walkable ice",
+    "force": "Push 1 tile per 10 Magnitude; collisions deal bonus damage",
+    "motion": "Teleport, swap, pull, or extra movement for allies",
+    "binding": "Root for 1 turn; tether two units",
+    "light": "Reveal hidden units and traps, blind, heal with Shield or Aura"
+  }
+}

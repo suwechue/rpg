@@ -1,0 +1,9 @@
+{
+  "cards": [
+    { "id": "card_ember_bolt",  "name": "Ember Bolt",  "kind": "spell", "vectors": { "heat": 1.0 }, "form": "bolt",   "magnitude": "standard", "properties": [], "cost": 2 },
+    { "id": "card_heat_shield", "name": "Heat Shield", "kind": "spell", "vectors": { "heat": 1.0 }, "form": "shield", "magnitude": "minor",    "properties": [], "cost": 2 },
+    { "id": "card_frost_line",  "name": "Frost Line",  "kind": "spell", "vectors": { "cold": 1.0 }, "form": "line",   "magnitude": "standard", "properties": [], "cost": 3 },
+    { "id": "card_strike",      "name": "Strike",      "kind": "basic", "stat": "str", "range": 1, "cost": 0 },
+    { "id": "card_guard",       "name": "Guard",       "kind": "basic", "effect": "defense_up", "cost": 0 }
+  ]
+}

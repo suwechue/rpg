@@ -1,0 +1,14 @@
+{
+  "defaultSchedule": ["physics", "drama", "earth_science"],
+  "classes": [
+    { "id": "pe",            "name": "PE",            "statGains": ["str", "con"], "affinity": { "force": 2 } },
+    { "id": "physics",       "name": "Physics",       "statGains": ["int", "dex"], "affinity": { "force": 2, "motion": 2 } },
+    { "id": "chemistry",     "name": "Chemistry",     "statGains": ["int"],        "affinity": { "transmutation": 2, "corrosion": 2 } },
+    { "id": "earth_science", "name": "Earth Science", "statGains": ["int", "per"], "affinity": { "heat": 2, "cold": 2 } },
+    { "id": "shop",          "name": "Shop Class",    "statGains": ["str", "dex"], "affinity": { "heat": 2 } },
+    { "id": "drama",         "name": "Drama",         "statGains": ["cha"],        "affinity": { "light": 2 } },
+    { "id": "debate",        "name": "Debate",        "statGains": ["cha", "wil"], "affinity": { "binding": 2 } },
+    { "id": "biology",       "name": "Biology",       "statGains": ["con", "int"], "affinity": { "vitality": 2 } },
+    { "id": "history",       "name": "History",       "statGains": ["wil"],        "affinity": {} }
+  ]
+}

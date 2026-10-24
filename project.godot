@@ -1,0 +1,47 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[animation]
+
+compatibility/default_parent_skeleton_in_mesh_instance_3d=true
+
+[application]
+
+config/name="Project Vector"
+config/description="Top-down school-life RPG with Vector spell cards and a weekly Upside-Down dungeon."
+run/main_scene="res://src/scenes/main.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+
+[autoload]
+
+EventBus="*res://src/autoload/event_bus.gd"
+InputSetup="*res://src/autoload/input_setup.gd"
+DataDB="*res://src/autoload/data_db.gd"
+Rng="*res://src/autoload/rng.gd"
+Narrator="*res://src/autoload/narrator.gd"
+Calendar="*res://src/autoload/calendar.gd"
+GameState="*res://src/autoload/game_state.gd"
+SaveSystem="*res://src/autoload/save_system.gd"
+SceneRouter="*res://src/autoload/scene_router.gd"
+
+[display]
+
+window/size/viewport_width=480
+window/size/viewport_height=270
+window/size/window_width_override=1440
+window/size/window_height_override=810
+window/stretch/mode="viewport"
+window/stretch/scale_mode="integer"
+
+[rendering]
+
+textures/canvas_textures/default_texture_filter=0
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"

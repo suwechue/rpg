@@ -1,0 +1,17 @@
+{
+  "id": "player",
+  "name": "New Kid",
+  "class": "mage",
+  "level": 1,
+  "xp": 0,
+  "stats": { "str": 4, "dex": 5, "con": 5, "int": 7, "per": 5, "wil": 6, "cha": 4 },
+  "vectorAffinity": { "heat": 20, "cold": 20, "force": 15, "motion": 15, "binding": 15, "light": 15 },
+  "knownVectors": ["heat"],
+  "knownForms": ["bolt", "shield"],
+  "knowledgeTier": 1,
+  "resistances": {},
+  "traits": [],
+  "deck": ["card_ember_bolt", "card_ember_bolt", "card_ember_bolt", "card_heat_shield", "card_heat_shield", "card_strike", "card_strike", "card_guard"],
+  "equipment": { "weapon": null, "armor": null, "trinket": null },
+  "flags": {}
+}
