@@ -7,6 +7,7 @@ extends Node
 const DT := preload("res://src/core/data_tables.gd")
 const CardRules := preload("res://src/core/card.gd")
 const AssetSpecs := preload("res://src/core/assets/asset_specs.gd")
+const CardEffects := preload("res://src/core/combat/card_effects.gd")
 const DATA_ROOT := "res://data"
 
 var errors: Array[String] = []
@@ -76,6 +77,7 @@ func _validate() -> void:
 	var stat_axes: Array = _tables["spaces"].get("stats", {}).get("axes", [])
 	var form_axes: Array = _tables["spaces"].get("forms", {}).get("axes", [])
 	_validate_cards(arcane)
+	_validate_card_effects()
 	_validate_assets()
 	var perk_ids := {}
 	for p in records_under("perks", "perks"):
@@ -201,6 +203,22 @@ func _validate_events() -> void:
 			for ch in e.get("choices", []):
 				for fk in ["effects", "success", "fail"]:
 					_validate_effects(id, ch.get(fk, {}))
+
+
+## AR cards: known effect ops, targeting types, rarities and footprints.
+func _validate_card_effects() -> void:
+	var rarities := ["common", "uncommon", "rare"]
+	for c in records_under("cards/", "cards"):
+		var id := str(c.get("id", "?"))
+		if c.has("rarity") and not rarities.has(str(c["rarity"])):
+			errors.append("card %s: unknown rarity '%s'" % [id, c["rarity"]])
+		for e in c.get("effects", []) + c.get("upgrade", {}).get("effects", []):
+			if not CardEffects.OPS.has(str(e.get("op", ""))):
+				errors.append("card %s: unknown effect op '%s'" % [id, e.get("op", "")])
+		if c.has("targeting") and not CardEffects.TARGETING.has(str(c["targeting"].get("type", ""))):
+			errors.append("card %s: unknown targeting '%s'" % [id, c["targeting"].get("type", "")])
+		if str(c.get("kind", "")) == "spell" and DT.record(_tables, "forms", str(c.get("form", ""))).is_empty():
+			errors.append("card %s: unknown form '%s'" % [id, c.get("form", "")])
 
 
 ## Asset ids: the manifest is well formed, data only names listed ids, and

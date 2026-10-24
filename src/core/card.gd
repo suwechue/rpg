@@ -103,6 +103,8 @@ static func power(db: Dictionary, card: Dictionary) -> float:
 static func resolve(db: Dictionary, id: String, library: Dictionary = {}) -> Dictionary:
 	if library.has(id):
 		return library[id]
+	if id.ends_with("+"):
+		return upgraded(DT.index_under(db, "cards/", "cards").get(id.trim_suffix("+"), {}))
 	if id.begins_with(SPELL_PREFIX):
 		var parts := id.substr(SPELL_PREFIX.length()).split(":")
 		if parts.size() == 3:
@@ -111,6 +113,20 @@ static func resolve(db: Dictionary, id: String, library: Dictionary = {}) -> Dic
 				vectors[axis] = 1.0
 			return make_spell(db, vectors, parts[1], parts[2])
 	return DT.index_under(db, "cards/", "cards").get(id, {})
+
+
+## The "+" version of a card: its "upgrade" fields replace the base ones
+## (a bigger Magnitude, more power, lower cost, new effects).
+static func upgraded(card: Dictionary) -> Dictionary:
+	if card.is_empty():
+		return {}
+	var out := card.duplicate(true)
+	for k in card.get("upgrade", {}):
+		out[k] = card["upgrade"][k]
+	out["id"] = str(card.get("id", "")) + "+"
+	out["name"] = str(card.get("name", "")) + "+"
+	out.erase("upgrade")
+	return out
 
 
 ## Highest Magnitude a Knowledge Tier allows.
@@ -191,8 +207,10 @@ static func describe(db: Dictionary, card: Dictionary) -> String:
 ## A one-line effect for the card face ("Bolt 10", "Heal 12"): short enough
 ## for a card. Basics and items use their "short" text from data.
 static func summary(db: Dictionary, card: Dictionary) -> String:
+	if card.has("short"):
+		return str(card["short"])
 	if not is_spell(card):
-		return str(card.get("short", str(card.get("name", "")).split(" ")[0]))
+		return str(card.get("name", "")).split(" ")[0]
 	var form_rec := DT.record(db, "forms", str(card.get("form", "")))
 	return "%s %d" % [form_rec.get("name", "?"), roundi(power(db, card))]
 

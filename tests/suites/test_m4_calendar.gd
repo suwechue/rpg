@@ -23,7 +23,7 @@ func test_new_run() -> void:
 	var run := fresh()
 	check(run["player"]["class"] == "mage" and run["player"]["isPlayer"], "player built")
 	check(run["schedule"].size() == 3, "default schedule")
-	check(int(run["collection"].get("card_guard", 0)) == 2, "starter deck goes into the collection")
+	check(int(run["collection"].get("card_guard", 0)) == 1 and int(run["collection"].get("card_blink", 0)) == 1, "starter deck goes into the collection")
 	check(run["money"] == int(db()["economy"]["startMoney"]), "start money from data")
 
 

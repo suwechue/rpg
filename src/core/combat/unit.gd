@@ -61,6 +61,7 @@ var start_cell := Vector2i.ZERO  # where this turn began (undo move)
 var moved_steps := 0
 var undo_ok := true              # false once something happened that can't be taken back
 var intent: Dictionary = {}      # enemies: the telegraphed next action (see combat_state.plan_intent)
+var links: Dictionary = {}       # status partners and amounts: "tether" / "pact" -> unit id, "regen" -> amount
 var downed := false
 var dead := false
 var turns_taken := 0

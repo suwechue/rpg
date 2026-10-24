@@ -54,7 +54,17 @@
     "rally": { "name": "Rallied", "text": "+20% damage.", "icon": "icon_status_rally", "color": "#e87cc9" },
     "infusion": { "name": "Infused", "text": "The next attack carries a Vector.", "icon": "icon_status_infusion", "color": "#e8663c" },
     "guard": { "name": "Guarding", "text": "+Defense and Magic Resistance until their next turn.", "icon": "icon_status_guard", "color": "#c9c9c9" },
-    "shield": { "name": "Shielded", "text": "A Shield absorbs damage first.", "icon": "icon_status_shield", "color": "#7cc7e8" }
+    "shield": { "name": "Shielded", "text": "A Shield absorbs damage first.", "icon": "icon_status_shield", "color": "#7cc7e8" },
+    "rime": { "name": "Rime", "text": "Melee attackers who hit it are Slowed.", "icon": "icon_status_shield", "color": "#cfefff" },
+    "tether": { "name": "Tethered", "text": "Hits on it also hurt the unit it's linked to.", "icon": "icon_vector_binding", "color": "#b07ce8" },
+    "pact": { "name": "Pact", "text": "Damage is split with its partner.", "icon": "icon_vector_binding", "color": "#8fd694" },
+    "regen": { "name": "Regenerating", "text": "Heals at the start of each turn.", "icon": "icon_vector_vitality", "color": "#5fd98a" },
+    "taunting": { "name": "Taunting", "text": "Enemy attacks aimed nearby turn toward it.", "icon": "icon_status_rally", "color": "#f5e27a" },
+    "brace": { "name": "Braced", "text": "Can't be pushed or pulled until its next turn.", "icon": "icon_status_guard", "color": "#c9a66b" },
+    "parry": { "name": "Parrying", "text": "The next melee hit against it is countered.", "icon": "icon_kind_basic", "color": "#ffffff" },
+    "haste_full": { "name": "Hasted", "text": "May move and act this turn.", "icon": "icon_status_haste", "color": "#9be36d" },
+    "empowered": { "name": "Empowered", "text": "Its next card of a Vector hits harder.", "icon": "icon_status_infusion", "color": "#e8663c" },
+    "corroded": { "name": "Corroded", "text": "Defense and Resistance shredded.", "icon": "icon_vector_corrosion", "color": "#8a9b3c" }
   },
   "kindIcons": { "spell": "icon_kind_spell", "basic": "icon_kind_basic", "item": "icon_kind_item" },
   "intentIcons": { "attack": "icon_intent_attack", "special": "icon_intent_special", "buff": "icon_intent_buff", "defend": "icon_intent_defend", "move": "icon_intent_move", "tracking": "icon_intent_tracking" },

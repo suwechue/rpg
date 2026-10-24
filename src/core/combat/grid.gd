@@ -21,6 +21,8 @@ var rows := 5
 var terrain: Array = []          # rows of terrain ids
 var burning: Dictionary = {}     # Vector2i -> turns left
 var steam: Dictionary = {}       # Vector2i -> turns left
+var fire_walls: Dictionary = {}  # Vector2i -> turns left: burning tiles nobody can walk through
+var toxic: Dictionary = {}       # Vector2i -> turns left: Corrosion puddles
 var exits: Array = []            # Vector2i cells the party can flee from
 var party_spawns: Array = []
 var enemy_spawns: Array = []
@@ -78,7 +80,7 @@ func set_terrain(cell: Vector2i, t: String) -> void:
 ## Terrain you can stand on (water only once frozen).
 func walkable_terrain(cell: Vector2i) -> bool:
 	var t := get_terrain(cell)
-	return t != WALL and t != WATER
+	return t != WALL and t != WATER and not fire_walls.has(cell)
 
 
 func blocks_sight(cell: Vector2i) -> bool:
@@ -164,7 +166,7 @@ func path(a: Vector2i, b: Vector2i, occupied: Dictionary) -> Array:
 
 ## Count down tile effects at the end of a round.
 func tick_round() -> void:
-	for table in [burning, steam]:
+	for table in [burning, steam, fire_walls, toxic]:
 		for cell in table.keys():
 			table[cell] = int(table[cell]) - 1
 			if int(table[cell]) <= 0:

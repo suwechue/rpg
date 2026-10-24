@@ -135,7 +135,8 @@ static func deck_error(db: Dictionary, run: Dictionary, ch: Dictionary, deck: Ar
 		var card := CardRules.resolve(db, str(id), run.get("cards", {}))
 		if card.is_empty():
 			return "Unknown card %s." % id
-		if CardRules.is_spell(card):
+		# Designs you made need the knowledge; named cards (learned, bought, found) don't.
+		if CardRules.is_spell(card) and str(id).begins_with(CardRules.SPELL_PREFIX):
 			for v in CardRules.ordered_vectors(db, card.get("vectors", {})):
 				if not ch.get("knownVectors", []).has(v):
 					return "%s doesn't know %s." % [ch.get("name", "?"), str(v).capitalize()]

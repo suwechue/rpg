@@ -1059,6 +1059,20 @@ func _play_event(e: Dictionary) -> void:
 			_note(str(e["text"]))
 		"glyph":
 			_note("A glyph flares!")
+		"blink":
+			var v := _view_for_id(str(e["unit"]))
+			if v != null:
+				v.modulate = Color(1, 1, 1, 0.2)
+				v.position = proj.cell_center(e["to"])
+				v.z_index = 10 + int(e["to"].y)
+				var tw := create_tween()
+				tw.tween_property(v, "modulate", Color.WHITE, _dur(0.2))
+				await tw.finished
+		"telegraph":
+			_say_banner("%s is coming!" % str(e.get("name", "Something")))
+			_note("%s will land on the marked tiles." % str(e.get("name", "Something")))
+			_sync_views()
+			await _wait(0.3)
 		"tiles":
 			if str(e.get("kind", "")) == "hazard":
 				_note("The floor breaks open. New hazards!")

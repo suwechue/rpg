@@ -46,38 +46,8 @@
         "construct": 4
       },
       "startVectors": 2,
-      "startForms": [
-        "bolt",
-        "shield"
-      ],
-      "starterDeck": [
-        {
-          "form": "bolt",
-          "magnitude": "standard",
-          "vectorSlot": 0,
-          "count": 3
-        },
-        {
-          "form": "bolt",
-          "magnitude": "standard",
-          "vectorSlot": 1,
-          "count": 2
-        },
-        {
-          "form": "shield",
-          "magnitude": "minor",
-          "vectorSlot": 0,
-          "count": 2
-        },
-        {
-          "basic": "card_strike",
-          "count": 1
-        },
-        {
-          "basic": "card_guard",
-          "count": 2
-        }
-      ],
+      "startForms": ["bolt", "shield", "burst", "line"],
+      "starterDeck": [{ "form": "bolt", "magnitude": "standard", "vectorSlot": 0, "count": 2 }, { "form": "bolt", "magnitude": "standard", "vectorSlot": 1, "count": 2 }, { "form": "burst", "magnitude": "minor", "vectorSlot": 0, "count": 1 }, { "form": "line", "magnitude": "minor", "vectorSlot": 1, "count": 1 }, { "form": "shield", "magnitude": "minor", "vectorSlot": 0, "count": 1 }, { "basic": "card_strike", "count": 1 }, { "basic": "card_guard", "count": 1 }, { "basic": "card_blink", "count": 1 }],
       "perk": {
         "id": "overchannel",
         "text": "Once per fight, improvise at normal card cost"
@@ -131,32 +101,7 @@
         "weapon_infusion",
         "touch"
       ],
-      "starterDeck": [
-        {
-          "basic": "card_strike",
-          "count": 3
-        },
-        {
-          "basic": "card_heavy_swing",
-          "count": 2
-        },
-        {
-          "form": "weapon_infusion",
-          "magnitude": "standard",
-          "vectorSlot": 0,
-          "count": 2
-        },
-        {
-          "form": "touch",
-          "magnitude": "minor",
-          "vectorSlot": 0,
-          "count": 1
-        },
-        {
-          "basic": "card_guard",
-          "count": 2
-        }
-      ],
+      "starterDeck": [{ "basic": "card_strike", "count": 2 }, { "basic": "card_heavy_swing", "count": 2 }, { "basic": "card_lunge", "count": 2 }, { "basic": "card_parry", "count": 1 }, { "basic": "card_brace", "count": 1 }, { "basic": "card_shove_basic", "count": 1 }, { "form": "weapon_infusion", "magnitude": "standard", "vectorSlot": 0, "count": 1 }],
       "perk": {
         "id": "second_wind",
         "text": "Heal 20% HP once per fight under 30% HP"
@@ -210,36 +155,7 @@
         "bolt",
         "projectile"
       ],
-      "starterDeck": [
-        {
-          "basic": "card_strike",
-          "count": 2
-        },
-        {
-          "basic": "card_quick_stab",
-          "count": 2
-        },
-        {
-          "basic": "card_dash",
-          "count": 2
-        },
-        {
-          "form": "bolt",
-          "magnitude": "standard",
-          "vectorSlot": 0,
-          "count": 2
-        },
-        {
-          "form": "projectile",
-          "magnitude": "minor",
-          "vectorSlot": 0,
-          "count": 1
-        },
-        {
-          "basic": "card_guard",
-          "count": 1
-        }
-      ],
+      "starterDeck": [{ "basic": "card_strike", "count": 2 }, { "basic": "card_quick_stab", "count": 2 }, { "basic": "card_dash", "count": 2 }, { "basic": "card_blink", "count": 1 }, { "basic": "card_afterimage", "count": 1 }, { "basic": "card_throw", "count": 1 }, { "form": "bolt", "magnitude": "standard", "vectorSlot": 0, "count": 1 }],
       "perk": {
         "id": "backstab",
         "text": "+50% damage from behind or flank"
@@ -296,34 +212,7 @@
       "forcedVectors": [
         "light"
       ],
-      "starterDeck": [
-        {
-          "form": "shield",
-          "magnitude": "standard",
-          "vectorSlot": 0,
-          "count": 3
-        },
-        {
-          "form": "aura",
-          "magnitude": "minor",
-          "vectorSlot": 0,
-          "count": 1
-        },
-        {
-          "form": "bolt",
-          "magnitude": "standard",
-          "vectorSlot": 0,
-          "count": 3
-        },
-        {
-          "basic": "card_strike",
-          "count": 1
-        },
-        {
-          "basic": "card_guard",
-          "count": 2
-        }
-      ],
+      "starterDeck": [{ "basic": "card_mend", "count": 2 }, { "basic": "card_halo", "count": 1 }, { "basic": "card_beacon", "count": 1 }, { "form": "shield", "magnitude": "standard", "vectorSlot": 0, "count": 1 }, { "form": "bolt", "magnitude": "standard", "vectorSlot": 0, "count": 2 }, { "basic": "card_strike", "count": 1 }, { "basic": "card_guard", "count": 2 }],
       "perk": {
         "id": "triage",
         "text": "Healing cards cost 1 less MP on allies under half HP"
@@ -376,32 +265,7 @@
         "burst",
         "bolt"
       ],
-      "starterDeck": [
-        {
-          "form": "burst",
-          "magnitude": "minor",
-          "vectorSlot": 0,
-          "count": 2
-        },
-        {
-          "form": "bolt",
-          "magnitude": "standard",
-          "vectorSlot": 0,
-          "count": 2
-        },
-        {
-          "basic": "card_rally",
-          "count": 2
-        },
-        {
-          "basic": "card_strike",
-          "count": 2
-        },
-        {
-          "basic": "card_guard",
-          "count": 2
-        }
-      ],
+      "starterDeck": [{ "basic": "card_haste", "count": 1 }, { "basic": "card_tailwind", "count": 1 }, { "basic": "card_dazzle", "count": 2 }, { "basic": "card_rally", "count": 1 }, { "form": "bolt", "magnitude": "standard", "vectorSlot": 0, "count": 2 }, { "basic": "card_strike", "count": 2 }, { "basic": "card_guard", "count": 1 }],
       "perk": {
         "id": "hype",
         "text": "Party gains initiative and +1 draw on turn 1"

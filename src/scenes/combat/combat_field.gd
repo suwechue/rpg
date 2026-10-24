@@ -161,6 +161,12 @@ func _draw_cell(cell: Vector2i) -> void:
 		draw_colored_polygon(poly, Color(1.0, 0.45, 0.15, 0.25 + 0.2 * flick))
 	if grid.steam.has(cell):
 		draw_colored_polygon(poly, Color(0.9, 0.9, 0.95, 0.45))
+	if grid.toxic.has(cell):
+		draw_colored_polygon(poly, Color(UiTheme.vector_color("corrosion"), 0.45))
+	if grid.fire_walls.has(cell):
+		var top := ctr + Vector2(0, -Display.tile * 0.6)
+		draw_line(ctr + Vector2(-6, 0), top, Color(1.0, 0.55, 0.2, 0.9), 3.0)
+		draw_line(ctr + Vector2(6, 0), top + Vector2(0, 4), Color(1.0, 0.75, 0.3, 0.9), 2.0)
 	if grid.exits.has(cell):
 		draw_string(UiTheme.font, ctr + Vector2(-3, 3), "<", HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, Color("8fd694"))
 
