@@ -53,7 +53,7 @@ func clear_body() -> void:
 			c.queue_free()
 
 
-func text(t: String, color: Color = UiTheme.TEXT) -> Label:
+func text(t: String, color: Variant = null) -> Label:
 	var l := UiTheme.label(t, color)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	l.custom_minimum_size = Vector2(panel.custom_minimum_size.x - 2 * UiTheme.FONT_SIZE, 0)

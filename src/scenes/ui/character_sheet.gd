@@ -53,7 +53,6 @@ func show_character(ch: Dictionary, library: Dictionary = {}) -> void:
 	mid.add_child(UiTheme.label("MP regen %d/turn" % d["mpRegen"]))
 	mid.add_child(UiTheme.label("Vector affinity", UiTheme.ACCENT))
 	var odds := Char.affinity_odds(db, ch)
-	var colors: Dictionary = db.get("vectors", {}).get("colors", {})
 	for axis in VO.ordered_axes(odds, Char.arcane_axes(db)):
 		if not odds.has(axis):
 			continue
@@ -63,7 +62,7 @@ func show_character(ch: Dictionary, library: Dictionary = {}) -> void:
 		name_l.custom_minimum_size = Vector2(46, 0)
 		row.add_child(name_l)
 		var bar := ColorRect.new()
-		bar.color = Color(str(colors.get(axis, "#cccccc")))
+		bar.color = UiTheme.vector_color(str(axis))
 		bar.custom_minimum_size = Vector2(maxf(1.0, float(odds[axis]) * 120.0), 5)
 		bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		row.add_child(bar)

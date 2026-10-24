@@ -1,0 +1,61 @@
+{
+  "comment": "UI skin settings (ROADMAP M11). Images are asset ids (data/assets/manifest.json, files in assets/ui/skin/, overridable in assets/custom/ui/). Colors are hex; change one here and every screen follows.",
+  "fontSize": 9,
+  "titleSize": 18,
+  "colors": {
+    "bg": "#141824ee",
+    "bgLight": "#262c40",
+    "border": "#5a6488",
+    "text": "#e8e6d8",
+    "dim": "#8c8fa3",
+    "accent": "#ffd966",
+    "good": "#8fd694",
+    "bad": "#e8746a",
+    "label": "#fff3c4",
+    "outline": "#000000",
+    "party": "#3d7a52",
+    "enemy": "#8a3a3a",
+    "neutralCard": "#9aa3b8",
+    "itemCard": "#d9b36a",
+    "shield": "#7cc7e8",
+    "heal": "#8fd694",
+    "damage": "#ff7a6a",
+    "crit": "#ffd966"
+  },
+  "skin": {
+    "panel": { "id": "ui_panel", "margin": 6, "padding": [4, 3] },
+    "tooltip": { "id": "ui_panel_tooltip", "margin": 6, "padding": [4, 3] },
+    "button": { "normal": "ui_button", "hover": "ui_button_hover", "pressed": "ui_button_pressed", "disabled": "ui_button_disabled", "focus": "ui_button_focus", "margin": 4, "padding": [4, 2] },
+    "field": { "id": "ui_field", "margin": 4, "padding": [3, 2] },
+    "barBg": { "id": "ui_bar_bg", "margin": 2 },
+    "barFill": { "id": "ui_bar_fill", "margin": 2 },
+    "cursor": "ui_cursor",
+    "cards": { "spell": "ui_card_spell", "basic": "ui_card_basic", "item": "ui_card_item", "select": "ui_card_select", "artPos": [4, 13], "costPos": [4, 2], "textPos": [4, 64] }
+  },
+  "colorblind": false,
+  "vectorColors": {
+    "heat": "#e8663c", "cold": "#7cc7e8", "force": "#c9a66b", "motion": "#9be36d", "binding": "#b07ce8",
+    "light": "#f5e27a", "transmutation": "#e87cc9", "vitality": "#5fd98a", "corrosion": "#8a9b3c"
+  },
+  "vectorColorsColorblind": {
+    "heat": "#d55e00", "cold": "#56b4e9", "force": "#e69f00", "motion": "#009e73", "binding": "#cc79a7",
+    "light": "#f0e442", "transmutation": "#dddddd", "vitality": "#0072b2", "corrosion": "#999933"
+  },
+  "vectorPatterns": {
+    "comment": "Drawn faintly behind card text so color never carries meaning alone: none, stripes, backslash, dots, grid, waves, rings, checks, cross.",
+    "heat": "stripes", "cold": "dots", "force": "grid", "motion": "backslash", "binding": "rings",
+    "light": "none", "transmutation": "checks", "vitality": "waves", "corrosion": "cross"
+  },
+  "statuses": {
+    "root": { "name": "Rooted", "text": "Can't move this turn.", "icon": "icon_status_root", "color": "#b07ce8" },
+    "slow": { "name": "Slowed", "text": "-1 Movement.", "icon": "icon_status_slow", "color": "#7cc7e8" },
+    "blind": { "name": "Blinded", "text": "Attacks can miss.", "icon": "icon_status_blind", "color": "#f5e27a" },
+    "haste": { "name": "Hasted", "text": "Extra Movement.", "icon": "icon_status_haste", "color": "#9be36d" },
+    "rally": { "name": "Rallied", "text": "+20% damage.", "icon": "icon_status_rally", "color": "#e87cc9" },
+    "infusion": { "name": "Infused", "text": "The next attack carries a Vector.", "icon": "icon_status_infusion", "color": "#e8663c" },
+    "guard": { "name": "Guarding", "text": "+Defense and Magic Resistance until their next turn.", "icon": "icon_status_guard", "color": "#c9c9c9" },
+    "shield": { "name": "Shielded", "text": "A Shield absorbs damage first.", "icon": "icon_status_shield", "color": "#7cc7e8" }
+  },
+  "kindIcons": { "spell": "icon_kind_spell", "basic": "icon_kind_basic", "item": "icon_kind_item" },
+  "timeline": { "count": 12, "portrait": 20 }
+}

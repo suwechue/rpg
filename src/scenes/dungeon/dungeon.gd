@@ -57,10 +57,8 @@ func _ready() -> void:
 	ui.add_child(bar)
 	_hud = UiTheme.label("")
 	bar.add_child(_hud)
-	_prompt = UiTheme.label("", UiTheme.ACCENT)
+	_prompt = UiTheme.world_label("", UiTheme.ACCENT)
 	_prompt.position = Vector2(4, Display.base.y - 18)
-	_prompt.add_theme_color_override("font_outline_color", Color.BLACK)
-	_prompt.add_theme_constant_override("outline_size", 3)
 	ui.add_child(_prompt)
 	Audio.play_music("dungeon_boss_floor" if bool(floor_data.get("boss", false)) else "dungeon")
 	if GameState.run.has("floor_fight"):

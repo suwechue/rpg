@@ -73,7 +73,10 @@ func custom_file(id: String) -> String:
 	var rid := resolve(id)
 	var sp := Spec.spec(DataDB.all(), rid)
 	if sp.is_empty():
-		return ""
+		# Per-card art needs no manifest entry: assets/custom/cards/card_art_<card id>.png.
+		if not rid.begins_with("card_art_"):
+			return ""
+		sp = { "type": "cards", "kind": "image" }
 	for p in Spec.custom_candidates(custom_root, sp, rid):
 		if FileAccess.file_exists(str(p)):
 			return str(p)

@@ -67,7 +67,7 @@ func _ensure_loaded() -> void:
 
 ## Schema checks. Extend as new tables are added.
 func _validate() -> void:
-	for required in ["spaces", "matchups", "calendar", "vectors", "forms", "classes", "stats", "leveling", "perks", "traits", "display", "assets/manifest", "assets/roles"]:
+	for required in ["spaces", "matchups", "calendar", "vectors", "forms", "classes", "stats", "leveling", "perks", "traits", "display", "assets/manifest", "assets/roles", "ui"]:
 		if not _tables.has(required):
 			errors.append("missing required table data/%s.json" % required)
 	if not (_tables.has("spaces") and _tables.has("forms") and _tables.has("vectors")):

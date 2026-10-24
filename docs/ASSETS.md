@@ -18,7 +18,7 @@ Sizes: tiles 32x32, characters 32x32 (up to 32x48 for tall ones), portraits 64x6
 
 Pack art is a placeholder: the 16x16 packs are scaled up 2x (nearest neighbour) to fit the 32x32 grid until you replace them.
 
-Replaced so far: Characters (walk sheets) 0/39, Portraits 0/35, Enemies and bosses 0/30, Tilesets 0/4, Single tiles 0/120, UI 0/1, VFX 0/0, Music 0/13, Sound effects 0/13.
+Replaced so far: Characters (walk sheets) 0/39, Portraits 0/35, Enemies and bosses 0/30, Tilesets 0/4, Single tiles 0/120, UI 0/16, Icons 0/20, Card art 0/11, VFX 0/0, Music 0/13, Sound effects 0/13.
 
 ## Characters (walk sheets) (39)
 
@@ -283,13 +283,73 @@ Single tiles inside a tileset. Replacing one changes it everywhere it's used. Dr
 | [ ] | `tile_dungeon_merchant` | 32x32 | - | top left | tile 84 of `tileset_dungeon` |  |
 | [ ] | `tile_dungeon_bones` | 32x32 | - | top left | tile 64 of `tileset_dungeon` |  |
 
-## UI (1)
+## UI (16)
 
 
 
 | Done | Id | Target size | Layout | Anchor | Source | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| [ ] | `font_ui` | - | - | - | pack: ninja_adventure | Pixel font drawn at its native 9 px (or an integer multiple). .ttf or .otf. |
+| [ ] | `ui_panel` | 24x24 | 9-slice: corners 6px stay fixed, edges and middle stretch | - | pack: res: | Every window and panel. |
+| [ ] | `ui_panel_tooltip` | 24x24 | 9-slice: corners 6px stay fixed, edges and middle stretch | - | pack: res: | Tooltips and hover info. |
+| [ ] | `ui_button` | 16x16 | 9-slice: corners 4px stay fixed, edges and middle stretch | - | pack: res: | Button, normal state. |
+| [ ] | `ui_button_hover` | 16x16 | 9-slice: corners 4px stay fixed, edges and middle stretch | - | pack: res: | Button, hover state. |
+| [ ] | `ui_button_pressed` | 16x16 | 9-slice: corners 4px stay fixed, edges and middle stretch | - | pack: res: | Button, pressed state. |
+| [ ] | `ui_button_disabled` | 16x16 | 9-slice: corners 4px stay fixed, edges and middle stretch | - | pack: res: | Button, disabled state. |
+| [ ] | `ui_button_focus` | 16x16 | 9-slice: corners 4px stay fixed, edges and middle stretch | - | pack: res: | Button, focus state. |
+| [ ] | `ui_field` | 16x12 | 9-slice: corners 4px stay fixed, edges and middle stretch | - | pack: res: | Text fields. |
+| [ ] | `ui_bar_bg` | 12x8 | 9-slice: corners 2px stay fixed, edges and middle stretch | - | pack: res: | Progress bar background. |
+| [ ] | `ui_bar_fill` | 12x8 | 9-slice: corners 2px stay fixed, edges and middle stretch | - | pack: res: | Progress bar fill; white, tinted in game. |
+| [ ] | `ui_card_spell` | 56x84 | Card frame: art window 48x48 at (4,13), header row above, text box below; light grey, tinted with the Vector color in game | top left | pack: res: | Spell cards. |
+| [ ] | `ui_card_basic` | 56x84 | Card frame: art window 48x48 at (4,13), header row above, text box below; light grey, tinted with the Vector color in game | top left | pack: res: | Basic cards. |
+| [ ] | `ui_card_item` | 56x84 | Card frame: art window 48x48 at (4,13), header row above, text box below; light grey, tinted with the Vector color in game | top left | pack: res: | Item cards. |
+| [ ] | `ui_card_select` | 56x84 | Outline drawn over a selected card | top left | pack: res: |  |
+| [ ] | `ui_cursor` | 12x12 | Mouse cursor, hotspot top left; scaled with the window | top left | pack: res: |  |
+| [ ] | `font_ui` | - | - | - | pack: res: | Pixel font drawn at its native 9 px (or an integer multiple). .ttf or .otf. |
+
+## Icons (20)
+
+
+
+| Done | Id | Target size | Layout | Anchor | Source | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| [ ] | `icon_vector_heat` | 16x16 | 16x16 white shape with dark outline; tinted with the Vector color | center | pack: res: |  |
+| [ ] | `icon_vector_cold` | 16x16 | 16x16 white shape with dark outline; tinted with the Vector color | center | pack: res: |  |
+| [ ] | `icon_vector_force` | 16x16 | 16x16 white shape with dark outline; tinted with the Vector color | center | pack: res: |  |
+| [ ] | `icon_vector_motion` | 16x16 | 16x16 white shape with dark outline; tinted with the Vector color | center | pack: res: |  |
+| [ ] | `icon_vector_binding` | 16x16 | 16x16 white shape with dark outline; tinted with the Vector color | center | pack: res: |  |
+| [ ] | `icon_vector_light` | 16x16 | 16x16 white shape with dark outline; tinted with the Vector color | center | pack: res: |  |
+| [ ] | `icon_vector_transmutation` | 16x16 | 16x16 white shape with dark outline; tinted with the Vector color | center | pack: res: |  |
+| [ ] | `icon_vector_vitality` | 16x16 | 16x16 white shape with dark outline; tinted with the Vector color | center | pack: res: |  |
+| [ ] | `icon_vector_corrosion` | 16x16 | 16x16 white shape with dark outline; tinted with the Vector color | center | pack: res: |  |
+| [ ] | `icon_status_root` | 16x16 | 16x16 white shape with dark outline | center | pack: res: |  |
+| [ ] | `icon_status_slow` | 16x16 | 16x16 white shape with dark outline | center | pack: res: |  |
+| [ ] | `icon_status_blind` | 16x16 | 16x16 white shape with dark outline | center | pack: res: |  |
+| [ ] | `icon_status_haste` | 16x16 | 16x16 white shape with dark outline | center | pack: res: |  |
+| [ ] | `icon_status_rally` | 16x16 | 16x16 white shape with dark outline | center | pack: res: |  |
+| [ ] | `icon_status_infusion` | 16x16 | 16x16 white shape with dark outline | center | pack: res: |  |
+| [ ] | `icon_status_guard` | 16x16 | 16x16 white shape with dark outline | center | pack: res: |  |
+| [ ] | `icon_status_shield` | 16x16 | 16x16 white shape with dark outline | center | pack: res: |  |
+| [ ] | `icon_kind_spell` | 16x16 | 16x16 white shape with dark outline | center | pack: res: |  |
+| [ ] | `icon_kind_basic` | 16x16 | 16x16 white shape with dark outline | center | pack: res: |  |
+| [ ] | `icon_kind_item` | 16x16 | 16x16 white shape with dark outline | center | pack: res: |  |
+
+## Card art (11)
+
+
+
+| Done | Id | Target size | Layout | Anchor | Source | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| [ ] | `card_art_heat` | 48x48 | 48x48 card illustration | top left | pack: res: | Default art for heat cards. Give one card its own art with assets/custom/cards/card_art_<card id>.png. |
+| [ ] | `card_art_cold` | 48x48 | 48x48 card illustration | top left | pack: res: | Default art for cold cards. Give one card its own art with assets/custom/cards/card_art_<card id>.png. |
+| [ ] | `card_art_force` | 48x48 | 48x48 card illustration | top left | pack: res: | Default art for force cards. Give one card its own art with assets/custom/cards/card_art_<card id>.png. |
+| [ ] | `card_art_motion` | 48x48 | 48x48 card illustration | top left | pack: res: | Default art for motion cards. Give one card its own art with assets/custom/cards/card_art_<card id>.png. |
+| [ ] | `card_art_binding` | 48x48 | 48x48 card illustration | top left | pack: res: | Default art for binding cards. Give one card its own art with assets/custom/cards/card_art_<card id>.png. |
+| [ ] | `card_art_light` | 48x48 | 48x48 card illustration | top left | pack: res: | Default art for light cards. Give one card its own art with assets/custom/cards/card_art_<card id>.png. |
+| [ ] | `card_art_transmutation` | 48x48 | 48x48 card illustration | top left | pack: res: | Default art for transmutation cards. Give one card its own art with assets/custom/cards/card_art_<card id>.png. |
+| [ ] | `card_art_vitality` | 48x48 | 48x48 card illustration | top left | pack: res: | Default art for vitality cards. Give one card its own art with assets/custom/cards/card_art_<card id>.png. |
+| [ ] | `card_art_corrosion` | 48x48 | 48x48 card illustration | top left | pack: res: | Default art for corrosion cards. Give one card its own art with assets/custom/cards/card_art_<card id>.png. |
+| [ ] | `card_art_basic` | 48x48 | 48x48 card illustration | top left | pack: res: | Default art for basic cards. Give one card its own art with assets/custom/cards/card_art_<card id>.png. |
+| [ ] | `card_art_item` | 48x48 | 48x48 card illustration | top left | pack: res: | Default art for item cards. Give one card its own art with assets/custom/cards/card_art_<card id>.png. |
 
 ## VFX (0)
 

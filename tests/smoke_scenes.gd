@@ -426,3 +426,34 @@ func smoke_custom_art_hot_reload() -> void:
 	assets.set("override_root", "")
 	assets.call("reload")
 	check(assets.call("source", "portrait_kelly") == "pack", "removing the file and reloading restores the pack art")
+
+
+func smoke_ui_skin_restyles_everything() -> void:
+	var ui := _root_node("UiTheme")
+	var assets := _root_node("Assets")
+	var theme: Theme = ui.get("theme")
+	var root := "user://skin_smoke"
+	DirAccess.make_dir_recursive_absolute(root + "/ui")
+	var panel := Image.create(24, 24, false, Image.FORMAT_RGBA8)
+	panel.fill(Color(1, 0, 0))
+	panel.save_png(root + "/ui/ui_panel.png")
+	assets.set("override_root", root)
+	assets.call("reload")
+	var sb := theme.get_stylebox("panel", "PanelContainer") as StyleBoxTexture
+	check(sb != null and sb.texture.get_image().get_pixel(12, 12).is_equal_approx(Color(1, 0, 0)), "a custom panel image restyles every PanelContainer")
+	var colors: Dictionary = _root_node("DataDB").call("table", "ui")["colors"]
+	var old_text: String = colors["text"]
+	colors["text"] = "#00ff00"
+	ui.call("rebuild")
+	check(theme.get_color("font_color", "Label").is_equal_approx(Color("#00ff00")), "one color in ui.json changes every label")
+	colors["text"] = old_text
+	DirAccess.remove_absolute(root + "/ui/ui_panel.png")
+	assets.set("override_root", "")
+	assets.call("reload")
+	check(theme.get_color("font_color", "Label").is_equal_approx(Color(old_text)), "restored")
+	var was: bool = ui.get("colorblind")
+	ui.set("colorblind", true)
+	var cb: Color = ui.call("vector_color", "vitality")
+	ui.set("colorblind", false)
+	check(not cb.is_equal_approx(ui.call("vector_color", "vitality")), "the colorblind palette changes Vector colors")
+	ui.set("colorblind", was)

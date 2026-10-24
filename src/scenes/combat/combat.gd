@@ -14,8 +14,7 @@ const FieldScript := preload("res://src/scenes/combat/combat_field.gd")
 const UnitView := preload("res://src/scenes/combat/unit_view.gd")
 const Res := preload("res://src/core/combat/resolver.gd")
 
-const CARD_W := 54
-const CARD_H := 60
+const CardView := preload("res://src/scenes/combat/card_view.gd")
 
 var state: StateScript
 var proj: Proj
@@ -45,6 +44,9 @@ var _wheel: PanelContainer
 var _result_panel: PanelContainer
 var _fx: Node2D
 var _float_slots: Dictionary = {}   # unit view -> floating texts currently shown
+var _hover_info: PanelContainer
+var _hover_label: Label
+var _hover_card := -1                # card in hand under the mouse: preview without selecting
 
 
 func _ready() -> void:
@@ -133,15 +135,7 @@ func _sync_views() -> void:
 		v.downed = u.downed
 		v.highlight = u == state.current and not _done
 		v.face(u.facing)
-		var tags: Array = []
-		for s in ["root", "slow", "blind", "haste", "rally"]:
-			if u.statuses.has(s):
-				tags.append(str(s).substr(0, 2).to_upper())
-		if not u.infusion.is_empty():
-			tags.append("IN")
-		if u.guard_active:
-			tags.append("GD")
-		v.statuses = tags
+		v.statuses = state.status_list(u)
 		v.queue_redraw()
 	var gl: Array = []
 	for g in state.glyphs:
@@ -156,13 +150,14 @@ func _sync_views() -> void:
 
 func _build_ui() -> void:
 	var view := Display.size_f()
-	var hand_y := view.y - CARD_H - 4
+	var card_h := Assets.texture(str(UiTheme.skin("cards").get("spell", ""))).get_height()
+	var hand_y := view.y - card_h - 4
 	_ui = CanvasLayer.new()
 	_ui.layer = 10
 	add_child(_ui)
 	_timeline = HBoxContainer.new()
 	_timeline.position = Vector2(118, 2)
-	_timeline.add_theme_constant_override("separation", 1)
+	_timeline.theme_type_variation = "CompactBox"
 	_ui.add_child(_timeline)
 	var up := PanelContainer.new()
 	up.position = Vector2(2, 2)
@@ -186,13 +181,12 @@ func _build_ui() -> void:
 	_ui.add_child(_banner)
 	_hand = HBoxContainer.new()
 	_hand.position = Vector2(4, hand_y)
-	_hand.add_theme_constant_override("separation", 2)
+	_hand.theme_type_variation = "CompactBox"
 	_ui.add_child(_hand)
 	var col := GridContainer.new()
 	col.columns = 2
 	col.position = Vector2(view.x - 82, hand_y)
-	col.add_theme_constant_override("h_separation", 1)
-	col.add_theme_constant_override("v_separation", 1)
+	col.theme_type_variation = "CompactGrid"
 	_ui.add_child(col)
 	for spec in [["end", "End", "End turn [Space]"], ["strike", "Strike", "Free basic Strike: adjacent, STR [S]"],
 			["guard", "Guard", "Free basic Guard: +Defense until your next turn [G]"],
@@ -203,19 +197,24 @@ func _build_ui() -> void:
 		b.tooltip_text = spec[2]
 		col.add_child(b)
 		_buttons[key] = b
+	# Hover info: what's on the tile under the mouse (unit, HP, statuses).
+	_hover_info = PanelContainer.new()
+	_hover_info.theme_type_variation = "Tooltip"
+	_hover_info.visible = false
+	_hover_info.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_ui.add_child(_hover_info)
+	_hover_label = UiTheme.label("")
+	_hover_info.add_child(_hover_label)
 
 
 func _refresh_hud() -> void:
 	for c in _timeline.get_children():
 		c.queue_free()
-	for u in state.timeline(14):
-		var box := Panel.new()
-		box.custom_minimum_size = Vector2(UiTheme.FONT_SIZE * 2, 18)
-		var sb := UiTheme.box(Color("2a5a3a") if u.team == "party" else Color("5a2a2a"), Color("ffd966") if u == state.current else Color("101010"))
-		box.add_theme_stylebox_override("panel", sb)
-		var l := UiTheme.label(u.name.substr(0, 2), UiTheme.TEXT)
-		l.position = Vector2(2, 3)
-		box.add_child(l)
+	var tl: Dictionary = DataDB.table("ui").get("timeline", {})
+	for u in state.timeline(int(tl.get("count", 12))):
+		var box := PanelContainer.new()
+		box.theme_type_variation = "TimelineCurrent" if u == state.current else ("TimelineParty" if u.team == "party" else "TimelineEnemy")
+		box.add_child(_portrait(u, int(tl.get("portrait", 20))))
 		box.tooltip_text = "%s (init %d)" % [u.name, u.initiative]
 		_timeline.add_child(box)
 	var u := state.current
@@ -245,38 +244,68 @@ func _refresh_hand() -> void:
 	var u := state.current
 	if u == null or u.deck == null or u.team != "party" or u.ai_controlled:
 		return
-	var db: Dictionary = DataDB.all()
-	var colors: Dictionary = db.get("vectors", {}).get("colors", {})
 	for i in u.deck.hand.size():
 		var card := state.card_of(u, i)
-		var b := Button.new()
-		b.custom_minimum_size = Vector2(CARD_W, CARD_H)
-		b.clip_text = true
+		var b := CardView.new()
 		var cost := state.card_cost(u, card)
-		var name_text := str(card.get("name", "?")).replace(" ", "\n")
-		b.text = "%d MP\n%s" % [cost, name_text]
-		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
-		var tint := Color("3a3550")
-		if CardRules.is_spell(card):
-			var axis := str(CardRules.ordered_vectors(db, card.get("vectors", {}))[0])
-			tint = Color(str(colors.get(axis, "#888888"))).darkened(0.55)
-		var sel := (mode == "card" and selected_hand == i) or (mode == "wheel_target" and wheel_fuel == i)
-		var sb := UiTheme.box(tint, Color("ffd966") if sel else Color("5a6488"))
-		sb.content_margin_left = 3
-		sb.content_margin_top = 2
-		b.add_theme_stylebox_override("normal", sb)
-		var hb := UiTheme.box(tint.lightened(0.15), Color("ffd966"))
-		hb.content_margin_left = 3
-		hb.content_margin_top = 2
-		b.add_theme_stylebox_override("hover", hb)
-		b.add_theme_stylebox_override("pressed", hb)
+		b.setup(card, cost)
+		b.selected = (mode == "card" and selected_hand == i) or (mode == "wheel_target" and wheel_fuel == i)
 		b.disabled = not _player_turn() or (cost > u.mp and mode != "fuel")
-		b.tooltip_text = "%s\n%s" % [card.get("name", ""), CardRules.describe(db, card)]
+		if b.disabled and _player_turn() and cost > u.mp:
+			b.tooltip_text += "\nNeeds %d MP" % cost
 		var idx := i
 		b.pressed.connect(func() -> void: _on_card(idx))
-		b.mouse_entered.connect(func() -> void: _show_card_info(idx))
+		b.mouse_entered.connect(func() -> void: _hover_card_changed(idx))
+		b.focus_entered.connect(func() -> void: _hover_card_changed(idx))
+		b.mouse_exited.connect(func() -> void: _hover_card_changed(-1))
+		b.focus_exited.connect(func() -> void: _hover_card_changed(-1))
 		_hand.add_child(b)
+
+
+## A small picture of a unit for the timeline: their portrait if they have one,
+## otherwise the first frame of their sprite.
+func _portrait(u: UnitScript, size: int) -> TextureRect:
+	var r := TextureRect.new()
+	r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	r.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	r.custom_minimum_size = Vector2(size, size)
+	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if u.is_prop():
+		return r
+	var portrait := str(u.source.get("portrait", ""))
+	if portrait != "" and Assets.has(portrait):
+		r.texture = Assets.texture(portrait)
+		return r
+	var sprite_id := u.sprite if u.sprite != "" else Assets.role("player")
+	var at := AtlasTexture.new()
+	at.atlas = Assets.texture(sprite_id)
+	at.region = Rect2(Vector2.ZERO, Assets.frame(sprite_id))
+	r.texture = at
+	return r
+
+
+## Hovering (or focusing) a card previews it on the grid without selecting it.
+func _hover_card_changed(i: int) -> void:
+	_hover_card = i
+	if i >= 0:
+		_show_card_info(i)
+	_refresh_overlays()
+
+
+func _likely_target(cells: Array) -> Vector2i:
+	var best := Vector2i(-1, -1)
+	var best_d := INF
+	for c in cells:
+		var cell: Vector2i = c
+		var t := state.unit_at(cell)
+		if t != null and t.team != state.current.team and not t.dead:
+			var d := Vector2(cell - state.current.cell).length()
+			if d < best_d:
+				best_d = d
+				best = cell
+	if best.x < 0 and not cells.is_empty():
+		best = cells[0]
+	return best
 
 
 func _show_card_info(i: int) -> void:
@@ -308,6 +337,10 @@ func _refresh_overlays() -> void:
 		match mode:
 			"idle":
 				field.reach_cells = state.reachable_cells(u).keys()
+				if _hover_card >= 0 and _hover_card < u.deck.hand.size():
+					var card := state.card_of(u, _hover_card)
+					field.target_cells = state.card_targets(u, card)
+					_preview(card, false, true)
 			"card":
 				var card := state.card_of(u, selected_hand)
 				field.target_cells = state.card_targets(u, card)
@@ -321,8 +354,12 @@ func _refresh_overlays() -> void:
 	field.queue_redraw()
 
 
-func _preview(card: Dictionary, improvised: bool) -> void:
+## Footprint and predicted damage at the hovered tile; for a card that's only
+## hovered in hand (`guess`), at the nearest target tile with an enemy on it.
+func _preview(card: Dictionary, improvised: bool, guess: bool = false) -> void:
 	var target := hover_cell if hover_cell.x >= 0 else cursor_cell
+	if guess and not field.target_cells.has(target):
+		target = _likely_target(field.target_cells)
 	if not field.target_cells.has(target):
 		return
 	var p := state.preview(state.current, card, target, improvised)
@@ -350,6 +387,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		if c != hover_cell:
 			hover_cell = c
 			_refresh_overlays()
+		_update_hover_info(event.position)
 		return
 	if event is InputEventMouseButton and event.pressed:
 		if event.button_index == MOUSE_BUTTON_RIGHT:
@@ -397,6 +435,26 @@ func _unhandled_input(event: InputEvent) -> void:
 			_on_button("wheel")
 		elif k == KEY_F:
 			_on_button("flee")
+
+
+## The tooltip for whoever stands on the hovered tile: name, HP and each status.
+func _update_hover_info(at: Vector2) -> void:
+	var t := state.unit_at(hover_cell) if hover_cell.x >= 0 else null
+	if t == null or t.dead or t.is_prop():
+		_hover_info.visible = false
+		return
+	var lines: Array = ["%s  HP %d/%d" % [t.name, t.hp, t.max_hp]]
+	for s in state.status_list(t):
+		var info := UiTheme.status_info(str(s))
+		lines.append("%s: %s" % [info.get("name", s), info.get("text", "")])
+	_hover_label.text = "\n".join(PackedStringArray(lines))
+	_hover_info.reset_size()
+	var pos := at + Vector2(10, 10)
+	var view := Display.size_f()
+	pos.x = minf(pos.x, view.x - _hover_info.size.x - 2)
+	pos.y = minf(pos.y, view.y - _hover_info.size.y - 2)
+	_hover_info.position = pos
+	_hover_info.visible = true
 
 
 func _cancel() -> void:
@@ -646,11 +704,10 @@ func _play_event(e: Dictionary) -> void:
 			await get_tree().create_timer(0.25).timeout
 		"area":
 			field.flash_cells = e["cells"]
-			var colors: Dictionary = DataDB.table("vectors").get("colors", {})
 			var axis := ""
 			for k in e["vectors"]:
 				axis = str(k)
-			var c := Color(str(colors.get(axis, "#ffffff")))
+			var c := UiTheme.vector_color(axis)
 			c.a = 0.5
 			field.flash_color = c
 			field.queue_redraw()
@@ -665,7 +722,7 @@ func _play_event(e: Dictionary) -> void:
 				txt += " (%d)" % int(e["absorbed"])
 			if bool(e.get("crit", false)):
 				txt += "!"
-			_float_text(v, txt, Color("ff7a6a") if not bool(e.get("crit", false)) else Color("ffd966"))
+			_float_text(v, txt, UiTheme.color("damage") if not bool(e.get("crit", false)) else UiTheme.color("crit"))
 			Audio.play_sfx("hit")
 			if v != null:
 				var tw := create_tween()
@@ -676,17 +733,17 @@ func _play_event(e: Dictionary) -> void:
 			else:
 				await get_tree().create_timer(0.12).timeout
 		"heal":
-			_float_text(_view_for_id(str(e["unit"])), "+%d%s" % [int(e["amount"]), " up!" if bool(e.get("revived", false)) else ""], Color("8fd694"))
+			_float_text(_view_for_id(str(e["unit"])), "+%d%s" % [int(e["amount"]), " up!" if bool(e.get("revived", false)) else ""], UiTheme.color("heal"))
 			Audio.play_sfx("heal")
 			await get_tree().create_timer(0.12).timeout
 		"shield":
-			_float_text(_view_for_id(str(e["unit"])), "+%d shield" % int(e["amount"]), Color("7cc7e8"))
+			_float_text(_view_for_id(str(e["unit"])), "+%d shield" % int(e["amount"]), UiTheme.color("shield"))
 		"status":
-			_float_text(_view_for_id(str(e["unit"])), str(e["status"]), Color("f5e27a"))
+			_float_text(_view_for_id(str(e["unit"])), str(UiTheme.status_info(str(e["status"])).get("name", e["status"])), UiTheme.ACCENT)
 		"guard":
-			_float_text(_view_for_id(str(e["unit"])), "guard", Color("c9c9c9"))
+			_float_text(_view_for_id(str(e["unit"])), "guard", UiTheme.DIM)
 		"miss":
-			_float_text(_view_for_id(str(e["unit"])), "miss", Color("c9c9c9"))
+			_float_text(_view_for_id(str(e["unit"])), "miss", UiTheme.DIM)
 		"collide":
 			await _shake(2.0)
 		"down":
@@ -741,11 +798,7 @@ func _view_for_id(id: String) -> Node2D:
 func _float_text(v: Node2D, text: String, color: Color) -> void:
 	if v == null:
 		return
-	var l := Label.new()
-	l.text = text
-	l.add_theme_color_override("font_color", color)
-	l.add_theme_color_override("font_outline_color", Color.BLACK)
-	l.add_theme_constant_override("outline_size", 2)
+	var l := UiTheme.world_label(text, color)
 	# Texts on the same unit at the same time stack upward instead of overlapping.
 	var slot := int(_float_slots.get(v, 0))
 	_float_slots[v] = slot + 1

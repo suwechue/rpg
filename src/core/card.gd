@@ -186,3 +186,28 @@ static func describe(db: Dictionary, card: Dictionary) -> String:
 	if not card.get("properties", []).is_empty():
 		text += "Properties: %s." % ", ".join(PackedStringArray(card["properties"]))
 	return text.strip_edges()
+
+
+## A one-line effect for the card face ("Bolt 10", "Heal 12"): short enough
+## for a card. Basics and items use their "short" text from data.
+static func summary(db: Dictionary, card: Dictionary) -> String:
+	if not is_spell(card):
+		return str(card.get("short", str(card.get("name", "")).split(" ")[0]))
+	var form_rec := DT.record(db, "forms", str(card.get("form", "")))
+	return "%s %d" % [form_rec.get("name", "?"), roundi(power(db, card))]
+
+
+## Card art ids to try, most specific first: the card's own art, its first
+## Vector's art (spells), then its kind's art.
+static func art_ids(db: Dictionary, card: Dictionary) -> Array:
+	var out: Array = []
+	if card.has("art"):
+		out.append(str(card["art"]))
+	if card.has("id") and not str(card["id"]).begins_with("sp:"):
+		out.append("card_art_%s" % card["id"])
+	if is_spell(card):
+		var axes := ordered_vectors(db, card.get("vectors", {}))
+		if not axes.is_empty():
+			out.append("card_art_%s" % axes[0])
+	out.append("card_art_%s" % str(card.get("kind", "basic")))
+	return out

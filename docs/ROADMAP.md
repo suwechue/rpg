@@ -40,7 +40,8 @@ Tools come first, because everything after them gets built with them. Then come 
 | M10 | Replaceable art pipeline | M9 |
 | M11 | Swappable UI skin and readable combat | M10 |
 | M12 | Modular map building | M10 |
-| M13 | The new school | M12 |
+| M12b | Visual variety and full pack usage | M10, M12 |
+| M13 | The new school | M12b |
 | M14 | Cutscene system | M12 |
 | M15 | Intro and tutorial day | M13, M14 |
 | M16 | Class scenes, school calendar, clubs and exams | M13, M14 |
@@ -116,6 +117,45 @@ Replace the runtime-generated town with pieces the user builds in Godot's editor
 - **`docs/MAP_GUIDE.md`:** a step-by-step guide for the user to add a street, a building and a new location.
 
 **Done when:** the user can add a new building to downtown by placing a block and a door marker and adding one entry to `locations.json`, following `MAP_GUIDE.md`, with no code.
+
+## M12b: Visual variety and full pack usage
+
+An audit on Oct 24 found most downloaded art unused. Ninja Adventure is used for characters, monsters and audio, but its 20+ tilesets are barely touched. Kenney Tiny Town, City and Dungeon are each used for one stamping style. Tiny Battle, Tiny Factory, Tiny Creatures, DungeonTileset II, UI Pack Pixel Adventure and Input Prompts Pixel are not used at all. The town looks repetitive because of it.
+
+- **Pack inventory:** a tool script that scans `assets/packs/` and writes `docs/ART_INVENTORY.md`. It lists every tileset and sprite sheet with a contact-sheet preview image (in `tools/inventory/`), what it suits (ground, buildings, props, characters, UI, VFX) and whether the game uses it yet. Every pack should be used somewhere by the end of this milestone, or listed as deliberately unused with a reason.
+- **Tile variation:**
+  - Every ground tile (grass, pavement, dirt, floor, sand) gets 3 to 6 variants (cracks, flowers, stones, wear, stains), using TileSet alternative tiles with weights so painting a large area never looks tiled.
+  - Godot **terrain sets** (autotiling) handle transitions: grass to path, path to road, sidewalk edges, water shores, fences and walls. Edges and corners join automatically when painting.
+- **Decoration layer:** a seeded **decorator** that scatters props by rules per zone and per block (grass gets flowers and pebbles, sidewalks get trash cans, lamps and benches near shops, yards get fences, bushes, mailboxes and toys). Results are baked into the block so the user can edit them by hand; the decorator can be re-run. Rules live in `data/world/decor_rules.json`.
+- **Buildings with identity:**
+  - At least 6 house styles mixing roof color, wall material, size, porch and garage from Kenney Tiny Town and Ninja Adventure's TilesetHouse.
+  - Hillside uses the larger, fancier set; Maple Street mixes styles so no two neighbours match.
+  - Every shop gets its own facade, awning color and sign.
+  - The forge, hospital, school, train station, mansion and factory (Tiny Factory) each look unique.
+- **Pack roles:**
+
+  | Area | Packs |
+  | --- | --- |
+  | Downtown | Tiny City (roads, cars, storefronts) mixed with Ninja Adventure floors and props |
+  | Residential | Tiny Town plus Ninja Adventure TilesetHouse and TilesetNature |
+  | Outskirts | Ninja Adventure TilesetNature, Field, Relief and Water; Tiny Factory for the factory |
+  | Interiors | Ninja Adventure Interior |
+  | Upside-Down | Tiny Dungeon plus DungeonTileset II plus recolored town tiles (M20) |
+  | Combat props and markers | Tiny Battle |
+  | Extra creatures | Tiny Creatures for Upside-Down enemies |
+  | UI | UI Pack Pixel Adventure (via the M11 skin) |
+  | Input prompts | Input Prompts Pixel |
+
+  Mixing packs is fine as long as each zone stays consistent. Write the choices into `docs/ART_INVENTORY.md` as a style guide.
+- **Life and motion:**
+  - Animated tiles: water, the fountain, flags, flickering streetlamps, smoke from the forge chimney, swaying trees (Ninja Adventure Backgrounds/Animated).
+  - Ambient particles: falling leaves, dust, insects at dusk.
+  - Parked and slow-moving cars downtown (Tiny City).
+- **Time of day:** a lighting tint per day part (warm morning, neutral midday, orange after school, blue night) with lit windows and lamp glow in the evening. Driven by `data/display.json` colors.
+- **People variety:** palette and accessory swaps for generated NPCs (also used by M17), so crowds don't look like clones.
+- **Everything goes through asset ids** (M10). New variants and props are added to the manifest so the user can replace any of them.
+
+**Done when:** `ART_INVENTORY.md` exists with every pack used or explained, a screenshot of each zone shows no obvious repeated tiling, every house on a street looks different from its neighbours, and the day-part lighting and animated tiles are visible in town.
 
 ## M13: The new school
 
@@ -339,7 +379,7 @@ Paste this into Claude Code (VS Code, on the project-vector folder). To resume l
 ```text
 Phase 2 of Project Vector. Read CLAUDE.md, docs/ROADMAP.md (this plan; note the 32x32 tile and 640x360 decision at the top, which overrides DESIGN.md's 16x16 / 480x270), docs/DESIGN.md (Section 18 decisions are final), docs/characters.md, docs/TOWN.md and docs/PROGRESS.md before doing anything.
 
-Work through docs/ROADMAP.md milestones M9 to M23 in order, the same way as the alpha:
+Work through docs/ROADMAP.md milestones M9 to M23 in order (including M12b), the same way as the alpha:
 1. Write a short plan for the milestone, then build it.
 2. Rules in src/core with tests; content and tuning in data/; scenes only display and forward input; all art and sound by asset id once M10 exists.
 3. Make it playable and reachable from the game or the F1 debug menu.
@@ -347,7 +387,7 @@ Work through docs/ROADMAP.md milestones M9 to M23 in order, the same way as the 
 5. Update docs/PROGRESS.md (add a Phase 2 table) and CLAUDE.md "Current state", take screenshots into tools/screenshots/, commit "Mx: <summary>" and push to origin main. Confirm the push succeeded; if it fails, stop and tell me why.
 6. Continue to the next milestone without asking.
 
-Write the user-facing guides the roadmap asks for (ASSETS.md, MAP_GUIDE.md, CUTSCENE_GUIDE.md, PLAYTEST.md, ACT2.md) in plain language for someone new to Godot.
+Write the user-facing guides the roadmap asks for (ASSETS.md, ART_INVENTORY.md, MAP_GUIDE.md, CUTSCENE_GUIDE.md, PLAYTEST.md, ACT2.md) in plain language for someone new to Godot.
 
 If a decision in "Open decisions for the user" blocks you, use the default noted here and log it in PROGRESS.md: art sizes are decided (32x32 tiles, 640x360, 32x32 characters, 64x64 portraits; no hardcoded sizes); the narrator stays NARRATOR_REVEAL_TBD; the parent is chosen at character creation (mom, dad or guardian); Act 2 is a design stub only; Permadeath stays the default with Narrator's Mercy offered at new run.
 

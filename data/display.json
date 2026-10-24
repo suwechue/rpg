@@ -11,5 +11,5 @@
   "itemIconSize": 32,
   "detailScale": 2,
   "detailScaleNote": "Hand-drawn overlay details (furniture, boards, status chips, unit shadows) were authored for 16 px tiles; offsets are multiplied by this.",
-  "combat": { "frontY": 0.74, "cellWidth": 1.8, "cellWidthWide": 1.6, "cellHeight": 0.9, "cellHeightTall": 0.78, "shrink": 0.9 }
+  "combat": { "frontY": 0.69, "cellWidth": 1.8, "cellWidthWide": 1.6, "cellHeight": 0.9, "cellHeightTall": 0.78, "shrink": 0.9 }
 }

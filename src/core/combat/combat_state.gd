@@ -120,6 +120,21 @@ func occupied(except: UnitScript = null) -> Dictionary:
 	return out
 
 
+## Status ids on a unit for display, in a fixed order (icons and names in data/ui.json).
+func status_list(u: UnitScript) -> Array:
+	var out: Array = []
+	for s in ["root", "slow", "blind", "haste", "rally"]:
+		if u.statuses.has(s):
+			out.append(s)
+	if not u.infusion.is_empty():
+		out.append("infusion")
+	if u.guard_active:
+		out.append("guard")
+	if u.shield > 0:
+		out.append("shield")
+	return out
+
+
 func unit_at(cell: Vector2i) -> UnitScript:
 	for u in units:
 		if not u.dead and u.cell == cell:

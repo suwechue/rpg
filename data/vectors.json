@@ -23,10 +23,6 @@
     "heat": "Heat", "cold": "Cold", "force": "Force", "motion": "Motion", "binding": "Binding",
     "light": "Light", "transmutation": "Transmutation", "vitality": "Vitality", "corrosion": "Corrosion"
   },
-  "colors": {
-    "heat": "#e8663c", "cold": "#7cc7e8", "force": "#c9a66b", "motion": "#9be36d", "binding": "#b07ce8",
-    "light": "#f5e27a", "transmutation": "#e87cc9", "vitality": "#5fd98a", "corrosion": "#8a9b3c"
-  },
   "gridEffects": {
     "heat": "Burning tiles for 2 turns; water becomes sight-blocking steam",
     "cold": "Slow (-1 Movement); freezes water into walkable ice",

@@ -381,6 +381,10 @@ func _show_art(box: VBoxContainer) -> void:
 		Assets.reload()
 		_rebuild_scene()
 		_open(_show_art)))
+	row.add_child(UiTheme.button("Colorblind palette: %s" % ("on" if UiTheme.colorblind else "off"), func() -> void:
+		UiTheme.set_colorblind(not UiTheme.colorblind)
+		_rebuild_scene()
+		_open(_show_art)))
 	var where := UiTheme.label("Drop files in %s/<type>/<id>.png, then reload." % Assets.custom_root.trim_prefix("res://"), UiTheme.DIM)
 	where.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY
 	where.custom_minimum_size = Vector2(380, 0)

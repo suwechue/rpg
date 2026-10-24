@@ -168,7 +168,23 @@ static func referenced_ids(db: Dictionary) -> Dictionary:
 	for k in roles:
 		if k != "comment":
 			out[str(roles[k])] = "assets/roles %s" % k
+	_ui_ids(db.get("ui", {}).get("skin", {}), "ui skin", out)
+	for s in db.get("ui", {}).get("statuses", {}).values():
+		out[str(s.get("icon", ""))] = "ui statuses"
+	for k in db.get("ui", {}).get("kindIcons", {}).values():
+		out[str(k)] = "ui kindIcons"
 	return out
+
+
+## Asset ids inside data/ui.json "skin": strings, and the strings in nested
+## records except numbers and layout keys.
+static func _ui_ids(v: Variant, where: String, out: Dictionary) -> void:
+	if v is String:
+		out[str(v)] = where
+	elif v is Dictionary:
+		for k in v:
+			if not str(k) in ["margin", "padding", "artPos", "costPos", "textPos"]:
+				_ui_ids(v[k], "%s %s" % [where, k], out)
 
 
 ## Problems with the manifest: unknown kinds, tiles pointing at missing

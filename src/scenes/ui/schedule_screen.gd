@@ -35,7 +35,7 @@ func _refresh() -> void:
 			b.disabled = err != ""
 			b.tooltip_text = "%s\nTeacher: %s\n%s" % [cls.get("blurb", ""), str(db.get("school_classes", {}).get("professors", {}).get(str(cls.get("professor", "")), "")), err]
 			if chosen:
-				b.add_theme_color_override("font_color", UiTheme.ACCENT)
+				b.theme_type_variation = "SelectedButton"
 			flow.add_child(b)
 	var err := School.schedule_error(db, GameState.run, picks)
 	if err != "":

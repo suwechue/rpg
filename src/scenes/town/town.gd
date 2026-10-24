@@ -37,13 +37,11 @@ func _ready() -> void:
 	player = Walker.new(str(GameState.player.get("sprite", Assets.role("player"))))
 	player.z_index = 5
 	_camera = Camera2D.new()
-	_prompt = UiTheme.label("", UiTheme.ACCENT)
+	_prompt = UiTheme.world_label("", UiTheme.ACCENT)
 	var ui := CanvasLayer.new()
 	ui.layer = 5
 	add_child(ui)
 	_prompt.position = Vector2(4, Display.base.y - 40)
-	_prompt.add_theme_color_override("font_outline_color", Color.BLACK)
-	_prompt.add_theme_constant_override("outline_size", 3)
 	ui.add_child(_prompt)
 	var pos: Dictionary = GameState.run.get("town_pos", {})
 	if pos.is_empty():
@@ -260,9 +258,7 @@ func _place_npc(id: String, at: Vector2i) -> void:
 	map.add_child(w)
 	_npc_nodes.append(w)
 	npcs[at] = id
-	var tag := UiTheme.label(str(rec.get("name", id)).split(" ")[0], Color("fff3c4"))
-	tag.add_theme_color_override("font_outline_color", Color.BLACK)
-	tag.add_theme_constant_override("outline_size", 2)
+	var tag := UiTheme.world_label(str(rec.get("name", id)).split(" ")[0], UiTheme.LABEL)
 	tag.position = Vector2((w.frame_size.x - tag.get_minimum_size().x) / 2.0, -w.frame_size.y - UiTheme.FONT_SIZE - 3)
 	w.add_child(tag)
 
