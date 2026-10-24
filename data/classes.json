@@ -52,11 +52,11 @@
       "startStats": { "str": 3, "dex": 4, "con": 6, "int": 6, "per": 5, "wil": 8, "cha": 5 },
       "vectorAffinity": { "light": 30, "binding": 20, "heat": 10, "cold": 15, "force": 10, "motion": 15 },
       "formAffinity": { "shield": 25, "aura": 25, "touch": 15, "bolt": 10, "sphere": 10, "glyph": 10, "burst": 5 },
-      "startVectors": 1, "startForms": ["shield", "aura"], "forcedVectors": ["light"],
+      "startVectors": 1, "startForms": ["shield", "aura", "bolt"], "forcedVectors": ["light"],
       "starterDeck": [
         { "form": "shield", "magnitude": "standard", "vectorSlot": 0, "count": 3 },
-        { "form": "aura", "magnitude": "minor", "vectorSlot": 0, "count": 2 },
-        { "basic": "card_light_jab", "count": 2 },
+        { "form": "aura", "magnitude": "minor", "vectorSlot": 0, "count": 1 },
+        { "form": "bolt", "magnitude": "standard", "vectorSlot": 0, "count": 3 },
         { "basic": "card_strike", "count": 1 },
         { "basic": "card_guard", "count": 2 }
       ],

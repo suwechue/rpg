@@ -60,6 +60,10 @@ func _on_part_started() -> void:
 	var screens := GameState.part_screens()
 	for id in StoryRules.due(DataDB.all(), GameState.run, GameState.ctx(), true):
 		screens.push_front("story:" + str(id))
+	if Calendar.day_name() == "sun" and Calendar.part_id() == "weekend_evening":
+		var tease := str(preload("res://src/core/dungeon/signature.gd").week_rec(DataDB.all(), Calendar.week()).get("sundayTease", ""))
+		if tease != "":
+			Narrator.say(tease)
 	for hook in part_hooks:
 		screens = hook.call(screens)
 	_queue = screens
@@ -164,6 +168,12 @@ func enter_dungeon() -> void:
 		SceneRouter.goto(STORY_SCENE)
 		return
 	if ResourceLoader.exists(DUNGEON_SCENE):
+		var dcfg: Dictionary = DataDB.table("dungeon")
+		if _at_woods_edge() and not GameState.roster.is_empty():
+			Narrator.say(str(dcfg.get("woodsEdgeText", "")))
+			await show_modal(preload("res://src/scenes/ui/party_screen.gd").new())
+		elif not GameState.roster.is_empty():
+			Narrator.say(str(dcfg.get("pulledInText", "")))
 		set_hud(false)
 		SceneRouter.goto(DUNGEON_SCENE)
 		return
@@ -222,8 +232,25 @@ func _on_run_ended(cause: String) -> void:
 	var text := str(endings.get(cause, endings.get("default", "And that was the end of that.")))
 	Audio.play_music("death")
 	_busy = false
+	var p: Dictionary = GameState.player
+	var summary := "Week %d, %s. Level %d %s. %d days survived. Roster: %d. Kelly Risk: %d." % [Calendar.week(), Calendar.day_name().capitalize(),
+		int(p.get("level", 1)), str(p.get("class", "")).capitalize(), int(GameState.run.get("day_count", 0)), GameState.roster.size(), int(GameState.run.get("kelly_risk", 0))]
+	var jr: Dictionary = Journal.data
+	var journal_line := "The Narrator's Journal now holds %d lore entries and %d creatures. Runs: %d." % [jr.get("lore", {}).size(), jr.get("enemies", {}).size(), int(jr.get("runs", 0))]
 	await show_event({ "title": "The End (of this run)", "text": "%s
 
-Seed %d. The narrator closes the book. Then, after a moment, opens a new one." % [text, GameState.run_seed] })
+%s
+%s
+
+Seed %d. The narrator closes the book. Then, after a moment, opens a new one." % [text, summary, journal_line, GameState.run_seed] })
 	EventBus.run_closed.emit(cause)
 	SceneRouter.goto(TITLE_SCENE)
+
+## Standing near the park and woods edge when dusk comes lets you pick the party.
+func _at_woods_edge() -> bool:
+	var pos: Dictionary = GameState.run.get("town_pos", {})
+	if str(pos.get("map", "")) != "outskirts" or bool(pos.get("interior", false)):
+		return false
+	var c: Array = pos.get("cell", [0, 0])
+	var spot: Array = DataDB.table("town/zones/outskirts").get("spots", {}).get("park", [34, 25])
+	return absi(int(c[0]) - int(spot[0])) + absi(int(c[1]) - int(spot[1])) <= 6

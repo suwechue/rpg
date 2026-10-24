@@ -37,6 +37,10 @@ func _run_suites() -> void:
 		if not str(f).ends_with(".gd"):
 			continue
 		var script: GDScript = load("res://tests/suites/" + str(f))
+		if script == null or not script.can_instantiate():
+			_failures += 1
+			printerr("FAIL suite %s does not compile" % f)
+			continue
 		var suite: Object = script.new()
 		for m in script.get_script_method_list():
 			var method_name := str(m["name"])

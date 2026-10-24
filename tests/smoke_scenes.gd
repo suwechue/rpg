@@ -5,6 +5,7 @@ extends SceneTree
 
 var _passes := 0
 var _failures := 0
+var _dungeon_busy := false
 
 
 func _initialize() -> void:
@@ -79,17 +80,25 @@ func smoke_week_of_school() -> void:
 	var cal: Node = _root_node("Calendar")
 	var flow: Node = _root_node("Flow")
 	_root_node("SaveSystem").call("delete_save")
-	gs.call("new_run", 777, "bard")
+	gs.call("new_run", 777, "fighter")
 	gs.set("dev_autoplay", true)
+	var recruited := false
 	await _goto("res://src/scenes/town/town.tscn")
 	var stats0: Dictionary = gs.get("player")["stats"].duplicate()
 	var guard := 0
 	var seen := {}
 	var kind := ["Attend", "Go to sleep", "Confirm", "Ignore her", "Put it away", "Let her carry", "long way", "Look at me", "Continue"]
 	var start := Time.get_ticks_msec()
-	while int(cal.call("week")) == 1 and Time.get_ticks_msec() - start < 240000:
+	while int(cal.call("week")) == 1 and Time.get_ticks_msec() - start < 900000:
 		guard += 1
 		await process_frame
+		if not recruited and gs.call("flag", "story_done_w1_evening"):
+			recruited = true
+			for id in ["theo", "mara"]:
+				gs.get("run")["bonds"][id] = 45.0
+				preload("res://src/core/social/bonds.gd").recruit(_root_node("DataDB").call("all"), gs.get("run"), id, RandomNumberGenerator.new())
+		if current_scene != null and current_scene.name == "Title":
+			break
 		var m := _top_modal()
 		if m != null:
 			seen[str(m.get_script().resource_path.get_file())] = true
@@ -105,6 +114,8 @@ func smoke_week_of_school() -> void:
 		var sc := current_scene
 		if sc != null and sc.name == "Combat" and sc.get("_result_panel") != null:
 			_press(sc.get("_result_panel"))
+		if sc != null and sc.name == "Dungeon":
+			_dungeon_step(sc)
 		if sc != null and sc.name == "Town" and not flow.call("is_busy"):
 			flow.call("end_part")
 	check(int(cal.call("week")) == 2, "a whole week passes through the UI (guard %d)" % guard)
@@ -116,6 +127,9 @@ func smoke_week_of_school() -> void:
 	check(changed >= 2, "stats changed over the week (%d)" % changed)
 	check(_root_node("SaveSystem").call("has_save"), "autosave written at part changes")
 	check(gs.call("flag", "story_done_w1_evening"), "Monday night's story played inside the week")
+	check(gs.call("flag", "week1_cleared"), "M7: The Hollow Mascot is beaten and week 1 is cleared")
+	check(gs.get("run")["encounter_log"].size() >= 6, "fights Tuesday to Thursday were logged (%d)" % gs.get("run")["encounter_log"].size())
+	check(not _root_node("Journal").get("data")["enemies"].is_empty(), "the Narrator's Journal recorded creatures")
 	gs.set("dev_autoplay", false)
 
 
@@ -184,6 +198,22 @@ func smoke_town() -> void:
 	check(str(_root_node("Narrator").get("last_line")).find("renovations") >= 0, "the closed cinema gives its door line")
 
 
+## One step of auto-exploring a dungeon floor: fight, loot, rest, then leave.
+func _dungeon_step(sc: Node) -> void:
+	if _dungeon_busy or sc.get("_moving") or _root_node("Flow").call("is_busy"):
+		return
+	_dungeon_busy = true
+	var r: Dictionary = sc.call("next_room")
+	if not r.is_empty():
+		var t := str(r["type"])
+		if t in ["combat", "elite", "boss"]:
+			sc.call("visit_room", int(r["id"]))
+		else:
+			await sc.call("use_feature", int(r["id"]))
+	await process_frame
+	_dungeon_busy = false
+
+
 ## Press through modals (choosing by needle where given) and combat result
 ## panels until `done` returns true or the guard runs out.
 func _drive(done: Callable, needles: Array, seconds: float = 60.0) -> bool:
@@ -204,6 +234,8 @@ func _drive(done: Callable, needles: Array, seconds: float = 60.0) -> bool:
 			await process_frame
 			continue
 		var scene := current_scene
+		if scene != null and scene.name == "Dungeon":
+			_dungeon_step(scene)
 		if OS.has_environment("SMOKE_TRACE") and (Time.get_ticks_msec() / 1000) % 3 == 0 and Engine.get_process_frames() % 60 == 0:
 			print("[trace] scene=%s modal=%s pos=%s" % [scene.name if scene != null else "-", _top_modal(), _root_node("GameState").get("run").get("story_pos", {})])
 			if scene != null and scene.name == "Combat":

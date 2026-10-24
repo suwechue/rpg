@@ -94,6 +94,8 @@ func give_xp(id: String, amount: int) -> Array:
 func apply_effects(fx: Dictionary, extra_ctx: Dictionary = {}) -> Array:
 	var c := ctx()
 	c.merge(extra_ctx, true)
+	if fx.has("ap"):
+		Calendar.set_ap(Calendar.ap() + int(fx["ap"]))
 	var lines := Fx.apply(DataDB.all(), run, fx, Rng.stream("events"), c)
 	EventBus.stats_changed.emit("player")
 	EventBus.money_changed.emit(money)
@@ -103,7 +105,7 @@ func apply_effects(fx: Dictionary, extra_ctx: Dictionary = {}) -> Array:
 ## Context for event conditions: week, day, part, period.
 func ctx() -> Dictionary:
 	return { "week": Calendar.week(), "day": Calendar.day_name(), "part": Calendar.part_id(),
-		"period": int(Calendar.current_part().get("period", 0)) }
+		"period": int(Calendar.current_part().get("period", 0)), "ap": Calendar.ap() }
 
 
 func conditions_met(cond: Dictionary) -> bool:

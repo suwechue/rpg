@@ -34,6 +34,7 @@ SceneRouter="*res://src/autoload/scene_router.gd"
 UiTheme="*res://src/autoload/ui_theme.gd"
 Flow="*res://src/autoload/flow.gd"
 Social="*res://src/autoload/social.gd"
+Journal="*res://src/autoload/journal.gd"
 DebugMenu="*res://src/autoload/debug_menu.gd"
 
 [display]

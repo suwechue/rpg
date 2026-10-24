@@ -5,7 +5,7 @@
 ##   ctx.professor) or gradeFor {prof: n}, bond {npc: n}, flag "x" or [...],
 ##   unflag, hp n, mp n, money n, item "id" or {id: n}, card "id", kellyRisk n,
 ##   learnVector "axis", learnForm "form", xp n, signature {axis: w},
-##   counter {name: n}, disposition {npc: {axis: n}}, narrate "text".
+##   counter {name: n}, disposition {npc: {axis: n}}, narratorBond n, sigHint (week hint), ap n (GameState applies it), narrate "text".
 class_name Effects
 extends RefCounted
 
@@ -99,6 +99,10 @@ static func apply(db: Dictionary, run: Dictionary, fx: Dictionary, rng: RandomNu
 	for npc in fx.get("disposition", {}):
 		var state: Dictionary = npc_state(run, str(npc))
 		state["disposition"] = VO.shift(state.get("disposition", {}), fx["disposition"][npc], {}, -100.0)
+	if fx.has("narratorBond"):
+		change_bond(db, run, "narrator", float(fx["narratorBond"]), lines)
+	if bool(fx.get("sigHint", false)):
+		lines.append(preload("res://src/core/dungeon/signature.gd").hint(db, run, int(ctx.get("week", 1))))
 	if fx.has("narrate"):
 		lines.append(str(fx["narrate"]))
 	return lines
@@ -198,6 +202,10 @@ static func conditions_met(db: Dictionary, run: Dictionary, cond: Dictionary, ct
 		for s in cond["minStat"]:
 			if int(st.get(s, 0)) < int(cond["minStat"][s]):
 				return false
+	if cond.has("minAp") and int(ctx.get("ap", 99)) < int(cond["minAp"]):
+		return false
+	if cond.has("minMoney") and int(run.get("money", 0)) < int(cond["minMoney"]):
+		return false
 	if cond.has("kellyRiskAtLeast") and int(run.get("kelly_risk", 0)) < int(cond["kellyRiskAtLeast"]):
 		return false
 	if cond.has("minLevel") and int(run["player"].get("level", 1)) < int(cond["minLevel"]):

@@ -1,0 +1,24 @@
+{
+  "lore": {
+    "lore_founding_gap": "The town's records skip a winter in its founding years. Nobody teaches why.",
+    "lore_missing_people": "The 1980s town rolls are full of students who 'moved away'. Too many, too young.",
+    "lore_yearbook": "An old yearbook with every face cut out except the vice principal's, thirty years younger.",
+    "lore_forge": "The forge went cold once, long ago, 'for a reason'. The blacksmith won't say what.",
+    "lore_forge_apology": "In the Upside-Down, the blacksmith's younger voice apologizes for letting the fire die.",
+    "lore_reyes_log": "Dr. Reyes keeps a private log of anomalies going back years.",
+    "lore_marlowe": "The library holds the history the school board didn't approve.",
+    "lore_marlowe_notes": "Ms. Marlowe has been quietly documenting strange nights for years.",
+    "lore_nonsense_winter": "Ms. Nonsense admits the bad winter wasn't about weather.",
+    "lore_nonsense_upside": "Ms. Nonsense knows the Upside-Down by name, and has known for a long time.",
+    "lore_theo_mirror": "Theo's theory: the Upside-Down is a mirror with a delay.",
+    "lore_kris_maps": "Old town maps show buildings that were never built. Their outlines match the Upside-Down.",
+    "lore_lost_student": "A student in a letterman jacket, decades out of date, says the vice principal 'transferred' him."
+  },
+  "unlocks": [
+    { "trait": "night_owl", "runs": 1, "text": "You've died once. Mornings are a rumor." },
+    { "trait": "clear_speaker", "ending": "kelly", "text": "After Kelly, you choose your words carefully." },
+    { "trait": "early_bird", "week": 2, "text": "Survived a week. Up before the alarm." },
+    { "trait": "warm_hands", "week": 3, "text": "The forge remembers you." },
+    { "trait": "cold_feet", "lore": 5, "text": "You know too much to walk in confidently." }
+  ]
+}

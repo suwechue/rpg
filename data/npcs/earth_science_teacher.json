@@ -50,7 +50,8 @@
       "badText": "\"Weather is weather.\"",
       "outcomes": {
         "onGood": {
-          "flag": "signature_hint_teacher"
+          "flag": "signature_hint_teacher",
+          "sigHint": true
         }
       }
     },

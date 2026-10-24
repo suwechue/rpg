@@ -36,6 +36,7 @@ func _ready() -> void:
 	for extra in extra_buttons:
 		var e: Dictionary = extra
 		_menu.add_child(UiTheme.button(str(e["label"]), func() -> void: e["run"].call()))
+	_menu.add_child(UiTheme.button("Narrator's Journal", _show_journal))
 	_menu.add_child(UiTheme.button("Quit", func() -> void: get_tree().quit()))
 	(_menu.get_child(1 if not cont.disabled else 0) as Button).grab_focus()
 	Audio.play_music("title")
@@ -102,12 +103,45 @@ func _new_run() -> void:
 			if seed_edit.text.strip_edges().is_valid_int():
 				s = int(seed_edit.text.strip_edges())
 			m.finish({ "class": cid, "seed": s }), false, tip)
+	var unlocked: Array = Journal.unlocked_traits()
+	var trait_pick := { "id": "" }
+	if not unlocked.is_empty():
+		m.text("Starting trait (unlocked by the Journal):", UiTheme.DIM)
+		var trow := HFlowContainer.new()
+		trow.custom_minimum_size = Vector2(400, 0)
+		m.body.add_child(trow)
+		for t in [""] + unlocked:
+			var tid := str(t)
+			var rec := DataDB.record("traits", tid)
+			var b := UiTheme.button(str(rec.get("name", "None")), func() -> void: trait_pick["id"] = tid)
+			b.tooltip_text = str(rec.get("text", "No trait."))
+			trow.add_child(b)
 	m.add_button("Back", func() -> void: m.finish(null))
 	var r: Variant = await Flow.show_modal(m)
 	if r == null:
 		return
 	var pick: Dictionary = r
 	SaveSystem.delete_save()
-	GameState.new_run(int(pick["seed"]), str(pick["class"]))
+	var traits: Array = [] if str(trait_pick["id"]) == "" else [str(trait_pick["id"])]
+	GameState.new_run(int(pick["seed"]), str(pick["class"]), "New Kid", { "traits": traits })
 	Narrator.say("New kid in a small town. The narrator clears their throat. That's me. Hi.")
 	SceneRouter.goto(TOWN_SCENE)
+
+
+func _show_journal() -> void:
+	var m := Modal.new()
+	m.build("The Narrator's Journal", 420)
+	var j: Dictionary = Journal.data
+	m.text("Runs: %d. Furthest week: %d. Endings seen: %s." % [int(j.get("runs", 0)), int(j.get("bestWeek", 0)), ", ".join(PackedStringArray(j.get("endings", {}).keys())) if not j.get("endings", {}).is_empty() else "none"], UiTheme.DIM)
+	m.text("Lore", UiTheme.ACCENT)
+	if j.get("lore", {}).is_empty():
+		m.text("Nothing yet. The narrator taps the empty page meaningfully.", UiTheme.DIM)
+	for k in j.get("lore", {}):
+		m.text("- " + str(j["lore"][k]))
+	m.text("Creatures", UiTheme.ACCENT)
+	for k in j.get("enemies", {}):
+		var e: Dictionary = j["enemies"][k]
+		m.text("- %s (defeated %d). %s" % [e.get("name", k), int(e.get("defeated", 0)), e.get("text", "")])
+	m.text("Starting traits unlocked: %s" % (", ".join(PackedStringArray(Journal.unlocked_traits())) if not Journal.unlocked_traits().is_empty() else "none"), UiTheme.DIM)
+	m.add_button("Close", func() -> void: m.finish(null))
+	await Flow.show_modal(m)

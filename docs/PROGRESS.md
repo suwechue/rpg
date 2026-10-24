@@ -11,7 +11,7 @@ Claude Code updates this at the end of every milestone and before stopping, so a
 | M4 Calendar and AP | Done | Run as one Dictionary, Flow autoload runs day parts, schedule/class/night/detention screens, 64 class events, skipping and detention, Night workbench with a stub timing minigame, Property Bank crafting, deck editor, title screen |
 | M5 Town | Done | 4 walkable zones built from data with Kenney tiles, 72 locations with status/hours/door lines, 13 interiors, 35 NPC records with homes and schedules, doorstep talks, shops (deli, forge, hospital, corner store), items and gear |
 | M6 Social system | Done | 134 topics across 34 characters with CHA Gates, reception by Match, misheard lines, moods, gifts, hangouts, staggered recruitment, party screen, narrator Bond tone, the week 1 Monday Kelly scenario (lunch, disruption, evening tutorial floor with guest Kelly) with Kelly Risk and both outcomes |
-| M7 The Upside-Down | Not started | |
+| M7 The Upside-Down | Done | Weekly signature from data + town events, seeded floors Mon-Thu, Friday boss floor with fled-first returning fights, The Hollow Mascot (3 phases), rooms (combat, elite, treasure, rest, event, merchant, exit), shards, party scaling, woods-edge party pick, Narrator's Journal, death summary; week 1 plays end to end |
 | M8 Alpha content and polish | Not started | |
 
 ## Next step
@@ -66,6 +66,14 @@ Start M7 (the Upside-Down: weekly signature shaped by town events, seeded floors
 - Scenes: `dialogue_screen.gd` (topics, "you meant / they heard", gifts, hang out, recruit), `party_screen.gd` (Night menu), `src/scenes/story/story_scene.tscn` (plays non-inline stories and resumes after fights). `Flow` plays inline stories at part start, sends the evening to a due story, and on `run_ended` deletes the save, shows the ending and returns to the title.
 - Dev flag `--talk=npc_id` opens a conversation (screenshots).
 
+### M7 (done)
+- Core: `src/core/dungeon/signature.gd` (week base + shifts, enemy weights by Match, hints), `floor_generator.gd` (random-walk floors, Friday boss floor, returning encounters, encounter log), `night.gd` (rest, treasure, shards, after-combat, boss reward, party scaling `fight_enemies`, catch-up XP).
+- Data: `data/weeks.json` (all 5 weeks: signature, theme, boss, rewards, hints, Sunday teases), `data/dungeon.json`, `data/enemies/bosses.json` (The Hollow Mascot), `data/events/dungeon_events.json` (10), `data/story/town_events.json` (signature-shifting town events, weeks 1-4), `data/journal.json` (lore texts, trait unlocks), `data/endings.json`, upside merchant shop.
+- Scene: `src/scenes/dungeon/dungeon.tscn` (Kenney Tiny Dungeon tiles, fog of war, walk into fight rooms, E on features, exit to leave early). Resumes after fights via `run.floor_fight`.
+- `Journal` autoload (user://journal.json, atomic): lore, creatures, endings, best week, trait unlocks; title screen has a Journal viewer and an unlocked-trait pick for new runs. Death shows a run summary.
+- Balance tool: `tools/sim_nights.gd` (`-- --allies=N`) simulates nights with the AI.
+- Smoke: a full week 1 runs end to end in the real scenes (Hollow Mascot beaten, week 2 reached).
+
 ## Decisions made during development
 
 - **Git:** `origin` is https://github.com/suwechue/rpg.git; every milestone commit is pushed. Art and audio under `assets/` are tracked with Git LFS.
@@ -103,6 +111,15 @@ Start M7 (the Upside-Down: weekly signature shaped by town events, seeded floors
 - **Recruitment pacing:** Core Four from week 1; Sam, Baxter and Jon from week 2; Kris, Diane, Penny from week 3 (Jake also needs his forge questline, Phase 3 deli shifts); Mel from week 4. Kelly needs Bond 60 and a kind first night (Risk 0 or less). Recruits join near your level minus one. The roster holds anyone; 3 come along each night.
 - **Kelly's first night:** the evening is a scripted tutorial floor (story scene) rather than a generated one. Risk sources match DESIGN.md exactly; the panic choice reassurances need CHA 5 or having defended her earlier. The tutorial fight is two Detention Slips so it stays short. Surviving sets Kelly's Bond by (3 - Risk) x 4 and, at Risk 0 or less, her Loyalty to 60 and her recruitment flag.
 - **Narrator tone:** Rival or worse = sarcastic, Stranger = dry, Acquaintance and up = warm. The narrator is an NPC at the park and woods edge with their own topics (two hint at identities without confirming).
+- **Floors:** the DESIGN.md room counts (6/7/8/9) include the start and exit rooms. Doors connect every pair of adjacent rooms. The exit is the room farthest from the start; you can leave as soon as you reach it. Friday is a line: start, 3 returning fights, rest, boss, exit.
+- **Returning encounters:** fled-from fights first (x1.25 x1.15 power), then the most recent wins (x1.25), then fresh picks.
+- **Party scaling:** smaller parties face fewer, weaker enemies: solo half the enemies at 75% power, two at 75% count and 90%, three normal, four 110%. Week 1 fights have at most 2 enemies before scaling. Bosses always appear.
+- **Entering:** standing within 6 tiles of the woods edge at dusk lets you pick the party; otherwise you're pulled in with your current party. Everyone starts in the start room (the "random room" part of the design was simplified).
+- **Shards:** 3 shards of an axis teach that Vector if the Knowledge Tier allows. Treasure: money x week, maybe an item, a combat card or a shard of the week's signature.
+- **Boss rewards:** week 1 teaches a random new Form (Burst, Projectile, Line or Touch); weeks 2 and 4 raise the Knowledge Tier to 2 and 3.
+- **The Healer starts with a Light Bolt** (3 copies instead of 2 Light Jabs and 1 Aura) so a solo Healer can finish fights.
+- **Journal unlocks** are sidegrade starting traits (Night Owl, Clear Speaker, Early Bird, Warm Hands, Cold Feet), never raw power.
+- **Balance snapshot (AI plays, 20 seeds, week 1 nights, Tue/Wed/Thu/Fri survival):** solo Fighter 16/17/17/15, solo Mage 9/13/10/3, with one ally most classes 12-20 on weekdays and 5-15 on Friday. The AI never flees or leaves early; a player can.
 - **Magic Resistance as a percent:** each point of Magic Resistance is 2% spell damage reduction, capped at 60% (`stats.json` combat block).
 
 ## Stubs and known issues
@@ -111,6 +128,5 @@ Start M7 (the Upside-Down: weekly signature shaped by town events, seeded floors
 - The combat timeline shows 2-letter name tags instead of portraits.
 
 - Town art: interior furniture is drawn rectangles; water is drawn; road intersections reuse the horizontal road tile.
-- Death screen is a narrator event; M7 adds the Narrator's Journal and run summary.
+- Floors use generic rooms with a theme tint, not ~10 hand-built chunks per theme.
 - The crafting minigame is one timing bar for all 4 archetypes (M8 makes distinct ones).
-- The evening dungeon is skipped with a narrator line until M7.

@@ -33,6 +33,16 @@
         { "type": "item", "item": "focus_pendant", "price": 40 },
         { "type": "item", "item": "good_tea", "price": 4 }
       ] },
+    { "id": "upside_merchant", "name": "A merchant who shouldn't be here", "keeper": "",
+      "greeting": "A figure in a cardigan made of static. \"Cash only. Your cash, from up there. It works down here. Don't ask.\"",
+      "entries": [
+        { "type": "card", "card": "card_first_aid", "price": 10, "name": "First Aid Kit (combat item)" },
+        { "type": "card", "card": "card_deli_sandwich", "price": 7, "name": "A sandwich that might be Gary's" },
+        { "type": "service", "id": "mend", "name": "Mend (restore HP and MP)", "price": 12, "effects": { "hp": 999, "mp": 30 } },
+        { "type": "item", "item": "focus_pendant", "price": 38 },
+        { "type": "item", "item": "frost_charm", "price": 26 },
+        { "type": "item", "item": "ember_charm", "price": 26 }
+      ] },
     { "id": "corner_store", "name": "Corner store (walk-up window)", "keeper": "innocent_bystander",
       "greeting": "A tired clerk slides the window open without looking up.",
       "entries": [

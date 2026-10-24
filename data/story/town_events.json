@@ -1,0 +1,40 @@
+{
+  "comment": "Weekly town events. They play when their part starts and Shift the week's signature (DESIGN.md Section 10: 'letting the deli freezer fail adds Cold; helping the blacksmith keep the forge lit adds Heat').",
+  "stories": [
+    { "id": "t1_banner", "trigger": { "week": 1, "day": "tue", "part": "before_school" }, "inline": true,
+      "steps": [ { "type": "event", "event": {
+        "title": "The pep rally banner", "text": "On the front steps, the pep rally banner has come loose and hangs upside down: YLLAR PEP. Kara is trying to fix it alone and failing.",
+        "choices": [
+          { "label": "Help her fix it (1 AP)", "cond": { "minAp": 1 }, "effects": { "ap": -1, "bond": { "kara": 4 }, "signature": { "light": -2 } }, "result": "Right side up. Kara thanks you three times. The air feels a bit less glaring." },
+          { "label": "Leave it upside down", "effects": { "signature": { "light": 2, "force": 1 } }, "result": "Nobody fixes it. All day, people walk under it and feel slightly worse." }
+        ] } } ] },
+    { "id": "t1_megaphone", "trigger": { "week": 1, "day": "wed", "part": "after_school" }, "inline": true,
+      "steps": [ { "type": "event", "event": {
+        "title": "Practice", "text": "At the field, Coach Byrne's megaphone squeals feedback every time anyone talks. The squad is getting louder to compensate.",
+        "choices": [
+          { "label": "Unplug it", "effects": { "signature": { "force": -2 }, "bond": { "coach_byrne": 2 } }, "result": "Blessed silence. Coach nods once." },
+          { "label": "Turn it up", "effects": { "signature": { "force": 2 }, "bond": { "dex": 2 } }, "result": "Dex howls into it. The bleachers rattle. Something under them rattles back." }
+        ] } } ] },
+    { "id": "t2_freezer", "trigger": { "week": 2, "day": "tue", "part": "after_school" }, "inline": true,
+      "steps": [ { "type": "event", "event": {
+        "title": "Gary's freezer", "text": "Gary is wrestling with the deli's walk-in freezer. It's frosted shut from the OUTSIDE. \"Kid. Help me with this or go get the blacksmith.\"",
+        "choices": [
+          { "label": "Help Gary chip it open (1 AP)", "cond": { "minAp": 1 }, "effects": { "ap": -1, "bond": { "gary": 5 }, "signature": { "cold": -3 } }, "result": "Together you crack the ice. The freezer sighs. Gary pats your shoulder twice." },
+          { "label": "Let it be", "effects": { "signature": { "cold": 3 } }, "result": "The freezer stays sealed. All night, the deli hums a little colder." }
+        ] } } ] },
+    { "id": "t3_forge", "trigger": { "week": 3, "day": "tue", "part": "after_school" }, "inline": true,
+      "steps": [ { "type": "event", "event": {
+        "title": "The forge goes cold", "text": "The forge's fire gutters out in the middle of the afternoon. The blacksmith stares at it like it betrayed him. Jake is panicking.",
+        "choices": [
+          { "label": "Work the bellows until it catches (1 AP)", "cond": { "minAp": 1 }, "effects": { "ap": -1, "bond": { "blacksmith": 5, "jake": 3 }, "signature": { "heat": 3, "binding": -1 } }, "result": "It catches. The blacksmith grunts. It's the most grateful grunt you've ever heard." },
+          { "label": "Ask what's wrong with it", "effects": { "signature": { "binding": 2 }, "flag": "lore_forge" }, "result": "\"It went cold for a reason once. Now it's remembering.\"" }
+        ] } } ] },
+    { "id": "t4_wing", "trigger": { "week": 4, "day": "mon", "part": "after_school" }, "inline": true,
+      "steps": [ { "type": "event", "event": {
+        "title": "The closed wing", "text": "Dr. Reyes is standing at the closed wing's door with a key she hasn't used in years. \"I need someone to hold the light. Someone who's already seen worse.\"",
+        "choices": [
+          { "label": "Hold the light", "effects": { "flag": "week4_closed_wing_open", "bond": { "dr_reyes": 6 }, "signature": { "light": 2 } }, "result": "The door opens. The hall beyond is full of empty beds made with hospital corners. Somebody has kept them made." },
+          { "label": "Tell her to wait for daylight", "effects": { "flag": "week4_closed_wing_open", "signature": { "binding": 2 } }, "result": "She opens it anyway, later, alone. You hear about it from Patti." }
+        ] } } ] }
+  ]
+}

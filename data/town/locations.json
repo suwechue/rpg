@@ -24,7 +24,7 @@
       "activities": [ { "label": "Independent study", "ap": 2, "parts": ["after_school"], "effects": { "statXp": { "int": 1 }, "gradeFor": { "ms_g": 1 } }, "say": "Ms. G leaves the door open for anyone who wants to stay. She talks the whole time." } ] },
     { "id": "earth_science_room", "name": "Earth Science room", "zone": "school", "status": "OPEN", "kind": "room", "parent": "hallways", "interior": "classroom",
       "hours": ["before_school", "lunch", "after_school"],
-      "activities": [ { "label": "Read the weather station", "ap": 1, "effects": { "statXp": { "per": 0.5 }, "flag": "signature_hint_station" }, "say": "The readings this week are... leaning somewhere. You write it down." } ] },
+      "activities": [ { "label": "Read the weather station", "ap": 1, "effects": { "statXp": { "per": 0.5 }, "flag": "signature_hint_station", "sigHint": true }, "say": "The readings this week are... leaning somewhere. You write it down." } ] },
     { "id": "biology_room", "name": "Biology room", "zone": "school", "status": "OPEN", "kind": "room", "parent": "hallways", "interior": "classroom", "hours": ["before_school", "lunch", "after_school"] },
     { "id": "history_room", "name": "History room", "zone": "school", "status": "OPEN", "kind": "room", "parent": "hallways", "interior": "classroom", "hours": ["before_school", "lunch", "after_school"] },
     { "id": "drama_room", "name": "Drama room", "zone": "school", "status": "OPEN", "kind": "room", "parent": "hallways", "interior": "classroom", "hours": ["before_school", "lunch", "after_school"],

@@ -1,0 +1,32 @@
+{
+  "enemies": [
+    { "id": "hollow_mascot", "name": "The Hollow Mascot", "tier": "boss", "weeks": [1],
+      "text": "The school mascot costume, stood up by the town's collective anxiety about being liked. There is nobody inside. There never was.",
+      "hp": 90, "movement": 3, "initiative": 7, "physDefense": 1, "magicResist": 3, "stability": 10,
+      "stats": { "str": 8, "dex": 6 },
+      "weakTo": ["cold", "binding"], "strongAgainst": ["force", "light"],
+      "signature": { "force": 0.5, "light": 0.5 },
+      "disposition": { "courage": 60, "pride": 90, "kindness": -50 },
+      "actions": [
+        { "id": "team_spirit_slam", "name": "Team Spirit Slam", "kind": "strike", "stat": "str", "mult": 1.0, "power": 3, "vectors": { "force": 1 }, "profile": { "pride": 0.6, "courage": 0.6 } },
+        { "id": "megaphone_roar", "name": "Megaphone Roar", "form": "line", "vectors": { "force": 1 }, "power": 6, "profile": { "pride": 0.9 } }
+      ],
+      "phases": [
+        { "hpBelow": 1.0 },
+        { "hpBelow": 0.66, "say": "The Hollow Mascot does a cartwheel it should not be able to do. \"GIVE ME AN F!\" A Pom-Pom Wisp bursts out of its head.",
+          "summon": ["pom_pom_wisp"],
+          "actions": [
+            { "id": "spotlight", "name": "Spotlight", "form": "burst", "vectors": { "light": 1 }, "power": 7, "profile": { "pride": 1.0 } },
+            { "id": "team_spirit_slam", "name": "Team Spirit Slam", "kind": "strike", "stat": "str", "mult": 1.1, "power": 4, "vectors": { "force": 1 }, "profile": { "courage": 0.8 } }
+          ] },
+        { "hpBelow": 0.33, "say": "The costume tears. Inside: nothing but noise and a single blinking light. It stops pretending to be friendly.", "movement": 4,
+          "disposition": { "courage": 90, "pride": 100, "kindness": -90 },
+          "actions": [
+            { "id": "crowd_crush", "name": "Crowd Crush", "form": "burst", "vectors": { "force": 0.6, "light": 0.4 }, "power": 9, "profile": { "courage": 1.0 } },
+            { "id": "target_the_star", "name": "Target the Star", "form": "bolt", "vectors": { "light": 1 }, "power": 9, "target": "strongest", "profile": { "pride": 1.0 } }
+          ] }
+      ],
+      "xp": 60, "money": 30,
+      "sprite": "res://assets/packs/ninja_adventure/Actor/Boss/GiantRacoon/Idle.png", "spriteFrame": [60, 60] }
+  ]
+}

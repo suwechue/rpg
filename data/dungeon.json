@@ -1,0 +1,27 @@
+{
+  "comment": "Floor composition per weekday (DESIGN.md Section 10). 'rooms' is the total including the start and exit rooms; the mix fills the rest.",
+  "days": {
+    "mon": { "rooms": 6, "mix": { "combat": 3, "rest": 1 } },
+    "tue": { "rooms": 7, "mix": { "combat": 3, "elite": 1, "rest": 1 } },
+    "wed": { "rooms": 8, "mix": { "combat": 3, "event": 1, "treasure": 1, "rest": 1 } },
+    "thu": { "rooms": 9, "mix": { "combat": 3, "elite": 2, "merchant": 1, "rest": 1 } },
+    "fri": { "boss": true, "returning": 3, "rest": 1 }
+  },
+  "enemiesPerFight": { "mon": [2, 2], "tue": [2, 3], "wed": [2, 3], "thu": [3, 3], "fri": [3, 4] },
+  "enemyCapByWeek": { "1": 2, "2": 3 },
+  "partyScale": { "1": { "count": 0.5, "power": 0.75 }, "2": { "count": 0.75, "power": 0.9 }, "3": { "count": 1.0, "power": 1.0 }, "4": { "count": 1.0, "power": 1.1 } },
+  "eliteEscort": 1,
+  "weekScale": [1.0, 1.0, 1.25, 1.5, 1.8, 2.1],
+  "returningScale": 1.25,
+  "fledFirst": true,
+  "roomSize": [11, 9],
+  "roomSpacing": 13,
+  "tiles": { "floor": [48, 48, 48, 49, 50], "wall": 40, "door": 48, "stairs": 36, "chest": 89, "chestOpen": 91, "fire": 29, "merchant": 84, "bones": 64 },
+  "treasure": { "money": [8, 20], "itemChance": 0.6, "items": ["rare_ore", "old_photo", "good_coffee", "spice_tin", "collectible_figure", "lucky_coin"], "shardChance": 0.5, "cardChance": 0.4, "cards": ["card_first_aid", "card_deli_sandwich"] },
+  "combatLoot": { "shardChance": 0.15 },
+  "shardsToLearn": 3,
+  "rest": { "hpPct": 1.0, "mpPct": 1.0 },
+  "merchant": { "shop": "upside_merchant" },
+  "pulledInText": "The spark yanks you under wherever you're standing. You land somewhere random, with whoever happened to be near.",
+  "woodsEdgeText": "You walk into the woods on purpose. The spark meets you halfway and lets you choose who comes."
+}

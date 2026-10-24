@@ -55,6 +55,7 @@ static func end_day(db: Dictionary, run: Dictionary) -> Array:
 ## Unbreakable), dispositions drift back toward rest.
 static func new_week(db: Dictionary, run: Dictionary) -> Array:
 	School.new_week(run)
+	run["signature"] = {}
 	var bond_space: Dictionary = db.get("spaces", {}).get("bond", {})
 	var rate := float(bond_space.get("weeklyDecay", 0.05))
 	var floor_value := float(bond_space.get("noDecayAt", 86))
