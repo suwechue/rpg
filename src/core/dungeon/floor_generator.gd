@@ -8,6 +8,7 @@ extends RefCounted
 
 const VO := preload("res://src/core/vector_ops.gd")
 const Sig := preload("res://src/core/dungeon/signature.gd")
+const Enc := preload("res://src/core/dungeon/encounters.gd")
 const DT := preload("res://src/core/data_tables.gd")
 
 const DIRS := [Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(0, -1)]
@@ -90,21 +91,15 @@ static func _room(id: int, cell: Vector2i, type: String) -> Dictionary:
 
 
 static func _fill_room(db: Dictionary, run: Dictionary, week: int, day: String, r: Dictionary, rng: RandomNumberGenerator) -> void:
-	var span: Array = cfg(db).get("enemiesPerFight", {}).get(day, [2, 3]).duplicate()
-	var cap := int(cfg(db).get("enemyCapByWeek", {}).get(str(week), 99))
-	span = [mini(int(span[0]), cap), mini(int(span[1]), cap)]
 	var scales: Array = cfg(db).get("weekScale", [1.0])
 	r["scale"] = float(scales[mini(week, scales.size() - 1)])
 	match str(r["type"]):
-		"combat":
-			r["enemies"] = Sig.pick_enemies(db, run, week, "normal", rng.randi_range(int(span[0]), int(span[1])), rng)
-			r["layout"] = pick_layout(db, str(Sig.week_rec(db, week).get("theme", "school")), rng)
-		"elite":
-			var elites := Sig.pick_enemies(db, run, week, "elite", 1, rng)
-			if elites.is_empty():
-				elites = Sig.pick_enemies(db, run, week, "normal", 1, rng)
-			r["enemies"] = elites + Sig.pick_enemies(db, run, week, "normal", mini(int(cfg(db).get("eliteEscort", 1)), cap - 1), rng)
-			r["layout"] = pick_layout(db, str(Sig.week_rec(db, week).get("theme", "school")), rng)
+		"combat", "elite":
+			# Built from an encounter template (data/encounters.json).
+			var enc := Enc.build(db, run, week, str(r["type"]), rng)
+			for k in ["enemies", "roles", "affixes", "formation", "reinforcements", "template"]:
+				r[k] = enc[k]
+			r["layout"] = pick_layout(db, str(Sig.week_rec(db, week).get("theme", "school")), rng, bool(enc["big"]), str(enc["layoutTag"]))
 		"event":
 			var evs: Array = []
 			for e in db.get("events/dungeon_events", {}).get("events", []):
@@ -118,17 +113,25 @@ static func _fill_room(db: Dictionary, run: Dictionary, week: int, day: String, 
 				r["event"] = evs[rng.randi_range(0, evs.size() - 1)]
 
 
-## A combat layout for a theme (weighted), falling back to any.
-static func pick_layout(db: Dictionary, theme: String, rng: RandomNumberGenerator) -> String:
+## A combat layout for a theme (weighted), falling back to any. `big` asks for
+## an 11x6 grid (swarms, ambushes); `tag` for layouts tagged in data ("hazard").
+static func pick_layout(db: Dictionary, theme: String, rng: RandomNumberGenerator, big: bool = false, tag: String = "") -> String:
 	var w := {}
 	var order: Array = []
 	for l in db.get("rooms/combat_layouts", {}).get("layouts", []):
 		var weight := float(l.get("weight", 1))
 		if weight <= 0.0:
 			continue
+		var cols := str(l.get("map", [""])[0]).length()
+		if big != (cols >= 11):
+			continue
+		if tag != "" and not l.get("tags", []).has(tag):
+			continue
 		var bonus := 3.0 if str(l.get("theme", "")) == theme else 1.0
 		w[str(l["id"])] = weight * bonus
 		order.append(str(l["id"]))
+	if order.is_empty():
+		return pick_layout(db, theme, rng, false, "") if (big or tag != "") else "open_field"
 	return VO.sample(w, rng, order)
 
 
@@ -157,6 +160,9 @@ static func generate_boss(db: Dictionary, run: Dictionary, week: int, rng: Rando
 	boss["enemies"] = [str(wr.get("boss", ""))]
 	boss["layout"] = str(wr.get("bossLayout", "boss_stage"))
 	boss["scale"] = 1.0
+	var adds: Dictionary = db.get("encounters", {}).get("bossAdds", {}).get(str(week), {})
+	if not adds.is_empty():
+		boss["reinforcements"] = { "round": int(adds.get("round", 4)), "enemies": adds.get("enemies", []) }
 	rooms.append(boss)
 	rooms.append(_room(rooms.size(), Vector2i(x + 1, 0), "exit"))
 	return { "week": week, "day": "fri", "theme": theme, "rooms": rooms, "boss": true }

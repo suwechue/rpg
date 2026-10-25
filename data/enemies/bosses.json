@@ -72,11 +72,14 @@
           "hpBelow": 0.66,
           "say": "The Hollow Mascot does a cartwheel it should not be able to do. \"GIVE ME AN F!\" A Pom-Pom Wisp bursts out of its head.",
           "summon": [
-            "pom_pom_wisp"
+            "pom_pom_wisp",
+            "dust_gremlin"
           ],
           "actions": [
             {
-              "id": "spotlight", "charge": 1, "pattern": "cross",
+              "id": "spotlight",
+              "charge": 1,
+              "pattern": "cross",
               "name": "Spotlight",
               "form": "burst",
               "vectors": {
@@ -104,7 +107,8 @@
           ]
         },
         {
-          "hpBelow": 0.33, "hazards": 3,
+          "hpBelow": 0.33,
+          "hazards": 3,
           "say": "The costume tears. Inside: nothing but noise and a single blinking light. It stops pretending to be friendly.",
           "movement": 4,
           "disposition": {
@@ -114,7 +118,9 @@
           },
           "actions": [
             {
-              "id": "crowd_crush", "charge": 1, "pattern": "ring",
+              "id": "crowd_crush",
+              "charge": 1,
+              "pattern": "ring",
               "name": "Crowd Crush",
               "form": "burst",
               "vectors": {
@@ -139,6 +145,11 @@
                 "pride": 1.0
               }
             }
+          ],
+          "summon": [
+            "dust_gremlin",
+            "dust_gremlin",
+            "paper_wasp"
           ]
         }
       ],
@@ -220,7 +231,9 @@
           ],
           "actions": [
             {
-              "id": "deep_freeze", "charge": 1, "pattern": "rows",
+              "id": "deep_freeze",
+              "charge": 1,
+              "pattern": "rows",
               "name": "Deep Freeze",
               "form": "burst",
               "vectors": {
@@ -248,12 +261,15 @@
           ]
         },
         {
-          "hpBelow": 0.33, "hazards": 3,
+          "hpBelow": 0.33,
+          "hazards": 3,
           "say": "The freezer door slams behind you. The Cold Cut's breath fogs the whole room. It wants the recipe.",
           "movement": 4,
           "actions": [
             {
-              "id": "whiteout", "charge": 1, "pattern": "checker",
+              "id": "whiteout",
+              "charge": 1,
+              "pattern": "checker",
               "name": "Whiteout",
               "form": "burst",
               "vectors": {
@@ -278,6 +294,11 @@
                 "pride": 1.0
               }
             }
+          ],
+          "summon": [
+            "frost_mite",
+            "frost_mite",
+            "slimelet"
           ]
         }
       ],
@@ -359,7 +380,9 @@
           ],
           "actions": [
             {
-              "id": "pour", "charge": 1, "pattern": "line",
+              "id": "pour",
+              "charge": 1,
+              "pattern": "line",
               "name": "Pour",
               "form": "burst",
               "vectors": {
@@ -385,12 +408,15 @@
           ]
         },
         {
-          "hpBelow": 0.33, "hazards": 3,
+          "hpBelow": 0.33,
+          "hazards": 3,
           "say": "It goes white-hot. 'IT WILL HOLD,' it roars, in a voice like the blacksmith's. 'PROBABLY.'",
           "movement": 4,
           "actions": [
             {
-              "id": "temper", "charge": 1, "pattern": "ring",
+              "id": "temper",
+              "charge": 1,
+              "pattern": "ring",
               "name": "Temper",
               "form": "burst",
               "vectors": {
@@ -415,6 +441,11 @@
                 "pride": 1.0
               }
             }
+          ],
+          "summon": [
+            "spark_imp",
+            "spark_imp",
+            "rust_mite"
           ]
         }
       ],
@@ -496,7 +527,9 @@
           ],
           "actions": [
             {
-              "id": "rounds", "charge": 1, "pattern": "cross",
+              "id": "rounds",
+              "charge": 1,
+              "pattern": "cross",
               "name": "Rounds",
               "form": "burst",
               "vectors": {
@@ -522,11 +555,14 @@
           ]
         },
         {
-          "hpBelow": 0.33, "hazards": 3,
+          "hpBelow": 0.33,
+          "hazards": 3,
           "say": "The Ward reads from its clipboard: every name the town forgot. One of them is yours, dated next week.",
           "actions": [
             {
-              "id": "flatline", "charge": 1, "pattern": "checker",
+              "id": "flatline",
+              "charge": 1,
+              "pattern": "checker",
               "name": "Flatline",
               "form": "line",
               "vectors": {
@@ -550,6 +586,11 @@
                 "pride": 1.0
               }
             }
+          ],
+          "summon": [
+            "pill_bug",
+            "bandage_wisp",
+            "pill_bug"
           ]
         }
       ],
@@ -647,7 +688,9 @@
           ],
           "actions": [
             {
-              "id": "all_vectors", "charge": 1, "pattern": "ring",
+              "id": "all_vectors",
+              "charge": 1,
+              "pattern": "ring",
               "name": "Every Vector",
               "form": "burst",
               "vectors": {
@@ -676,14 +719,19 @@
           ]
         },
         {
-          "hpBelow": 0.35, "hazards": 3,
+          "hpBelow": 0.35,
+          "hazards": 3,
           "say": "The town folds tighter. Every building you've walked past is in it. A Mirror Kid peels off its walls.",
           "summon": [
-            "mirror_kid"
+            "mirror_kid",
+            "glass_shard",
+            "echo_kid"
           ],
           "actions": [
             {
-              "id": "final_bell", "charge": 1, "pattern": "checker",
+              "id": "final_bell",
+              "charge": 1,
+              "pattern": "checker",
               "name": "The Final Bell",
               "form": "burst",
               "vectors": {

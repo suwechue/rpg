@@ -93,6 +93,25 @@ func _new_run() -> void:
 	var seed_edit := LineEdit.new()
 	seed_edit.custom_minimum_size = Vector2(100, 0)
 	seed_row.add_child(seed_edit)
+	# Combat difficulty (data/combat_rules.json "difficulties"): Hard enemies move, then attack.
+	var diff := { "id": str(db.get("combat_rules", {}).get("difficulty", "normal")) }
+	var diff_row := m.row()
+	diff_row.add_child(UiTheme.label("Combat:"))
+	var diff_buttons: Array = []
+	var diffs: Dictionary = db.get("combat_rules", {}).get("difficulties", {})
+	for d in diffs:
+		if str(d) == "comment":
+			continue
+		var did := str(d)
+		var b := UiTheme.button(str(diffs[d].get("name", did.capitalize())), func() -> void:
+			diff["id"] = did
+			for x in diff_buttons:
+				(x as Button).theme_type_variation = "SelectedButton" if x.get_meta("id") == did else "")
+		b.set_meta("id", did)
+		b.theme_type_variation = "SelectedButton" if did == diff["id"] else ""
+		b.tooltip_text = "Enemies show what they'll do on your turn. %s" % ("On Hard they move, then attack." if bool(diffs[d].get("enemyMoveAndAct", false)) else "On Normal they either attack or move.")
+		diff_buttons.append(b)
+		diff_row.add_child(b)
 	for cls in db.get("classes", {}).get("classes", []):
 		if int(cls.get("tier", 1)) != 1:
 			continue
@@ -128,6 +147,7 @@ func _new_run() -> void:
 	SaveSystem.delete_save()
 	var traits: Array = [] if str(trait_pick["id"]) == "" else [str(trait_pick["id"])]
 	GameState.new_run(int(pick["seed"]), str(pick["class"]), "New Kid", { "traits": traits })
+	GameState.combat_difficulty = str(diff["id"])
 	Narrator.say("New kid in a small town. The narrator clears their throat. That's me. Hi.")
 	SceneRouter.goto(TOWN_SCENE)
 

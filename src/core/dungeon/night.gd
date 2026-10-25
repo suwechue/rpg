@@ -9,34 +9,57 @@ const Char := preload("res://src/core/character.gd")
 const Gen := preload("res://src/core/dungeon/floor_generator.gd")
 const Sig := preload("res://src/core/dungeon/signature.gd")
 const VO := preload("res://src/core/vector_ops.gd")
+const Enc := preload("res://src/core/dungeon/encounters.gd")
 
 
 static func cfg(db: Dictionary) -> Dictionary:
 	return db.get("dungeon", {})
 
 
-## Enemy records for a room's fight, scaled for the party's size: smaller
-## parties face fewer, weaker enemies (data/dungeon.json "partyScale").
-## The first enemy (an elite or the boss) always stays.
+## Enemy records for a room's fight, scaled for the party's size
+## (data/encounters.json "partyScale"): fewer, weaker enemies for a small
+## party, never below 2, one more for a full party. Elite affixes are applied.
 static func fight_enemies(db: Dictionary, room: Dictionary, party_size: int) -> Array:
-	var ps: Dictionary = cfg(db).get("partyScale", {}).get(str(clampi(party_size, 1, 4)), {})
+	return fight_setup(db, room, party_size)["enemies"]
+
+
+## Everything a room's fight needs: { "enemies": [records], "roles", "formation", "reinforcements" }.
+static func fight_setup(db: Dictionary, room: Dictionary, party_size: int) -> Dictionary:
 	var ids: Array = room.get("enemies", [])
 	var t := str(room.get("type", ""))
-	var keep := ids.size()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash("party_scale:%s:%s" % [room.get("id", 0), str(ids)])
+	var picks: Array = range(ids.size())
+	var power := 1.0
 	if t != "boss":
-		keep = maxi(1, ceili(float(ids.size()) * float(ps.get("count", 1.0))))
-	var idx := {}
-	for e in preload("res://src/core/data_tables.gd").records_under(db, "enemies/", "enemies"):
-		idx[str(e["id"])] = e
+		var sc := Enc.scale_for_party(db, ids, party_size, rng)
+		picks = sc["indices"]
+		power = float(sc["power"])
+	var idx := preload("res://src/core/data_tables.gd").index_under(db, "enemies/", "enemies")
+	var roles_in: Array = room.get("roles", [])
+	var affixes: Dictionary = room.get("affixes", {})
 	var out: Array = []
-	for i in keep:
+	var roles: Array = []
+	for i in picks:
 		var rec: Dictionary = idx.get(str(ids[i]), {}).duplicate(true)
 		if rec.is_empty():
 			continue
 		var base := 1.0 if t == "boss" else float(room.get("scale", 1.0))
-		rec["scale"] = base * float(ps.get("power", 1.0))
+		rec["scale"] = base * (1.0 if t == "boss" else power)
+		var ax: Variant = affixes.get(i, affixes.get(str(i), []))
+		if ax is Array and not (ax as Array).is_empty():
+			rec["affixes"] = ax
 		out.append(rec)
-	return out
+		roles.append(str(roles_in[i]) if i < roles_in.size() else "fighter")
+	var reinf: Dictionary = room.get("reinforcements", {})
+	var extra: Array = []
+	for id in reinf.get("enemies", []):
+		var rec: Dictionary = idx.get(str(id), {}).duplicate(true)
+		if not rec.is_empty():
+			rec["scale"] = float(room.get("scale", 1.0)) * power
+			extra.append(rec)
+	return { "enemies": out, "roles": roles, "formation": str(room.get("formation", "default")),
+		"reinforcements": { "round": int(reinf.get("round", 3)), "enemies": extra } if not extra.is_empty() else {} }
 
 
 static func party_size(run: Dictionary) -> int:

@@ -16,6 +16,10 @@ const COMBAT_SCENE := "res://src/scenes/combat/combat.tscn"
 
 var run: Dictionary = {}
 var combat_turn_mode := ""   # F1 > Fights override of data/combat_rules.json "turnMode" ("" = data)
+## Combat difficulty for this run ("normal" or "hard"), chosen at new run; F1 > Fights can switch it.
+var combat_difficulty: String:
+	get: return str(run.get("combat_difficulty", DataDB.table("combat_rules").get("difficulty", "normal")))
+	set(value): run["combat_difficulty"] = value
 var dev_autoplay := false
 var pending_combat: Dictionary = {}
 var combat_return := ""
@@ -177,9 +181,10 @@ func combat_setup(enemies: Array, layout_id: String, opts: Dictionary = {}) -> D
 		"boss": bool(opts.get("boss", false)),
 		"library": cards,
 	}
-	for key in ["intro", "fleeAllowed", "context"]:
+	for key in ["intro", "fleeAllowed", "context", "formation", "roles", "reinforcements", "turnMode"]:
 		if opts.has(key):
 			setup[key] = opts[key]
+	setup["difficulty"] = combat_difficulty
 	return setup
 
 

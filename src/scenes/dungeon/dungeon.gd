@@ -360,7 +360,8 @@ func _end_night() -> void:
 
 func _start_fight(room: Dictionary) -> void:
 	var db: Dictionary = DataDB.all()
-	var enemies := Night.fight_enemies(db, room, Night.party_size(GameState.run))
+	var fs := Night.fight_setup(db, room, Night.party_size(GameState.run))
+	var enemies: Array = fs["enemies"]
 	var t := str(room["type"])
 	var intro := ""
 	if bool(room.get("returning", false)):
@@ -370,7 +371,8 @@ func _start_fight(room: Dictionary) -> void:
 	elif t == "boss":
 		intro = str(Sig.week_rec(db, _week).get("bossIntro", ""))
 	GameState.run["floor_fight"] = int(room["id"])
-	var setup := GameState.combat_setup(enemies, str(room.get("layout", "open_field")), { "boss": t == "boss", "intro": intro })
+	var setup := GameState.combat_setup(enemies, str(room.get("layout", "open_field")), { "boss": t == "boss", "intro": intro,
+		"formation": fs["formation"], "roles": fs["roles"], "reinforcements": fs["reinforcements"] })
 	GameState.start_combat(setup, SELF)
 
 

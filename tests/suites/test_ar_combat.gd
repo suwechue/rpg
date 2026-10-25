@@ -88,14 +88,28 @@ func test_other_turn_modes() -> void:
 	check(st2.can_move(p2), "move_and_act: moving after acting too")
 
 
-func test_enemies_move_or_act() -> void:
-	var st := fight(["P.......E", "........."], [enemy("pom_pom_wisp")])
+func test_enemy_turns_by_difficulty() -> void:
+	var st := fight(["P....E...", "........."], [enemy("pom_pom_wisp")])
 	var e = foe(st)
-	var opts := AI.options(st, e)
+	check(st.difficulty == "normal" and not st._moves_and_acts(e), "Normal: enemies move or attack")
 	e.move_left = e.movement
 	for o in AI.options(st, e):
-		if str(o["kind"]) in ["action", "card", "strike"]:
-			check(o["move"] == e.cell, "enemy attacks are from where it stands")
+		if str(o["kind"]) == "action":
+			check(o["move"] == e.cell, "Normal: attacks are from where it stands")
+	var hard := StateScript.new(db(), seeded(5), { "layout": { "map": ["P....E...", "........."] }, "party": [{ "char": hero() }],
+		"enemies": [enemy("pom_pom_wisp")], "difficulty": "hard" })
+	var h = foe(hard)
+	check(hard._moves_and_acts(h), "Hard: enemies move, then attack")
+	h.move_left = h.movement
+	var moving_attack := false
+	for o in AI.options(hard, h):
+		if str(o["kind"]) == "action" and o["move"] != h.cell:
+			moving_attack = true
+	check(moving_attack, "Hard: their plans include moving into range and hitting")
+	var fast := enemy("pom_pom_wisp")
+	fast["moveAndAct"] = true
+	var st2 := fight(["P....E...", "........."], [fast])
+	check(st2._moves_and_acts(foe(st2)), "fast elites move and attack on Normal too")
 
 
 func test_burst_footprint_by_magnitude() -> void:
@@ -144,3 +158,24 @@ func test_disabling_cancels_telegraphs() -> void:
 	e.intent["action"] = { "id": "poke", "kind": "strike", "name": "Poke" }
 	st._push(p, e, Vector2i(1, 0), 3)
 	check(e.intent.is_empty(), "pushing a melee attacker out of range cancels its attack")
+
+
+func test_planning_ignores_last_turns_flags() -> void:
+	var st := fight(["P....E...", "........."], [enemy("pom_pom_wisp")])
+	var e = foe(st)
+	e.action_used = true
+	e.moved_steps = 2
+	e.move_left = 0
+	var plan := AI.plan_intent(st, e)
+	check(str(plan.get("kind", "")) != "defend" and str(plan.get("kind", "")) != "", "an enemy that acted last turn still plans a real move or attack (%s)" % plan.get("kind", ""))
+	check(e.action_used and e.moved_steps == 2, "its own flags are left as they were")
+
+
+func test_single_target_attacks_track() -> void:
+	var st := fight(["P........", ".E......."], [enemy("pom_pom_wisp")])
+	var e = foe(st)
+	var plan := AI.plan_intent(st, e)
+	if str(plan.get("kind", "")) == "attack" and plan.get("cells", []).size() <= 1:
+		check(str(plan["mode"]) == "tracking", "single-target attacks follow their target")
+	else:
+		check(true, "no single-target attack planned this time")

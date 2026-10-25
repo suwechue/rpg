@@ -38,7 +38,7 @@
     "hazardDamage": 4,
     "flankMul": 1.5,
     "backMul": 1.15,
-    "telegraphDamageMul": 1.35,
+    "telegraphDamageMul": 2.0,
     "adjacentFriendDamagePct": 0.05,
     "secondWindHpPct": 0.2,
     "secondWindBelowPct": 0.3,

@@ -57,7 +57,8 @@ func test_weekday_floors() -> void:
 	check(JSON.stringify(a) == JSON.stringify(b), "same seed, same floor")
 	check(JSON.stringify(a) != JSON.stringify(Gen.generate(db(), fresh(4), 2, "wed")), "different seed, different floor")
 	for r in Gen.generate(db(), run, 1, "tue")["rooms"]:
-		check(r["enemies"].size() <= 2, "week 1 fights have at most 2 enemies")
+		if str(r["type"]) in ["combat", "elite"]:
+			check(r["enemies"].size() >= 3 and r["enemies"].size() <= 9, "week 1 fights come from templates with 3+ enemies (%d)" % r["enemies"].size())
 
 
 func test_boss_floor_returning_fled_first() -> void:
@@ -85,8 +86,11 @@ func test_boss_floor_returning_fled_first() -> void:
 
 func test_party_scaling() -> void:
 	var room := { "type": "combat", "enemies": ["pom_pom_wisp", "megaphone_mimic", "locker_lurker", "detention_slip"], "scale": 1.0 }
-	check(Night.fight_enemies(db(), room, 1).size() == 2, "solo: half the enemies")
-	check(Night.fight_enemies(db(), room, 4).size() == 4, "full party: all of them")
+	check(Night.fight_enemies(db(), room, 1).size() == 3, "solo: three quarters of the enemies")
+	check(Night.fight_enemies(db(), room, 3).size() == 4, "trio: all of them")
+	check(Night.fight_enemies(db(), room, 4).size() == 5, "full party: one more")
+	var two := { "type": "combat", "enemies": ["pom_pom_wisp", "megaphone_mimic"], "scale": 1.0 }
+	check(Night.fight_enemies(db(), two, 1).size() == 2, "never below 2")
 	check(float(Night.fight_enemies(db(), room, 1)[0]["scale"]) < 1.0, "and weaker")
 	var boss := { "type": "boss", "enemies": ["hollow_mascot"] }
 	check(Night.fight_enemies(db(), boss, 1).size() == 1, "the boss always comes")
@@ -141,13 +145,13 @@ func test_hollow_mascot_phases() -> void:
 	for u in st.units:
 		if u.boss:
 			m = u
-	st._damage(m, 40, null, "", "test")
+	st._damage(m, ceili(m.max_hp * 0.4), null, "", "test")
 	check(m.phase_index == 1, "below 66% HP: phase 2")
 	var summoned := 0
 	for u in st.units:
 		if u.team == "enemy" and not u.boss:
 			summoned += 1
-	check(summoned == 1, "it summons a Pom-Pom Wisp")
-	st._damage(m, 25, null, "", "test")
+	check(summoned == 2, "it summons a Pom-Pom Wisp and a Dust Gremlin")
+	st._damage(m, ceili(m.max_hp * 0.3), null, "", "test")
 	check(m.phase_index == 2 and m.movement == 4, "below 33%: the final phase")
 	check(not st.can_flee(), "no fleeing the boss")

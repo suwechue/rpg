@@ -58,6 +58,14 @@ var _log_box: VBoxContainer
 var _last_turn_team := ""
 
 
+func _process(_delta: float) -> void:
+	# Hold the threat view key to shade every tile by the damage waiting there.
+	var tv := Input.is_action_pressed("threat_view")
+	if field != null and tv != field.threat_view:
+		field.threat_view = tv
+		field.queue_redraw()
+
+
 func _ready() -> void:
 	var setup: Dictionary = GameState.take_pending_combat()
 	if setup.is_empty():
@@ -173,6 +181,11 @@ func _sync_views() -> void:
 		threats[c] = { "damage": total, "charge": charge }
 	field.threat_cells = threats
 	field.support_cells = state.support_cells()
+	var marks: Array = []
+	for u in state.units:
+		if u.team == "enemy" and u.alive() and not u.intent.is_empty() and u.intent.get("move", u.cell) != u.cell:
+			marks.append({ "from": u.cell, "to": u.intent["move"] })
+	field.move_marks = marks
 	_refresh_overlays()
 	_refresh_hud()
 
@@ -273,11 +286,25 @@ func _refresh_hud() -> void:
 		if list.is_empty() or left <= 0:
 			continue
 		_timeline.add_child(UiTheme.label("R%d" % group[1], UiTheme.DIM))
-		for u in list.slice(0, left):
+		# Identical minions in a row show as one chip ("Gremlin x4").
+		var runs: Array = []
+		for u in list:
+			var key: String = str(u.source.get("id", u.id)) if u.role == "minion" else str(u.id)
+			if not runs.is_empty() and runs[-1]["key"] == key and u != state.current:
+				runs[-1]["n"] += 1
+			else:
+				runs.append({ "key": key, "unit": u, "n": 1 })
+		for r in runs.slice(0, left):
+			var u: UnitScript = r["unit"]
 			var box := PanelContainer.new()
 			box.theme_type_variation = "TimelineCurrent" if u == state.current and group[0] == "now" else ("TimelineParty" if u.team == "party" else "TimelineEnemy")
-			box.add_child(_portrait(u, int(tl.get("portrait", 20))))
-			box.tooltip_text = "%s (init %d)" % [u.name, u.initiative]
+			var inner := HBoxContainer.new()
+			inner.theme_type_variation = "CompactBox"
+			inner.add_child(_portrait(u, int(tl.get("portrait", 20))))
+			if int(r["n"]) > 1:
+				inner.add_child(UiTheme.label("x%d" % int(r["n"])))
+			box.add_child(inner)
+			box.tooltip_text = "%s%s (init %d)" % [u.name, " x%d" % int(r["n"]) if int(r["n"]) > 1 else "", u.initiative]
 			_timeline.add_child(box)
 			left -= 1
 	var u := state.current
@@ -836,7 +863,7 @@ func _run_ai() -> void:
 		return
 	_busy = true
 	_sync_views()
-	await _wait(0.3)
+	await _wait(0.1 if state.current.role == "minion" else 0.3)
 	AI.take_turn(state, state.current)
 	_busy = false
 	await _play_events()
@@ -910,15 +937,17 @@ func _play_event(e: Dictionary) -> void:
 					cursor_cell = u.cell
 					_focus_card = -1
 				elif u.team == "enemy":
-					if _last_turn_team != "enemy":
-						_say_banner("Enemy turn")
+					# Minions in a row act as one quick group: one banner, short pauses.
+					var group := u.role == "minion" and _last_turn_team == "minion"
+					if _last_turn_team != "enemy" and not group:
+						_say_banner("Minions" if u.role == "minion" else "Enemy turn")
 						await _wait(0.4)
 					_sync_views()
 					var v := _view_for_id(u.id)
-					if v != null:
+					if v != null and not group:
 						await _nudge_to(v)
-					await _wait(0.25)
-				_last_turn_team = u.team
+					await _wait(0.08 if group else 0.25)
+				_last_turn_team = "minion" if u.role == "minion" else u.team
 			_sync_views()
 		"intent":
 			pass

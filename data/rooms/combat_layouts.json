@@ -24,7 +24,7 @@
         "<P...#.E.",
         "<P.x.#.E."
       ] },
-    { "id": "flooded_gym", "theme": "school", "weight": 1,
+    { "id": "flooded_gym", "tags": ["hazard"], "theme": "school", "weight": 1,
       "map": [
         "<P..ww.E.",
         "<P..ww.E.",
@@ -32,7 +32,7 @@
         "<P.hh..E.",
         "<P.....E."
       ] },
-    { "id": "frozen_deli", "theme": "deli", "weight": 2,
+    { "id": "frozen_deli", "tags": ["hazard"], "theme": "deli", "weight": 2,
       "map": [
         "<P..ii.E.",
         "<P.#ww.E.",
@@ -40,7 +40,7 @@
         "<P.#...E.",
         "<P..x..E."
       ] },
-    { "id": "forge_floor", "theme": "forge", "weight": 2,
+    { "id": "forge_floor", "tags": ["hazard"], "theme": "forge", "weight": 2,
       "map": [
         "<P..h..E.",
         "<P.#h#.E.",
@@ -73,6 +73,8 @@
         "<P..c....E.",
         "<P.......E."
       ] },
-    { "id": "training_yard", "theme": "school", "weight": 0, "note": "Debug and screenshots only (weight 0): a hazard behind the first enemy, an ice strip in the last row.", "map": ["<P..Eh....", "<P........", "<P....E...", "<P........", "<P..Eiii.."] }
+    { "id": "training_yard", "theme": "school", "weight": 0, "note": "Debug and screenshots only (weight 0): a hazard behind the first enemy, an ice strip in the last row.", "map": ["<P..Eh....", "<P........", "<P....E...", "<P........", "<P..Eiii.."] },
+    { "id": "big_gym", "theme": "school", "weight": 2, "note": "11x6 for swarms and ambushes.", "map": ["<P....c...E", "<P........E", "<P..h...c.E", "<P........E", "<P...c....E", "<P........E"] },
+    { "id": "crossroads", "theme": "town", "weight": 2, "note": "11x6 for swarms and ambushes.", "map": ["<P...#....E", "<P........E", "<P.c...c..E", "<P........E", "<P...#....E", "<P..w.....E"] }
   ]
 }

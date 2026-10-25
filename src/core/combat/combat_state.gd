@@ -45,12 +45,14 @@ var _spawn_counter := 0
 var _ai: GDScript = null           # enemy_ai.gd, loaded lazily (it preloads this script)
 var _note := ""                    # why the next hit did what it did ("Cold, resisted"), for the log
 var turn_mode := "move_or_act"     # data/combat_rules.json "turnMode" (AR); setup "turnMode" overrides
+var difficulty := "normal"         # data/combat_rules.json "difficulty"; setup "difficulty" overrides
 var ai_overrides: Dictionary = {}  # sims: data/ai.json values to replace for this fight
 var delayed: Array = []            # telegraphed strikes that land later: [{ cells, turns, spec, caster, neutral, name }]
 var revealed := 0                  # rounds Reveal keeps every plan visible
 var _pending_decoys: Array = []    # decoys that appear where a unit stood once it moves away
 var _fx: GDScript = null           # card_effects.gd, loaded lazily
 var last_party_card: Dictionary = {}  # the last card a party member played (Mirror enemies copy it)
+var reinforcements: Dictionary = {}   # { "round", "enemies": [records], "cells": [telegraphed spawn tiles] }
 
 
 func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) -> void:
@@ -58,6 +60,7 @@ func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) ->
 	rng = p_rng
 	library = setup.get("library", {})
 	turn_mode = str(setup.get("turnMode", db.get("combat_rules", {}).get("turnMode", "move_or_act")))
+	difficulty = str(setup.get("difficulty", db.get("combat_rules", {}).get("difficulty", "normal")))
 	ai_overrides = setup.get("ai", {})
 	boss_fight = bool(setup.get("boss", false))
 	flee_allowed = bool(setup.get("fleeAllowed", not boss_fight))
@@ -75,10 +78,20 @@ func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) ->
 	for i in enemies.size():
 		var rec: Dictionary = EnemyMods.apply(db, enemies[i])
 		var u := UnitScript.from_enemy(rec, float(rec.get("scale", 1.0)))
+		var hp_mul := "bossHpMul" if u.boss else "enemyHpMul"
+		u.max_hp = maxi(1, roundi(float(u.max_hp) * float(db.get("combat_rules", {}).get(hp_mul, 1.0))))
+		u.max_hp = maxi(1, roundi(float(u.max_hp) * float(difficulty_rules().get("enemyHpMul", 1.0))))
+		u.hp = u.max_hp
+		var roles: Array = setup.get("roles", [])
+		u.role = str(roles[i]) if i < roles.size() else ("minion" if str(rec.get("tier", "")) == "minion" else "fighter")
 		_place(u, grid.enemy_spawns, i, false)
 		if float(rec.get("startShieldPct", 0.0)) > 0.0:
 			u.shield = roundi(float(u.max_hp) * float(rec["startShieldPct"]))
 			u.shield_turns = 99
+	_formation(str(setup.get("formation", "default")))
+	if not setup.get("reinforcements", {}).is_empty():
+		reinforcements = setup["reinforcements"].duplicate()
+		reinforcements["cells"] = []
 	for p in grid.prop_spawns:
 		var crate := UnitScript.make_prop("crate", int(Res.combat_cfg(db).get("crateHp", 8)))
 		crate.cell = p["cell"]
@@ -112,6 +125,112 @@ func _add_unit(u: UnitScript) -> void:
 	u.spawn_index = _spawn_counter
 	_spawn_counter += 1
 	units.append(u)
+
+
+## Encounter formations (data/encounters.json): front_back puts the front
+## role nearest the party and the rest behind; surround spreads enemies over
+## every row; ambush puts the party in the middle with enemies on both sides.
+func _formation(kind: String) -> void:
+	if kind == "default" or kind == "":
+		return
+	var foes: Array = units.filter(func(u: UnitScript) -> bool: return u.team == "enemy")
+	var party: Array = units.filter(func(u: UnitScript) -> bool: return u.team == "party")
+	var free := func(c: Vector2i) -> bool: return grid.walkable_terrain(c) and not grid.exits.has(c)
+	var mid := grid.cols / 2
+	if kind == "ambush":
+		var pc := Vector2i(mid, 0)
+		var i := 0
+		for u in party:
+			var c := Vector2i(mid - (i % 2), clampi(grid.rows / 2 - 1 + i / 2, 0, grid.rows - 1))
+			if free.call(c):
+				u.cell = c
+			i += 1
+		var left: Array = []
+		var right: Array = []
+		for r in grid.rows:
+			for c in [Vector2i(1, r), Vector2i(2, r)]:
+				if free.call(c):
+					left.append(c)
+			for c in [Vector2i(grid.cols - 1, r), Vector2i(grid.cols - 2, r)]:
+				if free.call(c):
+					right.append(c)
+		_spread(foes, [left, right], pc)
+		return
+	var zone: Array = []
+	for c in grid.all_cells():
+		var cell: Vector2i = c
+		if cell.x > mid and free.call(cell):
+			zone.append(cell)
+	if kind == "front_back":
+		zone.sort_custom(func(a: Vector2i, b: Vector2i) -> bool: return a.x < b.x or (a.x == b.x and absi(a.y - grid.rows / 2) < absi(b.y - grid.rows / 2)))
+		var fronts := foes.filter(func(u: UnitScript) -> bool: return u.role in ["front", "fighter", "elite", "leader"])
+		var backs := foes.filter(func(u: UnitScript) -> bool: return not (u.role in ["front", "fighter", "elite", "leader"]))
+		var far := zone.duplicate()
+		far.reverse()
+		_spread(fronts, [zone], Vector2i.ZERO)
+		_spread(backs, [far], Vector2i.ZERO)
+	elif kind == "surround":
+		var rows: Array = []
+		for r in grid.rows:
+			rows.append(zone.filter(func(c: Vector2i) -> bool: return c.y == r))
+		_spread(foes, rows, Vector2i.ZERO)
+
+
+## Hand out cells to units round-robin across the given lists (skipping taken cells).
+func _spread(list: Array, pools: Array, _center: Vector2i) -> void:
+	var taken := {}
+	for u in units:
+		if not list.has(u):
+			taken[u.cell] = true
+	var p := 0
+	for u in list:
+		for tries in pools.size():
+			var pool: Array = pools[(p + tries) % pools.size()]
+			var placed := false
+			for c in pool:
+				if not taken.has(c):
+					u.cell = c
+					taken[c] = true
+					placed = true
+					break
+			if placed:
+				break
+		p += 1
+
+
+## Reinforcements: the round before they arrive their spawn tiles are telegraphed.
+func _reinforce() -> void:
+	if reinforcements.is_empty():
+		return
+	var arrive := int(reinforcements.get("round", 3))
+	if round_num == arrive - 1 or (round_num >= arrive and reinforcements["cells"].is_empty()):
+		var spots: Array = []
+		var cols: Array = range(grid.cols - 1, grid.cols / 2, -1)
+		for c in cols:
+			for r in grid.rows:
+				var cell := Vector2i(c, r)
+				if spots.size() < reinforcements["enemies"].size() and grid.walkable_terrain(cell) and unit_at(cell) == null:
+					spots.append(cell)
+		reinforcements["cells"] = spots
+		_emit({ "t": "telegraph", "cells": spots, "name": "Reinforcements" })
+	if round_num >= arrive:
+		var i := 0
+		for rec in reinforcements["enemies"]:
+			var r: Dictionary = EnemyMods.apply(db, rec if typeof(rec) == TYPE_DICTIONARY else DT.index_under(db, "enemies/", "enemies").get(str(rec), {}))
+			if r.is_empty():
+				continue
+			var cell: Vector2i = reinforcements["cells"][i] if i < reinforcements["cells"].size() else _free_near(Vector2i(grid.cols - 1, grid.rows / 2))
+			if unit_at(cell) != null:
+				cell = _free_near(cell)
+			var s := UnitScript.from_enemy(r, float(r.get("scale", 1.0)))
+			s.cell = cell
+			s.role = "fighter"
+			_add_unit(s)
+			_emit({ "t": "spawn", "unit": s.id, "cell": cell, "prop": false })
+			i += 1
+		_emit({ "t": "log", "text": "Reinforcements arrive!" })
+		reinforcements = {}
+		_build_order_keep_current()
 
 
 ## Put a unit on its spawn cell, or the nearest free cell on its side.
@@ -308,6 +427,7 @@ func _advance() -> void:
 			if order.is_empty():
 				return
 			_emit({ "t": "round", "n": round_num })
+			_reinforce()
 		var u: UnitScript = order[turn_index]
 		if not u.alive():
 			continue
@@ -467,9 +587,20 @@ func act_block(u: UnitScript) -> String:
 	return ""
 
 
-## Fast elites (data "moveAndAct") ignore the move-or-act rule.
+## Who may move and act in one turn. Enemies always telegraph during the
+## player's turn and carry it out on their own. On Normal they either hit from
+## where they stand or move into position; on Hard they move, then attack
+## (data/combat_rules.json "difficulties", user decision Oct 24). Data
+## "moveAndAct" (fast elites) or Haste lets anyone do both.
 func _moves_and_acts(u: UnitScript) -> bool:
-	return bool(u.source.get("moveAndAct", false)) or bool(u.statuses.has("haste_full"))
+	if bool(u.source.get("moveAndAct", false)) or u.statuses.has("haste_full"):
+		return true
+	return u.team == "enemy" and bool(difficulty_rules().get("enemyMoveAndAct", false))
+
+
+## The combat difficulty's rules (normal or hard).
+func difficulty_rules() -> Dictionary:
+	return db.get("combat_rules", {}).get("difficulties", {}).get(difficulty, {})
 
 
 func move(u: UnitScript, dest: Vector2i) -> bool:
@@ -1481,6 +1612,12 @@ func _on_zero_hp(t: UnitScript, source: UnitScript) -> void:
 	money_total += t.money
 	_emit({ "t": "death", "unit": t.id })
 	_on_enemy_death(t)
+	if t.role == "leader":
+		for m in units:
+			if m.team == "enemy" and m.alive() and m.role == "minion":
+				m.disposition = { "courage": -90, "loyalty": -40 }
+				m.intent = {}
+		_emit({ "t": "log", "text": "The leader falls. The swarm scatters!" })
 
 
 ## Splitters split; explosive ones blow up next to them.
@@ -1664,7 +1801,7 @@ func intent_cells(u: UnitScript) -> Array:
 
 ## Tiles enemies plan to heal or summon onto (shown in green, not red).
 func support_cells() -> Array:
-	var out: Array = []
+	var out: Array = reinforcements.get("cells", []).duplicate() if not reinforcements.is_empty() else []
 	for u in units:
 		if u.team == "enemy" and u.alive() and (str(u.intent.get("kind", "")) == "buff" or bool(u.intent.get("summon", false))):
 			out.append_array(u.intent.get("cells", []))
@@ -1675,7 +1812,7 @@ func support_cells() -> Array:
 ## dodged, so they hit harder (data/stats.json combat "telegraphDamageMul").
 func intent_spec(u: UnitScript, action: Dictionary = {}) -> Dictionary:
 	var spec := action_spec(u, action if not action.is_empty() else u.intent.get("action", {}))
-	var mul := float(Res.combat_cfg(db).get("telegraphDamageMul", 1.0))
+	var mul := float(Res.combat_cfg(db).get("telegraphDamageMul", 1.0)) * float(difficulty_rules().get("enemyDamageMul", 1.0))
 	spec["power"] = float(spec["power"]) * mul
 	if spec.has("base"):
 		spec["base"] = float(spec["base"]) * mul
@@ -1829,11 +1966,20 @@ func execute_intent(u: UnitScript) -> bool:
 	u.intent = {}
 	var kind := str(it.get("kind", ""))
 	if str(it.get("mode", "locked")) == "tracking" and kind in ["attack", "special"]:
+		# Follow the target: take the planned step, then hit it if it's still in reach.
 		var t := unit_by_id(str(it.get("unit", "")))
 		if t == null or not t.alive():
 			return false
-		u.intent = it
-		return false
+		var step: Vector2i = it.get("move", u.cell)
+		if step != u.cell and can_move(u) and reachable_cells(u).has(step):
+			move(u, step)
+		if result != "" or not u.alive():
+			return true
+		var act: Dictionary = it.get("action", {})
+		if action_targets(u, act, u.cell).has(t.cell):
+			return perform_action(u, act, t.cell) or true
+		_emit({ "t": "log", "text": "%s can't reach %s." % [u.name, t.name] })
+		return true
 	var dest: Vector2i = it.get("move", u.cell)
 	if dest != u.cell and u.move_left > 0 and reachable_cells(u).has(dest):
 		move(u, dest)

@@ -2,5 +2,13 @@
   "comment": "Turn rules (docs/ARENA.md Part 1). turnMode: move_or_act (move OR one action each turn, the default), move_then_act (move first, then one action), move_and_act (move and one action in any order). Quick cards work with either. F1 > Fights switches it mid-fight.",
   "turnMode": "move_or_act",
   "turnModes": ["move_or_act", "move_then_act", "move_and_act"],
+  "enemyHpMul": 0.65,
+  "bossHpMul": 1.5,
+  "difficulty": "normal",
+  "difficulties": {
+    "comment": "Combat difficulty (user decision, Oct 24). Enemies always telegraph during the player's turn and carry it out on theirs. Normal: an enemy either attacks from where it stands or moves into position. Hard: it moves, then attacks, in that order.",
+    "normal": { "name": "Normal", "enemyMoveAndAct": false, "enemyDamageMul": 2.3 },
+    "hard": { "name": "Hard", "enemyMoveAndAct": true, "enemyHpMul": 1.0, "enemyDamageMul": 2.0 }
+  },
   "areaFalloff": { "comment": "Area attacks deal this much to every target beyond the first `fullHits`.", "fullHits": 2, "mul": 0.75 }
 }

@@ -7,10 +7,6 @@
     "thu": { "rooms": 9, "mix": { "combat": 3, "elite": 2, "merchant": 1, "rest": 1 } },
     "fri": { "boss": true, "returning": 3, "rest": 1 }
   },
-  "enemiesPerFight": { "mon": [2, 2], "tue": [2, 3], "wed": [2, 3], "thu": [3, 3], "fri": [3, 4] },
-  "enemyCapByWeek": { "1": 2, "2": 3 },
-  "partyScale": { "1": { "count": 0.5, "power": 0.75 }, "2": { "count": 0.75, "power": 0.82 }, "3": { "count": 1.0, "power": 0.9 }, "4": { "count": 1.0, "power": 1.0 } },
-  "eliteEscort": 1,
   "weekScale": [1.0, 1.0, 1.15, 1.35, 1.55, 1.75],
   "returningScale": 1.15,
   "fledFirst": true,

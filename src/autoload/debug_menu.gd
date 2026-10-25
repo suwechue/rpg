@@ -225,6 +225,22 @@ func _show_fights(box: VBoxContainer) -> void:
 			_open(_show_fights))
 		mb.disabled = mid == GameState.combat_turn_mode
 		mode_row.add_child(mb)
+	box.add_child(UiTheme.label("Combat difficulty: %s" % GameState.combat_difficulty, UiTheme.ACCENT))
+	var diff_row := HBoxContainer.new()
+	box.add_child(diff_row)
+	for d in DataDB.table("combat_rules").get("difficulties", {}):
+		if str(d) == "comment":
+			continue
+		var did := str(d)
+		var db_btn := UiTheme.button(did.capitalize(), func() -> void:
+			GameState.combat_difficulty = did
+			var scene := get_tree().current_scene
+			if scene != null and scene.get("state") != null:
+				scene.get("state").set("difficulty", did)
+				scene.call("_sync_views")
+			_open(_show_fights))
+		db_btn.disabled = did == GameState.combat_difficulty
+		diff_row.add_child(db_btn)
 	box.add_child(UiTheme.label("Spawn a fight (party: you + roster picks for tonight)", UiTheme.ACCENT))
 	var ally_row := HBoxContainer.new()
 	box.add_child(ally_row)

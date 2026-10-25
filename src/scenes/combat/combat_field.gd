@@ -20,6 +20,8 @@ var threat_cells: Dictionary = {}    # cell -> { "damage": n, "charge": n }
 var push_marks: Array = []           # [{ "from", "to", "collide", "hazard", "slide" }]
 var preview_labels: Dictionary = {}  # cell -> text drawn above the unit there
 var support_cells: Array = []        # enemy heals and summons (green)
+var threat_view := false             # held: every tile shaded by incoming damage
+var move_marks: Array = []           # enemy plans: [{ "from", "to" }] where they'll walk first
 var hover_cell := Vector2i(-1, -1)
 var cursor_cell := Vector2i(-1, -1)
 var glyph_cells: Array = []
@@ -45,9 +47,21 @@ func _draw() -> void:
 	for r in grid.rows:
 		for c in grid.cols:
 			_draw_cell(Vector2i(c, r))
+	if threat_view:
+		_draw_threat_view()
+		return
 	_draw_overlay(reach_cells, Color(0.45, 0.75, 1.0, 0.28))
 	_draw_threats()
 	_draw_overlay(support_cells, Color(UiTheme.GOOD, 0.3))
+	for m in move_marks:
+		var a := proj.cell_center(m["from"])
+		var b := proj.cell_center(m["to"])
+		var c := Color(UiTheme.color("bad"), 0.8)
+		var steps := 6
+		for i in steps:
+			if i % 2 == 0:
+				draw_line(a.lerp(b, float(i) / steps), a.lerp(b, float(i + 1) / steps), c, 1.0)
+		draw_arc(b, 5.0, 0, TAU, 12, c, 1.0)
 	_draw_overlay(target_cells, Color(1.0, 0.85, 0.4, 0.22))
 	_draw_overlay(footprint_cells, Color(0.55, 1.0, 0.6, 0.45) if footprint_heal else footprint_color)
 	_draw_overlay(flash_cells, flash_color)
@@ -64,6 +78,25 @@ func _draw() -> void:
 		var at := proj.cell_center(cell) + Vector2(-8, -Display.tile * 1.6)
 		draw_string_outline(UiTheme.font, at, str(preview_labels[cell]), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, 3, UiTheme.color("outline"))
 		draw_string(UiTheme.font, at, str(preview_labels[cell]), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, UiTheme.ACCENT)
+
+
+## Threat view: safe tiles dimmed, threatened ones from pale to deep red by damage.
+func _draw_threat_view() -> void:
+	var worst := 1
+	for c in threat_cells:
+		worst = maxi(worst, int(threat_cells[c].get("damage", 0)))
+	for r in grid.rows:
+		for c in grid.cols:
+			var cell := Vector2i(c, r)
+			var poly := proj.cell_polygon(cell)
+			if threat_cells.has(cell):
+				var k := float(threat_cells[cell].get("damage", 0)) / float(worst)
+				draw_colored_polygon(poly, Color(UiTheme.color("bad"), 0.25 + 0.55 * k))
+				var at := (poly[3] + poly[2]) / 2.0 + Vector2(-6, -2)
+				draw_string_outline(UiTheme.font, at, str(int(threat_cells[cell].get("damage", 0))), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, 3, UiTheme.color("outline"))
+				draw_string(UiTheme.font, at, str(int(threat_cells[cell].get("damage", 0))), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, UiTheme.TEXT)
+			else:
+				draw_colored_polygon(poly, Color(0, 0, 0, 0.35))
 
 
 ## Enemy telegraphs: red tiles (pulsing harder while charging) with the damage waiting there.

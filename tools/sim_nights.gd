@@ -27,11 +27,13 @@ static func night(db: Dictionary, run: Dictionary, week: int, day: String, rng: 
 			continue
 		if not t in ["combat", "elite", "boss"]:
 			continue
-		var enemies: Array = Night.fight_enemies(db, room, Night.party_size(run))
+		var fs := Night.fight_setup(db, room, Night.party_size(run))
+		var enemies: Array = fs["enemies"]
 		var party: Array = [{ "char": run["player"], "ai": true }]
 		for pid in run["party_ids"]:
 			party.append({ "char": RM.character(run, str(pid)), "ai": true })
-		var st := StateScript.new(db, rng, { "layout": DT.record(db, "rooms/combat_layouts", str(room["layout"])), "party": party, "enemies": enemies, "boss": t == "boss" })
+		var st := StateScript.new(db, rng, { "layout": DT.record(db, "rooms/combat_layouts", str(room["layout"])), "party": party, "enemies": enemies, "boss": t == "boss",
+			"formation": fs["formation"], "roles": fs["roles"], "reinforcements": fs["reinforcements"] })
 		var g := 0
 		while st.result == "" and g < 500:
 			AI.take_turn(st, st.current)
