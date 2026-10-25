@@ -1,0 +1,13 @@
+{
+  "comment": "Arena mutators: pick 1 of 3 at each checkpoint; it lasts until the next one. Effects: vectorDamage (axis -> multiplier, everyone), enemyHpMul, chargeAll (every enemy attack telegraphs that many turns earlier), mpRegen (party, per turn), fireSpreads, rewardMul, noRest.",
+  "mutators": [
+    { "id": "cold_snap", "name": "Cold is stronger", "text": "+50% Cold damage for everyone.", "icon": "icon_vector_cold", "effects": { "vectorDamage": { "cold": 1.5 } } },
+    { "id": "heat_wave", "name": "Heat wave", "text": "+50% Heat damage for everyone.", "icon": "icon_vector_heat", "effects": { "vectorDamage": { "heat": 1.5 } } },
+    { "id": "early_warning", "name": "Early warning", "text": "Enemies telegraph 1 turn earlier, but have +30% HP.", "icon": "icon_intent_special", "effects": { "chargeAll": 1, "enemyHpMul": 1.3 } },
+    { "id": "deep_breath", "name": "Deep breath", "text": "+1 MP regen per turn.", "icon": "icon_status_infusion", "effects": { "mpRegen": 1 } },
+    { "id": "wildfire", "name": "Wildfire", "text": "Fire spreads each round.", "icon": "icon_vector_heat", "effects": { "fireSpreads": true } },
+    { "id": "high_stakes", "name": "High stakes", "text": "Double rewards, but no resting at the next checkpoint.", "icon": "icon_kind_item", "effects": { "rewardMul": 2.0, "noRest": true } },
+    { "id": "thick_skin", "name": "Thick skin", "text": "Enemies have +50% HP; score bonus doubled.", "icon": "icon_status_guard", "effects": { "enemyHpMul": 1.5, "scoreMul": 2.0 } },
+    { "id": "force_field", "name": "Force field", "text": "+50% Force damage, and collisions hurt everyone.", "icon": "icon_vector_force", "effects": { "vectorDamage": { "force": 1.5 } } }
+  ]
+}

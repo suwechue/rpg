@@ -36,6 +36,7 @@ func _ready() -> void:
 	for extra in extra_buttons:
 		var e: Dictionary = extra
 		_menu.add_child(UiTheme.button(str(e["label"]), func() -> void: e["run"].call()))
+	_menu.add_child(UiTheme.button("Endless Arena", _arena))
 	_menu.add_child(UiTheme.button("Narrator's Journal", _show_journal))
 	_menu.add_child(UiTheme.button("Quit", func() -> void: get_tree().quit()))
 	(_menu.get_child(1 if not cont.disabled else 0) as Button).grab_focus()
@@ -152,6 +153,61 @@ func _new_run() -> void:
 	SceneRouter.goto(TOWN_SCENE)
 
 
+## Endless Arena from the title: a preset party (your class plus others) or the
+## party from your save, copied so the story save is never touched.
+func _arena() -> void:
+	var m := Modal.new()
+	m.build("Endless Arena", 420)
+	var db: Dictionary = DataDB.all()
+	m.text("Fight wave after wave. New terrain every wave, a checkpoint every five, a boss every ten.", UiTheme.DIM)
+	var size := { "n": 4 }
+	var srow := m.row()
+	srow.add_child(UiTheme.label("Party size:"))
+	var sbtns: Array = []
+	for n in [1, 2, 3, 4]:
+		var nn: int = n
+		var b := UiTheme.button(str(nn), func() -> void:
+			size["n"] = nn
+			for x in sbtns:
+				(x as Button).theme_type_variation = "SelectedButton" if int(x.get_meta("n")) == nn else "")
+		b.set_meta("n", nn)
+		b.theme_type_variation = "SelectedButton" if nn == 4 else ""
+		sbtns.append(b)
+		srow.add_child(b)
+	m.text("Preset party: pick your class; the others fill in.", UiTheme.DIM)
+	for cls in db.get("classes", {}).get("classes", []):
+		if int(cls.get("tier", 1)) != 1:
+			continue
+		var cid := str(cls["id"])
+		m.add_button("Play as %s" % cls["name"], func() -> void: m.finish({ "class": cid }))
+	m.add_button("Import the party from my save", func() -> void: m.finish({ "import": true }), not SaveSystem.has_save(),
+		"Uses a copy: your story save isn't changed." if SaveSystem.has_save() else "No save yet.")
+	m.add_button("Back", func() -> void: m.finish(null))
+	var r: Variant = await Flow.show_modal(m)
+	if r == null:
+		return
+	var pick: Dictionary = r
+	start_arena(pick, int(size["n"]), Rng.stream("creation").randi_range(1, 999999), 3)
+
+
+## Start an arena run (also used by the --arena dev flag).
+static func start_arena(pick: Dictionary, size: int, seed_value: int, level: int, waves_cap: int = 999) -> void:
+	const ArenaRules := preload("res://src/core/arena/arena.gd")
+	const ArenaParty := preload("res://src/core/arena/arena_party.gd")
+	if bool(pick.get("import", false)) and SaveSystem.load_run():
+		GameState.run = GameState.run.duplicate(true)
+		GameState.run["mode"] = "arena"
+	else:
+		var rng := RandomNumberGenerator.new()
+		rng.seed = seed_value
+		GameState.new_run(seed_value, str(pick.get("class", "mage")))
+		GameState.run = ArenaParty.preset_run(DataDB.all(), seed_value, str(pick.get("class", "mage")), size, level, rng)
+	GameState.run.erase("rift")
+	GameState.run["arena"] = ArenaRules.new_arena(seed_value, false)
+	GameState.run["devArenaWaves"] = waves_cap
+	SceneRouter.goto("res://src/scenes/arena/arena.tscn")
+
+
 func _show_journal() -> void:
 	var m := Modal.new()
 	m.build("The Narrator's Journal", 420)
@@ -167,5 +223,6 @@ func _show_journal() -> void:
 		var e: Dictionary = j["enemies"][k]
 		m.text("- %s (defeated %d). %s" % [e.get("name", k), int(e.get("defeated", 0)), e.get("text", "")])
 	m.text("Starting traits unlocked: %s" % (", ".join(PackedStringArray(Journal.unlocked_traits())) if not Journal.unlocked_traits().is_empty() else "none"), UiTheme.DIM)
+	m.text("Endless Arena, best wave: %d" % int(j.get("arena", {}).get("bestWave", 0)), UiTheme.DIM)
 	m.add_button("Close", func() -> void: m.finish(null))
 	await Flow.show_modal(m)

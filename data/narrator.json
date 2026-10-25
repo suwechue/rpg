@@ -1,6 +1,11 @@
 {
   "comment": "The narrator's tone depends on your Bond with them: Rival or worse is sarcastic, Stranger is dry, Acquaintance and up is warmer. Keys pick situations; tiers fall back to 'dry'.",
   "lines": {
+    "arena": {
+      "sarcastic": ["Five more waves. You're either very good or very stubborn.", "The Rift is keeping score. So am I. Mine is meaner.", "Still standing. Statistically, that's suspicious."],
+      "dry": ["Another five waves. The Rift doesn't get tired. Noted.", "Checkpoint. Breathe while it's free.", "The Rift rearranges itself. It's showing off."],
+      "warm": ["Five more. I'm genuinely impressed, and I don't say that.", "You're getting the hang of this place. Careful, it notices.", "Rest a second. You've earned it."]
+    },
     "misheard": {
       "sarcastic": ["Bold strategy, saying that out loud.", "And THAT is why we practice in the mirror.", "I'd tell you to be careful, but you're not going to listen, so."],
       "dry": ["That is not what you said. It is, however, what they heard.", "Communication: an ancient art you have not mastered.", "Somewhere between your mouth and their ears, the sentence took a wrong turn."],

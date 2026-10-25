@@ -27,7 +27,7 @@
     { "kind": "tower", "at": [30, 4] }, { "kind": "busstop", "at": [52, 17] }, { "kind": "sign", "at": [36, 17], "text": "Park and woods. Please stay on the path." },
     { "kind": "bench", "at": [29, 21] }, { "kind": "lamp", "at": [32, 22] }
   ],
-  "spots": { "park": [34, 25], "bus_stop_outskirts": [52, 17], "abandoned_lot": [17, 26], "water_tower": [30, 5], "cemetery": [52, 19] },
+  "spots": { "park": [34, 25], "bus_stop_outskirts": [52, 17], "abandoned_lot": [17, 26], "the_rift": [19, 26], "water_tower": [30, 5], "cemetery": [52, 19] },
   "exits": [ { "rect": [59, 15, 1, 2], "to": "downtown", "spawn": [2, 15] } ],
   "starts": {}
 }

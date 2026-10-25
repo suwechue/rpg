@@ -12,8 +12,13 @@ const COVER := "cover"
 const HAZARD := "hazard"
 const WATER := "water"
 const ICE := "ice"
+const PIT := "pit"                # arena: enemies pushed in are gone; party members take heavy damage
+const COLLAPSE := "collapse"      # arena: gives way the second time someone steps on it
+const DARK := "dark"              # arena: units here can't be targeted unless Light has lit the tile
+const CONVEYORS := { "conv_r": Vector2i(1, 0), "conv_l": Vector2i(-1, 0), "conv_u": Vector2i(0, -1), "conv_d": Vector2i(0, 1) }
 
-const LEGEND := { ".": FLOOR, "#": WALL, "c": COVER, "h": HAZARD, "w": WATER, "i": ICE }
+const LEGEND := { ".": FLOOR, "#": WALL, "c": COVER, "h": HAZARD, "w": WATER, "i": ICE, "p": PIT, "k": COLLAPSE, "d": DARK,
+	"R": "conv_r", "L": "conv_l", "U": "conv_u", "D": "conv_d", "t": FLOOR, "f": FLOOR, "g": FLOOR }
 const DIRS := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
 
 var cols := 9
@@ -23,6 +28,9 @@ var burning: Dictionary = {}     # Vector2i -> turns left
 var steam: Dictionary = {}       # Vector2i -> turns left
 var fire_walls: Dictionary = {}  # Vector2i -> turns left: burning tiles nobody can walk through
 var toxic: Dictionary = {}       # Vector2i -> turns left: Corrosion puddles
+var lit: Dictionary = {}         # Vector2i -> turns left: Light reveals dark tiles
+var cracked: Dictionary = {}     # collapsing tiles stepped on once
+var trap_spawns: Array = []      # glyph traps from the layout ("g")
 var exits: Array = []            # Vector2i cells the party can flee from
 var party_spawns: Array = []
 var enemy_spawns: Array = []
@@ -54,6 +62,12 @@ func _init(layout: Dictionary = {}) -> void:
 					exits.append(cell)
 				"x":
 					prop_spawns.append({ "cell": cell, "prop": "crate" })
+				"t":
+					toxic[cell] = 999
+				"f":
+					burning[cell] = 999
+				"g":
+					trap_spawns.append(cell)
 			row.append(LEGEND.get(ch, FLOOR))
 		terrain.append(row)
 	if exits.is_empty():
@@ -80,7 +94,12 @@ func set_terrain(cell: Vector2i, t: String) -> void:
 ## Terrain you can stand on (water only once frozen).
 func walkable_terrain(cell: Vector2i) -> bool:
 	var t := get_terrain(cell)
-	return t != WALL and t != WATER and not fire_walls.has(cell)
+	return t != WALL and t != WATER and t != PIT and not fire_walls.has(cell)
+
+
+## Darkness hides a tile unless Light has lit it.
+func is_dark(cell: Vector2i) -> bool:
+	return get_terrain(cell) == DARK and not lit.has(cell)
 
 
 func blocks_sight(cell: Vector2i) -> bool:
@@ -166,7 +185,7 @@ func path(a: Vector2i, b: Vector2i, occupied: Dictionary) -> Array:
 
 ## Count down tile effects at the end of a round.
 func tick_round() -> void:
-	for table in [burning, steam, fire_walls, toxic]:
+	for table in [burning, steam, fire_walls, toxic, lit]:
 		for cell in table.keys():
 			table[cell] = int(table[cell]) - 1
 			if int(table[cell]) <= 0:

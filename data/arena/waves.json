@@ -1,0 +1,20 @@
+{
+  "comment": "Endless Arena waves (docs/ARENA.md Part 5). Enemy budget = baseCount + perWave x (wave - 1), up to maxCount (minions count half). Enemies come from the weeks unlocked by waveForWeek; every 5th wave is an elite wave, every 10th a remixed boss. Between waves the party gets breatherMp MP back, no HP.",
+  "baseCount": 3,
+  "perWave": 0.4,
+  "maxCount": 10,
+  "hpPerWave": 0.05,
+  "powerPerWave": 0.04,
+  "eliteEvery": 5,
+  "bossEvery": 10,
+  "eliteAffixes": [1, 2],
+  "bossAffixesPerCycle": 1,
+  "mixedAfter": 10,
+  "waveForWeek": [[1, 1], [5, 2], [9, 3], [13, 4], [17, 5]],
+  "bosses": ["hollow_mascot", "cold_cut", "forge_revenant", "night_ward", "mirror_town"],
+  "breatherMp": 3,
+  "rewards": { "xpPerWave": 6, "moneyPerWave": 3, "shardEvery": 5, "cardEvery": 5, "cards": ["card_kindle", "card_shatter", "card_blink", "card_tether", "card_halo", "card_shove", "card_dazzle", "card_lunge"] },
+  "score": { "perWave": 10, "noDamage": 5, "fastClear": 3, "fastRounds": 4, "multiVector": 2, "perMutator": 3 },
+  "music": { "wave": "battle", "boss": "battle_boss", "hub": "dungeon" },
+  "narratorEvery": 5
+}

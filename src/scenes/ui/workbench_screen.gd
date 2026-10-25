@@ -8,6 +8,10 @@ const Char := preload("res://src/core/character.gd")
 
 var craft_ap := 1
 var place := "home"
+## Where AP comes from: the day's AP by default; the arena passes its Arena AP.
+var ap_left: Callable = func() -> int: return int(ap_left.call())
+var spend_ap: Callable = func(n: int, kind: String) -> bool: return Calendar.spend_ap(n, kind)
+var deck_save_cost := 0   # the arena charges for swapping cards
 var _vectors: Array = []
 var _form := ""
 var _magnitude := "standard"
@@ -22,9 +26,9 @@ func _ready() -> void:
 
 func _menu() -> void:
 	clear_body()
-	text("AP left: %d. A new design costs %d AP and a minigame; a copy costs %d AP." % [Calendar.ap(), craft_ap, int(DataDB.table("minigames").get("copyAp", 1))], UiTheme.DIM)
-	add_button("Design a new card", _design, Calendar.ap() < craft_ap)
-	add_button("Copy a design you own", _copy_menu, Calendar.ap() < int(DataDB.table("minigames").get("copyAp", 1)))
+	text("AP left: %d. A new design costs %d AP and a minigame; a copy costs %d AP." % [int(ap_left.call()), craft_ap, int(DataDB.table("minigames").get("copyAp", 1))], UiTheme.DIM)
+	add_button("Design a new card", _design, int(ap_left.call()) < craft_ap)
+	add_button("Copy a design you own", _copy_menu, int(ap_left.call()) < int(DataDB.table("minigames").get("copyAp", 1)))
 	add_button("Edit decks (free)", func() -> void:
 		_deck_owner = "player"
 		_deck = GameState.player.get("deck", []).duplicate()
@@ -87,13 +91,13 @@ func _design() -> void:
 		text("Minigame: %s. Better Performance rolls Properties; a perfect score adds a Magnitude step." % arch.capitalize(), UiTheme.DIM)
 	else:
 		text(err, UiTheme.BAD)
-	add_button("Craft (%d AP)" % craft_ap, _play_minigame, err != "" or Calendar.ap() < craft_ap)
+	add_button("Craft (%d AP)" % craft_ap, _play_minigame, err != "" or int(ap_left.call()) < craft_ap)
 	add_button("Back", _menu)
 	focus_first()
 
 
 func _play_minigame() -> void:
-	if not Calendar.spend_ap(craft_ap, "craft"):
+	if not bool(spend_ap.call(craft_ap, "craft")):
 		return
 	var db: Dictionary = DataDB.all()
 	var arch := Crafting.archetype(db, Crafting.input_vector(db, _vectors, _magnitude))
@@ -136,9 +140,9 @@ func _copy_menu() -> void:
 			continue
 		var cid := str(id)
 		add_button("%s x%d (%d MP)" % [card.get("name", id), int(coll[id]), CardRules.cost(db, card)], func() -> void:
-			if Calendar.spend_ap(copy_ap, "copy") and Crafting.copy(GameState.run, cid):
+			if bool(spend_ap.call(copy_ap, "copy")) and Crafting.copy(GameState.run, cid):
 				Narrator.say("Another %s for the pile." % card.get("name", cid))
-			_copy_menu(), Calendar.ap() < copy_ap)
+			_copy_menu(), int(ap_left.call()) < copy_ap)
 	add_button("Back", _menu)
 	focus_first()
 
@@ -184,9 +188,11 @@ func _deck_editor() -> void:
 	var err := Crafting.deck_error(db, GameState.run, ch, _deck)
 	if err != "":
 		text(err, UiTheme.BAD)
-	add_button("Save deck", func() -> void:
+	add_button("Save deck" + (" (%d AP)" % deck_save_cost if deck_save_cost > 0 else ""), func() -> void:
+		if deck_save_cost > 0 and not bool(spend_ap.call(deck_save_cost, "swapCard")):
+			return
 		Crafting.set_deck(DataDB.all(), GameState.run, GameState.character(_deck_owner), _deck)
-		_menu(), err != "")
+		_menu(), err != "" or int(ap_left.call()) < deck_save_cost)
 	add_button("Back (discard changes)", _menu)
 	focus_first()
 

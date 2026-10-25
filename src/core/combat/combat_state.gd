@@ -53,6 +53,8 @@ var _pending_decoys: Array = []    # decoys that appear where a unit stood once 
 var _fx: GDScript = null           # card_effects.gd, loaded lazily
 var last_party_card: Dictionary = {}  # the last card a party member played (Mirror enemies copy it)
 var reinforcements: Dictionary = {}   # { "round", "enemies": [records], "cells": [telegraphed spawn tiles] }
+var mutators: Array = []              # arena mutator records (data/arena/mutators.json) active in this fight
+var multi_vector_casts := 0           # party spells with two or more Vectors (arena score)
 
 
 func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) -> void:
@@ -62,6 +64,7 @@ func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) ->
 	turn_mode = str(setup.get("turnMode", db.get("combat_rules", {}).get("turnMode", "move_or_act")))
 	difficulty = str(setup.get("difficulty", db.get("combat_rules", {}).get("difficulty", "normal")))
 	ai_overrides = setup.get("ai", {})
+	mutators = setup.get("mutators", [])
 	boss_fight = bool(setup.get("boss", false))
 	flee_allowed = bool(setup.get("fleeAllowed", not boss_fight))
 	for f in db.get("forms", {}).get("forms", []):
@@ -80,7 +83,7 @@ func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) ->
 		var u := UnitScript.from_enemy(rec, float(rec.get("scale", 1.0)))
 		var hp_mul := "bossHpMul" if u.boss else "enemyHpMul"
 		u.max_hp = maxi(1, roundi(float(u.max_hp) * float(db.get("combat_rules", {}).get(hp_mul, 1.0))))
-		u.max_hp = maxi(1, roundi(float(u.max_hp) * float(difficulty_rules().get("enemyHpMul", 1.0))))
+		u.max_hp = maxi(1, roundi(float(u.max_hp) * float(difficulty_rules().get("enemyHpMul", 1.0)) * float(mutator_rules().get("enemyHpMul", 1.0))))
 		u.hp = u.max_hp
 		var roles: Array = setup.get("roles", [])
 		u.role = str(roles[i]) if i < roles.size() else ("minion" if str(rec.get("tier", "")) == "minion" else "fighter")
@@ -92,6 +95,8 @@ func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) ->
 	if not setup.get("reinforcements", {}).is_empty():
 		reinforcements = setup["reinforcements"].duplicate()
 		reinforcements["cells"] = []
+	for c in grid.trap_spawns:
+		glyphs.append({ "cell": c, "spec": {}, "team": "trap", "caster": null, "turns": 999 })
 	for p in grid.prop_spawns:
 		var crate := UnitScript.make_prop("crate", int(Res.combat_cfg(db).get("crateHp", 8)))
 		crate.cell = p["cell"]
@@ -312,7 +317,7 @@ func is_hostile(a: UnitScript, b: UnitScript) -> bool:
 func opponents_of(u: UnitScript) -> Array:
 	var out: Array = []
 	for o in units:
-		if o.alive() and is_hostile(u, o) and not o.statuses.has("burrowed"):
+		if o.alive() and is_hostile(u, o) and not o.statuses.has("burrowed") and not hidden(o):
 			out.append(o)
 	return out
 
@@ -458,6 +463,9 @@ func _end_round() -> void:
 					_hit_unit(caster, t, d["spec"], false)
 			_check_end()
 	revealed = maxi(0, revealed - 1)
+	_conveyors()
+	if bool(mutator_rules().get("fireSpreads", false)):
+		_spread_fire()
 	grid.tick_round()
 	for g in glyphs.duplicate():
 		g["turns"] = int(g["turns"]) - 1
@@ -520,7 +528,7 @@ func _start_turn(u: UnitScript) -> void:
 			if not u.alive():
 				return
 	if u.max_mp > 0:
-		u.mp = mini(u.max_mp, u.mp + u.mp_regen)
+		u.mp = mini(u.max_mp, u.mp + u.mp_regen + (int(mutator_rules().get("mpRegen", 0)) if u.team == "party" else 0))
 	u.move_left = u.movement + int(u.statuses.get("haste_amount", 0)) - (1 if u.statuses.has("slow") else 0)
 	if u.statuses.has("root"):
 		u.move_left = 0
@@ -598,6 +606,24 @@ func _moves_and_acts(u: UnitScript) -> bool:
 	return u.team == "enemy" and bool(difficulty_rules().get("enemyMoveAndAct", false))
 
 
+## Merged effects of the active arena mutators (numbers multiply, flags OR).
+func mutator_rules() -> Dictionary:
+	var out := {}
+	for m in mutators:
+		for k in m.get("effects", {}):
+			var v: Variant = m["effects"][k]
+			if v is Dictionary:
+				var d: Dictionary = out.get(k, {})
+				for kk in v:
+					d[kk] = float(d.get(kk, 1.0)) * float(v[kk])
+				out[k] = d
+			elif v is bool:
+				out[k] = bool(out.get(k, false)) or v
+			else:
+				out[k] = float(out.get(k, 1.0 if str(k).ends_with("Mul") else 0.0)) * float(v) if str(k).ends_with("Mul") else float(out.get(k, 0.0)) + float(v)
+	return out
+
+
 ## The combat difficulty's rules (normal or hard).
 func difficulty_rules() -> Dictionary:
 	return db.get("combat_rules", {}).get("difficulties", {}).get(difficulty, {})
@@ -644,6 +670,48 @@ func move(u: UnitScript, dest: Vector2i) -> bool:
 		u.intent["move"] = u.cell
 	_check_end()
 	return true
+
+
+## Conveyor tiles carry whoever stands on them one tile along at round end.
+func _conveyors() -> void:
+	for u in units.duplicate():
+		if u.dead or not u.alive() and not u.is_prop():
+			continue
+		var t := grid.get_terrain(u.cell)
+		if GridScript.CONVEYORS.has(t):
+			_push(u, u, GridScript.CONVEYORS[t], 1, false)
+
+
+## Mutator: fire spreads to one neighboring floor tile each round.
+func _spread_fire() -> void:
+	for c in grid.burning.keys():
+		for d in GridScript.DIRS:
+			var n: Vector2i = c + d
+			if grid.walkable_terrain(n) and not grid.burning.has(n) and rng.randf() < 0.25:
+				grid.burning[n] = 2
+				break
+
+
+## A unit falls into a pit: enemies are gone; party members take heavy damage
+## and climb out onto the nearest free tile.
+func _fall(u: UnitScript) -> void:
+	var cfg := Res.combat_cfg(db)
+	if u.team == "enemy" or u.is_prop():
+		_emit({ "t": "log", "text": "%s falls into the pit." % u.name })
+		u.hp = 0
+		u.shield = 0
+		_on_zero_hp(u, null)
+		_check_end()
+		return
+	var pit := u.cell
+	u.cell = _free_near(pit)
+	_emit({ "t": "blink", "unit": u.id, "from": pit, "to": u.cell })
+	_damage(u, maxi(1, roundi(float(u.max_hp) * float(cfg.get("pitDamagePct", 0.35)))), null, "", "hazard")
+
+
+## Units standing in darkness can't be picked as targets by the other side.
+func hidden(t: UnitScript) -> bool:
+	return grid.is_dark(t.cell)
 
 
 ## Hazard makers (data "trail") leave fire, ice or glyphs behind them.
@@ -705,7 +773,23 @@ func undo_move(u: UnitScript) -> bool:
 ## Effects of stepping onto a cell. Returns true if movement must stop.
 func _enter_cell(u: UnitScript, cell: Vector2i) -> bool:
 	var cfg := Res.combat_cfg(db)
+	if grid.get_terrain(cell) == GridScript.COLLAPSE:
+		if grid.cracked.has(cell):
+			grid.set_terrain(cell, GridScript.PIT)
+			_emit({ "t": "tiles", "kind": "pit", "cells": [cell] })
+			_emit({ "t": "log", "text": "The floor gives way under %s!" % u.name })
+			_fall(u)
+			return true
+		grid.cracked[cell] = true
+		_emit({ "t": "tiles", "kind": "cracked", "cells": [cell] })
 	for g in glyphs.duplicate():
+		if g["cell"] == cell and str(g["team"]) == "trap":
+			glyphs.erase(g)
+			_emit({ "t": "glyph", "cell": cell })
+			u.statuses["root"] = 1
+			_emit({ "t": "status", "unit": u.id, "status": "root" })
+			_damage(u, int(cfg.get("trapDamage", 3)), null, "binding", "hazard")
+			return true
 		if g["cell"] == cell and str(g["team"]) != u.team:
 			glyphs.erase(g)
 			_emit({ "t": "glyph", "cell": cell })
@@ -773,7 +857,7 @@ func _generic_targets(u: UnitScript, tg: Dictionary) -> Array:
 		var t := unit_at(cell)
 		match kind:
 			"enemy":
-				if t != null and is_hostile(u, t) and t.alive() and not t.statuses.has("burrowed"):
+				if t != null and is_hostile(u, t) and t.alive() and not t.statuses.has("burrowed") and not hidden(t):
 					out.append(cell)
 			"ally":
 				if t != null and t.team == u.team and not t.is_prop() and (t.alive() or bool(tg.get("downed", false))):
@@ -811,7 +895,7 @@ func _adjacent_hostiles(u: UnitScript, reach: int) -> Array:
 	for o in units:
 		if o.dead or o.downed or o == u:
 			continue
-		if (is_hostile(u, o) or o.is_prop()) and not o.statuses.has("burrowed") and GridScript.manhattan(o.cell, u.cell) <= reach:
+		if (is_hostile(u, o) or o.is_prop()) and not o.statuses.has("burrowed") and not hidden(o) and GridScript.manhattan(o.cell, u.cell) <= reach:
 			out.append(o.cell)
 	return out
 
@@ -1112,6 +1196,9 @@ func _spell_spec(u: UnitScript, card: Dictionary) -> Dictionary:
 
 func _expected_hit(u: UnitScript, t: UnitScript, spec: Dictionary) -> float:
 	var area := float(spec.get("areaMul", 1.0))
+	# Arena mutators: "Cold is stronger" and friends.
+	for axis in spec.get("vectors", {}):
+		area *= float(mutator_rules().get("vectorDamage", {}).get(str(axis), 1.0))
 	# Shield bearers block hits from the front; flank them or push them around.
 	var guard := float(t.source.get("frontGuard", 0.0))
 	if guard > 0.0 and u.cell.x != t.cell.x and signi(u.cell.x - t.cell.x) == t.facing:
@@ -1190,6 +1277,8 @@ func _cast(u: UnitScript, card: Dictionary, target: Vector2i, improvised: bool, 
 	var spec := _spell_spec(u, card)
 	for axis in card.get("vectors", {}):
 		u.statuses.erase("empower_" + str(axis))
+	if u.team == "party" and card.get("vectors", {}).size() >= 2:
+		multi_vector_casts += 1
 	_emit({ "t": "cast", "unit": u.id, "name": spec["name"], "target": target, "improvised": improvised })
 	var key := "%s:%s" % ["+".join(PackedStringArray(CardRules.ordered_vectors(db, spec["vectors"]))), str(spec["form"].get("id", ""))]
 	var uses: Dictionary = u.source.get("pairUses", {})
@@ -1482,6 +1571,8 @@ func _apply_vector_effects(u: UnitScript, spec: Dictionary, cells: Array, hit: A
 				if t.intent.has("move"):
 					t.intent["move"] = t.cell
 	if v.has("light"):
+		for c in cells:
+			grid.lit[c] = int(cfg.get("litTurns", 2))
 		for t in hit:
 			if t.alive() and not t.is_prop():
 				t.statuses["blind"] = int(cfg.get("blindTurns", 1))
@@ -1513,6 +1604,11 @@ func _push(u: UnitScript, t: UnitScript, dir: Vector2i, steps: int, collide: boo
 	for i in steps:
 		var next := t.cell + dir
 		var blocker := unit_at(next)
+		if grid.get_terrain(next) == GridScript.PIT and blocker == null:
+			t.cell = next
+			_emit({ "t": "push", "unit": t.id, "from": from, "to": next })
+			_fall(t)
+			return
 		if not grid.in_bounds(next) or not grid.walkable_terrain(next) or blocker != null:
 			if collide:
 				var dmg := int(Res.combat_cfg(db).get("collisionDamage", 4)) + (4 if u.perk == "momentum" else 0)
@@ -2161,7 +2257,7 @@ func finish() -> Dictionary:
 	return {
 		"result": result, "xp": xp_total, "money": money_total, "party": party, "kills": kills,
 		"remaining": remaining, "wildSurges": wild_surges, "support": support_log,
-		"helpAnswered": answered, "helpIgnored": ignored, "rounds": round_num,
+		"helpAnswered": answered, "helpIgnored": ignored, "rounds": round_num, "multiVector": multi_vector_casts,
 	}
 
 

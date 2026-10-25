@@ -10,6 +10,8 @@ func has_save() -> bool:
 
 
 func save_run() -> bool:
+	if str(GameState.run.get("mode", "")) == "arena":
+		return false
 	var data: Dictionary = GameState.to_dict()
 	var tmp_path := SAVE_PATH + ".tmp"
 	var f := FileAccess.open(tmp_path, FileAccess.WRITE)

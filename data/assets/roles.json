@@ -4,5 +4,10 @@
   "debugAlly": "debug_ally_walk",
   "dungeonEvent": "dungeon_event_walk",
   "dungeonMerchant": "dungeon_merchant_walk",
-  "font": "font_ui"
+  "font": "font_ui",
+  "arena_mage": "npc_priya_walk",
+  "arena_fighter": "debug_ally_walk",
+  "arena_rogue": "npc_dex_walk",
+  "arena_healer": "npc_mara_walk",
+  "arena_bard": "npc_theo_walk"
 }

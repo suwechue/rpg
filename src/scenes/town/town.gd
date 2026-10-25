@@ -471,6 +471,15 @@ func location_menu(loc: String) -> void:
 	if picked == null:
 		return
 	var p: Dictionary = picked
+	if p.has("act") and bool(p["act"].get("rift", false)):
+		# The Rift: the rest of After School goes into the Endless Arena (docs/ARENA.md).
+		Narrator.say(str(p["act"].get("say", "")))
+		Calendar.set_ap(0)
+		GameState.run.erase("arena")
+		GameState.run["rift"] = preload("res://src/core/arena/arena.gd").new_arena(hash("%d:%d:%s" % [int(GameState.run.get("seed", 0)), Calendar.week(), Calendar.day_name()]), true)
+		_save_pos()
+		SceneRouter.goto("res://src/scenes/arena/arena.tscn")
+		return
 	if p.has("act"):
 		var act: Dictionary = p["act"]
 		if not Calendar.spend_ap(int(act.get("ap", 1)), "activity:" + loc):

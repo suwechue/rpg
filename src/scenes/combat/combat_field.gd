@@ -180,6 +180,12 @@ func _draw_cell(cell: Vector2i) -> void:
 			base = base.lightened(0.08)
 		GridScript.WALL:
 			base = base.darkened(0.5)
+		GridScript.PIT:
+			base = Color("050308")
+		GridScript.COLLAPSE:
+			base = base.lerp(Color("6b4a2a"), 0.35)
+		GridScript.DARK:
+			base = base.darkened(0.25)
 	if grid.exits.has(cell):
 		base = base.lerp(Color("3d6b4a"), 0.5)
 	draw_colored_polygon(poly, base * Color(depth, depth, depth, 1.0))
@@ -196,6 +202,17 @@ func _draw_cell(cell: Vector2i) -> void:
 		draw_colored_polygon(poly, Color(1.0, 0.45, 0.15, 0.25 + 0.2 * flick))
 	if grid.steam.has(cell):
 		draw_colored_polygon(poly, Color(0.9, 0.9, 0.95, 0.45))
+	if t == GridScript.COLLAPSE and grid.cracked.has(cell):
+		draw_line(ctr + Vector2(-7, -2), ctr + Vector2(1, 1), Color("1d140c"), 1.0)
+		draw_line(ctr + Vector2(1, 1), ctr + Vector2(6, -1), Color("1d140c"), 1.0)
+	if GridScript.CONVEYORS.has(t):
+		var dir: Vector2i = GridScript.CONVEYORS[t]
+		var tip := ctr + Vector2(dir) * 6.0
+		draw_line(ctr - Vector2(dir) * 6.0, tip, UiTheme.ACCENT, 1.0)
+		draw_line(tip, tip - Vector2(dir) * 3.0 + Vector2(dir.y, dir.x) * 3.0, UiTheme.ACCENT, 1.0)
+		draw_line(tip, tip - Vector2(dir) * 3.0 - Vector2(dir.y, dir.x) * 3.0, UiTheme.ACCENT, 1.0)
+	if t == GridScript.DARK and not grid.lit.has(cell):
+		draw_colored_polygon(poly, Color(0, 0, 0, 0.55))
 	if grid.toxic.has(cell):
 		draw_colored_polygon(poly, Color(UiTheme.vector_color("corrosion"), 0.45))
 	if grid.fire_walls.has(cell):

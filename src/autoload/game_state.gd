@@ -23,6 +23,7 @@ var combat_difficulty: String:
 var dev_autoplay := false
 var pending_combat: Dictionary = {}
 var combat_return := ""
+var combat_context := ""     # "arena" for Endless Arena and Rift fights (losing isn't death there)
 var last_combat: Dictionary = {}
 
 var run_seed: int:
@@ -195,6 +196,7 @@ func start_combat(setup: Dictionary, return_scene: String = "") -> void:
 		var cur := get_tree().current_scene
 		return_scene = cur.scene_file_path if cur != null else ""
 	combat_return = return_scene
+	combat_context = str(setup.get("context", ""))
 	SceneRouter.goto(COMBAT_SCENE)
 
 
@@ -245,7 +247,7 @@ func finish_combat(summary: Dictionary) -> Dictionary:
 			for r in give_xp(str(p["id"]), int(summary.get("xp", 0))):
 				lines.append("%s reached level %d!" % [ch.get("name", "?"), int(r["level"])])
 	if result == "lose":
-		lines.append("The Upside-Down keeps you.")
+		lines.append("You're knocked out." if combat_context == "arena" else "The Upside-Down keeps you.")
 	else:
 		var survivors: Array = []
 		for p in summary.get("party", []):
@@ -258,7 +260,7 @@ func finish_combat(summary: Dictionary) -> Dictionary:
 
 ## Leave the combat scene. Death is handled by whoever listens for run_ended.
 func leave_combat() -> void:
-	if str(last_combat.get("result", "")) == "lose":
+	if str(last_combat.get("result", "")) == "lose" and combat_context != "arena":
 		EventBus.run_ended.emit("combat")
 		return
 	var dest := combat_return if combat_return != "" else "res://src/scenes/town/town.tscn"

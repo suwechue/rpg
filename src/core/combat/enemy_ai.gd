@@ -195,7 +195,7 @@ static func plan_intent(state: StateScript, u: UnitScript) -> Dictionary:
 	var target: Vector2i = plan["target"]
 	if bool(spec["heal"]):
 		return { "kind": "buff", "action": action, "move": m, "target": target, "cells": [target] }
-	var charge := int(action.get("charge", 0))
+	var charge := int(action.get("charge", 0)) + int(state.mutator_rules().get("chargeAll", 0))
 	if charge > 0:
 		# Charging attacks are aimed from where the unit stands now.
 		m = u.cell

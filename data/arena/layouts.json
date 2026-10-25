@@ -1,0 +1,20 @@
+{
+  "comment": "Arena layouts and hazard sets (docs/ARENA.md Part 5). A wave picks a base layout and the next hazard set in order, so the player meets every hazard; 'sprinkle' scatters that many hazard letters over empty floor in the middle of the map (seeded per wave). Map letters: . floor, # wall, c cover, h hazard, w water, i ice, p pit, k collapsing floor, d dark, R L U D conveyors, t toxic, f fire, g glyph trap, P party, E enemies.",
+  "layouts": [
+    { "id": "ring", "map": ["P........E", "P..c...c.E", "P........E", "P..c...c.E", "P........E"] },
+    { "id": "pillars", "map": ["P...#....E", "P........E", "P.#....#.E", "P........E", "P...#....E"] },
+    { "id": "open_wide", "map": ["P.........E", "P.........E", "P.........E", "P.........E", "P.........E", "P.........E"] },
+    { "id": "corridor", "map": ["#P........E#", "#P..c..c..E#", "#P........E#", "#P..c..c..E#", "#P........E#"] }
+  ],
+  "hazardSets": [
+    { "id": "fire", "name": "Fire and burning ground", "letter": "f", "sprinkle": 6, "icon": "icon_vector_heat" },
+    { "id": "ice", "name": "Water and ice", "letter": "i", "sprinkle": 7, "extra": { "letter": "w", "count": 2 }, "icon": "icon_vector_cold" },
+    { "id": "pits", "name": "Pits", "letter": "p", "sprinkle": 4, "icon": "icon_intent_special" },
+    { "id": "cover", "name": "Cover", "letter": "c", "sprinkle": 6, "icon": "icon_status_guard" },
+    { "id": "glyphs", "name": "Glyph traps", "letter": "g", "sprinkle": 5, "icon": "icon_vector_binding" },
+    { "id": "collapse", "name": "Collapsing floor", "letter": "k", "sprinkle": 8, "icon": "icon_intent_move" },
+    { "id": "conveyors", "name": "Conveyors", "row": "R", "icon": "icon_vector_motion" },
+    { "id": "dark", "name": "Darkness (only Light reveals)", "letter": "d", "sprinkle": 12, "icon": "icon_vector_light" },
+    { "id": "toxic", "name": "Toxic puddles", "letter": "t", "sprinkle": 6, "icon": "icon_vector_corrosion" }
+  ]
+}

@@ -50,6 +50,7 @@ func _ready() -> void:
 ##   --jump=week,day_index,part_index  --town=zone:x,y (start position in the town)
 ##   --section=Art (with --debug)  --custom=C:/folder (use another custom art folder)
 ##   --hand=ids --hovercard=N --card=N --hover=x,y (combat previews, see _combat_dev_args)
+##   --arena --size=4 --level=3 --arenawave=N --waves=N (Endless Arena; --autoplay plays it)
 ## --debug opens this menu; --shot saves the viewport after N frames and quits.
 func _dev_args() -> void:
 	var args := {}
@@ -75,6 +76,15 @@ func _dev_args() -> void:
 		GameState.pending_combat = GameState.combat_setup(str(args["fight"]).split(","), str(args.get("layout", "boss_stage")), { "boss": true })
 	if args.has("scene"):
 		SceneRouter.goto(str(args["scene"]))
+	if args.has("arena"):
+		# --arena [--seed=N --class=mage --size=4 --level=3 --arenawave=N --waves=N]: straight into the Endless Arena.
+		preload("res://src/scenes/title/title.gd").start_arena({ "class": str(args.get("class", "mage")) }, int(args.get("size", "4")),
+			int(args.get("seed", "1")), int(args.get("level", "3")), int(args.get("waves", "999")))
+		if args.has("arenawave"):
+			GameState.run["arena"]["wave"] = int(args["arenawave"]) - 1
+		if str(args.get("arenaphase", "")) == "checkpoint":
+			preload("res://src/core/arena/arena.gd").checkpoint(DataDB.all(), GameState.run["arena"])
+			GameState.run["arena"]["phase"] = "checkpoint"
 	if args.has("hand") or args.has("hovercard") or args.has("card"):
 		_combat_dev_args.call_deferred(args)
 	if args.has("talk"):

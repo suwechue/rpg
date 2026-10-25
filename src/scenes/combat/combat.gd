@@ -167,7 +167,8 @@ func _sync_views() -> void:
 		v.queue_redraw()
 	var gl: Array = []
 	for g in state.glyphs:
-		if str(g["team"]) == "party":
+		# Your glyphs and the arena's traps are visible; enemy glyphs stay hidden.
+		if str(g["team"]) == "party" or str(g["team"]) == "trap":
 			gl.append(g["cell"])
 	field.glyph_cells = gl
 	var threats := {}
@@ -276,6 +277,7 @@ func _build_ui() -> void:
 
 func _refresh_hud() -> void:
 	for c in _timeline.get_children():
+		_timeline.remove_child(c)
 		c.queue_free()
 	# This round, a round marker, then the next round.
 	var tl: Dictionary = DataDB.table("ui").get("timeline", {})
@@ -1236,4 +1238,9 @@ func _finish() -> void:
 	cont.grab_focus()
 	if GameState.dev_autoplay:
 		print("[autoplay] combat result: %s, xp %d, rounds %d" % [result, int(summary["xp"]), int(summary["rounds"])])
+		if GameState.combat_context == "arena":
+			# Arena autoplay keeps going on its own (--arena --autoplay, tests/smoke_arena.gd).
+			get_tree().create_timer(0.5).timeout.connect(func() -> void:
+				if is_inside_tree():
+					GameState.leave_combat())
 	Audio.play_sfx("win" if result == "win" else "lose")

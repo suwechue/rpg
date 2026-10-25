@@ -103,10 +103,11 @@ static func pick_template(db: Dictionary, week: int, elite: bool, rng: RandomNum
 
 ## Build one encounter: { "template", "enemies": [ids], "roles": [role per enemy],
 ## "affixes": { index: [affix ids] }, "formation", "big", "layoutTag", "reinforcements" }.
-static func build(db: Dictionary, run: Dictionary, week: int, room_type: String, rng: RandomNumberGenerator) -> Dictionary:
+static func build(db: Dictionary, run: Dictionary, week: int, room_type: String, rng: RandomNumberGenerator, budget_override: float = -1.0, template_week: int = -1) -> Dictionary:
 	var elite := room_type == "elite"
-	var tpl := pick_template(db, week, elite, rng)
-	var total := float(budget(db, week, room_type, rng)) + float(tpl.get("minionBonus", 0)) * float(cfg(db).get("minionWeight", 0.5))
+	var tpl := pick_template(db, week if template_week < 0 else template_week, elite, rng)
+	var base := float(budget(db, week, room_type, rng)) if budget_override < 0.0 else budget_override
+	var total := base + float(tpl.get("minionBonus", 0)) * float(cfg(db).get("minionWeight", 0.5))
 	var reinforce: Dictionary = tpl.get("reinforce", {})
 	var main_budget := total * (1.0 - float(reinforce.get("share", 0.0)))
 	var out := { "template": str(tpl.get("id", "")), "enemies": [], "roles": [], "affixes": {}, "formation": str(tpl.get("formation", "default")),
