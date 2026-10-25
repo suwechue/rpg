@@ -22,6 +22,7 @@ var BAD := Color.RED
 var LABEL := Color.WHITE
 
 var colorblind := false
+var _role_fonts: Dictionary = {}
 var font: Font
 var theme: Theme
 
@@ -80,6 +81,35 @@ func set_colorblind(on: bool) -> void:
 	cfg.load(SETTINGS)
 	cfg.set_value("ui", "colorblind", on)
 	cfg.save(SETTINGS)
+
+
+## The font for a role (ui, dialogue, title, damage) from data/ui.json "fonts",
+## as a variation with the UI's wider spaces.
+func font_for(role: String) -> Font:
+	var rec: Dictionary = _ui().get("fonts", {}).get(role, {})
+	var base := Assets.font(str(rec.get("id", "")))
+	if base == null:
+		return font
+	if _role_fonts.has(role) and (_role_fonts[role] as FontVariation).base_font == base:
+		return _role_fonts[role]
+	var v := FontVariation.new()
+	v.base_font = base
+	v.spacing_space = 2
+	_role_fonts[role] = v
+	return v
+
+
+func size_for(role: String) -> int:
+	return int(_ui().get("fonts", {}).get(role, {}).get("size", FONT_SIZE))
+
+
+## A label in a role's font and size.
+func role_label(text: String, role: String, color_value: Variant = null) -> Label:
+	var l := label(text, color_value)
+	l.add_theme_font_override("font", font_for(role))
+	if size_for(role) != FONT_SIZE:
+		l.add_theme_font_size_override("font_size", size_for(role))
+	return l
 
 
 ## A Vector's color (the colorblind-safe palette when that option is on).
@@ -200,8 +230,8 @@ func label(text: String, color_value: Variant = null, size: int = 0) -> Label:
 
 
 ## A label for the game world (prompts, name tags): outlined.
-func world_label(text: String, color_value: Variant = null) -> Label:
-	var l := label(text, color_value)
+func world_label(text: String, color_value: Variant = null, role: String = "ui") -> Label:
+	var l := label(text, color_value) if role == "ui" else role_label(text, role, color_value)
 	l.theme_type_variation = "OutlinedLabel"
 	return l
 

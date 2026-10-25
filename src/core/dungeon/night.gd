@@ -3,6 +3,8 @@
 class_name DungeonNight
 extends RefCounted
 
+const Str := preload("res://src/core/strings.gd")
+
 const RM := preload("res://src/core/run/run_model.gd")
 const Fx := preload("res://src/core/run/effects.gd")
 const Char := preload("res://src/core/character.gd")
@@ -81,7 +83,7 @@ static func rest(db: Dictionary, run: Dictionary, room: Dictionary) -> Array:
 		ch["hp"] = int(d["maxHp"]) if not bool(ch.get("downed", false)) else maxi(1, int(ch.get("hp", 1)))
 		ch["mp"] = int(d["maxMp"])
 	room["cleared"] = true
-	lines.append("You rest by a fire that burns without wood. HP and MP restored.")
+	lines.append(Str.t(db, "night.you_rest_by_a_fire"))
 	return lines
 
 
@@ -108,7 +110,7 @@ static func party_chars(run: Dictionary) -> Array:
 
 ## A Vector shard: three of an axis teach it (if the Knowledge Tier allows).
 static func add_shard(db: Dictionary, run: Dictionary, axis: String) -> Array:
-	var lines: Array = ["A %s shard hums in your hand." % axis.capitalize()]
+	var lines: Array = [Str.t(db, "night.a_shard_hums_in_your") % axis.capitalize()]
 	var shards: Dictionary = run.get("shards", {})
 	shards[axis] = int(shards.get(axis, 0)) + 1
 	run["shards"] = shards
@@ -117,7 +119,7 @@ static func add_shard(db: Dictionary, run: Dictionary, axis: String) -> Array:
 	if int(shards[axis]) >= int(cfg(db).get("shardsToLearn", 3)) and not p["knownVectors"].has(axis) and tier <= int(p.get("knowledgeTier", 1)):
 		shards[axis] = 0
 		p["knownVectors"].append(axis)
-		lines.append("The shards fuse. You know the %s Vector now." % axis.capitalize())
+		lines.append(Str.t(db, "night.the_shards_fuse_you_know") % axis.capitalize())
 	return lines
 
 
@@ -129,7 +131,7 @@ static func shard_axis(db: Dictionary, run: Dictionary, week: int, rng: RandomNu
 
 static func open_treasure(db: Dictionary, run: Dictionary, room: Dictionary, week: int, rng: RandomNumberGenerator) -> Array:
 	var t: Dictionary = cfg(db).get("treasure", {})
-	var lines: Array = ["The chest opens with a sound like a locker slamming."]
+	var lines: Array = [Str.t(db, "night.the_chest_opens_with_a")]
 	var span: Array = t.get("money", [5, 15])
 	var fx := { "money": rng.randi_range(int(span[0]), int(span[1])) * week }
 	if rng.randf() < float(t.get("itemChance", 0.5)):
@@ -159,7 +161,7 @@ static func after_combat(db: Dictionary, run: Dictionary, room: Dictionary, summ
 	elif result == "flee":
 		room["cleared"] = true
 		room["fled"] = true
-		lines.append("You got away. They'll remember you on Friday.")
+		lines.append(Str.t(db, "night.you_got_away_they_ll"))
 	return lines
 
 
@@ -188,7 +190,7 @@ static func boss_reward(db: Dictionary, run: Dictionary, week: int, rng: RandomN
 		p["knowledgeTier"] = int(rw["knowledgeTier"])
 		for m in run.get("roster", []):
 			m["knowledgeTier"] = maxi(int(m.get("knowledgeTier", 1)), int(rw["knowledgeTier"]))
-		lines.append("Your Knowledge Tier rises to %d." % int(rw["knowledgeTier"]))
+		lines.append(Str.t(db, "night.your_knowledge_tier_rises_to") % int(rw["knowledgeTier"]))
 	for m in run.get("roster", []):
 		if run.get("party_ids", []).has(m["id"]) and int(rw.get("xp", 0)) > 0:
 			preload("res://src/core/progression/leveling.gd").add_xp(db, m, int(rw["xp"]), rng)

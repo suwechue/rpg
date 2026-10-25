@@ -177,6 +177,10 @@ func font(id: String) -> Font:
 	if custom != "":
 		var ff := FontFile.new()
 		if ff.load_dynamic_font(ProjectSettings.globalize_path(custom)) == OK:
+			# Pixel fonts: no smoothing, so text stays crisp at whole-number sizes.
+			ff.antialiasing = TextServer.FONT_ANTIALIASING_NONE
+			ff.hinting = TextServer.HINTING_NONE
+			ff.subpixel_positioning = TextServer.SUBPIXEL_POSITIONING_DISABLED
 			f = ff
 	if f == null:
 		var src := str(spec(rid).get("source", ""))

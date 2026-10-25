@@ -40,7 +40,7 @@ func _draw() -> void:
 	var s := ""
 	for v in _scores:
 		s += "%d%%  " % roundi(float(v) * 100.0)
-	draw_frame("Round %d/%d   %s   [E] to stop" % [mini(_round + 1, ROUNDS), ROUNDS, s])
+	draw_frame(Strings.t("precision_minigame.round_e_to_stop") % [mini(_round + 1, ROUNDS), ROUNDS, s])
 	var bar := Rect2(box.position + Vector2(30, 70), Vector2(260, 14))
 	draw_rect(bar, Color("262c40"))
 	var zone_w := bar.size.x * 0.12

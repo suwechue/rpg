@@ -4,6 +4,8 @@
 class_name RunModel
 extends RefCounted
 
+const Str := preload("res://src/core/strings.gd")
+
 const Char := preload("res://src/core/character.gd")
 const VO := preload("res://src/core/vector_ops.gd")
 
@@ -13,7 +15,7 @@ const VERSION := 3
 ## A fresh run. opts: name, traits.
 static func new_run(db: Dictionary, seed_value: int, class_id: String, rng: RandomNumberGenerator, opts: Dictionary = {}) -> Dictionary:
 	var player := Char.create(db, class_id, rng, {
-		"id": "player", "name": str(opts.get("name", "New Kid")), "isPlayer": true, "traits": opts.get("traits", []) })
+		"id": "player", "name": str(opts.get("name", Str.t(db, "run_model.new_kid"))), "isPlayer": true, "traits": opts.get("traits", []) })
 	player["sprite"] = str(opts.get("sprite", db.get("assets/roles", {}).get("player", "")))
 	var collection := {}
 	for id in player["deck"]:

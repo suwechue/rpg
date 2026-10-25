@@ -3,6 +3,7 @@
   "name": "Kara",
   "role": "Cheer squad",
   "home": "kara_house",
+  "voice": { "id": "voice_default", "pitch": 1.0 },
   "sprite": "npc_kara_walk",
   "portrait": "portrait_kara",
   "startBond": 0,

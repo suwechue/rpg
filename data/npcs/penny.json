@@ -3,6 +3,7 @@
   "name": "Penny",
   "role": "Student",
   "home": "penny_house",
+  "voice": { "id": "voice_default", "pitch": 1.19 },
   "sprite": "npc_penny_walk",
   "portrait": "portrait_penny",
   "startBond": -5,

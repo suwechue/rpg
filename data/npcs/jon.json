@@ -3,6 +3,7 @@
   "name": "Jon",
   "role": "Student",
   "home": "jon_house",
+  "voice": { "id": "voice_default", "pitch": 0.92 },
   "sprite": "npc_jon_walk",
   "portrait": "portrait_jon",
   "startBond": 10,

@@ -3,6 +3,7 @@
   "name": "Mel",
   "role": "Student",
   "home": "mel_house",
+  "voice": { "id": "voice_default", "pitch": 1.23 },
   "sprite": "npc_mel_walk",
   "portrait": "portrait_mel",
   "startBond": 10,

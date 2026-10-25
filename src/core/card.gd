@@ -5,6 +5,8 @@
 class_name Card
 extends RefCounted
 
+const Str := preload("res://src/core/strings.gd")
+
 const VO := preload("res://src/core/vector_ops.gd")
 const DT := preload("res://src/core/data_tables.gd")
 
@@ -158,17 +160,17 @@ static func step_up(db: Dictionary, magnitude: String, tier: int) -> String:
 ## the Knowledge Tier caps Magnitude and which new Vectors and Forms can be learned.
 static func design_error(db: Dictionary, ch: Dictionary, vectors: Array, form: String, magnitude: String) -> String:
 	if vectors.is_empty() or vectors.size() > 2:
-		return "Pick one Vector, or two for a hybrid."
+		return Str.t(db, "card.pick_one_vector_or_two")
 	for v in vectors:
 		if not ch.get("knownVectors", []).has(v):
-			return "%s is not a Vector you know." % str(v).capitalize()
+			return Str.t(db, "card.is_not_a_vector_you") % str(v).capitalize()
 	if not ch.get("knownForms", []).has(form):
-		return "You don't know the %s Form." % form.capitalize()
+		return Str.t(db, "card.you_don_t_know_the") % form.capitalize()
 	var tier := int(ch.get("knowledgeTier", 1))
 	if magnitude_index(db, magnitude) < 0:
-		return "Unknown Magnitude."
+		return Str.t(db, "card.unknown_magnitude")
 	if magnitude_index(db, magnitude) > magnitude_index(db, max_magnitude(db, tier)):
-		return "Knowledge Tier %d caps you at %s." % [tier, max_magnitude(db, tier).capitalize()]
+		return Str.t(db, "card.knowledge_tier_caps_you_at") % [tier, max_magnitude(db, tier).capitalize()]
 	return ""
 
 
@@ -200,7 +202,7 @@ static func describe(db: Dictionary, card: Dictionary) -> String:
 	for axis in ordered_vectors(db, card.get("vectors", {})):
 		text += str(effects.get(axis, "")).split(";")[0] + ". "
 	if not card.get("properties", []).is_empty():
-		text += "Properties: %s." % ", ".join(PackedStringArray(card["properties"]))
+		text += Str.t(db, "card.properties") % ", ".join(PackedStringArray(card["properties"]))
 	return text.strip_edges()
 
 

@@ -7,6 +7,8 @@
 class_name EnemyAI
 extends RefCounted
 
+const Str := preload("res://src/core/strings.gd")
+
 const VO := preload("res://src/core/vector_ops.gd")
 const CardRules := preload("res://src/core/card.gd")
 const GridScript := preload("res://src/core/combat/grid.gd")
@@ -307,7 +309,7 @@ static func _actions(state: StateScript, u: UnitScript) -> Array:
 		# Mirrors copy the last card the party played.
 		if str(u.source.get("behavior", "")) == "mirror" and not state.last_party_card.is_empty():
 			var card: Dictionary = state.last_party_card
-			actions.append({ "id": "mirror", "name": "Mirror: %s" % card.get("name", "?"), "form": str(card.get("form", "bolt")),
+			actions.append({ "id": "mirror", "name": Str.t(state.db, "enemy_ai.mirror") % card.get("name", "?"), "form": str(card.get("form", "bolt")),
 				"vectors": card.get("vectors", {}), "power": CardRules.power(state.db, card), "magnitude": str(card.get("magnitude", "standard")),
 				"profile": { "curiosity": 1.0 } })
 		for a in actions:

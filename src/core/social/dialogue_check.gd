@@ -5,6 +5,8 @@
 class_name DialogueCheck
 extends RefCounted
 
+const Str := preload("res://src/core/strings.gd")
+
 const VO := preload("res://src/core/vector_ops.gd")
 const RM := preload("res://src/core/run/run_model.gd")
 const Fx := preload("res://src/core/run/effects.gd")
@@ -42,7 +44,7 @@ static func mood(db: Dictionary, run: Dictionary, id: String, day_count: int) ->
 
 ## "Kelly seems fine.": the person's name with a singular verb (data/social.json "moodText").
 static func mood_line(db: Dictionary, id: String, mood_name: String) -> String:
-	var tpl := str(cfg(db).get("moodText", {}).get(mood_name, "{name} seems fine."))
+	var tpl := str(cfg(db).get("moodText", {}).get(mood_name, Str.t(db, "dialogue_check.name_seems_fine")))
 	return tpl.replace("{name}", str(npc(db, id).get("name", id.capitalize())))
 
 
@@ -65,11 +67,11 @@ static func topic_lock(db: Dictionary, run: Dictionary, id: String, topic: Dicti
 	if topic.has("minTier"):
 		var have := tier_rank(db, bond_tier(db, RM.bond(run, id)))
 		if have < tier_rank(db, str(topic["minTier"])):
-			return "Bond: %s" % topic["minTier"]
+			return Str.t(db, "dialogue_check.bond") % topic["minTier"]
 	if topic.has("needItem") and int(run.get("inventory", {}).get(str(topic["needItem"]), 0)) <= 0:
-		return "Needs an item"
+		return Str.t(db, "dialogue_check.needs_an_item")
 	if not Fx.conditions_met(db, run, topic.get("cond", {}), ctx):
-		return str(topic.get("lockedHint", "Not yet"))
+		return str(topic.get("lockedHint", Str.t(db, "dialogue_check.not_yet")))
 	return ""
 
 

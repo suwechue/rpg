@@ -4,6 +4,8 @@
 class_name Story
 extends RefCounted
 
+const Str := preload("res://src/core/strings.gd")
+
 const RM := preload("res://src/core/run/run_model.gd")
 const Fx := preload("res://src/core/run/effects.gd")
 const Dlg := preload("res://src/core/social/dialogue_check.gd")
@@ -106,7 +108,7 @@ static func make_guest(db: Dictionary, run: Dictionary, id: String, rng: RandomN
 		"knownVectors": combat.get("vectors", []), "traits": rec.get("traits", []) })
 	ch["sprite"] = str(rec.get("sprite", ""))
 	ch["guest"] = true
-	ch["helpLine"] = str(rec.get("helpLine", "Help!"))
+	ch["helpLine"] = str(rec.get("helpLine", Str.t(db, "story.help")))
 	ch["disposition"] = rec.get("disposition", {})
 	if not run.has("guests"):
 		run["guests"] = []

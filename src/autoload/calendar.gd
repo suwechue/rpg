@@ -44,7 +44,7 @@ func set_ap(amount: int) -> void:
 
 
 func label() -> String:
-	return "Week %d, %s, %s" % [logic.week, logic.day_name().capitalize(), str(current_part().get("name", ""))]
+	return Strings.t("calendar.week") % [logic.week, logic.day_name().capitalize(), str(current_part().get("name", ""))]
 
 
 func max_ap() -> int:

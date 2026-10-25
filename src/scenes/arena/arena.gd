@@ -98,25 +98,25 @@ func _refresh() -> void:
 	_clear()
 	var db: Dictionary = DataDB.all()
 	var next := int(arena["wave"]) + 1
-	_text(("The Rift" if story else "Endless Arena") + "  Score %d" % int(arena["score"]), UiTheme.ACCENT)
+	_text((Strings.t("arena.the_rift") if story else Strings.t("arena.endless_arena")) + Strings.t("arena.score") % int(arena["score"]), UiTheme.ACCENT)
 	var phase := str(arena.get("phase", "ready"))
 	if phase == "over":
 		_over()
 		return
 	for ch in Party.party(GameState.run):
 		var d := preload("res://src/core/character.gd").derived(db, ch)
-		_text("%s  Lv %d  HP %d/%d  MP %d/%d" % [ch.get("name", "?"), int(ch.get("level", 1)), int(ch.get("hp", 0)), int(d["maxHp"]), int(ch.get("mp", 0)), int(d["maxMp"])], UiTheme.DIM)
+		_text(Strings.t("arena.lv_hp_mp") % [ch.get("name", "?"), int(ch.get("level", 1)), int(ch.get("hp", 0)), int(d["maxHp"]), int(ch.get("mp", 0)), int(d["maxMp"])], UiTheme.DIM)
 	for m in arena.get("mutators", []):
-		_text("Mutator: %s. %s" % [m.get("name", ""), m.get("text", "")], UiTheme.GOOD)
+		_text(Strings.t("arena.mutator") % [m.get("name", ""), m.get("text", "")], UiTheme.GOOD)
 	if phase == "checkpoint":
 		_checkpoint()
 		return
 	var hz := Arena.hazard_set(db, next)
-	var kind := "Boss wave!" if Arena.is_boss(db, next) else ("Elite wave" if Arena.is_elite(db, next) else "Wave")
-	_text("%s %d. Terrain: %s." % [kind, next, hz.get("name", "plain")], UiTheme.TEXT)
-	_button("Start wave %d" % next, _start_wave)
+	var kind := Strings.t("arena.boss_wave") if Arena.is_boss(db, next) else (Strings.t("arena.elite_wave") if Arena.is_elite(db, next) else "Wave")
+	_text(Strings.t("arena.terrain") % [kind, next, hz.get("name", "plain")], UiTheme.TEXT)
+	_button(Strings.t("arena.start_wave") % next, _start_wave)
 	if not story:
-		_button("Give up", func() -> void: _end_run())
+		_button(Strings.t("arena.give_up"), func() -> void: _end_run())
 	_center()
 
 
@@ -138,7 +138,7 @@ func _start_wave() -> void:
 		hp += int(ch.get("hp", 0))
 	arena["hpBefore"] = hp
 	arena["inFight"] = true
-	setup["intro"] = "Wave %d. %s" % [wave, str(Arena.hazard_set(db, wave).get("name", ""))]
+	setup["intro"] = Strings.t("arena.wave") % [wave, str(Arena.hazard_set(db, wave).get("name", ""))]
 	GameState.start_combat(setup, SELF)
 
 
@@ -184,7 +184,7 @@ func _apply_rewards(r: Dictionary) -> void:
 	for c in r.get("cards", []):
 		coll[str(c)] = int(coll.get(str(c), 0)) + 1
 	GameState.run["collection"] = coll
-	Narrator.say("Rewards banked: %d XP, $%d." % [int(r.get("xp", 0)), int(r.get("money", 0))])
+	Narrator.say(Strings.t("arena.rewards_banked_xp") % [int(r.get("xp", 0)), int(r.get("money", 0))])
 
 
 func _lost() -> void:
@@ -201,17 +201,17 @@ func _lost() -> void:
 
 func _over() -> void:
 	if story:
-		_text("You're knocked out. You wake up at home, sore, and the day is gone.", UiTheme.BAD)
-		_text("Rewards up to your last checkpoint are kept.", UiTheme.DIM)
-		_button("Wake up", _wake_at_home)
+		_text(Strings.t("arena.you_re_knocked_out_you"), UiTheme.BAD)
+		_text(Strings.t("arena.rewards_up_to_your_last"), UiTheme.DIM)
+		_button(Strings.t("arena.wake_up"), _wake_at_home)
 	else:
-		_text("Waves cleared: %d. Final score: %d.%s" % [int(arena["cleared"]), int(arena["score"]), " New best!" if bool(arena.get("newBest", false)) else ""], UiTheme.TEXT)
+		_text(Strings.t("arena.waves_cleared_final_score") % [int(arena["cleared"]), int(arena["score"]), Strings.t("arena.new_best") if bool(arena.get("newBest", false)) else ""], UiTheme.TEXT)
 		var scores: Dictionary = Journal.data.get("arena", {})
-		_text("Best wave ever: %d." % int(scores.get("bestWave", 0)), UiTheme.DIM)
+		_text(Strings.t("arena.best_wave_ever") % int(scores.get("bestWave", 0)), UiTheme.DIM)
 		for k in scores:
 			if str(k).begins_with("party"):
-				_text("%s: %d points (wave %d)" % [str(k).replace("party", "Party of ").replace("_mut", ", mutators "), int(scores[k]["score"]), int(scores[k]["wave"])], UiTheme.DIM)
-		_button("Back to the title", _end_run)
+				_text(Strings.t("arena.points_wave") % [str(k).replace("party", Strings.t("arena.party_of")).replace("_mut", Strings.t("arena.mutators")), int(scores[k]["score"]), int(scores[k]["wave"])], UiTheme.DIM)
+		_button(Strings.t("arena.back_to_the_title"), _end_run)
 	_center()
 
 
@@ -245,40 +245,40 @@ func _leave() -> void:
 func _checkpoint() -> void:
 	var db: Dictionary = DataDB.all()
 	var costs: Dictionary = Arena.checkpoint_cfg(db).get("costs", {})
-	_text("Checkpoint. Arena AP: %d (unspent AP carries over)." % int(arena["ap"]), UiTheme.ACCENT)
+	_text(Strings.t("arena.checkpoint_arena_ap_unspent_ap") % int(arena["ap"]), UiTheme.ACCENT)
 	var hz := Arena.hazard_set(db, int(arena["wave"]) + 1)
-	_text("Next wave's terrain: %s." % hz.get("name", "plain"), UiTheme.DIM)
+	_text(Strings.t("arena.next_wave_s_terrain") % hz.get("name", "plain"), UiTheme.DIM)
 	var ap := int(arena["ap"])
-	_button("Rest: heal half HP and MP (%d AP)" % int(costs.get("rest", 2)), func() -> void:
+	_button(Strings.t("arena.rest_heal_half_hp_and") % int(costs.get("rest", 2)), func() -> void:
 		if Arena.spend(db, arena, "rest"):
 			Arena.rest(db, Party.party(GameState.run))
-		_refresh(), ap < int(costs.get("rest", 2)) or bool(arena.get("noRest", false)), "No resting after High stakes." if bool(arena.get("noRest", false)) else "")
-	_button("Swap cards in a deck (%d AP)" % int(costs.get("swapCard", 1)), func() -> void: await _workbench(0, int(costs.get("swapCard", 1))), ap < int(costs.get("swapCard", 1)))
-	_button("Craft a card (%d AP)" % int(costs.get("craftCard", 2)), func() -> void: await _workbench(int(costs.get("craftCard", 2)), 0), ap < int(costs.get("craftCard", 2)))
-	_button("Swap a teammate (%d AP)" % int(costs.get("swapTeammate", 2)), _swap_teammate, ap < int(costs.get("swapTeammate", 2)) or GameState.roster.size() <= GameState.party_ids.size())
-	_button("Change equipment (%d AP)" % int(costs.get("changeEquipment", 1)), _equipment, ap < int(costs.get("changeEquipment", 1)) or _equipment_items().is_empty())
+		_refresh(), ap < int(costs.get("rest", 2)) or bool(arena.get("noRest", false)), Strings.t("arena.no_resting_after_high_stakes") if bool(arena.get("noRest", false)) else "")
+	_button(Strings.t("arena.swap_cards_in_a_deck") % int(costs.get("swapCard", 1)), func() -> void: await _workbench(0, int(costs.get("swapCard", 1))), ap < int(costs.get("swapCard", 1)))
+	_button(Strings.t("arena.craft_a_card_ap") % int(costs.get("craftCard", 2)), func() -> void: await _workbench(int(costs.get("craftCard", 2)), 0), ap < int(costs.get("craftCard", 2)))
+	_button(Strings.t("arena.swap_a_teammate_ap") % int(costs.get("swapTeammate", 2)), _swap_teammate, ap < int(costs.get("swapTeammate", 2)) or GameState.roster.size() <= GameState.party_ids.size())
+	_button(Strings.t("arena.change_equipment_ap") % int(costs.get("changeEquipment", 1)), _equipment, ap < int(costs.get("changeEquipment", 1)) or _equipment_items().is_empty())
 	if arena.get("mutators", []).is_empty():
-		_text("Pick a mutator for the next five waves:", UiTheme.ACCENT)
+		_text(Strings.t("arena.pick_a_mutator_for_the"), UiTheme.ACCENT)
 		for m in arena.get("offered", []):
 			var mid := str(m["id"])
 			_button("%s: %s" % [m.get("name", mid), m.get("text", "")], func() -> void:
 				Arena.choose_mutator(arena, mid)
 				_refresh())
-		_button("Reroll the choices (%d AP)" % int(costs.get("rerollMutators", 1)), func() -> void:
+		_button(Strings.t("arena.reroll_the_choices_ap") % int(costs.get("rerollMutators", 1)), func() -> void:
 			if Arena.spend(db, arena, "rerollMutators"):
 				Arena.offer_mutators(db, arena, int(arena.get("rerolls", 0)) + 1)
 			_refresh(), ap < int(costs.get("rerollMutators", 1)))
-		_button("No mutator", func() -> void:
+		_button(Strings.t("arena.no_mutator"), func() -> void:
 			arena["offered"] = []
 			arena["mutators"] = []
 			arena["phase"] = "ready"
 			_refresh())
 	else:
-		_button("Continue to wave %d" % (int(arena["wave"]) + 1), func() -> void:
+		_button(Strings.t("arena.continue_to_wave") % (int(arena["wave"]) + 1), func() -> void:
 			arena["phase"] = "ready"
 			_refresh())
 	if story:
-		_button("Bank and leave the Rift", _leave)
+		_button(Strings.t("arena.bank_and_leave_the_rift"), _leave)
 	_center()
 
 
@@ -291,7 +291,7 @@ func _arena_spend(n: int, _kind: String) -> bool:
 
 func _workbench(craft_cost: int, swap_cost: int) -> void:
 	var wb := Workbench.new()
-	wb.place = "the Rift"
+	wb.place = Strings.t("arena.the_rift_2")
 	wb.craft_ap = maxi(1, craft_cost)
 	wb.deck_save_cost = swap_cost
 	wb.ap_left = func() -> int: return int(arena["ap"])
@@ -320,14 +320,14 @@ func _equipment_items() -> Array:
 
 func _equipment() -> void:
 	var m := Modal.new()
-	m.build("Change equipment", 380)
+	m.build(Strings.t("arena.change_equipment"), 380)
 	for id in _equipment_items():
 		var it := DataDB.record("items", id)
 		for ch in Party.party(GameState.run):
 			var who: Dictionary = ch
 			var iid: String = id
 			m.add_button("%s: %s" % [who.get("name", "?"), it.get("name", iid)], func() -> void: m.finish({ "ch": who, "item": iid }))
-	m.add_button("Back", func() -> void: m.finish(null))
+	m.add_button(Strings.t("arena.back"), func() -> void: m.finish(null))
 	var r: Variant = await Flow.show_modal(m)
 	if r is Dictionary and _arena_spend(int(Arena.checkpoint_cfg(DataDB.all()).get("costs", {}).get("changeEquipment", 1)), "changeEquipment"):
 		var err := Shop.equip(DataDB.all(), GameState.run, r["ch"], str(r["item"]))

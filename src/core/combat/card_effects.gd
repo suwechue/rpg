@@ -4,6 +4,8 @@
 ## combat_state.gd loads this script, so it can't be preloaded both ways).
 extends RefCounted
 
+const Str := preload("res://src/core/strings.gd")
+
 const GridScript := preload("res://src/core/combat/grid.gd")
 const Forms := preload("res://src/core/combat/forms.gd")
 const UnitScript := preload("res://src/core/combat/unit.gd")
@@ -89,7 +91,7 @@ static func _op(st, u: UnitScript, card: Dictionary, fx: Dictionary, target: Vec
 				for s in NEGATIVE:
 					if t.statuses.has(s):
 						t.statuses.erase(s)
-						st._emit({ "t": "log", "text": "%s shakes off %s." % [t.name, s] })
+						st._emit({ "t": "log", "text": Str.t(st.db, "card_effects.shakes_off") % [t.name, s] })
 						break
 				if fx.has("heal"):
 					st._heal(u, t, int(fx["heal"]))
@@ -107,7 +109,7 @@ static func _op(st, u: UnitScript, card: Dictionary, fx: Dictionary, target: Vec
 			for t in _foes(st, cells, u):
 				if not t.intent.is_empty():
 					t.intent = {}
-					st._emit({ "t": "interrupt", "unit": t.id, "text": "%s's attack is snapped off." % t.name })
+					st._emit({ "t": "interrupt", "unit": t.id, "text": Str.t(st.db, "card_effects.s_attack_is_snapped_off") % t.name })
 		"rime":
 			var t: UnitScript = st.unit_at(target)
 			if t != null:
@@ -280,8 +282,8 @@ static func _op(st, u: UnitScript, card: Dictionary, fx: Dictionary, target: Vec
 			for o in st.units:
 				if o.statuses.has("burrowed"):
 					o.statuses.erase("burrowed")
-					st._emit({ "t": "log", "text": "%s is dragged into the light." % o.name })
-			st._emit({ "t": "log", "text": "Every enemy plan is laid bare." })
+					st._emit({ "t": "log", "text": Str.t(st.db, "card_effects.is_dragged_into_the_light") % o.name })
+			st._emit({ "t": "log", "text": Str.t(st.db, "card_effects.every_enemy_plan_is_laid") })
 		"halo":
 			for a in st.allies_of(u):
 				if GridScript.manhattan(a.cell, u.cell) <= 1:
@@ -338,7 +340,7 @@ static func _op(st, u: UnitScript, card: Dictionary, fx: Dictionary, target: Vec
 					u.shield += stolen
 					u.shield_turns = maxi(u.shield_turns, 2)
 					st._emit({ "t": "shield", "unit": u.id, "amount": stolen })
-				st._emit({ "t": "log", "text": "%s is stripped of protection." % t.name })
+				st._emit({ "t": "log", "text": Str.t(st.db, "card_effects.is_stripped_of_protection") % t.name })
 		"toxic_tiles":
 			for c in cells:
 				if grid.walkable_terrain(c):

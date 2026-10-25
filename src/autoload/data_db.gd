@@ -68,7 +68,7 @@ func _ensure_loaded() -> void:
 
 ## Schema checks. Extend as new tables are added.
 func _validate() -> void:
-	for required in ["spaces", "matchups", "calendar", "vectors", "forms", "classes", "stats", "leveling", "perks", "traits", "display", "assets/manifest", "assets/roles", "ui"]:
+	for required in ["spaces", "matchups", "calendar", "vectors", "forms", "classes", "stats", "leveling", "perks", "traits", "display", "assets/manifest", "assets/roles", "ui", "audio_events", "strings"]:
 		if not _tables.has(required):
 			errors.append("missing required table data/%s.json" % required)
 	if not (_tables.has("spaces") and _tables.has("forms") and _tables.has("vectors")):
@@ -245,7 +245,7 @@ func _validate_assets() -> void:
 	var all: Dictionary = AssetSpecs.manifest(_tables).get("assets", {})
 	for id in all:
 		var src := str(all[id].get("source", ""))
-		if src != "" and not ResourceLoader.exists(src):
+		if src != "" and not bool(all[id].get("planned", false)) and not ResourceLoader.exists(src):
 			errors.append("asset %s: source file missing: %s" % [id, src])
 
 

@@ -14,13 +14,13 @@ func _ready() -> void:
 	var db: Dictionary = DataDB.all()
 	period = int(Calendar.current_part().get("period", 1))
 	cls = School.class_rec(db, str(GameState.schedule[period - 1]))
-	build("Period %d: %s" % [period, cls.get("name", "?")], 380)
+	build(Strings.t("class.period") % [period, cls.get("name", "?")], 380)
 	var prof := str(db.get("school_classes", {}).get("professors", {}).get(str(cls.get("professor", "")), ""))
-	text("%s, with %s. %s" % [cls.get("name", ""), prof, cls.get("blurb", "")], UiTheme.DIM)
+	text(Strings.t("class.with") % [cls.get("name", ""), prof, cls.get("blurb", "")], UiTheme.DIM)
 	var grade := float(GameState.run["grades"].get(str(cls.get("professor", "")), 0.0))
-	text("Grade with %s: %d. Skips this week: %d." % [prof, roundi(grade), int(GameState.run.get("skips_week", 0))], UiTheme.DIM)
-	add_button("Attend (takes the whole period)", _attend)
-	add_button("Skip (free 2 AP part, Grade drops)", _skip)
+	text(Strings.t("class.grade_with_skips_this_week") % [prof, roundi(grade), int(GameState.run.get("skips_week", 0))], UiTheme.DIM)
+	add_button(Strings.t("class.attend_takes_the_whole_period"), _attend)
+	add_button(Strings.t("class.skip_free_2_ap_part"), _skip)
 	focus_first()
 	Audio.play_music("school")
 
@@ -41,13 +41,13 @@ func _attend() -> void:
 		text(str(line), UiTheme.GOOD if str(line).ends_with("!") else UiTheme.DIM)
 	EventBus.stats_changed.emit("player")
 	if _event.is_empty():
-		add_button("Continue", func() -> void: finish("attended"))
+		add_button(Strings.t("class.continue"), func() -> void: finish("attended"))
 		focus_first()
 		return
 	text(School.fill(str(_event.get("text", "")), _ctx))
 	var choices: Array = _event.get("choices", [])
 	if choices.is_empty():
-		add_button("Continue", func() -> void: _resolve(-1))
+		add_button(Strings.t("class.continue"), func() -> void: _resolve(-1))
 	else:
 		for i in choices.size():
 			var ch: Dictionary = choices[i]
@@ -63,7 +63,7 @@ func _resolve(choice: int) -> void:
 	for line in r["lines"]:
 		text(School.fill(str(line), _ctx))
 	EventBus.stats_changed.emit("player")
-	add_button("Continue", func() -> void: finish("attended"))
+	add_button(Strings.t("class.continue"), func() -> void: finish("attended"))
 	focus_first()
 
 
@@ -72,6 +72,6 @@ func _skip() -> void:
 	clear_body()
 	for line in lines:
 		text(str(line))
-	text("The period is yours: 2 AP to spend however you like.", UiTheme.DIM)
-	add_button("Continue", func() -> void: finish("skipped"))
+	text(Strings.t("class.the_period_is_yours_2"), UiTheme.DIM)
+	add_button(Strings.t("class.continue"), func() -> void: finish("skipped"))
 	focus_first()

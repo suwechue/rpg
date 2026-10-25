@@ -18,7 +18,7 @@ func _ready() -> void:
 	text(str(event.get("text", "")))
 	var choices: Array = event.get("choices", [])
 	if choices.is_empty():
-		add_button("Continue", func() -> void: _choose({ "effects": event.get("effects", {}), "result": event.get("result", "") }))
+		add_button(Strings.t("event.continue"), func() -> void: _choose({ "effects": event.get("effects", {}), "result": event.get("result", "") }))
 	else:
 		for ch in choices:
 			var ok := GameState.conditions_met(ch.get("cond", {}))
@@ -42,5 +42,5 @@ func _choose(picked: Dictionary) -> void:
 		text(str(ch["result"]))
 	for line in lines:
 		text(str(line), UiTheme.DIM)
-	add_button("Continue", func() -> void: finish(ch))
+	add_button(Strings.t("event.continue"), func() -> void: finish(ch))
 	focus_first()

@@ -3,6 +3,7 @@
   "name": "Dex",
   "role": "Student (Core Four)",
   "home": "dex_house",
+  "voice": { "id": "voice_dex", "pitch": 1.05 },
   "sprite": "npc_dex_walk",
   "portrait": "portrait_dex",
   "startBond": 10,

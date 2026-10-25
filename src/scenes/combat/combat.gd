@@ -243,10 +243,10 @@ func _build_ui() -> void:
 	col.position = Vector2(view.x - 82, hand_y)
 	col.theme_type_variation = "CompactGrid"
 	_ui.add_child(col)
-	for spec in [["end", "End", "End turn [Space]"], ["strike", "Strike", "Basic Strike: adjacent, STR. Uses your action [S]"],
-			["guard", "Guard", "Basic Guard: +Defense until your next turn. Uses your action [G]"],
-			["wheel", "Wheel", "Vector Wheel: improvise a spell. Uses your action [V]"], ["flee", "Flee", "Flee when everyone stands on an exit tile [F]"],
-			["undo", "Undo", "Undo this turn's move (before you act) [Esc]"]]:
+	for spec in [["end", "End", Strings.t("combat.end_turn_space")], ["strike", "Strike", Strings.t("combat.basic_strike_adjacent_str_uses")],
+			["guard", "Guard", Strings.t("combat.basic_guard_defense_until_your")],
+			["wheel", "Wheel", Strings.t("combat.vector_wheel_improvise_a_spell_2")], ["flee", "Flee", Strings.t("combat.flee_when_everyone_stands_on")],
+			["undo", "Undo", Strings.t("combat.undo_this_turn_s_move")]]:
 		var key: String = spec[0]
 		var b := UiTheme.button(spec[1], func() -> void: _on_button(key))
 		b.custom_minimum_size = Vector2(39, 18)
@@ -306,18 +306,18 @@ func _refresh_hud() -> void:
 			if int(r["n"]) > 1:
 				inner.add_child(UiTheme.label("x%d" % int(r["n"])))
 			box.add_child(inner)
-			box.tooltip_text = "%s%s (init %d)" % [u.name, " x%d" % int(r["n"]) if int(r["n"]) > 1 else "", u.initiative]
+			box.tooltip_text = Strings.t("combat.init") % [u.name, " x%d" % int(r["n"]) if int(r["n"]) > 1 else "", u.initiative]
 			_timeline.add_child(box)
 			left -= 1
 	var u := state.current
 	if u != null:
-		var lines: Array = ["%s%s" % [u.name, " (AI)" if u.ai_controlled else ""], "HP %d/%d  MP %d/%d" % [u.hp, u.max_hp, u.mp, u.max_mp]]
+		var lines: Array = ["%s%s" % [u.name, Strings.t("combat.ai") if u.ai_controlled else ""], Strings.t("combat.hp_mp") % [u.hp, u.max_hp, u.mp, u.max_mp]]
 		if u.team == "party" and not u.ai_controlled:
-			lines.append("Move %d  %s" % [u.move_left, "action used" if u.action_used else "action ready"])
+			lines.append(Strings.t("combat.move") % [u.move_left, Strings.t("combat.action_used") if u.action_used else Strings.t("combat.action_ready")])
 			if u.deck != null:
-				lines.append("Deck %d  Discard %d" % [u.deck.draw_pile.size(), u.deck.discard.size()])
+				lines.append(Strings.t("combat.deck_discard") % [u.deck.draw_pile.size(), u.deck.discard.size()])
 		if u.shield > 0:
-			lines.append("Shield %d" % u.shield)
+			lines.append(Strings.t("combat.shield") % u.shield)
 		_unit_panel.text = "\n".join(PackedStringArray(lines))
 	_refresh_hand()
 	var player_turn := _player_turn()
@@ -340,16 +340,16 @@ func _turn_hint() -> String:
 	var can_act := state.act_block(u) == ""
 	if not can_act and not state.can_move(u):
 		_buttons["end"].grab_focus.call_deferred()
-		return "Turn done. End turn [Space]."
+		return Strings.t("combat.turn_done_end_turn_space")
 	var parts: Array = []
 	if state.can_move(u):
-		parts.append("move %d" % u.move_left)
+		parts.append(Strings.t("combat.move_2") % u.move_left)
 	if can_act:
-		parts.append("act once")
+		parts.append(Strings.t("combat.act_once"))
 	if not u.quick_used:
-		parts.append("1 quick card")
-	var rule := " or " if state.turn_mode == "move_or_act" and u.moved_steps == 0 and not u.action_used else ", "
-	return "This turn: %s.\nRed tiles: enemy attacks. Step off them to dodge, or strike first." % rule.join(PackedStringArray(parts))
+		parts.append(Strings.t("combat.1_quick_card"))
+	var rule := Strings.t("combat.or") if state.turn_mode == "move_or_act" and u.moved_steps == 0 and not u.action_used else ", "
+	return Strings.t("combat.this_turn_red_tiles_enemy") % rule.join(PackedStringArray(parts))
 
 
 func _refresh_hand() -> void:
@@ -370,7 +370,7 @@ func _refresh_hand() -> void:
 		if _player_turn() and block != "":
 			b.tooltip_text += "\n" + block
 		elif bool(card.get("quick", false)):
-			b.tooltip_text += "\nQuick: doesn't use your action (once a turn)."
+			b.tooltip_text += Strings.t("combat.quick_doesn_t_use_your")
 		var idx := i
 		b.pressed.connect(func() -> void: _on_card(idx))
 		b.mouse_entered.connect(func() -> void: _hover_card_changed(idx))
@@ -431,7 +431,7 @@ func _likely_target(cells: Array) -> Vector2i:
 func _show_card_info(i: int) -> void:
 	var card := state.card_of(state.current, i)
 	if not card.is_empty():
-		_info.text = "%s (%d MP)\n%s" % [card.get("name", ""), state.card_cost(state.current, card), CardRules.describe(DataDB.all(), card)]
+		_info.text = Strings.t("combat.mp") % [card.get("name", ""), state.card_cost(state.current, card), CardRules.describe(DataDB.all(), card)]
 
 
 func _player_turn() -> bool:
@@ -494,7 +494,7 @@ func _preview(card: Dictionary, improvised: bool, guess: bool = false) -> void:
 	field.footprint_color = fc
 	field.push_marks = p.get("pushes", [])
 	var hostile := 0
-	var lines: Array = ["%s: %d MP" % [card.get("name", ""), int(p["cost"])]]
+	var lines: Array = [Strings.t("combat.mp_2") % [card.get("name", ""), int(p["cost"])]]
 	for h in p["hits"]:
 		var t := state.unit_by_id(str(h["unit"]))
 		var nm: String = t.name if t != null else str(h["unit"])
@@ -510,19 +510,19 @@ func _preview(card: Dictionary, improvised: bool, guess: bool = false) -> void:
 		if t != null:
 			field.preview_labels[t.cell] = tag
 	if hostile > 1:
-		lines.append("Hits %d enemies" % hostile)
+		lines.append(Strings.t("combat.hits_enemies") % hostile)
 	for m in p.get("pushes", []):
 		var t := state.unit_by_id(str(m["unit"]))
-		var what := "lands in a hazard" if bool(m["hazard"]) else ("slides on ice" if bool(m["slide"]) else "")
+		var what := Strings.t("combat.lands_in_a_hazard") if bool(m["hazard"]) else (Strings.t("combat.slides_on_ice") if bool(m["slide"]) else "")
 		if bool(m["collide"]):
-			what = "slams into something (-%d)" % int(m["damage"])
+			what = Strings.t("combat.slams_into_something_2") % int(m["damage"])
 		if what != "" and t != null:
 			lines.append("%s %s" % [t.name, what])
 	for i in p.get("interrupts", []):
 		var t := state.unit_by_id(str(i["unit"]))
 		if t != null:
 			lines.append("%s: %s!" % [t.name, i["effect"]])
-	lines.append("Stable: %d%%" % roundi(float(p["chance"]) * 100.0))
+	lines.append(Strings.t("combat.stable") % roundi(float(p["chance"]) * 100.0))
 	_info.text = "\n".join(PackedStringArray(lines))
 
 
@@ -612,7 +612,7 @@ func _update_hover_info(at: Vector2) -> void:
 	var lines: Array = []
 	var t := state.unit_at(hover_cell)
 	if t != null and not t.dead:
-		lines.append("%s  HP %d/%d%s" % [t.name, t.hp, t.max_hp, "  MP %d/%d" % [t.mp, t.max_mp] if t.max_mp > 0 else ""])
+		lines.append(Strings.t("combat.hp") % [t.name, t.hp, t.max_hp, Strings.t("combat.mp_3") % [t.mp, t.max_mp] if t.max_mp > 0 else ""])
 		for s in state.status_list(t):
 			var info := UiTheme.status_info(str(s))
 			lines.append("%s: %s" % [info.get("name", s), info.get("text", "")])
@@ -622,21 +622,21 @@ func _update_hover_info(at: Vector2) -> void:
 			if act.has("name"):
 				plan = str(act["name"])
 			if int(t.intent.get("charge", 0)) > 0:
-				plan += " (charging, %d turn)" % int(t.intent["charge"])
+				plan += Strings.t("combat.charging_turn") % int(t.intent["charge"])
 			if str(t.intent.get("mode", "")) == "tracking":
-				plan += " (follows its target)"
-			lines.append("Next: " + plan)
+				plan += Strings.t("combat.follows_its_target")
+			lines.append(Strings.t("combat.next") + plan)
 	var ter := state.grid.get_terrain(hover_cell)
 	if ter != GridScript.FLOOR:
 		lines.append(ter.capitalize())
 	if state.grid.burning.has(hover_cell):
-		lines.append("Burning")
+		lines.append(Strings.t("combat.burning"))
 	if state.grid.steam.has(hover_cell):
-		lines.append("Steam (blocks sight)")
+		lines.append(Strings.t("combat.steam_blocks_sight"))
 	for h in state.threats().get(hover_cell, []):
 		var src := state.unit_by_id(str(h["unit"]))
 		if src != null:
-			lines.append("Threatened by %s: %d" % [src.name, int(h["damage"])])
+			lines.append(Strings.t("combat.threatened_by") % [src.name, int(h["damage"])])
 	if lines.is_empty():
 		_hover_info.visible = false
 		return
@@ -670,7 +670,7 @@ func _on_card(i: int) -> void:
 	if mode == "fuel":
 		wheel_fuel = i
 		mode = "wheel_target"
-		_info.text = "Aim the improvised spell. Burning %s as fuel." % state.card_of(u, i).get("name", "")
+		_info.text = Strings.t("combat.aim_the_improvised_spell_burning") % state.card_of(u, i).get("name", "")
 		_refresh_overlays()
 		_refresh_hud()
 		return
@@ -784,11 +784,11 @@ func _open_wheel() -> void:
 	_ui.add_child(_wheel)
 	var box := VBoxContainer.new()
 	_wheel.add_child(box)
-	box.add_child(UiTheme.label("Vector Wheel: improvise a spell", UiTheme.ACCENT))
+	box.add_child(UiTheme.label(Strings.t("combat.vector_wheel_improvise_a_spell"), UiTheme.ACCENT))
 	var db: Dictionary = DataDB.all()
 	var row := HBoxContainer.new()
 	box.add_child(row)
-	row.add_child(UiTheme.label("Vectors:"))
+	row.add_child(UiTheme.label(Strings.t("combat.vectors")))
 	for axis in u.known_vectors:
 		var a := str(axis)
 		var b := UiTheme.button(("[%s]" if wheel_vectors.has(a) else "%s") % a.capitalize(), func() -> void:
@@ -804,7 +804,7 @@ func _open_wheel() -> void:
 	var frow := HFlowContainer.new()
 	frow.custom_minimum_size = Vector2(250, 0)
 	box.add_child(frow)
-	frow.add_child(UiTheme.label("Form:"))
+	frow.add_child(UiTheme.label(Strings.t("combat.form")))
 	for f in u.known_forms:
 		var fid := str(f)
 		frow.add_child(UiTheme.button(("[%s]" if wheel_form == fid else "%s") % str(DataDB.record("forms", fid).get("name", fid)), func() -> void:
@@ -812,7 +812,7 @@ func _open_wheel() -> void:
 			_open_wheel()))
 	var mrow := HBoxContainer.new()
 	box.add_child(mrow)
-	mrow.add_child(UiTheme.label("Magnitude:"))
+	mrow.add_child(UiTheme.label(Strings.t("combat.magnitude")))
 	var cap := CardRules.magnitude_index(db, CardRules.max_magnitude(db, u.knowledge_tier))
 	if CardRules.magnitude_index(db, wheel_magnitude) > cap:
 		wheel_magnitude = "minor"
@@ -827,21 +827,21 @@ func _open_wheel() -> void:
 	var err := state.improvise_error(u, wheel_vectors, wheel_form, wheel_magnitude)
 	if not card.is_empty():
 		var cost := state.improvise_cost(u, card)
-		box.add_child(UiTheme.label("%s: %d MP + 1 card as fuel. Stable %d%%." % [card["name"], cost,
+		box.add_child(UiTheme.label(Strings.t("combat.mp_1_card_as_fuel") % [card["name"], cost,
 			roundi(Res.stability_chance(db, u.stability, cost, u.mp, true) * 100.0)]))
 	if err != "":
 		box.add_child(UiTheme.label(err, UiTheme.BAD))
 	var brow := HBoxContainer.new()
 	box.add_child(brow)
-	var aim := UiTheme.button("Pick fuel card, then aim", func() -> void:
+	var aim := UiTheme.button(Strings.t("combat.pick_fuel_card_then_aim"), func() -> void:
 		_wheel.queue_free()
 		_wheel = null
 		mode = "fuel"
-		_info.text = "Click a card in your hand to burn as fuel."
+		_info.text = Strings.t("combat.click_a_card_in_your")
 		_refresh_hud())
 	aim.disabled = err != ""
 	brow.add_child(aim)
-	brow.add_child(UiTheme.button("Close", _cancel))
+	brow.add_child(UiTheme.button(Strings.t("combat.close"), _cancel))
 
 
 # --- Events ---------------------------------------------------------------------------------------
@@ -928,8 +928,8 @@ func _nudge_back() -> void:
 func _play_event(e: Dictionary) -> void:
 	match str(e["t"]):
 		"round":
-			_say_banner("Round %d" % int(e["n"]))
-			_note("-- Round %d --" % int(e["n"]))
+			_say_banner(Strings.t("combat.round") % int(e["n"]))
+			_note(Strings.t("combat.round_2") % int(e["n"]))
 			await _wait(0.4)
 		"turn":
 			await _nudge_back()
@@ -942,7 +942,7 @@ func _play_event(e: Dictionary) -> void:
 					# Minions in a row act as one quick group: one banner, short pauses.
 					var group := u.role == "minion" and _last_turn_team == "minion"
 					if _last_turn_team != "enemy" and not group:
-						_say_banner("Minions" if u.role == "minion" else "Enemy turn")
+						_say_banner(Strings.t("combat.minions") if u.role == "minion" else Strings.t("combat.enemy_turn"))
 						await _wait(0.4)
 					_sync_views()
 					var v := _view_for_id(u.id)
@@ -972,7 +972,7 @@ func _play_event(e: Dictionary) -> void:
 				v.z_index = 10 + int(e["to"].y)
 				await tw.finished
 			if str(e["t"]) == "slide":
-				_note("%s slides across the ice." % _uname(str(e["unit"])))
+				_note(Strings.t("combat.slides_across_the_ice") % _uname(str(e["unit"])))
 		"undo":
 			_sync_views()
 		"cast":
@@ -991,7 +991,7 @@ func _play_event(e: Dictionary) -> void:
 				await _wait(0.25)
 		"charge":
 			var u := state.unit_by_id(str(e["unit"]))
-			var line := "%s is charging %s!" % [u.name if u != null else "?", e.get("name", "something big")]
+			var line := Strings.t("combat.is_charging") % [u.name if u != null else "?", e.get("name", Strings.t("combat.something_big"))]
 			_say_banner(line)
 			_note(line)
 			Audio.play_sfx("fail")
@@ -1037,27 +1037,27 @@ func _play_event(e: Dictionary) -> void:
 			else:
 				await _wait(0.15)
 		"heal":
-			_float_text(_view_for_id(str(e["unit"])), "+%d%s" % [int(e["amount"]), " up!" if bool(e.get("revived", false)) else ""], UiTheme.color("heal"))
-			_note("%s recovers %d HP%s." % [_uname(str(e["unit"])), int(e["amount"]), " and gets back up" if bool(e.get("revived", false)) else ""])
+			_float_text(_view_for_id(str(e["unit"])), "+%d%s" % [int(e["amount"]), Strings.t("combat.up") if bool(e.get("revived", false)) else ""], UiTheme.color("heal"))
+			_note(Strings.t("combat.recovers_hp") % [_uname(str(e["unit"])), int(e["amount"]), Strings.t("combat.and_gets_back_up") if bool(e.get("revived", false)) else ""])
 			Audio.play_sfx("heal")
 			await _wait(0.15)
 		"shield":
-			_float_text(_view_for_id(str(e["unit"])), "+%d shield" % int(e["amount"]), UiTheme.color("shield"))
+			_float_text(_view_for_id(str(e["unit"])), Strings.t("combat.shield_2") % int(e["amount"]), UiTheme.color("shield"))
 		"status":
 			var sname := str(UiTheme.status_info(str(e["status"])).get("name", e["status"]))
 			_float_text(_view_for_id(str(e["unit"])), sname, UiTheme.ACCENT)
 			_note("%s: %s." % [_uname(str(e["unit"])), sname])
 		"guard":
 			_float_text(_view_for_id(str(e["unit"])), "guard", UiTheme.DIM)
-			_note("%s guards." % _uname(str(e["unit"])))
+			_note(Strings.t("combat.guards") % _uname(str(e["unit"])))
 		"miss":
 			_float_text(_view_for_id(str(e["unit"])), "miss", UiTheme.DIM)
-			_note("The attack on %s misses." % _uname(str(e["unit"])))
+			_note(Strings.t("combat.the_attack_on_misses") % _uname(str(e["unit"])))
 		"collide":
-			_note("%s slams into something." % _uname(str(e["unit"])))
+			_note(Strings.t("combat.slams_into_something") % _uname(str(e["unit"])))
 			await _shake(2.0)
 		"down":
-			_note("%s is down!" % _uname(str(e["unit"])))
+			_note(Strings.t("combat.is_down") % _uname(str(e["unit"])))
 		"death", "vanish":
 			var u: UnitScript = null
 			for x in state.units:
@@ -1065,7 +1065,7 @@ func _play_event(e: Dictionary) -> void:
 					u = x
 			if u != null:
 				if str(e["t"]) == "death":
-					_note("%s is defeated." % u.name)
+					_note(Strings.t("combat.is_defeated") % u.name)
 				var v: Node2D = views[u]
 				var tw := create_tween()
 				tw.tween_property(v, "modulate", Color(1, 1, 1, 0), _dur(0.25))
@@ -1092,7 +1092,7 @@ func _play_event(e: Dictionary) -> void:
 		"log":
 			_note(str(e["text"]))
 		"glyph":
-			_note("A glyph flares!")
+			_note(Strings.t("combat.a_glyph_flares"))
 		"blink":
 			var v := _view_for_id(str(e["unit"]))
 			if v != null:
@@ -1103,13 +1103,13 @@ func _play_event(e: Dictionary) -> void:
 				tw.tween_property(v, "modulate", Color.WHITE, _dur(0.2))
 				await tw.finished
 		"telegraph":
-			_say_banner("%s is coming!" % str(e.get("name", "Something")))
-			_note("%s will land on the marked tiles." % str(e.get("name", "Something")))
+			_say_banner(Strings.t("combat.is_coming") % str(e.get("name", "Something")))
+			_note(Strings.t("combat.will_land_on_the_marked") % str(e.get("name", "Something")))
 			_sync_views()
 			await _wait(0.3)
 		"tiles":
 			if str(e.get("kind", "")) == "hazard":
-				_note("The floor breaks open. New hazards!")
+				_note(Strings.t("combat.the_floor_breaks_open_new"))
 			field.queue_redraw()
 		"end":
 			await _nudge_back()
@@ -1126,24 +1126,24 @@ func _damage_line(e: Dictionary) -> String:
 	if bool(e.get("crit", false)):
 		why.append("critical")
 	if int(e.get("absorbed", 0)) > 0:
-		why.append("%d absorbed" % int(e["absorbed"]))
+		why.append(Strings.t("combat.absorbed") % int(e["absorbed"]))
 	var cause := str(e.get("cause", "hit"))
 	var target := _uname(str(e["unit"]))
 	var line := ""
 	match cause:
 		"burn":
-			line = "%s burns for %d" % [target, int(e["amount"])]
+			line = Strings.t("combat.burns_for") % [target, int(e["amount"])]
 		"hazard":
-			line = "%s takes %d from the hazard" % [target, int(e["amount"])]
+			line = Strings.t("combat.takes_from_the_hazard") % [target, int(e["amount"])]
 		"collision":
-			line = "%s takes %d from the collision" % [target, int(e["amount"])]
+			line = Strings.t("combat.takes_from_the_collision") % [target, int(e["amount"])]
 		"fatigue":
-			line = "%s takes %d Fatigue" % [target, int(e["amount"])]
+			line = Strings.t("combat.takes_fatigue") % [target, int(e["amount"])]
 		"backlash":
-			line = "The spell backlashes on %s for %d" % [target, int(e["amount"])]
+			line = Strings.t("combat.the_spell_backlashes_on_for") % [target, int(e["amount"])]
 		_:
 			var src := str(e.get("source", ""))
-			line = "%s hit %s for %d" % [_uname(src) if src != "" else "Something", target, int(e["amount"])]
+			line = Strings.t("combat.hit_for") % [_uname(src) if src != "" else "Something", target, int(e["amount"])]
 	if not why.is_empty():
 		line += " (%s)" % ", ".join(PackedStringArray(why))
 	return line + "."
@@ -1159,7 +1159,7 @@ func _view_for_id(id: String) -> Node2D:
 func _float_text(v: Node2D, text: String, color: Color) -> void:
 	if v == null:
 		return
-	var l := UiTheme.world_label(text, color)
+	var l := UiTheme.world_label(text, color, "damage")
 	# Texts on the same unit at the same time stack upward instead of overlapping.
 	var slot := int(_float_slots.get(v, 0))
 	_float_slots[v] = slot + 1
@@ -1226,14 +1226,14 @@ func _finish() -> void:
 	_ui.add_child(_result_panel)
 	var box := VBoxContainer.new()
 	_result_panel.add_child(box)
-	var title := str({ "win": "Victory", "flee": "You got away", "lose": "You fell" }.get(result, result))
-	box.add_child(UiTheme.label(title, UiTheme.ACCENT, UiTheme.TITLE_SIZE))
+	var title := str({ "win": "Victory", "flee": Strings.t("combat.you_got_away"), "lose": Strings.t("combat.you_fell") }.get(result, result))
+	box.add_child(UiTheme.role_label(title, "title", UiTheme.ACCENT))
 	for line in outcome.get("lines", []):
 		var l := UiTheme.label(str(line))
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.custom_minimum_size = Vector2(230, 0)
 		box.add_child(l)
-	var cont := UiTheme.button("Continue", func() -> void: GameState.leave_combat())
+	var cont := UiTheme.button(Strings.t("combat.continue"), func() -> void: GameState.leave_combat())
 	box.add_child(cont)
 	cont.grab_focus()
 	if GameState.dev_autoplay:

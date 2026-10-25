@@ -24,6 +24,7 @@ config/features=PackedStringArray("4.7", "GL Compatibility")
 EventBus="*res://src/autoload/event_bus.gd"
 InputSetup="*res://src/autoload/input_setup.gd"
 DataDB="*res://src/autoload/data_db.gd"
+Strings="*res://src/autoload/strings.gd"
 Rng="*res://src/autoload/rng.gd"
 Display="*res://src/autoload/display.gd"
 Assets="*res://src/autoload/assets.gd"

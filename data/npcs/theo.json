@@ -3,6 +3,7 @@
   "name": "Theo",
   "role": "Student (Core Four)",
   "home": "theo_house",
+  "voice": { "id": "voice_theo", "pitch": 0.95 },
   "sprite": "npc_theo_walk",
   "portrait": "portrait_theo",
   "startBond": 5,

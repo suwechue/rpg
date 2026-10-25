@@ -3,6 +3,7 @@
   "name": "Ms. Marlowe",
   "role": "Librarian",
   "home": "elm_apartments",
+  "voice": { "id": "voice_default", "pitch": 1.23 },
   "sprite": "npc_ms_marlowe_walk",
   "portrait": "portrait_ms_marlowe",
   "startBond": 5,

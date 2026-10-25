@@ -3,6 +3,7 @@
   "name": "Diane",
   "role": "Student",
   "home": "diane_house",
+  "voice": { "id": "voice_default", "pitch": 1.18 },
   "sprite": "npc_diane_walk",
   "portrait": "portrait_diane",
   "startBond": 5,

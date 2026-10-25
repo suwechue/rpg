@@ -169,7 +169,7 @@ func _detention() -> void:
 	if not pick.is_empty():
 		await show_event(pick)
 	Calendar.set_ap(0)
-	Narrator.say("Detention ate your afternoon. The clock in Mr. B's office runs slow on purpose.")
+	Narrator.say(Strings.t("flow.detention_ate_your_afternoon_the"))
 
 
 ## The evening Upside-Down. Until the dungeon scene exists, it is skipped.
@@ -190,7 +190,7 @@ func enter_dungeon() -> void:
 		set_hud(false)
 		SceneRouter.goto(DUNGEON_SCENE)
 		return
-	Narrator.say("The spark tugs at you at dusk... and lets go. (The Upside-Down opens in a later build.)")
+	Narrator.say(Strings.t("flow.the_spark_tugs_at_you"))
 	GameState.advance_part()
 
 
@@ -232,7 +232,7 @@ func play_inline_story(id: String) -> void:
 			"foreshadow":
 				var l := Narrator.line("foreshadow")
 				Narrator.say(l)
-				await show_event({ "title": "The narrator", "text": l })
+				await show_event({ "title": Strings.t("flow.the_narrator"), "text": l })
 
 
 ## Permadeath: the save goes, the narrator gives the ending, back to the title.
@@ -242,15 +242,15 @@ func _on_run_ended(cause: String) -> void:
 	set_hud(false)
 	SaveSystem.delete_save()
 	var endings: Dictionary = DataDB.table("endings").get("deaths", {})
-	var text := str(endings.get(cause, endings.get("default", "And that was the end of that.")))
+	var text := str(endings.get(cause, endings.get("default", Strings.t("flow.and_that_was_the_end"))))
 	Audio.play_music("death")
 	_busy = false
 	var p: Dictionary = GameState.player
-	var summary := "Week %d, %s. Level %d %s. %d days survived. Roster: %d. Kelly Risk: %d." % [Calendar.week(), Calendar.day_name().capitalize(),
+	var summary := Strings.t("flow.week_level_days_survived_roster") % [Calendar.week(), Calendar.day_name().capitalize(),
 		int(p.get("level", 1)), str(p.get("class", "")).capitalize(), int(GameState.run.get("day_count", 0)), GameState.roster.size(), int(GameState.run.get("kelly_risk", 0))]
 	var jr: Dictionary = Journal.data
-	var journal_line := "The Narrator's Journal now holds %d lore entries and %d creatures. Runs: %d." % [jr.get("lore", {}).size(), jr.get("enemies", {}).size(), int(jr.get("runs", 0))]
-	await show_event({ "title": "The End (of this run)", "text": "%s
+	var journal_line := Strings.t("flow.the_narrator_s_journal_now") % [jr.get("lore", {}).size(), jr.get("enemies", {}).size(), int(jr.get("runs", 0))]
+	await show_event({ "title": Strings.t("flow.the_end_of_this_run"), "text": "%s
 
 %s
 %s

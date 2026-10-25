@@ -37,7 +37,7 @@ func _draw() -> void:
 	var s := ""
 	for v in _scores:
 		s += "%d%%  " % roundi(float(v) * 100.0)
-	draw_frame("Ring %d/3   %s" % [mini(_locked + 1, 3), s])
+	draw_frame(Strings.t("alignment_minigame.ring_3") % [mini(_locked + 1, 3), s])
 	var center := box.position + Vector2(box.size.x / 2.0, 90)
 	draw_line(center + Vector2(0, -52), center + Vector2(0, -40), Color("8fd694"), 2.0)
 	for i in 3:

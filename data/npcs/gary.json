@@ -3,6 +3,7 @@
   "name": "Gary",
   "role": "Deli owner",
   "home": "garys_apartment",
+  "voice": { "id": "voice_gary", "pitch": 0.8 },
   "sprite": "npc_gary_walk",
   "portrait": "portrait_gary",
   "startBond": 15,

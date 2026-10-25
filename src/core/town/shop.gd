@@ -3,6 +3,8 @@
 class_name TownShop
 extends RefCounted
 
+const Str := preload("res://src/core/strings.gd")
+
 const DT := preload("res://src/core/data_tables.gd")
 const Fx := preload("res://src/core/run/effects.gd")
 const Char := preload("res://src/core/character.gd")
@@ -58,10 +60,10 @@ static func entry_name(db: Dictionary, entry: Dictionary) -> String:
 ## Buy one entry. Returns { "ok": bool, "lines": [...] }.
 static func buy(db: Dictionary, run: Dictionary, shop_id: String, entry: Dictionary, rng: RandomNumberGenerator) -> Dictionary:
 	if not Fx.conditions_met(db, run, entry.get("cond", {}), {}):
-		return { "ok": false, "lines": [str(entry.get("lockedHint", "Not for you. Not yet."))] }
+		return { "ok": false, "lines": [str(entry.get("lockedHint", Str.t(db, "shop.not_for_you_not_yet")))] }
 	var cost := price(db, run, shop_id, entry)
 	if cost > int(run.get("money", 0)):
-		return { "ok": false, "lines": ["You can't afford that ($%d)." % cost] }
+		return { "ok": false, "lines": [Str.t(db, "shop.you_can_t_afford_that") % cost] }
 	run["money"] = int(run["money"]) - cost
 	var lines: Array = ["-$%d" % cost]
 	match str(entry.get("type", "")):
@@ -72,7 +74,7 @@ static func buy(db: Dictionary, run: Dictionary, shop_id: String, entry: Diction
 				for m in run.get("roster", []):
 					if int(m.get("injured", 0)) > 0:
 						m["injured"] = 0
-						lines.append("%s is patched up." % m.get("name", "?"))
+						lines.append(Str.t(db, "shop.is_patched_up") % m.get("name", "?"))
 			if fx.has("hp") and int(fx["hp"]) >= 999:
 				fx["hp"] = int(Char.derived(db, run["player"])["maxHp"])
 			lines.append_array(Fx.apply(db, run, fx, rng, {}))
@@ -84,17 +86,17 @@ static func buy(db: Dictionary, run: Dictionary, shop_id: String, entry: Diction
 			var deck: Array = run["player"]["deck"]
 			if deck.size() < Char.deck_max(db, run["player"]) and deck.count(cid) < int(db.get("leveling", {}).get("maxCopies", 3)):
 				deck.append(cid)
-				lines.append("%s added to your deck." % entry_name(db, entry))
+				lines.append(Str.t(db, "shop.added_to_your_deck") % entry_name(db, entry))
 			else:
-				lines.append("%s added to your collection." % entry_name(db, entry))
+				lines.append(Str.t(db, "shop.added_to_your_collection") % entry_name(db, entry))
 		"item":
 			var iid := str(entry["item"])
 			Fx.add_item(run, iid, 1)
-			lines.append("Got %s." % entry_name(db, entry))
+			lines.append(Str.t(db, "shop.got") % entry_name(db, entry))
 			var it := item(db, iid)
 			if str(it.get("kind", "")) == "equipment" and run["player"]["equipment"].get(str(it.get("slot", ""))) == null:
 				equip(db, run, run["player"], iid)
-				lines.append("Equipped.")
+				lines.append(Str.t(db, "shop.equipped"))
 	return { "ok": true, "lines": lines }
 
 
@@ -115,9 +117,9 @@ static func sell(db: Dictionary, run: Dictionary, item_id: String) -> int:
 static func equip(db: Dictionary, run: Dictionary, ch: Dictionary, item_id: String) -> String:
 	var it := item(db, item_id)
 	if str(it.get("kind", "")) != "equipment":
-		return "You can't equip that."
+		return Str.t(db, "shop.you_can_t_equip_that")
 	if int(run.get("inventory", {}).get(item_id, 0)) <= 0:
-		return "You don't have it."
+		return Str.t(db, "shop.you_don_t_have_it")
 	var slot := str(it.get("slot", ""))
 	var old: Variant = ch["equipment"].get(slot)
 	Fx.add_item(run, item_id, -1)

@@ -3,6 +3,7 @@
   "name": "Kayla",
   "role": "Cheer squad",
   "home": "kayla_house",
+  "voice": { "id": "voice_default", "pitch": 0.95 },
   "sprite": "npc_kayla_walk",
   "portrait": "portrait_kayla",
   "startBond": 0,

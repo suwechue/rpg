@@ -3,6 +3,7 @@
   "name": "Sam",
   "role": "Student",
   "home": "sam_estate",
+  "voice": { "id": "voice_default", "pitch": 0.86 },
   "sprite": "npc_sam_walk",
   "portrait": "portrait_sam",
   "startBond": 15,

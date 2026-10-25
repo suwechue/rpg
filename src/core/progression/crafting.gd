@@ -11,6 +11,8 @@
 class_name Crafting
 extends RefCounted
 
+const Str := preload("res://src/core/strings.gd")
+
 const VO := preload("res://src/core/vector_ops.gd")
 const DT := preload("res://src/core/data_tables.gd")
 const CardRules := preload("res://src/core/card.gd")
@@ -121,27 +123,27 @@ static func copy(run: Dictionary, card_id: String) -> bool:
 static func deck_error(db: Dictionary, run: Dictionary, ch: Dictionary, deck: Array) -> String:
 	var lv: Dictionary = db.get("leveling", {})
 	if deck.size() < int(lv.get("deckMin", 10)):
-		return "A deck needs at least %d cards." % int(lv.get("deckMin", 10))
+		return Str.t(db, "crafting.a_deck_needs_at_least") % int(lv.get("deckMin", 10))
 	if deck.size() > Char.deck_max(db, ch):
-		return "This deck can hold at most %d cards." % Char.deck_max(db, ch)
+		return Str.t(db, "crafting.this_deck_can_hold_at") % Char.deck_max(db, ch)
 	var counts := {}
 	for id in deck:
 		counts[id] = int(counts.get(id, 0)) + 1
 	for id in counts:
 		if int(counts[id]) > int(lv.get("maxCopies", 3)):
-			return "No more than %d copies of a design." % int(lv.get("maxCopies", 3))
+			return Str.t(db, "crafting.no_more_than_copies_of") % int(lv.get("maxCopies", 3))
 		if int(counts[id]) > owned(run, ch, str(id)):
-			return "You only own %d of %s." % [owned(run, ch, str(id)), id]
+			return Str.t(db, "crafting.you_only_own_of") % [owned(run, ch, str(id)), id]
 		var card := CardRules.resolve(db, str(id), run.get("cards", {}))
 		if card.is_empty():
-			return "Unknown card %s." % id
+			return Str.t(db, "crafting.unknown_card") % id
 		# Designs you made need the knowledge; named cards (learned, bought, found) don't.
 		if CardRules.is_spell(card) and str(id).begins_with(CardRules.SPELL_PREFIX):
 			for v in CardRules.ordered_vectors(db, card.get("vectors", {})):
 				if not ch.get("knownVectors", []).has(v):
-					return "%s doesn't know %s." % [ch.get("name", "?"), str(v).capitalize()]
+					return Str.t(db, "crafting.doesn_t_know") % [ch.get("name", "?"), str(v).capitalize()]
 			if not ch.get("knownForms", []).has(str(card.get("form", ""))):
-				return "%s doesn't know the %s Form." % [ch.get("name", "?"), card.get("form", "")]
+				return Str.t(db, "crafting.doesn_t_know_the_form") % [ch.get("name", "?"), card.get("form", "")]
 	return ""
 
 

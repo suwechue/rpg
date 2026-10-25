@@ -4,6 +4,8 @@
 class_name DungeonSignature
 extends RefCounted
 
+const Str := preload("res://src/core/strings.gd")
+
 const VO := preload("res://src/core/vector_ops.gd")
 const DT := preload("res://src/core/data_tables.gd")
 
@@ -28,7 +30,7 @@ static func dominant(db: Dictionary, run: Dictionary, week: int) -> String:
 
 ## The hint line for the week's dominant axis (shown, never the numbers).
 static func hint(db: Dictionary, run: Dictionary, week: int) -> String:
-	return str(week_rec(db, week).get("hints", {}).get(dominant(db, run, week), "The air feels strange tonight."))
+	return str(week_rec(db, week).get("hints", {}).get(dominant(db, run, week), Str.t(db, "signature.the_air_feels_strange_tonight")))
 
 
 ## Enemies that can appear this week at this tier, weighted by

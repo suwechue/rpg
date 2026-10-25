@@ -3,6 +3,7 @@
   "name": "Phase",
   "role": "Student",
   "home": "phase_house",
+  "voice": { "id": "voice_default", "pitch": 0.94 },
   "sprite": "npc_phase_walk",
   "portrait": "portrait_phase",
   "startBond": 10,

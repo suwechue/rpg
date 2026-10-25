@@ -51,7 +51,7 @@ var schedule: Array:
 
 
 ## Start a fresh run. Pass a seed to replay a run exactly; -1 picks one.
-func new_run(seed_value: int = -1, class_id: String = "mage", player_name: String = "New Kid", opts: Dictionary = {}) -> void:
+func new_run(seed_value: int = -1, class_id: String = "mage", player_name: String = Strings.t("game_state.new_kid"), opts: Dictionary = {}) -> void:
 	if seed_value < 0:
 		seed_value = absi(hash(Time.get_ticks_usec() + int(Time.get_unix_time_from_system()))) % 2147483647
 	Rng.reseed(seed_value)
@@ -211,7 +211,7 @@ func add_debug_ally(class_id: String) -> void:
 	if run.is_empty():
 		new_run()
 	var id := "debug_%s_%d" % [class_id, roster.size()]
-	var ch := Char.create(DataDB.all(), class_id, Rng.stream("creation"), { "id": id, "name": "Debug %s" % class_id.capitalize() })
+	var ch := Char.create(DataDB.all(), class_id, Rng.stream("creation"), { "id": id, "name": Strings.t("game_state.debug") % class_id.capitalize() })
 	ch["sprite"] = Assets.role("debugAlly")
 	roster.append(ch)
 	party_ids.append(id)
@@ -232,22 +232,22 @@ func finish_combat(summary: Dictionary) -> Dictionary:
 	var result := str(summary.get("result", ""))
 	if result == "win":
 		money += int(summary.get("money", 0))
-		lines.append("+%d XP each, +$%d" % [int(summary.get("xp", 0)), int(summary.get("money", 0))])
+		lines.append(Strings.t("game_state.xp_each") % [int(summary.get("xp", 0)), int(summary.get("money", 0))])
 		EventBus.money_changed.emit(money)
 	elif result == "flee":
-		lines.append("You leave the room's loot behind.")
+		lines.append(Strings.t("game_state.you_leave_the_room_s"))
 	for p in summary.get("party", []):
 		var ch := character(str(p["id"]))
 		if ch.is_empty():
 			continue
 		if bool(p.get("downed", false)) and not ch.get("isPlayer", false):
 			ch["injured"] = int(DataDB.table("leveling").get("injuryDays", 2))
-			lines.append("%s is injured and will need the hospital." % ch.get("name", "?"))
+			lines.append(Strings.t("game_state.is_injured_and_will_need") % ch.get("name", "?"))
 		if result == "win" and int(summary.get("xp", 0)) > 0:
 			for r in give_xp(str(p["id"]), int(summary.get("xp", 0))):
-				lines.append("%s reached level %d!" % [ch.get("name", "?"), int(r["level"])])
+				lines.append(Strings.t("game_state.reached_level") % [ch.get("name", "?"), int(r["level"])])
 	if result == "lose":
-		lines.append("You're knocked out." if combat_context == "arena" else "The Upside-Down keeps you.")
+		lines.append(Strings.t("game_state.you_re_knocked_out") if combat_context == "arena" else Strings.t("game_state.the_upside_down_keeps_you"))
 	else:
 		var survivors: Array = []
 		for p in summary.get("party", []):

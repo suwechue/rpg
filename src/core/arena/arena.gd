@@ -5,6 +5,8 @@
 ## one Dictionary (in the run as run["arena"] or run["rift"]).
 extends RefCounted
 
+const Str := preload("res://src/core/strings.gd")
+
 const DT := preload("res://src/core/data_tables.gd")
 const VO := preload("res://src/core/vector_ops.gd")
 const Enc := preload("res://src/core/dungeon/encounters.gd")
@@ -159,10 +161,10 @@ static func wave_won(db: Dictionary, arena: Dictionary, stats: Dictionary) -> Ar
 	var points := int(sc.get("perWave", 10))
 	if int(stats.get("damageTaken", 1)) == 0:
 		points += int(sc.get("noDamage", 5))
-		lines.append("No damage taken!")
+		lines.append(Str.t(db, "arena.no_damage_taken"))
 	if int(stats.get("rounds", 99)) <= int(sc.get("fastRounds", 4)):
 		points += int(sc.get("fastClear", 3))
-		lines.append("Fast clear!")
+		lines.append(Str.t(db, "arena.fast_clear"))
 	points += int(stats.get("multiVector", 0)) * int(sc.get("multiVector", 2))
 	points += arena.get("mutators", []).size() * int(sc.get("perMutator", 3))
 	points = roundi(float(points) * float(mutator_effect(arena, "scoreMul", 1.0)))
@@ -179,7 +181,7 @@ static func wave_won(db: Dictionary, arena: Dictionary, stats: Dictionary) -> Ar
 		var cards: Array = rw.get("cards", [])
 		if not cards.is_empty():
 			p["cards"].append(cards[rng_for(arena, wave, "card").randi_range(0, cards.size() - 1)])
-	lines.push_front("Wave %d cleared: +%d points." % [wave, points])
+	lines.push_front(Str.t(db, "arena.wave_cleared_points") % [wave, points])
 	return lines
 
 

@@ -3,6 +3,7 @@
   "name": "Kris",
   "role": "Student",
   "home": "kris_house",
+  "voice": { "id": "voice_default", "pitch": 0.86 },
   "sprite": "npc_kris_walk",
   "portrait": "portrait_kris",
   "startBond": 10,

@@ -68,6 +68,6 @@ func draw_frame(status: String) -> void:
 	draw_rect(box, Color("141824"))
 	draw_rect(box, Color("ffd966"), false, 1.0)
 	var font: Font = UiTheme.font
-	draw_string(font, box.position + Vector2(10, 7 + UiTheme.FONT_SIZE), "%s minigame" % title, HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, Color("ffd966"))
+	draw_string(font, box.position + Vector2(10, 7 + UiTheme.FONT_SIZE), Strings.t("minigame_base.minigame") % title, HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, Color("ffd966"))
 	draw_string(font, box.position + Vector2(10, 30), hint, HORIZONTAL_ALIGNMENT_LEFT, box.size.x - 20, UiTheme.FONT_SIZE, Color("8c8fa3"))
 	draw_string(font, box.position + Vector2(10, box.size.y - 8), status, HORIZONTAL_ALIGNMENT_LEFT, box.size.x - 20, UiTheme.FONT_SIZE, Color("e8e6d8"))

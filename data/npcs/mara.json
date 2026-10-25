@@ -3,6 +3,7 @@
   "name": "Mara",
   "role": "Student (Core Four)",
   "home": "mara_house",
+  "voice": { "id": "voice_mara", "pitch": 1.1 },
   "sprite": "npc_mara_walk",
   "portrait": "portrait_mara",
   "startBond": 10,

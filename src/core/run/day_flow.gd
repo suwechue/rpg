@@ -3,6 +3,8 @@
 class_name DayFlow
 extends RefCounted
 
+const Str := preload("res://src/core/strings.gd")
+
 const RM := preload("res://src/core/run/run_model.gd")
 const School := preload("res://src/core/run/school.gd")
 const Char := preload("res://src/core/character.gd")
@@ -45,12 +47,12 @@ static func end_day(db: Dictionary, run: Dictionary) -> Array:
 			var cls := preload("res://src/core/progression/class_change.gd").auto_advance(db, run, m)
 			if cls != "":
 				var cname := str(db.get("classes", {}).get("classes", []).filter(func(c: Variant) -> bool: return str(c["id"]) == cls)[0].get("name", cls))
-				lines.append("%s grew into %s %s." % [m.get("name", "?"), "an" if "AEIOU".contains(cname.left(1)) else "a", cname])
+				lines.append(Str.t(db, "day_flow.grew_into") % [m.get("name", "?"), "an" if "AEIOU".contains(cname.left(1)) else "a", cname])
 		Char.full_restore(db, m)
 		if int(m.get("injured", 0)) > 0:
 			m["injured"] = int(m["injured"]) - 1
 			if int(m["injured"]) == 0:
-				lines.append("%s is out of the hospital." % m.get("name", "?"))
+				lines.append(Str.t(db, "day_flow.is_out_of_the_hospital") % m.get("name", "?"))
 	School.new_day(run)
 	run["day_count"] = int(run.get("day_count", 0)) + 1
 	return lines

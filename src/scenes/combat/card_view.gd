@@ -34,7 +34,7 @@ func setup(p_card: Dictionary, p_cost: int) -> void:
 		if Assets.has(str(id)) or Assets.custom_file(str(id)) != "":
 			_art = Assets.texture(str(id))
 			break
-	tooltip_text = "%s (%d MP)\n%s" % [card.get("name", ""), cost, CardRules.describe(db, card)]
+	tooltip_text = Strings.t("card_view.mp") % [card.get("name", ""), cost, CardRules.describe(db, card)]
 	queue_redraw()
 
 

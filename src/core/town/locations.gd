@@ -5,6 +5,8 @@
 class_name TownLocations
 extends RefCounted
 
+const Str := preload("res://src/core/strings.gd")
+
 const DT := preload("res://src/core/data_tables.gd")
 const RM := preload("res://src/core/run/run_model.gd")
 const Fx := preload("res://src/core/run/effects.gd")
@@ -40,18 +42,18 @@ static func in_hours(r: Dictionary, part: String) -> bool:
 static func closed_reason(db: Dictionary, run: Dictionary, id: String, week: int, part: String) -> String:
 	var r := rec(db, id)
 	if r.is_empty():
-		return "Nothing here."
+		return Str.t(db, "locations.nothing_here")
 	var st := status(db, run, id)
 	if st == "CLOSED" or st == "STORY":
-		return str(r.get("doorLine", "It's shut."))
+		return str(r.get("doorLine", Str.t(db, "locations.it_s_shut")))
 	if week < int(r.get("openFromWeek", 0)):
-		return str(r.get("lockedLine", "Not yet."))
+		return str(r.get("lockedLine", Str.t(db, "locations.not_yet")))
 	if r.has("gate") and not Fx.conditions_met(db, run, { "minStat": r["gate"] }, {}):
-		return str(r.get("lockedLine", "You can't get in."))
+		return str(r.get("lockedLine", Str.t(db, "locations.you_can_t_get_in")))
 	if st == "EXTERIOR" and not bool(r.get("walkUp", false)):
-		return str(r.get("doorLine", "Nobody answers."))
+		return str(r.get("doorLine", Str.t(db, "locations.nobody_answers")))
 	if not in_hours(r, part):
-		return str(r.get("doorLine", "%s is closed right now." % r.get("name", "It")))
+		return str(r.get("doorLine", Str.t(db, "locations.is_closed_right_now") % r.get("name", "It")))
 	return ""
 
 

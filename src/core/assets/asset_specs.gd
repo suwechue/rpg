@@ -36,7 +36,7 @@ static func spec(db: Dictionary, id: String) -> Dictionary:
 
 static func exts_for(sp: Dictionary) -> Array:
 	match str(sp.get("kind", "")):
-		"music", "sfx":
+		"music", "sfx", "ambience":
 			return AUDIO_EXTS
 		"font":
 			return FONT_EXTS
@@ -165,6 +165,8 @@ static func referenced_ids(db: Dictionary) -> Dictionary:
 			for f in ["sprite", "portrait"]:
 				if db[key].has(f):
 					out[str(db[key][f])] = k
+			if db[key].has("voice"):
+				out[str(db[key]["voice"].get("id", "voice_default"))] = k + " voice"
 		elif k.begins_with("enemies/"):
 			for e in db[key].get("enemies", []):
 				if e.has("sprite"):
@@ -173,10 +175,14 @@ static func referenced_ids(db: Dictionary) -> Dictionary:
 		out[str(p)] = "town/styles"
 	if db.get("dungeon", {}).has("tileset"):
 		out[str(db["dungeon"]["tileset"])] = "dungeon"
-	for group in ["music", "sfx"]:
-		var a: Dictionary = db.get("audio", {}).get(group, {})
-		for k in a:
-			out[str(a[k])] = "audio %s" % k
+	for k in db.get("audio", {}).get("music", {}):
+		var t: Variant = db["audio"]["music"][k]
+		out[str(t.get("id", "") if t is Dictionary else t)] = "audio music %s" % k
+	for k in db.get("audio", {}).get("ambience", {}):
+		out[str(db["audio"]["ambience"][k])] = "audio ambience %s" % k
+	for k in db.get("audio_events", {}).get("events", {}):
+		for id in db["audio_events"]["events"][k].get("ids", []):
+			out[str(id)] = "audio event %s" % k
 	var roles: Dictionary = db.get("assets/roles", {})
 	for k in roles:
 		if k != "comment":
@@ -217,7 +223,7 @@ static func validate(db: Dictionary) -> Array:
 		if str(sp.get("kind", "")) == "tile":
 			if str(all.get(str(sp.get("tileset", "")), {}).get("kind", "")) != "tileset":
 				errors.append("asset %s: tileset '%s' is not a tileset id" % [id, sp.get("tileset")])
-		elif not sp.has("source"):
+		elif not sp.has("source") and not bool(sp.get("planned", false)):
 			errors.append("asset %s: no source" % id)
 	var refs := referenced_ids(db)
 	for id in refs:

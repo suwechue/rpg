@@ -1,35 +1,248 @@
 {
-  "comment": "Music and sound ids used by the game -> asset ids in data/assets/manifest.json.",
+  "comment": "Music by situation (asset ids, volume, loop, crossfade seconds) and ambience loops by situation. Replacing a track = drop assets/custom/music/<id>.ogg. Sound effects are events in data/audio_events.json.",
   "musicVolumeDb": -10,
   "sfxVolumeDb": -6,
+  "ambienceVolumeDb": -16,
+  "voiceVolumeDb": -10,
   "music": {
-    "title": "music_title",
-    "town": "music_town",
-    "school": "music_school",
-    "weekend": "music_weekend",
-    "night": "music_night",
-    "dungeon": "music_dungeon",
-    "dungeon_boss_floor": "music_dungeon_boss_floor",
-    "battle": "music_battle",
-    "battle_boss": "music_battle_boss",
-    "death": "music_death",
-    "story": "music_story",
-    "reveal": "music_reveal",
-    "ending": "music_ending"
+    "title": {
+      "id": "music_title",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "town": {
+      "id": "music_town",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "school": {
+      "id": "music_school",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "weekend": {
+      "id": "music_weekend",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "night": {
+      "id": "music_night",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "dungeon": {
+      "id": "music_dungeon",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "dungeon_boss_floor": {
+      "id": "music_dungeon_boss_floor",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "battle": {
+      "id": "music_battle",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "battle_boss": {
+      "id": "music_battle_boss",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "death": {
+      "id": "music_death",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "story": {
+      "id": "music_story",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "reveal": {
+      "id": "music_reveal",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "ending": {
+      "id": "music_ending",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "town_morning": {
+      "id": "music_town_morning",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "town_after_school": {
+      "id": "music_town_after_school",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "town_night": {
+      "id": "music_night",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "zone_school": {
+      "id": "music_school",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "zone_downtown": {
+      "id": "music_zone_downtown",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "zone_residential": {
+      "id": "music_zone_residential",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "zone_outskirts": {
+      "id": "music_zone_outskirts",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "upside_down_week1": {
+      "id": "music_dungeon",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "upside_down_week2": {
+      "id": "music_upside_down_week2",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "upside_down_week3": {
+      "id": "music_upside_down_week3",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "upside_down_week4": {
+      "id": "music_upside_down_week4",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "upside_down_week5": {
+      "id": "music_upside_down_week5",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "combat": {
+      "id": "music_battle",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "elite": {
+      "id": "music_elite",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "boss_hollow_mascot": {
+      "id": "music_battle_boss",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "boss_cold_cut": {
+      "id": "music_battle_boss",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "boss_forge_revenant": {
+      "id": "music_battle_boss",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "boss_night_ward": {
+      "id": "music_battle_boss",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "boss_mirror_town": {
+      "id": "music_battle_boss",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "cutscene_tense": {
+      "id": "music_cutscene_tense",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "cutscene_sad": {
+      "id": "music_cutscene_sad",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "cutscene_funny": {
+      "id": "music_cutscene_funny",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "arena": {
+      "id": "music_arena",
+      "volumeDb": 0,
+      "loop": true,
+      "crossfade": 0.8
+    },
+    "victory": {
+      "id": "jingle_victory",
+      "volumeDb": 0,
+      "loop": false,
+      "crossfade": 0.0
+    },
+    "defeat": {
+      "id": "jingle_defeat",
+      "volumeDb": 0,
+      "loop": false,
+      "crossfade": 0.0
+    }
   },
-  "sfx": {
-    "cast": "sfx_cast",
-    "hit": "sfx_hit",
-    "heal": "sfx_heal",
-    "fail": "sfx_fail",
-    "win": "sfx_win",
-    "lose": "sfx_lose",
-    "levelup": "sfx_levelup",
-    "click": "sfx_click",
-    "cancel": "sfx_cancel",
-    "coin": "sfx_coin",
-    "door": "sfx_door",
-    "step": "sfx_step",
-    "secret": "sfx_secret"
+  "ambience": {
+    "town_day": "amb_town_day",
+    "town_night": "amb_town_night",
+    "school": "amb_school_hall",
+    "upside_down_week1": "amb_upside_down_week1",
+    "upside_down_week2": "amb_upside_down_week2",
+    "upside_down_week3": "amb_upside_down_week3",
+    "upside_down_week4": "amb_upside_down_week4",
+    "upside_down_week5": "amb_upside_down_week5",
+    "arena": "amb_rift"
   }
 }

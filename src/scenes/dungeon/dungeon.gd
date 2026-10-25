@@ -65,7 +65,7 @@ func _ready() -> void:
 		await _after_fight(int(GameState.run["floor_fight"]))
 	elif not GameState.run.has("floor_pos"):
 		var intro := str(Sig.week_rec(db, _week).get("bossIntro" if bool(floor_data.get("boss", false)) else "intro", ""))
-		Narrator.say(intro if bool(floor_data.get("boss", false)) else "The Upside-Down rebuilds itself every night. Tonight it smells like %s." % Sig.dominant(db, GameState.run, _week))
+		Narrator.say(intro if bool(floor_data.get("boss", false)) else Strings.t("dungeon.the_upside_down_rebuilds_itself") % Sig.dominant(db, GameState.run, _week))
 	_refresh()
 
 
@@ -286,7 +286,7 @@ func _front_feature() -> Dictionary:
 
 func _update_prompt() -> void:
 	var room := _front_feature()
-	var labels := { "treasure": "Open the chest", "rest": "Rest by the fire", "merchant": "Browse the merchant", "event": "Approach the figure", "exit": "Leave the Upside-Down", "start": "" }
+	var labels := { "treasure": Strings.t("dungeon.open_the_chest"), "rest": Strings.t("dungeon.rest_by_the_fire"), "merchant": Strings.t("dungeon.browse_the_merchant"), "event": Strings.t("dungeon.approach_the_figure"), "exit": Strings.t("dungeon.leave_the_upside_down"), "start": "" }
 	var t := str(room.get("type", ""))
 	_prompt.text = ("[E] %s" % labels[t]) if labels.has(t) and str(labels[t]) != "" and not (t in ["treasure", "event", "rest"] and bool(room.get("cleared", false))) else ""
 
@@ -308,7 +308,7 @@ func interact() -> void:
 			if not bool(room.get("cleared", false)):
 				var lines := Night.rest(db, GameState.run, room)
 				Audio.play_sfx("heal")
-				await Flow.show_event({ "title": "A strange fire", "text": "\n".join(PackedStringArray(lines)) })
+				await Flow.show_event({ "title": Strings.t("dungeon.a_strange_fire"), "text": "\n".join(PackedStringArray(lines)) })
 		"merchant":
 			var s := ShopScreen.new()
 			s.shop_id = str(db.get("dungeon", {}).get("merchant", {}).get("shop", "upside_merchant"))
@@ -329,14 +329,14 @@ func interact() -> void:
 
 func _exit_prompt() -> void:
 	var m := Modal.new()
-	m.build("The way out", 320)
+	m.build(Strings.t("dungeon.the_way_out"), 320)
 	var left := 0
 	for r in floor_data["rooms"]:
 		if str(r["type"]) in ["combat", "elite", "treasure", "event"] and not bool(r.get("cleared", false)):
 			left += 1
-	m.text("A staircase up into the real night. %s" % ("Rooms left unexplored: %d. Leaving now trades their loot and XP for safety." % left if left > 0 else "Nothing left down here worth staying for."), UiTheme.DIM)
-	m.add_button("Leave the Upside-Down", func() -> void: m.finish(true))
-	m.add_button("Not yet", func() -> void: m.finish(false))
+	m.text(Strings.t("dungeon.a_staircase_up_into_the") % (Strings.t("dungeon.rooms_left_unexplored_leaving_now") % left if left > 0 else Strings.t("dungeon.nothing_left_down_here_worth")), UiTheme.DIM)
+	m.add_button(Strings.t("dungeon.leave_the_upside_down"), func() -> void: m.finish(true))
+	m.add_button(Strings.t("dungeon.not_yet"), func() -> void: m.finish(false))
 	var r: Variant = await Flow.show_modal(m)
 	if bool(r):
 		_end_night()
@@ -351,7 +351,7 @@ func _end_night() -> void:
 	if GameState.flag("week%d_cleared" % int(DataDB.table("calendar").get("totalWeeks", 5))):
 		SceneRouter.goto("res://src/scenes/story/narrator_reveal_tbd.tscn")
 		return
-	Narrator.say("You climb out into the real night. The woods let you go. This time.")
+	Narrator.say(Strings.t("dungeon.you_climb_out_into_the"))
 	GameState.advance_part()
 	SceneRouter.goto(TOWN)
 
@@ -365,9 +365,9 @@ func _start_fight(room: Dictionary) -> void:
 	var t := str(room["type"])
 	var intro := ""
 	if bool(room.get("returning", false)):
-		intro = "Unfinished business. %s" % ("You ran from these. They remember." if bool(room.get("fled", false)) else "They're back, and bigger.")
+		intro = Strings.t("dungeon.unfinished_business") % (Strings.t("dungeon.you_ran_from_these_they") if bool(room.get("fled", false)) else Strings.t("dungeon.they_re_back_and_bigger"))
 	elif t == "elite":
-		intro = "Something bigger than the rest. An elite."
+		intro = Strings.t("dungeon.something_bigger_than_the_rest")
 	elif t == "boss":
 		intro = str(Sig.week_rec(db, _week).get("bossIntro", ""))
 	GameState.run["floor_fight"] = int(room["id"])
@@ -386,7 +386,7 @@ func _after_fight(room_id: int) -> void:
 	if str(room.get("type", "")) == "boss" and str(summary.get("result", "")) == "win":
 		lines.append_array(Night.boss_reward(db, GameState.run, _week, Rng.stream("dungeon")))
 		Audio.play_sfx("win")
-		await Flow.show_event({ "title": "Week %d cleared" % _week, "text": "\n".join(PackedStringArray(lines)) })
+		await Flow.show_event({ "title": Strings.t("dungeon.week_cleared") % _week, "text": "\n".join(PackedStringArray(lines)) })
 	elif not lines.is_empty():
 		Narrator.say(" ".join(PackedStringArray(lines)))
 	if _sprites.has(room_id) and bool(room.get("cleared", false)):
@@ -412,7 +412,7 @@ func _refresh() -> void:
 	for r in floor_data["rooms"]:
 		if bool(r.get("cleared", false)):
 			cleared += 1
-	_hud.text = "Upside-Down, week %d %s%s   HP %d/%d  MP %d/%d   %s   rooms %d/%d" % [_week, _day.capitalize(), " (boss floor)" if bool(floor_data.get("boss", false)) else "",
+	_hud.text = Strings.t("dungeon.upside_down_week_hp_mp") % [_week, _day.capitalize(), Strings.t("dungeon.boss_floor") if bool(floor_data.get("boss", false)) else "",
 		int(p.get("hp", 0)), int(d["maxHp"]), int(p.get("mp", 0)), int(d["maxMp"]), ", ".join(PackedStringArray(party)), cleared, floor_data["rooms"].size()]
 	_overlay.queue_redraw()
 

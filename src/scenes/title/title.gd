@@ -15,12 +15,12 @@ var _t := 0.0
 func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	Flow.set_hud(false)
-	var title := UiTheme.label("Project Vector", UiTheme.ACCENT, UiTheme.TITLE_SIZE)
+	var title := UiTheme.role_label(Strings.t("title.project_vector"), "title", UiTheme.ACCENT)
 	title.position = Vector2((Display.base.x - 180) / 2.0, 50)
 	title.size = Vector2(180, 24)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(title)
-	var sub := UiTheme.label("A small town. A big week. Five of them, actually.", UiTheme.DIM)
+	var sub := UiTheme.label(Strings.t("title.a_small_town_a_big"), UiTheme.DIM)
 	sub.position = Vector2((Display.base.x - 300) / 2.0, 74)
 	sub.size = Vector2(300, 12)
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -29,16 +29,16 @@ func _ready() -> void:
 	_menu.position = Vector2((Display.base.x - 120) / 2.0, 110)
 	_menu.custom_minimum_size = Vector2(120, 0)
 	add_child(_menu)
-	_menu.add_child(UiTheme.button("New run", _new_run))
-	var cont := UiTheme.button("Continue", _continue)
+	_menu.add_child(UiTheme.button(Strings.t("title.new_run"), _new_run))
+	var cont := UiTheme.button(Strings.t("title.continue"), _continue)
 	cont.disabled = not SaveSystem.has_save()
 	_menu.add_child(cont)
 	for extra in extra_buttons:
 		var e: Dictionary = extra
 		_menu.add_child(UiTheme.button(str(e["label"]), func() -> void: e["run"].call()))
-	_menu.add_child(UiTheme.button("Endless Arena", _arena))
-	_menu.add_child(UiTheme.button("Narrator's Journal", _show_journal))
-	_menu.add_child(UiTheme.button("Quit", func() -> void: get_tree().quit()))
+	_menu.add_child(UiTheme.button(Strings.t("title.endless_arena"), _arena))
+	_menu.add_child(UiTheme.button(Strings.t("title.narrator_s_journal"), _show_journal))
+	_menu.add_child(UiTheme.button(Strings.t("title.quit"), func() -> void: get_tree().quit()))
 	(_menu.get_child(1 if not cont.disabled else 0) as Button).grab_focus()
 	Audio.play_music("title")
 
@@ -86,18 +86,18 @@ func _continue() -> void:
 
 func _new_run() -> void:
 	var m := Modal.new()
-	m.build("Who are you, new kid?", 420)
+	m.build(Strings.t("title.who_are_you_new_kid"), 420)
 	var db: Dictionary = DataDB.all()
-	m.text("Pick a starting class. You can advance into others at levels 5 and 12.", UiTheme.DIM)
+	m.text(Strings.t("title.pick_a_starting_class_you"), UiTheme.DIM)
 	var seed_row := m.row()
-	seed_row.add_child(UiTheme.label("Seed (blank = random):"))
+	seed_row.add_child(UiTheme.label(Strings.t("title.seed_blank_random")))
 	var seed_edit := LineEdit.new()
 	seed_edit.custom_minimum_size = Vector2(100, 0)
 	seed_row.add_child(seed_edit)
 	# Combat difficulty (data/combat_rules.json "difficulties"): Hard enemies move, then attack.
 	var diff := { "id": str(db.get("combat_rules", {}).get("difficulty", "normal")) }
 	var diff_row := m.row()
-	diff_row.add_child(UiTheme.label("Combat:"))
+	diff_row.add_child(UiTheme.label(Strings.t("title.combat")))
 	var diff_buttons: Array = []
 	var diffs: Dictionary = db.get("combat_rules", {}).get("difficulties", {})
 	for d in diffs:
@@ -110,7 +110,7 @@ func _new_run() -> void:
 				(x as Button).theme_type_variation = "SelectedButton" if x.get_meta("id") == did else "")
 		b.set_meta("id", did)
 		b.theme_type_variation = "SelectedButton" if did == diff["id"] else ""
-		b.tooltip_text = "Enemies show what they'll do on your turn. %s" % ("On Hard they move, then attack." if bool(diffs[d].get("enemyMoveAndAct", false)) else "On Normal they either attack or move.")
+		b.tooltip_text = Strings.t("title.enemies_show_what_they_ll") % (Strings.t("title.on_hard_they_move_then") if bool(diffs[d].get("enemyMoveAndAct", false)) else Strings.t("title.on_normal_they_either_attack"))
 		diff_buttons.append(b)
 		diff_row.add_child(b)
 	for cls in db.get("classes", {}).get("classes", []):
@@ -120,7 +120,7 @@ func _new_run() -> void:
 		var growth: Dictionary = cls.get("growth", {})
 		var tops: Array = growth.keys()
 		tops.sort_custom(func(a: Variant, b: Variant) -> bool: return float(growth[a]) > float(growth[b]))
-		var tip := "%s\nGrows: %s\nStarts with: %d Vector(s), %s\nPerk: %s" % [cls["name"], ", ".join(PackedStringArray(tops.slice(0, 3).map(func(s: Variant) -> String: return str(s).to_upper()))),
+		var tip := Strings.t("title.grows_starts_with_vector_s") % [cls["name"], ", ".join(PackedStringArray(tops.slice(0, 3).map(func(s: Variant) -> String: return str(s).to_upper()))),
 			int(cls.get("startVectors", 1)), ", ".join(PackedStringArray(cls.get("startForms", []))), str(cls.get("perk", {}).get("text", ""))]
 		m.add_button("%s: %s" % [cls["name"], str(cls.get("perk", {}).get("text", ""))], func() -> void:
 			var s := -1
@@ -130,7 +130,7 @@ func _new_run() -> void:
 	var unlocked: Array = Journal.unlocked_traits()
 	var trait_pick := { "id": "" }
 	if not unlocked.is_empty():
-		m.text("Starting trait (unlocked by the Journal):", UiTheme.DIM)
+		m.text(Strings.t("title.starting_trait_unlocked_by_the"), UiTheme.DIM)
 		var trow := HFlowContainer.new()
 		trow.custom_minimum_size = Vector2(400, 0)
 		m.body.add_child(trow)
@@ -138,18 +138,18 @@ func _new_run() -> void:
 			var tid := str(t)
 			var rec := DataDB.record("traits", tid)
 			var b := UiTheme.button(str(rec.get("name", "None")), func() -> void: trait_pick["id"] = tid)
-			b.tooltip_text = str(rec.get("text", "No trait."))
+			b.tooltip_text = str(rec.get("text", Strings.t("title.no_trait")))
 			trow.add_child(b)
-	m.add_button("Back", func() -> void: m.finish(null))
+	m.add_button(Strings.t("title.back"), func() -> void: m.finish(null))
 	var r: Variant = await Flow.show_modal(m)
 	if r == null:
 		return
 	var pick: Dictionary = r
 	SaveSystem.delete_save()
 	var traits: Array = [] if str(trait_pick["id"]) == "" else [str(trait_pick["id"])]
-	GameState.new_run(int(pick["seed"]), str(pick["class"]), "New Kid", { "traits": traits })
+	GameState.new_run(int(pick["seed"]), str(pick["class"]), Strings.t("title.new_kid"), { "traits": traits })
 	GameState.combat_difficulty = str(diff["id"])
-	Narrator.say("New kid in a small town. The narrator clears their throat. That's me. Hi.")
+	Narrator.say(Strings.t("title.new_kid_in_a_small"))
 	SceneRouter.goto(TOWN_SCENE)
 
 
@@ -157,12 +157,12 @@ func _new_run() -> void:
 ## party from your save, copied so the story save is never touched.
 func _arena() -> void:
 	var m := Modal.new()
-	m.build("Endless Arena", 420)
+	m.build(Strings.t("title.endless_arena"), 420)
 	var db: Dictionary = DataDB.all()
-	m.text("Fight wave after wave. New terrain every wave, a checkpoint every five, a boss every ten.", UiTheme.DIM)
+	m.text(Strings.t("title.fight_wave_after_wave_new"), UiTheme.DIM)
 	var size := { "n": 4 }
 	var srow := m.row()
-	srow.add_child(UiTheme.label("Party size:"))
+	srow.add_child(UiTheme.label(Strings.t("title.party_size")))
 	var sbtns: Array = []
 	for n in [1, 2, 3, 4]:
 		var nn: int = n
@@ -174,15 +174,15 @@ func _arena() -> void:
 		b.theme_type_variation = "SelectedButton" if nn == 4 else ""
 		sbtns.append(b)
 		srow.add_child(b)
-	m.text("Preset party: pick your class; the others fill in.", UiTheme.DIM)
+	m.text(Strings.t("title.preset_party_pick_your_class"), UiTheme.DIM)
 	for cls in db.get("classes", {}).get("classes", []):
 		if int(cls.get("tier", 1)) != 1:
 			continue
 		var cid := str(cls["id"])
-		m.add_button("Play as %s" % cls["name"], func() -> void: m.finish({ "class": cid }))
-	m.add_button("Import the party from my save", func() -> void: m.finish({ "import": true }), not SaveSystem.has_save(),
-		"Uses a copy: your story save isn't changed." if SaveSystem.has_save() else "No save yet.")
-	m.add_button("Back", func() -> void: m.finish(null))
+		m.add_button(Strings.t("title.play_as") % cls["name"], func() -> void: m.finish({ "class": cid }))
+	m.add_button(Strings.t("title.import_the_party_from_my"), func() -> void: m.finish({ "import": true }), not SaveSystem.has_save(),
+		Strings.t("title.uses_a_copy_your_story") if SaveSystem.has_save() else Strings.t("title.no_save_yet"))
+	m.add_button(Strings.t("title.back"), func() -> void: m.finish(null))
 	var r: Variant = await Flow.show_modal(m)
 	if r == null:
 		return
@@ -210,19 +210,19 @@ static func start_arena(pick: Dictionary, size: int, seed_value: int, level: int
 
 func _show_journal() -> void:
 	var m := Modal.new()
-	m.build("The Narrator's Journal", 420)
+	m.build(Strings.t("title.the_narrator_s_journal"), 420)
 	var j: Dictionary = Journal.data
-	m.text("Runs: %d. Furthest week: %d. Endings seen: %s." % [int(j.get("runs", 0)), int(j.get("bestWeek", 0)), ", ".join(PackedStringArray(j.get("endings", {}).keys())) if not j.get("endings", {}).is_empty() else "none"], UiTheme.DIM)
-	m.text("Lore", UiTheme.ACCENT)
+	m.text(Strings.t("title.runs_furthest_week_endings_seen") % [int(j.get("runs", 0)), int(j.get("bestWeek", 0)), ", ".join(PackedStringArray(j.get("endings", {}).keys())) if not j.get("endings", {}).is_empty() else "none"], UiTheme.DIM)
+	m.text(Strings.t("title.lore"), UiTheme.ACCENT)
 	if j.get("lore", {}).is_empty():
-		m.text("Nothing yet. The narrator taps the empty page meaningfully.", UiTheme.DIM)
+		m.text(Strings.t("title.nothing_yet_the_narrator_taps"), UiTheme.DIM)
 	for k in j.get("lore", {}):
 		m.text("- " + str(j["lore"][k]))
-	m.text("Creatures", UiTheme.ACCENT)
+	m.text(Strings.t("title.creatures"), UiTheme.ACCENT)
 	for k in j.get("enemies", {}):
 		var e: Dictionary = j["enemies"][k]
-		m.text("- %s (defeated %d). %s" % [e.get("name", k), int(e.get("defeated", 0)), e.get("text", "")])
-	m.text("Starting traits unlocked: %s" % (", ".join(PackedStringArray(Journal.unlocked_traits())) if not Journal.unlocked_traits().is_empty() else "none"), UiTheme.DIM)
-	m.text("Endless Arena, best wave: %d" % int(j.get("arena", {}).get("bestWave", 0)), UiTheme.DIM)
-	m.add_button("Close", func() -> void: m.finish(null))
+		m.text(Strings.t("title.defeated") % [e.get("name", k), int(e.get("defeated", 0)), e.get("text", "")])
+	m.text(Strings.t("title.starting_traits_unlocked") % (", ".join(PackedStringArray(Journal.unlocked_traits())) if not Journal.unlocked_traits().is_empty() else "none"), UiTheme.DIM)
+	m.text(Strings.t("title.endless_arena_best_wave") % int(j.get("arena", {}).get("bestWave", 0)), UiTheme.DIM)
+	m.add_button(Strings.t("title.close"), func() -> void: m.finish(null))
 	await Flow.show_modal(m)

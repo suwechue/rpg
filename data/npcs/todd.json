@@ -3,6 +3,7 @@
   "name": "Todd",
   "role": "Townsperson",
   "home": "todd_house",
+  "voice": { "id": "voice_default", "pitch": 1.12 },
   "sprite": "npc_todd_walk",
   "portrait": "portrait_todd",
   "startBond": 0,

@@ -3,6 +3,7 @@
   "name": "Kelly",
   "role": "Cheerleader",
   "home": "kelly_house",
+  "voice": { "id": "voice_kelly", "pitch": 1.25 },
   "sprite": "npc_kelly_walk",
   "portrait": "portrait_kelly",
   "startBond": -10,

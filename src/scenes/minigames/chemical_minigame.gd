@@ -49,7 +49,7 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
-	draw_frame("Mix turns in %.1f s   Mistakes: %d" % [maxf(0.0, LIMIT - _t), _mistakes])
+	draw_frame(Strings.t("chemical_minigame.mix_turns_in_1f_s") % [maxf(0.0, LIMIT - _t), _mistakes])
 	for i in _seq.size():
 		var p := box.position + Vector2(60 + i * 52, 70)
 		var idx := int(_seq[i])

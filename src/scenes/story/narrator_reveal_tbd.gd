@@ -49,9 +49,9 @@ func _play() -> void:
 	for id in bond_lines:
 		if float(GameState.bonds.get(str(id), 0.0)) >= 41.0:
 			lines.append(str(bond_lines[id]))
-	lines.append("\nRun complete: level %d %s, %d days, seed %d." % [int(GameState.player.get("level", 1)),
+	lines.append(Strings.t("narrator_reveal_tbd.run_complete_level_days_seed") % [int(GameState.player.get("level", 1)),
 		str(DataDB.record("classes", str(GameState.player.get("class", ""))).get("name", "")), int(GameState.run.get("day_count", 0)), GameState.run_seed])
-	await Flow.show_event({ "title": "The Mirror Town, after", "text": "\n\n".join(PackedStringArray(lines)) })
+	await Flow.show_event({ "title": Strings.t("narrator_reveal_tbd.the_mirror_town_after"), "text": "\n\n".join(PackedStringArray(lines)) })
 	await Flow.show_event({ "title": "Credits", "text": str(end.get("credits", "")) })
 	Journal.note_ending("alpha_complete")
 	SaveSystem.delete_save()

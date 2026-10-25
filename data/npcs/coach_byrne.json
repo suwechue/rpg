@@ -3,6 +3,7 @@
   "name": "Coach Byrne",
   "role": "PE teacher and cheer adviser",
   "home": "byrne_house",
+  "voice": { "id": "voice_default", "pitch": 1.14 },
   "sprite": "npc_coach_byrne_walk",
   "portrait": "portrait_coach_byrne",
   "startBond": 0,

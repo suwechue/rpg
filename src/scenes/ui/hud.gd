@@ -25,7 +25,7 @@ func _ready() -> void:
 	_top = UiTheme.label("")
 	_top.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	h.add_child(_top)
-	_end = UiTheme.button("End part [Space]", func() -> void: Flow.end_part())
+	_end = UiTheme.button(Strings.t("hud.end_part_space"), func() -> void: Flow.end_part())
 	h.add_child(_end)
 	var bottom := PanelContainer.new()
 	bottom.position = Vector2(0, Display.base.y - 26)
@@ -49,7 +49,7 @@ func refresh() -> void:
 		return
 	var p: Dictionary = GameState.player
 	var d := Char.derived(DataDB.all(), p)
-	_top.text = "%s   AP %d/%d   $%d   HP %d/%d  MP %d/%d" % [Calendar.label(), Calendar.ap(), Calendar.max_ap(), GameState.money,
+	_top.text = Strings.t("hud.ap_hp_mp") % [Calendar.label(), Calendar.ap(), Calendar.max_ap(), GameState.money,
 		int(p.get("hp", 0)), int(d["maxHp"]), int(p.get("mp", 0)), int(d["maxMp"])]
 	_line.text = Narrator.last_line
 	_end.disabled = Flow.is_busy()

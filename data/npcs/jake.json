@@ -3,6 +3,7 @@
   "name": "Jake",
   "role": "Student",
   "home": "jake_house",
+  "voice": { "id": "voice_default", "pitch": 0.96 },
   "sprite": "npc_jake_walk",
   "portrait": "portrait_jake",
   "startBond": 10,

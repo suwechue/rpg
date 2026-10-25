@@ -3,6 +3,7 @@
   "name": "The Mayor",
   "role": "Mayor",
   "home": "mayor_residence",
+  "voice": { "id": "voice_default", "pitch": 1.17 },
   "sprite": "npc_mayor_walk",
   "portrait": "portrait_mayor",
   "startBond": 5,

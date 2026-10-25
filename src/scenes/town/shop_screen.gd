@@ -43,21 +43,21 @@ func _refresh() -> void:
 			_refresh(), not ok or price > GameState.money, tip)
 	var inv: Dictionary = GameState.run.get("inventory", {})
 	if not inv.is_empty():
-		text("Your things (click to sell; equipment: equip):", UiTheme.DIM)
+		text(Strings.t("shop.your_things_click_to_sell"), UiTheme.DIM)
 		for id in inv:
 			var iid := str(id)
 			var it := Shop.item(db, iid)
 			if str(it.get("kind", "")) == "equipment":
-				add_button("Equip %s (%s)" % [it.get("name", iid), it.get("slot", "")], func() -> void:
+				add_button(Strings.t("shop.equip") % [it.get("name", iid), it.get("slot", "")], func() -> void:
 					_note = Shop.equip(DataDB.all(), GameState.run, GameState.player, iid)
 					if _note == "":
-						_note = "Equipped %s." % it.get("name", iid)
+						_note = Strings.t("shop.equipped_2") % it.get("name", iid)
 					EventBus.stats_changed.emit("player")
 					_refresh())
-			add_button("Sell %s x%d for $%d" % [it.get("name", iid), int(inv[id]), Shop.sell_price(db, iid)], func() -> void:
+			add_button(Strings.t("shop.sell_x_for") % [it.get("name", iid), int(inv[id]), Shop.sell_price(db, iid)], func() -> void:
 				var got := Shop.sell(DataDB.all(), GameState.run, iid)
 				_note = "+$%d" % got
 				EventBus.money_changed.emit(GameState.money)
 				_refresh())
-	add_button("Done", func() -> void: finish(null))
+	add_button(Strings.t("shop.done"), func() -> void: finish(null))
 	focus_first()

@@ -5,6 +5,8 @@
 class_name Character
 extends RefCounted
 
+const Str := preload("res://src/core/strings.gd")
+
 const VO := preload("res://src/core/vector_ops.gd")
 const DT := preload("res://src/core/data_tables.gd")
 const CardRules := preload("res://src/core/card.gd")
@@ -51,7 +53,7 @@ static func create(db: Dictionary, class_id: String, rng: RandomNumberGenerator,
 		known_vectors = _roll_start_vectors(db, cls, affinity, rng)
 	var ch := {
 		"id": str(opts.get("id", "player")),
-		"name": str(opts.get("name", "New Kid")),
+		"name": str(opts.get("name", Str.t(db, "character.new_kid"))),
 		"class": class_id,
 		"classHistory": [class_id],
 		"level": 1,

@@ -37,7 +37,7 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
-	draw_frame("Time %.1f s   In the band: %d%%" % [maxf(0.0, DURATION - _t), roundi(_in_band / maxf(0.01, _t) * 100.0)])
+	draw_frame(Strings.t("thermal_minigame.time_1f_s_in_the") % [maxf(0.0, DURATION - _t), roundi(_in_band / maxf(0.01, _t) * 100.0)])
 	var bar := Rect2(box.position + Vector2(150, 44), Vector2(20, 90))
 	draw_rect(bar, Color("262c40"))
 	var c := _band_center()
@@ -45,4 +45,4 @@ func _draw() -> void:
 	draw_rect(Rect2(bar.position.x, band_y, bar.size.x, bar.size.y * 0.2), Color("8fd694", 0.6))
 	var ny := bar.end.y - bar.size.y * _temp
 	draw_rect(Rect2(bar.position.x - 4, ny - 1, bar.size.x + 8, 3), Color("e8663c") if _heating else Color("7cc7e8"))
-	draw_string(UiTheme.font, bar.position + Vector2(30, 50), "Hold [E] to heat", HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, Color("e8e6d8"))
+	draw_string(UiTheme.font, bar.position + Vector2(30, 50), Strings.t("thermal_minigame.hold_e_to_heat"), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, Color("e8e6d8"))

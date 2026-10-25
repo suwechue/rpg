@@ -3,6 +3,7 @@
   "name": "Your guardian",
   "role": "Parent/Guardian",
   "home": "player_home",
+  "voice": { "id": "voice_default", "pitch": 0.95 },
   "sprite": "npc_parent_walk",
   "portrait": "portrait_parent",
   "startBond": 50,

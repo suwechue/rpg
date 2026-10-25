@@ -9,6 +9,8 @@
 class_name Effects
 extends RefCounted
 
+const Str := preload("res://src/core/strings.gd")
+
 const RM := preload("res://src/core/run/run_model.gd")
 const Char := preload("res://src/core/character.gd")
 const Lv := preload("res://src/core/progression/leveling.gd")
@@ -25,7 +27,7 @@ static func apply(db: Dictionary, run: Dictionary, fx: Dictionary, rng: RandomNu
 		if int(r["gained"]) > 0:
 			lines.append("%s +%d!" % [str(stat).to_upper(), int(r["gained"])])
 		else:
-			lines.append("%s training %.1f/%.0f" % [str(stat).to_upper(), float(r["bar"]), float(r["need"])])
+			lines.append(Str.t(db, "effects.training_1f_0f") % [str(stat).to_upper(), float(r["bar"]), float(r["need"])])
 	for stat in fx.get("stats", {}):
 		var hi := int(db.get("stats", {}).get("statMax", 20))
 		p["stats"][stat] = clampi(int(p["stats"].get(stat, 1)) + int(fx["stats"][stat]), 1, hi)
@@ -36,9 +38,9 @@ static func apply(db: Dictionary, run: Dictionary, fx: Dictionary, rng: RandomNu
 			scaled[axis] = float(fx["affinity"][axis]) * mul
 		RM.nudge_affinity(db, p, scaled)
 	if fx.has("grade") and ctx.has("professor"):
-		_grade(run, str(ctx["professor"]), float(fx["grade"]) * (mul if float(fx["grade"]) > 0 else 1.0), lines)
+		_grade(db, run, str(ctx["professor"]), float(fx["grade"]) * (mul if float(fx["grade"]) > 0 else 1.0), lines)
 	for prof in fx.get("gradeFor", {}):
-		_grade(run, str(prof), float(fx["gradeFor"][prof]), lines)
+		_grade(db, run, str(prof), float(fx["gradeFor"][prof]), lines)
 	for npc in fx.get("bond", {}):
 		change_bond(db, run, str(npc), float(fx["bond"][npc]), lines)
 	var flags: Variant = fx.get("flag", [])
@@ -55,12 +57,12 @@ static func apply(db: Dictionary, run: Dictionary, fx: Dictionary, rng: RandomNu
 		var d := Char.derived(db, p)
 		var before := int(p.get("hp", d["maxHp"]))
 		p["hp"] = clampi(before + int(fx["hp"]), 1, int(d["maxHp"]))
-		lines.append("HP %+d" % (int(p["hp"]) - before))
+		lines.append(Str.t(db, "effects.hp_d") % (int(p["hp"]) - before))
 	if fx.has("mp"):
 		var d := Char.derived(db, p)
 		var before := int(p.get("mp", d["maxMp"]))
 		p["mp"] = clampi(before + int(fx["mp"]), 0, int(d["maxMp"]))
-		lines.append("MP %+d" % (int(p["mp"]) - before))
+		lines.append(Str.t(db, "effects.mp_d") % (int(p["mp"]) - before))
 	if fx.has("money"):
 		run["money"] = maxi(0, int(run.get("money", 0)) + int(fx["money"]))
 		lines.append("$%+d" % int(fx["money"]))
@@ -70,28 +72,28 @@ static func apply(db: Dictionary, run: Dictionary, fx: Dictionary, rng: RandomNu
 	for item_id in items:
 		add_item(run, str(item_id), int(items[item_id]))
 		var rec := DT.record(db, "items", str(item_id))
-		lines.append("Got %s." % str(rec.get("name", item_id)))
+		lines.append(Str.t(db, "effects.got") % str(rec.get("name", item_id)))
 	if fx.has("card"):
 		var cid := str(fx["card"])
 		run["collection"][cid] = int(run["collection"].get(cid, 0)) + 1
-		lines.append("New card: %s." % cid)
+		lines.append(Str.t(db, "effects.new_card") % cid)
 	if fx.has("kellyRisk"):
 		run["kelly_risk"] = int(run.get("kelly_risk", 0)) + int(fx["kellyRisk"])
 	if fx.has("learnVector"):
 		var axis := str(fx["learnVector"])
 		if not p["knownVectors"].has(axis):
 			p["knownVectors"].append(axis)
-			lines.append("You learned the %s Vector!" % axis.capitalize())
+			lines.append(Str.t(db, "effects.you_learned_the_vector") % axis.capitalize())
 	if fx.has("learnForm"):
 		var form := str(fx["learnForm"])
 		if not p["knownForms"].has(form):
 			p["knownForms"].append(form)
-			lines.append("You learned the %s Form!" % form.capitalize())
+			lines.append(Str.t(db, "effects.you_learned_the_form") % form.capitalize())
 	if fx.has("xp"):
 		var reports := Lv.add_xp(db, p, int(fx["xp"]), rng)
-		lines.append("+%d XP" % int(fx["xp"]))
+		lines.append(Str.t(db, "effects.xp") % int(fx["xp"]))
 		for r in reports:
-			lines.append("Level %d!" % int(r["level"]))
+			lines.append(Str.t(db, "effects.level") % int(r["level"]))
 	if fx.has("signature"):
 		run["signature"] = VO.shift(run.get("signature", {}), fx["signature"])
 	for c in fx.get("counter", {}):
@@ -108,11 +110,11 @@ static func apply(db: Dictionary, run: Dictionary, fx: Dictionary, rng: RandomNu
 	return lines
 
 
-static func _grade(run: Dictionary, prof: String, delta: float, lines: Array) -> void:
+static func _grade(db: Dictionary, run: Dictionary, prof: String, delta: float, lines: Array) -> void:
 	var g := clampf(float(run["grades"].get(prof, 0.0)) + delta, 0.0, 100.0)
 	run["grades"][prof] = g
 	if delta < 0:
-		lines.append("Grade with %s %+d" % [prof.replace("_", " ").capitalize(), roundi(delta)])
+		lines.append(Str.t(db, "effects.grade_with_d") % [prof.replace("_", " ").capitalize(), roundi(delta)])
 
 
 ## Bond change with the NPC's trait multipliers (All or nothing, Nervous, etc.).

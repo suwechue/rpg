@@ -3,6 +3,7 @@
   "name": "Dr. Reyes",
   "role": "Hospital doctor",
   "home": "reyes_house",
+  "voice": { "id": "voice_default", "pitch": 1.06 },
   "sprite": "npc_dr_reyes_walk",
   "portrait": "portrait_dr_reyes",
   "startBond": 5,

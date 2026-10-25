@@ -5,6 +5,8 @@
 class_name School
 extends RefCounted
 
+const Str := preload("res://src/core/strings.gd")
+
 const VO := preload("res://src/core/vector_ops.gd")
 const DT := preload("res://src/core/data_tables.gd")
 const RM := preload("res://src/core/run/run_model.gd")
@@ -24,25 +26,25 @@ static func class_rec(db: Dictionary, id: String) -> Dictionary:
 static func class_gate_error(db: Dictionary, run: Dictionary, id: String) -> String:
 	var cls := class_rec(db, id)
 	if cls.is_empty():
-		return "No such class."
+		return Str.t(db, "school.no_such_class")
 	var gate: Dictionary = cls.get("gate", {})
 	if gate.is_empty():
 		return ""
 	for prior in gate.get("attended", {}):
 		if int(run["attendance"].get(prior, 0)) < int(gate["attended"][prior]):
-			return "Needs %s attended %d times." % [str(class_rec(db, str(prior)).get("name", prior)), int(gate["attended"][prior])]
+			return Str.t(db, "school.needs_attended_times") % [str(class_rec(db, str(prior)).get("name", prior)), int(gate["attended"][prior])]
 	var st := Char.effective_stats(db, run["player"])
 	for s in gate.get("stats", {}):
 		if int(st.get(s, 0)) < int(gate["stats"][s]):
-			return "Needs %s %d." % [str(s).to_upper(), int(gate["stats"][s])]
+			return Str.t(db, "school.needs") % [str(s).to_upper(), int(gate["stats"][s])]
 	if gate.has("tier") and int(run["player"].get("knowledgeTier", 1)) < int(gate["tier"]):
-		return "Needs Knowledge Tier %d." % int(gate["tier"])
+		return Str.t(db, "school.needs_knowledge_tier") % int(gate["tier"])
 	return ""
 
 
 static func schedule_error(db: Dictionary, run: Dictionary, schedule: Array) -> String:
 	if schedule.size() != 3:
-		return "Pick one class for each of the 3 periods."
+		return Str.t(db, "school.pick_one_class_for_each")
 	for id in schedule:
 		var err := class_gate_error(db, run, str(id))
 		if err != "":
@@ -77,7 +79,7 @@ static func attend(db: Dictionary, run: Dictionary, period: int, rng: RandomNumb
 	c["gainMul"] = mul
 	c["class"] = cid
 	c["period"] = period
-	var lines: Array = ["You attend %s%s." % [cls.get("name", cid), " (again: half gains)" if mul < 1.0 else ""]]
+	var lines: Array = [Str.t(db, "school.you_attend") % [cls.get("name", cid), Str.t(db, "school.again_half_gains") if mul < 1.0 else ""]]
 	lines.append_array(Fx.apply(db, run, fx, rng, c))
 	var event := pick_event(db, run, cid, rng, c)
 	if not event.is_empty() and bool(event.get("once", false)):
@@ -139,7 +141,7 @@ static func resolve_event(db: Dictionary, run: Dictionary, event: Dictionary, ch
 		var st := Char.effective_stats(db, run["player"])
 		var roll := rng.randi_range(1, 6) + int(st.get(str(chk.get("stat", "int")), 0))
 		success = roll >= int(chk.get("dc", 10))
-		lines.append("%s check: %d vs %d, %s." % [str(chk.get("stat", "")).to_upper(), roll, int(chk.get("dc", 10)), "success" if success else "fail"])
+		lines.append(Str.t(db, "school.check_vs") % [str(chk.get("stat", "")).to_upper(), roll, int(chk.get("dc", 10)), "success" if success else "fail"])
 	var fx: Dictionary = node.get("success" if success else "fail", node.get("effects", {}))
 	var text := str(node.get("successText" if success else "failText", node.get("result", "")))
 	if text != "":
@@ -175,12 +177,12 @@ static func skip(db: Dictionary, run: Dictionary, period: int) -> Array:
 	var cfg: Dictionary = db.get("school_classes", {}).get("rules", {})
 	run["skips_week"] = int(run.get("skips_week", 0)) + 1
 	run["skips_total"] = int(run.get("skips_total", 0)) + 1
-	var lines: Array = ["You skip %s." % cls.get("name", cid)]
+	var lines: Array = [Str.t(db, "school.you_skip") % cls.get("name", cid)]
 	Fx.apply(db, run, { "gradeFor": { str(cls.get("professor", "")): -float(cfg.get("skipGradeLoss", 5)) } }, null, {})
 	if int(run["skips_week"]) >= int(cfg.get("skipsForDetention", 3)) and not RM.flag(run, "detention_this_week"):
 		run["detention_pending"] = true
 		RM.set_flag(run, "detention_this_week")
-		lines.append("That's three skips this week. Somebody in the front office has noticed.")
+		lines.append(Str.t(db, "school.that_s_three_skips_this"))
 	return lines
 
 

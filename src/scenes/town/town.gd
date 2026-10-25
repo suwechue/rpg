@@ -169,8 +169,8 @@ func _enter_line(loc: String) -> String:
 	for p in people:
 		names.append(str(DataDB.table("npcs/" + str(p)).get("name", p)))
 	if names.is_empty():
-		return "%s. Nobody you know is here." % r.get("name", loc)
-	return "%s. Here: %s." % [r.get("name", loc), ", ".join(PackedStringArray(names))]
+		return Strings.t("town.nobody_you_know_is_here") % r.get("name", loc)
+	return Strings.t("town.here") % [r.get("name", loc), ", ".join(PackedStringArray(names))]
 
 
 func _leave_interior() -> void:
@@ -349,7 +349,7 @@ func _update_prompt() -> void:
 	var f := _front()
 	var text := ""
 	if npcs.has(f):
-		text = "[E] Talk to %s" % DataDB.table("npcs/" + str(npcs[f])).get("name", "")
+		text = Strings.t("town.e_talk_to") % DataDB.table("npcs/" + str(npcs[f])).get("name", "")
 	elif map.doors.has(f):
 		text = "[E] %s" % Locs.rec(DataDB.all(), str(map.doors[f]["loc"])).get("name", "Door")
 	elif map.room_doors.has(f):
@@ -357,13 +357,13 @@ func _update_prompt() -> void:
 	elif map.furniture.has(f) and map.furniture[f].has("label"):
 		text = "[E] %s" % map.furniture[f]["label"]
 	elif map.signs.has(f):
-		text = "[E] Read sign"
+		text = Strings.t("town.e_read_sign")
 	else:
 		var loc := _spot_here()
 		if loc != "":
 			text = "[E] %s" % Locs.rec(DataDB.all(), loc).get("name", loc)
 		elif interior:
-			text = "[E] Look around %s" % Locs.rec(DataDB.all(), interior_loc).get("name", "")
+			text = Strings.t("town.e_look_around") % Locs.rec(DataDB.all(), interior_loc).get("name", "")
 	_prompt.text = text
 
 
@@ -397,7 +397,7 @@ func interact() -> void:
 			_enter_interior(room, return_zone, return_cell)
 		return
 	if map.signs.has(f):
-		Narrator.say("The sign says: \"%s\"" % map.signs[f])
+		Narrator.say(Strings.t("town.the_sign_says") % map.signs[f])
 		return
 	if map.furniture.has(f):
 		var kind := str(map.furniture[f].get("kind", ""))
@@ -415,7 +415,7 @@ func interact() -> void:
 	if loc != "":
 		await location_menu(loc)
 	else:
-		Narrator.say("Nothing to do here. Walking is free; everything else costs time.")
+		Narrator.say(Strings.t("town.nothing_to_do_here_walking"))
 
 
 func _use_door(loc: String, approach: Vector2i) -> void:
@@ -432,7 +432,7 @@ func _use_door(loc: String, approach: Vector2i) -> void:
 		"doorstep":
 			var who: Array = d["npcs"]
 			var names: Array = who.map(func(n: Variant) -> String: return str(DataDB.table("npcs/" + str(n)).get("name", n)))
-			Narrator.say("%s comes to the door." % " and ".join(PackedStringArray(names)))
+			Narrator.say(Strings.t("town.comes_to_the_door") % Strings.t("town.and").join(PackedStringArray(names)))
 			await Social.talk(str(who[0]), { "doorstep": true })
 		_:
 			Narrator.say(str(d["text"]))
@@ -448,25 +448,25 @@ func location_menu(loc: String) -> void:
 		return
 	var m := Modal.new()
 	m.build(str(r.get("name", loc)), 380)
-	m.text("AP left: %d   $%d" % [Calendar.ap(), GameState.money], UiTheme.DIM)
+	m.text(Strings.t("town.ap_left") % [Calendar.ap(), GameState.money], UiTheme.DIM)
 	var acts := Locs.activities(db, GameState.run, loc, Calendar.part_id(), GameState.ctx())
 	for a in acts:
 		var act: Dictionary = a
 		var cost := int(act.get("ap", 1))
 		var price := int(act.get("money", 0))
-		var label := "%s (%d AP%s)" % [act.get("label", "?"), cost, ", $%d" % price if price > 0 else ""]
+		var label := Strings.t("town.ap") % [act.get("label", "?"), cost, ", $%d" % price if price > 0 else ""]
 		m.add_button(label, func() -> void: m.finish({ "act": act }), Calendar.ap() < cost or price > GameState.money)
 	if r.has("shop"):
 		var visit := int(DataDB.table("town/shops").get("rules", {}).get("visitAp", 1))
-		m.add_button("Shop (%d AP per visit)" % visit, func() -> void: m.finish({ "shop": str(r["shop"]) }), Calendar.ap() < visit)
+		m.add_button(Strings.t("town.shop_ap_per_visit") % visit, func() -> void: m.finish({ "shop": str(r["shop"]) }), Calendar.ap() < visit)
 	if r.has("workbench"):
-		m.add_button("Workbench (craft %d AP)" % int(r["workbench"]), func() -> void: m.finish({ "workbench": true }))
+		m.add_button(Strings.t("town.workbench_craft_ap") % int(r["workbench"]), func() -> void: m.finish({ "workbench": true }))
 	if bool(r.get("busStop", false)):
 		for z in ["school", "downtown", "residential", "outskirts"]:
 			if z != map_id:
 				var zone := str(z)
-				m.add_button("Take the bus to %s (free)" % DataDB.table("town/zones/" + z).get("name", z), func() -> void: m.finish({ "bus": zone }))
-	m.add_button("Leave", func() -> void: m.finish(null))
+				m.add_button(Strings.t("town.take_the_bus_to_free") % DataDB.table("town/zones/" + z).get("name", z), func() -> void: m.finish({ "bus": zone }))
+	m.add_button(Strings.t("town.leave"), func() -> void: m.finish(null))
 	var picked: Variant = await Flow.show_modal(m)
 	if picked == null:
 		return
@@ -499,7 +499,7 @@ func location_menu(loc: String) -> void:
 	elif p.has("bus"):
 		var spawn := { "school": Vector2i(29, 14), "downtown": Vector2i(27, 18), "residential": Vector2i(30, 19), "outskirts": Vector2i(52, 18) }
 		_load_map(str(p["bus"]), false, "", spawn[str(p["bus"])])
-		Narrator.say("The bus is empty except for a driver who doesn't blink. You arrive anyway.")
+		Narrator.say(Strings.t("town.the_bus_is_empty_except"))
 	_refresh_people()
 
 

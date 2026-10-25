@@ -3,6 +3,7 @@
   "name": "The Blacksmith",
   "role": "Blacksmith",
   "home": "blacksmith_cottage",
+  "voice": { "id": "voice_default", "pitch": 1.03 },
   "sprite": "npc_blacksmith_walk",
   "portrait": "portrait_blacksmith",
   "startBond": 0,

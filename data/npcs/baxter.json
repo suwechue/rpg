@@ -3,6 +3,7 @@
   "name": "Baxter",
   "role": "Student",
   "home": "baxter_house",
+  "voice": { "id": "voice_default", "pitch": 0.91 },
   "sprite": "npc_baxter_walk",
   "portrait": "portrait_baxter",
   "startBond": 5,

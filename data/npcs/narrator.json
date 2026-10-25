@@ -3,6 +3,7 @@
   "name": "The Narrator",
   "role": "The narrator",
   "home": "park",
+  "voice": { "id": "voice_narrator", "pitch": 0.9 },
   "sprite": "npc_narrator_walk",
   "portrait": "portrait_narrator",
   "startBond": 0,

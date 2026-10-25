@@ -58,9 +58,9 @@ func _after_combat(step_index: int) -> void:
 	if risk != 0:
 		GameState.run["kelly_risk"] = int(GameState.run.get("kelly_risk", 0)) + risk
 	if int(summary.get("helpIgnored", 0)) > 0:
-		Narrator.say("Kelly called for you. You were busy. She noticed.")
+		Narrator.say(Strings.t("story.kelly_called_for_you_you"))
 	elif int(summary.get("support", {}).get(str(step.get("guest", "")), 0)) > 0:
-		Narrator.say("You covered her. She won't say it, but she saw.")
+		Narrator.say(Strings.t("story.you_covered_her_she_won"))
 	_save(step_index + 1)
 
 
@@ -77,7 +77,7 @@ func _run(from: int) -> void:
 			"foreshadow":
 				var l := Narrator.line("foreshadow")
 				Narrator.say(l)
-				await Flow.show_event({ "title": "The narrator", "text": l })
+				await Flow.show_event({ "title": Strings.t("story.the_narrator"), "text": l })
 			"guest":
 				if step.has("add"):
 					StoryRules.make_guest(DataDB.all(), GameState.run, str(step["add"]), Rng.stream("npc"))

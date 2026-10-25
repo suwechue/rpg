@@ -3,6 +3,7 @@
   "name": "Mr. J",
   "role": "Shop teacher",
   "home": "mr_j_house",
+  "voice": { "id": "voice_default", "pitch": 1.09 },
   "sprite": "npc_mr_j_walk",
   "portrait": "portrait_mr_j",
   "startBond": 5,

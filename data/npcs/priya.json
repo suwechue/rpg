@@ -3,6 +3,7 @@
   "name": "Priya",
   "role": "Student (Core Four)",
   "home": "priya_house",
+  "voice": { "id": "voice_priya", "pitch": 1.15 },
   "sprite": "npc_priya_walk",
   "portrait": "portrait_priya",
   "startBond": 5,

@@ -3,6 +3,7 @@
   "name": "Mr. B",
   "role": "Vice principal",
   "home": "mr_b_house",
+  "voice": { "id": "voice_mr_b", "pitch": 0.75 },
   "sprite": "npc_mr_b_walk",
   "portrait": "portrait_mr_b",
   "startBond": -20,

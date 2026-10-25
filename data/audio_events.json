@@ -1,0 +1,477 @@
+{
+  "comment": "Game events -> sound ids (one is picked at random) with a pitch and volume range. Code only fires events (Audio.event(\"door_open\")). Add a variation by adding its id here and its file in assets/custom/sfx/.",
+  "events": {
+    "cast": {
+      "ids": [
+        "sfx_cast"
+      ],
+      "pitch": [
+        0.95,
+        1.05
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "hit": {
+      "ids": [
+        "sfx_hit",
+        "sfx_hit_2",
+        "sfx_hit_3"
+      ],
+      "pitch": [
+        0.95,
+        1.05
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "heal": {
+      "ids": [
+        "sfx_heal"
+      ],
+      "pitch": [
+        0.95,
+        1.05
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "fail": {
+      "ids": [
+        "sfx_fail"
+      ],
+      "pitch": [
+        0.95,
+        1.05
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "win": {
+      "ids": [
+        "sfx_win"
+      ],
+      "pitch": [
+        0.95,
+        1.05
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "lose": {
+      "ids": [
+        "sfx_lose"
+      ],
+      "pitch": [
+        0.95,
+        1.05
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "levelup": {
+      "ids": [
+        "sfx_levelup"
+      ],
+      "pitch": [
+        0.95,
+        1.05
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "click": {
+      "ids": [
+        "sfx_click",
+        "sfx_click_2"
+      ],
+      "pitch": [
+        0.97,
+        1.03
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "cancel": {
+      "ids": [
+        "sfx_cancel"
+      ],
+      "pitch": [
+        0.95,
+        1.05
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "coin": {
+      "ids": [
+        "sfx_coin"
+      ],
+      "pitch": [
+        0.95,
+        1.05
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "door": {
+      "ids": [
+        "sfx_door"
+      ],
+      "pitch": [
+        0.95,
+        1.05
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "step": {
+      "ids": [
+        "sfx_step"
+      ],
+      "pitch": [
+        0.95,
+        1.05
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "secret": {
+      "ids": [
+        "sfx_secret"
+      ],
+      "pitch": [
+        0.95,
+        1.05
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "card_hover": {
+      "ids": [
+        "sfx_card_hover"
+      ],
+      "pitch": [
+        1.0,
+        1.1
+      ],
+      "volumeDb": [
+        -6.0,
+        -4.0
+      ]
+    },
+    "card_play_heat": {
+      "ids": [
+        "sfx_card_play_heat"
+      ],
+      "pitch": [
+        0.95,
+        1.05
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "card_play_cold": {
+      "ids": [
+        "sfx_card_play_cold"
+      ],
+      "pitch": [
+        0.95,
+        1.05
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "card_play_force": {
+      "ids": [
+        "sfx_card_play_force"
+      ],
+      "pitch": [
+        0.95,
+        1.05
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "card_play_motion": {
+      "ids": [
+        "sfx_card_play_motion"
+      ],
+      "pitch": [
+        0.95,
+        1.05
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "card_play_binding": {
+      "ids": [
+        "sfx_card_play_binding"
+      ],
+      "pitch": [
+        0.95,
+        1.05
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "card_play_light": {
+      "ids": [
+        "sfx_card_play_light"
+      ],
+      "pitch": [
+        0.95,
+        1.05
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "card_play_transmutation": {
+      "ids": [
+        "sfx_card_play_transmutation"
+      ],
+      "pitch": [
+        0.95,
+        1.05
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "card_play_vitality": {
+      "ids": [
+        "sfx_card_play_vitality"
+      ],
+      "pitch": [
+        0.95,
+        1.05
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "card_play_corrosion": {
+      "ids": [
+        "sfx_card_play_corrosion"
+      ],
+      "pitch": [
+        0.95,
+        1.05
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "card_play_basic": {
+      "ids": [
+        "sfx_card_play_basic"
+      ],
+      "pitch": [
+        0.95,
+        1.05
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "step_grass": {
+      "ids": [
+        "sfx_step_grass",
+        "sfx_step_grass_2"
+      ],
+      "pitch": [
+        0.9,
+        1.1
+      ],
+      "volumeDb": [
+        -10.0,
+        -8.0
+      ]
+    },
+    "step_floor": {
+      "ids": [
+        "sfx_step_floor"
+      ],
+      "pitch": [
+        0.9,
+        1.1
+      ],
+      "volumeDb": [
+        -12.0,
+        -10.0
+      ]
+    },
+    "door_open": {
+      "ids": [
+        "sfx_door"
+      ],
+      "pitch": [
+        0.95,
+        1.05
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "ap_spent": {
+      "ids": [
+        "sfx_ap_spent"
+      ],
+      "pitch": [
+        1.0,
+        1.05
+      ],
+      "volumeDb": [
+        -6.0,
+        -5.0
+      ]
+    },
+    "level_up": {
+      "ids": [
+        "jingle_level_up"
+      ],
+      "pitch": [
+        1.0,
+        1.0
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "telegraph_warning": {
+      "ids": [
+        "sfx_telegraph_warning"
+      ],
+      "pitch": [
+        1.0,
+        1.0
+      ],
+      "volumeDb": [
+        -4.0,
+        -3.0
+      ]
+    },
+    "enemy_windup": {
+      "ids": [
+        "sfx_enemy_windup"
+      ],
+      "pitch": [
+        0.9,
+        1.0
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "explosion": {
+      "ids": [
+        "sfx_explosion"
+      ],
+      "pitch": [
+        0.95,
+        1.05
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "charge": {
+      "ids": [
+        "sfx_charge"
+      ],
+      "pitch": [
+        0.95,
+        1.05
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "combo_discovered": {
+      "ids": [
+        "sfx_combo_discovered"
+      ],
+      "pitch": [
+        1.0,
+        1.0
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "victory": {
+      "ids": [
+        "jingle_victory"
+      ],
+      "pitch": [
+        1.0,
+        1.0
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    },
+    "defeat": {
+      "ids": [
+        "jingle_defeat"
+      ],
+      "pitch": [
+        1.0,
+        1.0
+      ],
+      "volumeDb": [
+        -1.0,
+        0.0
+      ]
+    }
+  }
+}

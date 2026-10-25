@@ -11,6 +11,8 @@
 class_name CombatState
 extends RefCounted
 
+const Str := preload("res://src/core/strings.gd")
+
 const VO := preload("res://src/core/vector_ops.gd")
 const DT := preload("res://src/core/data_tables.gd")
 const CardRules := preload("res://src/core/card.gd")
@@ -233,7 +235,7 @@ func _reinforce() -> void:
 			_add_unit(s)
 			_emit({ "t": "spawn", "unit": s.id, "cell": cell, "prop": false })
 			i += 1
-		_emit({ "t": "log", "text": "Reinforcements arrive!" })
+		_emit({ "t": "log", "text": Str.t(db, "combat_state.reinforcements_arrive") })
 		reinforcements = {}
 		_build_order_keep_current()
 
@@ -456,7 +458,7 @@ func _end_round() -> void:
 			delayed.erase(d)
 			var caster: UnitScript = d["caster"]
 			_emit({ "t": "area", "cells": d["cells"], "vectors": d["spec"]["vectors"] })
-			_emit({ "t": "log", "text": "%s lands." % d.get("name", "The strike") })
+			_emit({ "t": "log", "text": Str.t(db, "combat_state.lands") % d.get("name", Str.t(db, "combat_state.the_strike")) })
 			for c in d["cells"]:
 				var t := unit_at(c)
 				if t != null and t.alive() and t != caster and (bool(d["neutral"]) or is_hostile(caster, t)):
@@ -523,7 +525,7 @@ func _start_turn(u: UnitScript) -> void:
 			u.statuses.erase("hype_draw")
 		var drew := u.deck.draw(n, rng)
 		if int(drew["fatigue"]) > 0:
-			_emit({ "t": "log", "text": "%s reshuffles and takes %d Fatigue." % [u.name, int(drew["fatigue"])] })
+			_emit({ "t": "log", "text": Str.t(db, "combat_state.reshuffles_and_takes_fatigue") % [u.name, int(drew["fatigue"])] })
 			_damage(u, int(drew["fatigue"]), null, "", "fatigue")
 			if not u.alive():
 				return
@@ -543,7 +545,7 @@ func _start_turn(u: UnitScript) -> void:
 				threatened = true
 		if threatened:
 			help_calls.append({ "unit": u.id, "round": round_num, "answered": false, "open": true })
-			_emit({ "t": "say", "unit": u.id, "text": str(u.source.get("helpLine", "Help! A little help here?!")) })
+			_emit({ "t": "say", "unit": u.id, "text": str(u.source.get("helpLine", Str.t(db, "combat_state.help_a_little_help_here"))) })
 
 
 func _end_cleanup(u: UnitScript) -> void:
@@ -564,7 +566,7 @@ func _resolve_help_calls(u: UnitScript) -> void:
 		if bool(call["open"]) and str(call["unit"]) == u.id:
 			call["open"] = false
 			if not bool(call["answered"]):
-				_emit({ "t": "log", "text": "Nobody came when %s called for help." % u.name })
+				_emit({ "t": "log", "text": Str.t(db, "combat_state.nobody_came_when_called_for") % u.name })
 
 
 func _answer_help(helper: UnitScript, target: UnitScript) -> void:
@@ -589,9 +591,9 @@ func can_move(u: UnitScript) -> bool:
 ## Whether this unit may still take its action: under move_or_act, not after moving.
 func act_block(u: UnitScript) -> String:
 	if u.action_used:
-		return "No action left"
+		return Str.t(db, "combat_state.no_action_left")
 	if turn_mode == "move_or_act" and u.moved_steps > 0 and not _moves_and_acts(u):
-		return "Already moved (undo the move to act)"
+		return Str.t(db, "combat_state.already_moved_undo_the_move")
 	return ""
 
 
@@ -697,7 +699,7 @@ func _spread_fire() -> void:
 func _fall(u: UnitScript) -> void:
 	var cfg := Res.combat_cfg(db)
 	if u.team == "enemy" or u.is_prop():
-		_emit({ "t": "log", "text": "%s falls into the pit." % u.name })
+		_emit({ "t": "log", "text": Str.t(db, "combat_state.falls_into_the_pit") % u.name })
 		u.hp = 0
 		u.shield = 0
 		_on_zero_hp(u, null)
@@ -730,7 +732,7 @@ func _leave_trail(u: UnitScript, cells: Array) -> void:
 				if grid.get_terrain(cell) == GridScript.FLOOR:
 					grid.set_terrain(cell, GridScript.ICE)
 			"glyph":
-				glyphs.append({ "cell": cell, "spec": action_spec(u, { "form": "touch", "vectors": { "binding": 1.0 }, "power": 3, "name": "Snare Trail" }),
+				glyphs.append({ "cell": cell, "spec": action_spec(u, { "form": "touch", "vectors": { "binding": 1.0 }, "power": 3, "name": Str.t(db, "combat_state.snare_trail") }),
 					"team": u.team, "caster": u, "turns": 3 })
 	_emit({ "t": "tiles", "kind": kind, "cells": cells })
 
@@ -777,7 +779,7 @@ func _enter_cell(u: UnitScript, cell: Vector2i) -> bool:
 		if grid.cracked.has(cell):
 			grid.set_terrain(cell, GridScript.PIT)
 			_emit({ "t": "tiles", "kind": "pit", "cells": [cell] })
-			_emit({ "t": "log", "text": "The floor gives way under %s!" % u.name })
+			_emit({ "t": "log", "text": Str.t(db, "combat_state.the_floor_gives_way_under") % u.name })
 			_fall(u)
 			return true
 		grid.cracked[cell] = true
@@ -905,14 +907,14 @@ func _adjacent_hostiles(u: UnitScript, reach: int) -> Array:
 ## card, uses the action.
 func card_block(u: UnitScript, card: Dictionary) -> String:
 	if card.is_empty():
-		return "No card"
+		return Str.t(db, "combat_state.no_card")
 	if bool(card.get("quick", false)) and not u.quick_used:
 		pass
 	elif act_block(u) != "" and not (bool(card.get("moves", false)) and not u.action_used):
 		return act_block(u)
 	var cost := card_cost(u, card)
 	if cost > u.mp:
-		return "Needs %d MP" % cost
+		return Str.t(db, "combat_state.needs_mp") % cost
 	return ""
 
 
@@ -1023,12 +1025,12 @@ func improvise_error(u: UnitScript, vectors: Array, form: String, magnitude: Str
 	if act_block(u) != "":
 		return act_block(u)
 	if u.deck == null or u.deck.hand.is_empty():
-		return "You need a card in hand to burn as fuel."
+		return Str.t(db, "combat_state.you_need_a_card_in")
 	var v := {}
 	for a in vectors:
 		v[a] = 1.0
 	if improvise_cost(u, CardRules.make_spell(db, v, form, magnitude)) > u.mp:
-		return "Not enough MP."
+		return Str.t(db, "combat_state.not_enough_mp")
 	return ""
 
 
@@ -1053,7 +1055,7 @@ func improvise(u: UnitScript, vectors: Array, form: String, magnitude: String, f
 	u.undo_ok = false
 	u.mp -= cost
 	u.deck.discard_from_hand(fuel_index)
-	card["name"] = "Improvised " + str(card["name"])
+	card["name"] = Str.t(db, "combat_state.improvised") + str(card["name"])
 	_cast(u, card, target, true, cost, mp_before)
 	_check_end()
 	return true
@@ -1130,11 +1132,11 @@ func _preview_motion(u: UnitScript, spec: Dictionary, out: Dictionary) -> void:
 			pushes.append(land)
 		if int(t.intent.get("charge", 0)) > 0:
 			if v.has("light"):
-				interrupts.append({ "unit": t.id, "effect": "cancels the charge" })
+				interrupts.append({ "unit": t.id, "effect": Str.t(db, "combat_state.cancels_the_charge") })
 			elif v.has("cold"):
-				interrupts.append({ "unit": t.id, "effect": "delays the charge" })
+				interrupts.append({ "unit": t.id, "effect": Str.t(db, "combat_state.delays_the_charge") })
 			elif not land.is_empty() and land["to"] != t.cell:
-				interrupts.append({ "unit": t.id, "effect": "moves the charge" })
+				interrupts.append({ "unit": t.id, "effect": Str.t(db, "combat_state.moves_the_charge") })
 	out["pushes"] = pushes
 	out["interrupts"] = interrupts
 
@@ -1308,7 +1310,7 @@ func _cast(u: UnitScript, card: Dictionary, target: Vector2i, improvised: bool, 
 				wild_surges += 1
 				if u.team == "party":
 					u.source["wildSurges"] = int(u.source.get("wildSurges", 0)) + 1
-				_emit({ "t": "log", "text": "Wild Surge! The spell comes out as %s." % str(axis).capitalize() })
+				_emit({ "t": "log", "text": Str.t(db, "combat_state.wild_surge_the_spell_comes") % str(axis).capitalize() })
 	_resolve_spec(u, spec, target)
 
 
@@ -1352,7 +1354,7 @@ func _resolve_spec(u: UnitScript, spec: Dictionary, target: Vector2i) -> void:
 				hp_value *= 2
 			var prop := UnitScript.make_prop("construct", hp_value, int(form.get("turns", 3)) + (2 if u.perk == "constructor" else 0))
 			prop.cell = target
-			prop.name = "%s Construct" % str(spec["name"]).split(" ")[0]
+			prop.name = Str.t(db, "combat_state.construct") % str(spec["name"]).split(" ")[0]
 			_add_unit(prop)
 			_emit({ "t": "spawn", "unit": prop.id, "cell": target, "prop": true })
 			return
@@ -1401,7 +1403,7 @@ func _after_hit(u: UnitScript, t: UnitScript, amount: int) -> void:
 	if float(u.source.get("leech", 0.0)) > 0.0 and t.max_mp > 0 and t.mp > 0:
 		var drained := mini(t.mp, maxi(1, ceili(float(amount) * float(u.source["leech"]))))
 		t.mp -= drained
-		_emit({ "t": "log", "text": "%s drains %d MP from %s." % [u.name, drained, t.name] })
+		_emit({ "t": "log", "text": Str.t(db, "combat_state.drains_mp_from") % [u.name, drained, t.name] })
 	if float(u.source.get("vampiric", 0.0)) > 0.0 and u.alive() and amount > 0:
 		_heal(u, u, maxi(1, roundi(float(amount) * float(u.source["vampiric"]))))
 
@@ -1468,11 +1470,11 @@ func hit_note(u: UnitScript, t: UnitScript, vectors: Dictionary) -> String:
 	var parts: Array = []
 	var c := Res.contest_mult(db, vectors, t)
 	if c > 1.05:
-		parts.append("weak spot")
+		parts.append(Str.t(db, "combat_state.weak_spot"))
 	elif c < 0.95:
 		parts.append("resisted")
 	if Res.is_behind(u, t):
-		parts.append("from behind")
+		parts.append(Str.t(db, "combat_state.from_behind"))
 	if grid.get_terrain(t.cell) == GridScript.COVER and GridScript.manhattan(u.cell, t.cell) > 1:
 		parts.append("cover")
 	return ", ".join(PackedStringArray(parts))
@@ -1483,7 +1485,7 @@ func parried(u: UnitScript, t: UnitScript) -> bool:
 	if not t.statuses.has("parry") or GridScript.manhattan(u.cell, t.cell) != 1 or not t.alive():
 		return false
 	t.statuses.erase("parry")
-	_emit({ "t": "log", "text": "%s parries and strikes back!" % t.name })
+	_emit({ "t": "log", "text": Str.t(db, "combat_state.parries_and_strikes_back") % t.name })
 	var dmg := Res.finalize(db, _expected_strike(t, u, { "stat": "str", "mult": 1.0 }), t, rng)
 	_damage(u, int(dmg["amount"]), t, "", "hit", bool(dmg["crit"]))
 	return true
@@ -1505,7 +1507,7 @@ func draw_telegraphs(cell: Vector2i, radius: int) -> void:
 		var who := unit_at(cell)
 		if who != null:
 			e.intent["unit"] = who.id
-		_emit({ "t": "interrupt", "unit": e.id, "text": "%s turns toward the lure." % e.name })
+		_emit({ "t": "interrupt", "unit": e.id, "text": Str.t(db, "combat_state.turns_toward_the_lure") % e.name })
 
 
 func _face_toward(u: UnitScript, cell: Vector2i) -> void:
@@ -1598,7 +1600,7 @@ func _apply_vector_effects(u: UnitScript, spec: Dictionary, cells: Array, hit: A
 ## Push (or pull) a unit. Collisions with walls, edges or units deal bonus damage.
 func _push(u: UnitScript, t: UnitScript, dir: Vector2i, steps: int, collide: bool = true) -> void:
 	if t.statuses.has("brace") and t != u:
-		_emit({ "t": "log", "text": "%s braces and doesn't budge." % t.name })
+		_emit({ "t": "log", "text": Str.t(db, "combat_state.braces_and_doesn_t_budge") % t.name })
 		return
 	var from := t.cell
 	for i in steps:
@@ -1684,7 +1686,7 @@ func _damage(t: UnitScript, amount: int, source: UnitScript, vector: String, cau
 	if t.perk == "second_wind" and not t.perk_used and t.hp_ratio() < float(Res.combat_cfg(db).get("secondWindBelowPct", 0.3)):
 		t.perk_used = true
 		_heal(t, t, maxi(1, roundi(float(t.max_hp) * float(Res.combat_cfg(db).get("secondWindHpPct", 0.2)))))
-		_emit({ "t": "log", "text": "%s catches a Second Wind." % t.name })
+		_emit({ "t": "log", "text": Str.t(db, "combat_state.catches_a_second_wind") % t.name })
 	if t.boss:
 		_check_phase(t)
 
@@ -1713,7 +1715,7 @@ func _on_zero_hp(t: UnitScript, source: UnitScript) -> void:
 			if m.team == "enemy" and m.alive() and m.role == "minion":
 				m.disposition = { "courage": -90, "loyalty": -40 }
 				m.intent = {}
-		_emit({ "t": "log", "text": "The leader falls. The swarm scatters!" })
+		_emit({ "t": "log", "text": Str.t(db, "combat_state.the_leader_falls_the_swarm") })
 
 
 ## Splitters split; explosive ones blow up next to them.
@@ -1721,7 +1723,7 @@ func _on_enemy_death(t: UnitScript) -> void:
 	var boom := int(t.source.get("explodeOnDeath", 0))
 	if boom > 0:
 		_emit({ "t": "area", "cells": pattern_cells(t, "square_self", t.cell), "vectors": { "force": 1.0 } })
-		_emit({ "t": "log", "text": "%s explodes!" % t.name })
+		_emit({ "t": "log", "text": Str.t(db, "combat_state.explodes") % t.name })
 		for c in pattern_cells(t, "square_self", t.cell):
 			var o := unit_at(c)
 			if o != null and o.alive():
@@ -1741,7 +1743,7 @@ func _on_enemy_death(t: UnitScript) -> void:
 				_emit({ "t": "spawn", "unit": s.id, "cell": c, "prop": false })
 				made += 1
 		if made > 0:
-			_emit({ "t": "log", "text": "%s splits apart!" % t.name })
+			_emit({ "t": "log", "text": Str.t(db, "combat_state.splits_apart") % t.name })
 			_build_order_keep_current()
 
 
@@ -2013,7 +2015,7 @@ func _shift_intent(u: UnitScript, delta: Vector2i) -> void:
 			var tgt: Vector2i = u.intent.get("target", u.cell)
 			if not action_targets(u, u.intent.get("action", {}), u.cell).has(tgt):
 				u.intent = {}
-				_emit({ "t": "interrupt", "unit": u.id, "text": "%s is knocked out of range." % u.name })
+				_emit({ "t": "interrupt", "unit": u.id, "text": Str.t(db, "combat_state.is_knocked_out_of_range") % u.name })
 		return
 	var moved: Array = []
 	for c in u.intent.get("cells", []):
@@ -2021,7 +2023,7 @@ func _shift_intent(u: UnitScript, delta: Vector2i) -> void:
 		if grid.in_bounds(cell):
 			moved.append(cell)
 	u.intent["cells"] = moved
-	_emit({ "t": "interrupt", "unit": u.id, "text": "%s's charge is knocked aside." % u.name })
+	_emit({ "t": "interrupt", "unit": u.id, "text": Str.t(db, "combat_state.s_charge_is_knocked_aside") % u.name })
 
 
 ## Blind cancels a charge (and, under move_or_act, any attack); Slow delays a
@@ -2032,20 +2034,20 @@ func _interrupt(t: UnitScript, status: String) -> void:
 	var kind := str(t.intent.get("kind", ""))
 	if status == "root" and kind == "move":
 		t.intent = {}
-		_emit({ "t": "interrupt", "unit": t.id, "text": "%s is rooted and can't get into position." % t.name })
+		_emit({ "t": "interrupt", "unit": t.id, "text": Str.t(db, "combat_state.is_rooted_and_can_t") % t.name })
 		return
 	if status == "blind" and kind in ["attack", "special"] and turn_mode == "move_or_act":
 		t.intent = {}
-		_emit({ "t": "interrupt", "unit": t.id, "text": "%s is blinded and loses its target." % t.name })
+		_emit({ "t": "interrupt", "unit": t.id, "text": Str.t(db, "combat_state.is_blinded_and_loses_its") % t.name })
 		return
 	if int(t.intent.get("charge", 0)) <= 0:
 		return
 	if status == "blind":
 		t.intent = {}
-		_emit({ "t": "interrupt", "unit": t.id, "text": "%s loses focus. The charge fizzles." % t.name })
+		_emit({ "t": "interrupt", "unit": t.id, "text": Str.t(db, "combat_state.loses_focus_the_charge_fizzles") % t.name })
 	elif status == "slow":
 		t.intent["charge"] = int(t.intent["charge"]) + 1
-		_emit({ "t": "interrupt", "unit": t.id, "text": "%s's charge is slowed down." % t.name })
+		_emit({ "t": "interrupt", "unit": t.id, "text": Str.t(db, "combat_state.s_charge_is_slowed_down") % t.name })
 
 
 ## An enemy carries out its intent. Returns false if the AI should choose
@@ -2074,7 +2076,7 @@ func execute_intent(u: UnitScript) -> bool:
 		var act: Dictionary = it.get("action", {})
 		if action_targets(u, act, u.cell).has(t.cell):
 			return perform_action(u, act, t.cell) or true
-		_emit({ "t": "log", "text": "%s can't reach %s." % [u.name, t.name] })
+		_emit({ "t": "log", "text": Str.t(db, "combat_state.can_t_reach") % [u.name, t.name] })
 		return true
 	var dest: Vector2i = it.get("move", u.cell)
 	if dest != u.cell and u.move_left > 0 and reachable_cells(u).has(dest):
@@ -2151,7 +2153,7 @@ func _resolve_locked(u: UnitScript, it: Dictionary) -> void:
 ## Burrowers dig in (can't be hurt) and telegraph where they'll come up.
 func _burrow(u: UnitScript, target: Vector2i) -> void:
 	u.statuses["burrowed"] = 99
-	_emit({ "t": "log", "text": "%s burrows underground." % u.name })
+	_emit({ "t": "log", "text": Str.t(db, "combat_state.burrows_underground") % u.name })
 	var victim: UnitScript = null
 	for o in opponents_of(u):
 		if victim == null or GridScript.manhattan(o.cell, u.cell) < GridScript.manhattan(victim.cell, u.cell):
@@ -2173,7 +2175,7 @@ func _summon(u: UnitScript, cells: Array) -> void:
 			s.cell = cell
 			_add_unit(s)
 			_emit({ "t": "spawn", "unit": s.id, "cell": cell, "prop": false })
-			_emit({ "t": "log", "text": "%s calls %s." % [u.name, s.name] })
+			_emit({ "t": "log", "text": Str.t(db, "combat_state.calls") % [u.name, s.name] })
 			_build_order_keep_current()
 			return
 

@@ -3,6 +3,7 @@
   "name": "Biology Teacher",
   "role": "Biology teacher",
   "home": "elm_apartments",
+  "voice": { "id": "voice_default", "pitch": 1.09 },
   "sprite": "npc_biology_teacher_walk",
   "portrait": "portrait_biology_teacher",
   "startBond": 10,

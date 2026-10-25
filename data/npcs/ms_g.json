@@ -3,6 +3,7 @@
   "name": "Ms. G",
   "role": "Physics and Chemistry teacher",
   "home": "ms_g_house",
+  "voice": { "id": "voice_ms_g", "pitch": 1.0 },
   "sprite": "npc_ms_g_walk",
   "portrait": "portrait_ms_g",
   "startBond": 10,

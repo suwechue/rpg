@@ -2,6 +2,13 @@
   "comment": "UI skin settings (ROADMAP M11). Images are asset ids (data/assets/manifest.json, files in assets/ui/skin/, overridable in assets/custom/ui/). Colors are hex; change one here and every screen follows.",
   "fontSize": 9,
   "titleSize": 18,
+  "fonts": {
+    "comment": "Fonts by role: an asset id and a size. Keep sizes at the font's native size or a whole multiple so pixels stay crisp.",
+    "ui": { "id": "font_ui", "size": 9 },
+    "dialogue": { "id": "font_dialogue", "size": 9 },
+    "title": { "id": "font_title", "size": 18 },
+    "damage": { "id": "font_damage_numbers", "size": 9 }
+  },
   "colors": {
     "bg": "#141824ee",
     "bgLight": "#262c40",

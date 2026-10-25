@@ -3,6 +3,7 @@
   "name": "Sam, Unmasked",
   "role": "Hidden encounter",
   "home": "sam_estate",
+  "voice": { "id": "voice_default", "pitch": 1.17 },
   "sprite": "npc_sam_unmasked_walk",
   "portrait": "portrait_sam_unmasked",
   "startBond": 0,

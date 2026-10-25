@@ -3,6 +3,7 @@
   "name": "Nurse Patti",
   "role": "Hospital nurse",
   "home": "elm_apartments",
+  "voice": { "id": "voice_default", "pitch": 1.11 },
   "sprite": "npc_patti_walk",
   "portrait": "portrait_patti",
   "startBond": 10,

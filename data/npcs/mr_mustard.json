@@ -3,6 +3,7 @@
   "name": "Mr. Mustard",
   "role": "Drama and Debate teacher",
   "home": "elm_apartments",
+  "voice": { "id": "voice_default", "pitch": 0.91 },
   "sprite": "npc_mr_mustard_walk",
   "portrait": "portrait_mr_mustard",
   "startBond": 15,

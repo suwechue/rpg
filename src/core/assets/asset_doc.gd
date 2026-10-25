@@ -88,7 +88,11 @@ static func _intro(group: String) -> String:
 		"portraits":
 			return "Faces shown when you talk to someone."
 		"music":
-			return "Background music; loops."
+			return "Background music by situation (data/audio.json). Tracks loop; jingles play once."
+		"ambience":
+			return "Quiet background loops by place and time. Some aren't in the packs yet: drop your own in assets/custom/ambience/."
+		"voice":
+			return "The little blips that play as a character's text types out. Each character's pitch is in their NPC data."
 		"sfx":
 			return "Short sound effects."
 	return ""
@@ -97,7 +101,7 @@ static func _intro(group: String) -> String:
 ## "32x32 frames (sheet 128x128)", "64x64", or "-" for sounds.
 static func size_text(sp: Dictionary, display: Dictionary) -> String:
 	var kind := str(sp.get("kind", ""))
-	if kind in ["music", "sfx", "font"]:
+	if kind in ["music", "sfx", "font", "ambience"]:
 		return "-"
 	if kind == "tile":
 		return "%dx%d" % [int(display.get("tileSize", 0)), int(display.get("tileSize", 0))]
@@ -118,5 +122,9 @@ static func size_text(sp: Dictionary, display: Dictionary) -> String:
 static func _pack_name(sp: Dictionary, all: Dictionary) -> String:
 	if str(sp.get("kind", "")) == "tile":
 		return "tile %d of `%s`" % [int(sp.get("index", 0)), sp.get("tileset", "")]
-	var src := str(sp.get("source", "")).trim_prefix("res://assets/packs/")
-	return "pack: " + src.get_slice("/", 0)
+	if bool(sp.get("planned", false)):
+		return "missing (add yours)"
+	var src := str(sp.get("source", ""))
+	if src.begins_with("res://assets/ui/skin/"):
+		return "skin placeholder"
+	return "pack: " + src.trim_prefix("res://assets/packs/").get_slice("/", 0)

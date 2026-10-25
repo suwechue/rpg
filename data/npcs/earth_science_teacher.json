@@ -3,6 +3,7 @@
   "name": "Earth Science Teacher",
   "role": "Earth Science teacher",
   "home": "elm_apartments",
+  "voice": { "id": "voice_default", "pitch": 1.09 },
   "sprite": "npc_earth_science_teacher_walk",
   "portrait": "portrait_earth_science_teacher",
   "startBond": 10,

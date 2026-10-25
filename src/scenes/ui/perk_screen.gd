@@ -7,8 +7,8 @@ const Lv := preload("res://src/core/progression/leveling.gd")
 func _ready() -> void:
 	var p: Dictionary = GameState.player
 	var lvl := int(p["pendingPerks"][0])
-	build("Level %d perk" % lvl, 380)
-	text("Pick one. It stays with you (a Class Change lets you keep one).", UiTheme.DIM)
+	build(Strings.t("perk.level_perk") % lvl, 380)
+	text(Strings.t("perk.pick_one_it_stays_with"), UiTheme.DIM)
 	for id in Lv.perk_options(DataDB.all(), p, lvl):
 		var pid := str(id)
 		var rec := DataDB.record("perks", pid)

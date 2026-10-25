@@ -3,6 +3,8 @@
 class_name Bonds
 extends RefCounted
 
+const Str := preload("res://src/core/strings.gd")
+
 const RM := preload("res://src/core/run/run_model.gd")
 const Fx := preload("res://src/core/run/effects.gd")
 const Char := preload("res://src/core/character.gd")
@@ -18,7 +20,7 @@ static func cfg(db: Dictionary) -> Dictionary:
 ## otherwise a polite +2. Returns { "reaction": "like"|"dislike"|"neutral", "lines" }.
 static func give_gift(db: Dictionary, run: Dictionary, id: String, item_id: String) -> Dictionary:
 	if int(run.get("inventory", {}).get(item_id, 0)) <= 0:
-		return { "reaction": "none", "lines": ["You don't have that."] }
+		return { "reaction": "none", "lines": [Str.t(db, "bonds.you_don_t_have_that")] }
 	var it := DT.record(db, "items", item_id)
 	var gifts: Dictionary = Dlg.npc(db, id).get("gifts", {})
 	var tags: Array = it.get("tags", [])
@@ -71,19 +73,19 @@ static func hang_out(db: Dictionary, run: Dictionary, id: String, rng: RandomNum
 static func recruit_block(db: Dictionary, run: Dictionary, id: String, week: int) -> String:
 	var rec := Dlg.npc(db, id)
 	if not bool(rec.get("recruitable", false)):
-		return "Not a party member."
+		return Str.t(db, "bonds.not_a_party_member")
 	if not RM.character(run, id).is_empty():
-		return "Already in your roster."
+		return Str.t(db, "bonds.already_in_your_roster")
 	var need := float(rec.get("recruitBond", cfg(db).get("recruitBond", 41)))
 	if RM.bond(run, id) < need:
-		return "Needs Bond %d." % roundi(need)
+		return Str.t(db, "bonds.needs_bond") % roundi(need)
 	if week < int(rec.get("recruitWeek", 1)):
-		return "They're not ready yet (week %d)." % int(rec.get("recruitWeek", 1))
+		return Str.t(db, "bonds.they_re_not_ready_yet") % int(rec.get("recruitWeek", 1))
 	if rec.has("recruitFlag") and not RM.flag(run, str(rec["recruitFlag"])):
-		return str(rec.get("recruitHint", "Something has to happen first."))
+		return str(rec.get("recruitHint", Str.t(db, "bonds.something_has_to_happen_first")))
 	for c in rec.get("recruitCounter", {}):
 		if int(run.get("shifts", {}).get(c, 0)) < int(rec["recruitCounter"][c]):
-			return str(rec.get("recruitHint", "Spend more time where they are."))
+			return str(rec.get("recruitHint", Str.t(db, "bonds.spend_more_time_where_they")))
 	return ""
 
 
@@ -115,10 +117,10 @@ static func recruit(db: Dictionary, run: Dictionary, id: String, rng: RandomNumb
 ## Pick tonight's party: up to 3 roster ids.
 static func set_party(db: Dictionary, run: Dictionary, ids: Array) -> String:
 	if ids.size() > int(cfg(db).get("maxParty", 3)):
-		return "Up to %d people can come with you." % int(cfg(db).get("maxParty", 3))
+		return Str.t(db, "bonds.up_to_people_can_come") % int(cfg(db).get("maxParty", 3))
 	for id in ids:
 		if RM.character(run, str(id)).is_empty():
-			return "%s isn't in your roster." % id
+			return Str.t(db, "bonds.isn_t_in_your_roster") % id
 	run["party_ids"] = ids.duplicate()
 	return ""
 

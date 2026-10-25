@@ -245,7 +245,7 @@ func _prop(p: Dictionary) -> void:
 	if kind == "sign" and p.has("text"):
 		signs[cell] = str(p["text"])
 	if kind == "tower":
-		_labels.append({ "pos": Vector2(cell.x * TILE - TILE * 0.75, cell.y * TILE - 2), "text": "Water tower", "color": Color("c9c9c9") })
+		_labels.append({ "pos": Vector2(cell.x * TILE - TILE * 0.75, cell.y * TILE - 2), "text": Strings.t("town_map.water_tower"), "color": Color("c9c9c9") })
 
 
 func _tree(cell: Vector2i) -> void:

@@ -3,6 +3,7 @@
   "name": "Innocent Bystander",
   "role": "Townsperson",
   "home": "bystander_house",
+  "voice": { "id": "voice_default", "pitch": 0.94 },
   "sprite": "npc_innocent_bystander_walk",
   "portrait": "portrait_innocent_bystander",
   "startBond": 0,

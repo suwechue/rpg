@@ -8,14 +8,14 @@ var picks: Array = []
 
 func _ready() -> void:
 	picks = GameState.schedule.duplicate()
-	build("Week %d schedule" % Calendar.week(), 420)
+	build(Strings.t("schedule.week_schedule") % Calendar.week(), 420)
 	_refresh()
 
 
 func _refresh() -> void:
 	clear_body()
 	var db: Dictionary = DataDB.all()
-	text("Pick a class for each period. The same class twice gives half gains the second time.", UiTheme.DIM)
+	text(Strings.t("schedule.pick_a_class_for_each"), UiTheme.DIM)
 	for period in 3:
 		var r := row()
 		r.add_child(UiTheme.label("P%d" % (period + 1), UiTheme.ACCENT))
@@ -33,15 +33,15 @@ func _refresh() -> void:
 				picks[p] = cid
 				_refresh())
 			b.disabled = err != ""
-			b.tooltip_text = "%s\nTeacher: %s\n%s" % [cls.get("blurb", ""), str(db.get("school_classes", {}).get("professors", {}).get(str(cls.get("professor", "")), "")), err]
+			b.tooltip_text = Strings.t("schedule.teacher") % [cls.get("blurb", ""), str(db.get("school_classes", {}).get("professors", {}).get(str(cls.get("professor", "")), "")), err]
 			if chosen:
 				b.theme_type_variation = "SelectedButton"
 			flow.add_child(b)
 	var err := School.schedule_error(db, GameState.run, picks)
 	if err != "":
 		text(err, UiTheme.BAD)
-	add_button("Confirm schedule", func() -> void:
+	add_button(Strings.t("schedule.confirm_schedule"), func() -> void:
 		School.set_schedule(DataDB.all(), GameState.run, picks, Calendar.week())
-		Narrator.say("Schedule set: %s." % ", ".join(PackedStringArray(picks.map(func(c: Variant) -> String: return str(School.class_rec(DataDB.all(), str(c)).get("name", c))))))
+		Narrator.say(Strings.t("schedule.schedule_set") % ", ".join(PackedStringArray(picks.map(func(c: Variant) -> String: return str(School.class_rec(DataDB.all(), str(c)).get("name", c))))))
 		finish(picks), err != "")
 	focus_first()

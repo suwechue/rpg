@@ -20,20 +20,20 @@ var _deck: Array = []
 
 
 func _ready() -> void:
-	build("Workbench (%s)" % place, 420)
+	build(Strings.t("workbench.workbench") % place, 420)
 	_menu()
 
 
 func _menu() -> void:
 	clear_body()
-	text("AP left: %d. A new design costs %d AP and a minigame; a copy costs %d AP." % [int(ap_left.call()), craft_ap, int(DataDB.table("minigames").get("copyAp", 1))], UiTheme.DIM)
-	add_button("Design a new card", _design, int(ap_left.call()) < craft_ap)
-	add_button("Copy a design you own", _copy_menu, int(ap_left.call()) < int(DataDB.table("minigames").get("copyAp", 1)))
-	add_button("Edit decks (free)", func() -> void:
+	text(Strings.t("workbench.ap_left_a_new_design") % [int(ap_left.call()), craft_ap, int(DataDB.table("minigames").get("copyAp", 1))], UiTheme.DIM)
+	add_button(Strings.t("workbench.design_a_new_card"), _design, int(ap_left.call()) < craft_ap)
+	add_button(Strings.t("workbench.copy_a_design_you_own"), _copy_menu, int(ap_left.call()) < int(DataDB.table("minigames").get("copyAp", 1)))
+	add_button(Strings.t("workbench.edit_decks_free"), func() -> void:
 		_deck_owner = "player"
 		_deck = GameState.player.get("deck", []).duplicate()
 		_deck_editor())
-	add_button("Done", func() -> void: finish(null))
+	add_button(Strings.t("workbench.done"), func() -> void: finish(null))
 	focus_first()
 
 
@@ -45,10 +45,10 @@ func _design() -> void:
 		_vectors = [p["knownVectors"][0]]
 	if _form == "" or not p["knownForms"].has(_form):
 		_form = str(p["knownForms"][0]) if not p["knownForms"].is_empty() else ""
-	text("Pick 1 Vector (or 2 for a hybrid), a Form and a Magnitude.", UiTheme.DIM)
+	text(Strings.t("workbench.pick_1_vector_or_2"), UiTheme.DIM)
 	var vr := HFlowContainer.new()
 	body.add_child(vr)
-	vr.add_child(UiTheme.label("Vectors:"))
+	vr.add_child(UiTheme.label(Strings.t("workbench.vectors")))
 	for v in p["knownVectors"]:
 		var a := str(v)
 		vr.add_child(UiTheme.button(("[%s]" if _vectors.has(a) else "%s") % a.capitalize(), func() -> void:
@@ -62,7 +62,7 @@ func _design() -> void:
 			_design()))
 	var fr := HFlowContainer.new()
 	body.add_child(fr)
-	fr.add_child(UiTheme.label("Form:"))
+	fr.add_child(UiTheme.label(Strings.t("workbench.form")))
 	for f in p["knownForms"]:
 		var fid := str(f)
 		fr.add_child(UiTheme.button(("[%s]" if _form == fid else "%s") % str(DataDB.record("forms", fid).get("name", fid)), func() -> void:
@@ -70,7 +70,7 @@ func _design() -> void:
 			_design()))
 	var mr := HFlowContainer.new()
 	body.add_child(mr)
-	mr.add_child(UiTheme.label("Magnitude:"))
+	mr.add_child(UiTheme.label(Strings.t("workbench.magnitude")))
 	var cap := CardRules.magnitude_index(db, CardRules.max_magnitude(db, int(p.get("knowledgeTier", 1))))
 	for m in db.get("vectors", {}).get("magnitudeOrder", []):
 		var mid := str(m)
@@ -78,7 +78,7 @@ func _design() -> void:
 			_magnitude = mid
 			_design())
 		b.disabled = CardRules.magnitude_index(db, mid) > cap
-		b.tooltip_text = "Needs a higher Knowledge Tier." if b.disabled else ""
+		b.tooltip_text = Strings.t("workbench.needs_a_higher_knowledge_tier") if b.disabled else ""
 		mr.add_child(b)
 	var err := CardRules.design_error(db, p, _vectors, _form, _magnitude)
 	if err == "":
@@ -87,12 +87,12 @@ func _design() -> void:
 			dir[v] = 1.0
 		var card := CardRules.make_spell(db, dir, _form, _magnitude)
 		var arch := Crafting.archetype(db, Crafting.input_vector(db, _vectors, _magnitude))
-		text("%s: %d MP. %s" % [card["name"], int(card["cost"]), CardRules.describe(db, card)])
-		text("Minigame: %s. Better Performance rolls Properties; a perfect score adds a Magnitude step." % arch.capitalize(), UiTheme.DIM)
+		text(Strings.t("workbench.mp") % [card["name"], int(card["cost"]), CardRules.describe(db, card)])
+		text(Strings.t("workbench.minigame_better_performance_rolls_properties") % arch.capitalize(), UiTheme.DIM)
 	else:
 		text(err, UiTheme.BAD)
-	add_button("Craft (%d AP)" % craft_ap, _play_minigame, err != "" or int(ap_left.call()) < craft_ap)
-	add_button("Back", _menu)
+	add_button(Strings.t("workbench.craft_ap") % craft_ap, _play_minigame, err != "" or int(ap_left.call()) < craft_ap)
+	add_button(Strings.t("workbench.back"), _menu)
 	focus_first()
 
 
@@ -112,26 +112,26 @@ func _play_minigame() -> void:
 	visible = true
 	var card := Crafting.craft(db, GameState.run, GameState.player, _vectors, _form, _magnitude, perf, Rng.stream("crafting"))
 	clear_body()
-	text("Performance: %d%%" % roundi(perf * 100.0), UiTheme.ACCENT)
+	text(Strings.t("workbench.performance") % roundi(perf * 100.0), UiTheme.ACCENT)
 	if card.has("error"):
 		text(str(card["error"]), UiTheme.BAD)
 	else:
-		text("You made %s (%d MP)." % [card["name"], int(card["cost"])], UiTheme.GOOD)
+		text(Strings.t("workbench.you_made_mp") % [card["name"], int(card["cost"])], UiTheme.GOOD)
 		for prop in card.get("properties", []):
 			var pr := DataDB.record("properties", str(prop))
-			text("Property: %s. %s" % [pr.get("name", prop), pr.get("text", "")])
+			text(Strings.t("workbench.property") % [pr.get("name", prop), pr.get("text", "")])
 		if bool(card.get("stepped", false)):
-			text("A perfect craft: +1 Magnitude step!", UiTheme.GOOD)
-		text("It's in your collection. Add it to a deck from Edit decks.", UiTheme.DIM)
-		Narrator.say("A new card. The workbench smells faintly of %s." % str(_vectors[0]))
-	add_button("Back", _menu)
+			text(Strings.t("workbench.a_perfect_craft_1_magnitude"), UiTheme.GOOD)
+		text(Strings.t("workbench.it_s_in_your_collection"), UiTheme.DIM)
+		Narrator.say(Strings.t("workbench.a_new_card_the_workbench") % str(_vectors[0]))
+	add_button(Strings.t("workbench.back"), _menu)
 	focus_first()
 
 
 func _copy_menu() -> void:
 	clear_body()
 	var db: Dictionary = DataDB.all()
-	text("Copies keep the original's Properties and skip the minigame.", UiTheme.DIM)
+	text(Strings.t("workbench.copies_keep_the_original_s"), UiTheme.DIM)
 	var coll: Dictionary = GameState.run.get("collection", {})
 	var copy_ap := int(DataDB.table("minigames").get("copyAp", 1))
 	for id in coll:
@@ -139,11 +139,11 @@ func _copy_menu() -> void:
 		if not CardRules.is_spell(card):
 			continue
 		var cid := str(id)
-		add_button("%s x%d (%d MP)" % [card.get("name", id), int(coll[id]), CardRules.cost(db, card)], func() -> void:
+		add_button(Strings.t("workbench.x_mp") % [card.get("name", id), int(coll[id]), CardRules.cost(db, card)], func() -> void:
 			if bool(spend_ap.call(copy_ap, "copy")) and Crafting.copy(GameState.run, cid):
-				Narrator.say("Another %s for the pile." % card.get("name", cid))
+				Narrator.say(Strings.t("workbench.another_for_the_pile") % card.get("name", cid))
 			_copy_menu(), int(ap_left.call()) < copy_ap)
-	add_button("Back", _menu)
+	add_button(Strings.t("workbench.back"), _menu)
 	focus_first()
 
 
@@ -161,7 +161,7 @@ func _deck_editor() -> void:
 			_deck = GameState.character(oid).get("deck", []).duplicate()
 			_deck_editor()))
 	var ch := GameState.character(_deck_owner)
-	text("%s's deck: %d cards (%d to %d)." % [ch.get("name", "?"), _deck.size(), int(db["leveling"].get("deckMin", 10)), Char.deck_max(db, ch)], UiTheme.ACCENT)
+	text(Strings.t("workbench.s_deck_cards_to") % [ch.get("name", "?"), _deck.size(), int(db["leveling"].get("deckMin", 10)), Char.deck_max(db, ch)], UiTheme.ACCENT)
 	var ids: Array = []
 	for id in GameState.run.get("collection", {}):
 		ids.append(str(id))
@@ -175,7 +175,7 @@ func _deck_editor() -> void:
 			continue
 		var in_deck := _deck.count(id)
 		var r := row()
-		var l := UiTheme.label("%s (%d MP)  %d in deck / %d owned" % [card.get("name", id), CardRules.cost(db, card), in_deck, Crafting.owned(GameState.run, ch, id)])
+		var l := UiTheme.label(Strings.t("workbench.mp_in_deck_owned") % [card.get("name", id), CardRules.cost(db, card), in_deck, Crafting.owned(GameState.run, ch, id)])
 		l.custom_minimum_size = Vector2(300, 0)
 		r.add_child(l)
 		var cid := id
@@ -188,11 +188,11 @@ func _deck_editor() -> void:
 	var err := Crafting.deck_error(db, GameState.run, ch, _deck)
 	if err != "":
 		text(err, UiTheme.BAD)
-	add_button("Save deck" + (" (%d AP)" % deck_save_cost if deck_save_cost > 0 else ""), func() -> void:
+	add_button(Strings.t("workbench.save_deck") + (Strings.t("workbench.ap") % deck_save_cost if deck_save_cost > 0 else ""), func() -> void:
 		if deck_save_cost > 0 and not bool(spend_ap.call(deck_save_cost, "swapCard")):
 			return
 		Crafting.set_deck(DataDB.all(), GameState.run, GameState.character(_deck_owner), _deck)
 		_menu(), err != "" or int(ap_left.call()) < deck_save_cost)
-	add_button("Back (discard changes)", _menu)
+	add_button(Strings.t("workbench.back_discard_changes"), _menu)
 	focus_first()
 
