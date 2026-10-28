@@ -1,4 +1,5 @@
-## Builds one town map (a zone from data/town/zones/ or an interior template
+## Builds one town map (a zone scene from src/world/zones/ built in the editor
+## (M12), else a zone from data/town/zones/, or an interior template
 ## from data/town/interiors.json) as TileMapLayers stamped from the tilesets
 ## named in data/town/styles.json "packs" (asset ids), plus a drawn overlay for water, furniture, signs,
 ## lit windows and shut doors. Display only; the town scene asks it what is
@@ -6,6 +7,9 @@
 extends Node2D
 
 const SRC := { "town": 0, "city": 1, "floor": 2 }
+const Locs := preload("res://src/core/town/locations.gd")
+const ZoneReader := preload("res://src/world/zone_reader.gd")
+const ZONE_DIR := "res://src/world/zones/"
 
 var TILE: int:
 	get: return Display.tile
@@ -25,6 +29,7 @@ var room_doors: Dictionary = {}    # school hall: cell -> room loc id
 var lit: Array = []                # loc ids with someone home
 var shut: Dictionary = {}          # loc id -> "closed" | "story" (drawn boards)
 var buildings: Array = []
+var camera_rect := Rect2i()          # M12 CameraBounds marker (empty = the whole zone)
 
 var _ground: TileMapLayer
 var _objects: TileMapLayer
@@ -54,9 +59,88 @@ func build(db: Dictionary, id: String, interior: bool) -> void:
 	add_child(_overlay)
 	if interior:
 		_build_interior(db.get("town/interiors", {}).get("interiors", []).filter(func(r: Variant) -> bool: return str(r.get("id", "")) == id)[0])
+	elif ResourceLoader.exists(scene_path(id)):
+		var inst := (load(scene_path(id)) as PackedScene).instantiate()
+		_build_from_scene(ZoneReader.read(inst, TILE))
+		inst.free()
 	else:
 		_build_zone(db.get("town/zones/" + id, {}))
 	_overlay.queue_redraw()
+
+
+static func scene_path(id: String) -> String:
+	return ZONE_DIR + id + ".tscn"
+
+
+## Build from a zone dictionary in the data format (the migration tool and
+## blocks use this to stamp pieces).
+func build_custom(db: Dictionary, zone: Dictionary) -> void:
+	_db = db
+	map_id = str(zone.get("id", "custom"))
+	_styles = db.get("town/styles", {})
+	var ts := _tileset()
+	_ground = TileMapLayer.new()
+	_ground.tile_set = ts
+	add_child(_ground)
+	_objects = TileMapLayer.new()
+	_objects.tile_set = ts
+	add_child(_objects)
+	_overlay = Node2D.new()
+	_build_zone(zone)
+
+
+## The stamped layers and data, for the migration tool.
+func layers() -> Dictionary:
+	return { "ground": _ground, "objects": _objects, "water": _water.duplicate(), "labels": _labels.duplicate() }
+
+
+# --- Zone scenes (M12) ---------------------------------------------------------------
+
+## Build from a zone scene read by ZoneReader: Ground and Objects tiles (Objects
+## and Collision block, Water is drawn and blocks), doors with their buildings,
+## spots, signs and exits.
+func _build_from_scene(z: Dictionary) -> void:
+	size = z["tiles"]
+	for key in ["Ground", "Objects"]:
+		var layer := _ground if key == "Ground" else _objects
+		for t in z[key]:
+			layer.set_cell(t["cell"], int(t["source"]), t["atlas"])
+			if key == "Objects":
+				_block(t["cell"])
+	for t in z["Collision"]:
+		_block(t["cell"])
+	for t in z["Water"]:
+		_water.append(t["cell"])
+		_ground.erase_cell(t["cell"])
+		_block(t["cell"])
+	for d in z["doors"]:
+		var r: Rect2i = d["rect"]
+		var door: Vector2i = d["cell"]
+		var loc := str(d["loc"])
+		for y in range(r.position.y, r.end.y):
+			for x in range(r.position.x, r.end.x):
+				_block(Vector2i(x, y))
+		_block(door)
+		doors[door] = { "loc": loc, "approach": door + Vector2i(0, 1) }
+		door_by_loc[loc] = door
+		buildings.append({ "loc": loc, "rect": r, "door": door })
+		# Every building has a sign; houses get a nameplate with the location's name.
+		var text := str(d["sign"]) if str(d["sign"]) != "" else str(Locs.rec(_db, loc).get("name", ""))
+		if text != "":
+			var row := r.end.y - 1 - (1 if r.size.y >= 5 else 0)
+			_labels.append({ "pos": Vector2(r.position.x * TILE + 2, row * TILE + TILE / 2.0 + 4), "text": text, "color": Color("fff3c4") })
+	for s in z["spots"]:
+		spots[str(s["id"])] = s["cell"]
+	for s in z["signs"]:
+		if str(s["text"]) != "":
+			signs[s["cell"]] = str(s["text"])
+		if str(s["label"]) != "":
+			var c: Vector2i = s["cell"]
+			_labels.append({ "pos": Vector2(c.x * TILE - TILE * 0.75, c.y * TILE - 2), "text": str(s["label"]), "color": Color("c9c9c9") })
+	for e in z["exits"]:
+		exits.append({ "rect": e["rect"], "to": str(e["to"]), "spawn": e["spawn"] })
+	if not z["bounds"].is_empty():
+		camera_rect = z["bounds"][0]
 
 
 func _tileset() -> TileSet:

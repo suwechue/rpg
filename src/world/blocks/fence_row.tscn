@@ -1,0 +1,13 @@
+[gd_scene format=4]
+
+[ext_resource type="TileSet" path="res://src/world/world_tileset.tres" id="1_xmfgj"]
+
+[node name="FenceRow" type="Node2D" unique_id=1511250040]
+
+[node name="Ground" type="TileMapLayer" parent="." unique_id=1885852842]
+tile_map_data = PackedByteArray("AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAACAAAAAAAAAAAAAAADAAAAAAABAAAAAAAEAAAAAAAAAAAAAAAFAAAAAAACAAAAAAA=")
+tile_set = ExtResource("1_xmfgj")
+
+[node name="Objects" type="TileMapLayer" parent="." unique_id=1440450103]
+tile_map_data = PackedByteArray("AAAAAAAAAAAIAAMAAAABAAAAAAAJAAMAAAACAAAAAAAJAAMAAAADAAAAAAAJAAMAAAAEAAAAAAAJAAMAAAAFAAAAAAAKAAMAAAA=")
+tile_set = ExtResource("1_xmfgj")

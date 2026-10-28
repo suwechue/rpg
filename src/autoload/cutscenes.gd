@@ -94,7 +94,8 @@ func _ready() -> void:
 	_choices = VBoxContainer.new()
 	v.add_child(_choices)
 	_skip_btn = UiTheme.button(Strings.t("cutscene.skip"), func() -> void: _skip = true)
-	_skip_btn.position = Vector2(view.x - 52, 4)
+	# Above the dialogue box, clear of the HUD bar and its buttons.
+	_skip_btn.position = Vector2(view.x - 52, view.y - 86)
 	_skip_btn.visible = false
 	add_child(_skip_btn)
 

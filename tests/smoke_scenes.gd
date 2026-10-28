@@ -75,6 +75,29 @@ func _press(modal: Node, needle: String = "") -> bool:
 	return false
 
 
+## M12: each zone scene builds the same map as the zone data it came from
+## (blocked tiles, doors, spots, signs and exits).
+func smoke_zone_scenes_match_data() -> void:
+	var db: Dictionary = _root_node("DataDB").call("all")
+	var MapScript: GDScript = load("res://src/scenes/town/town_map.gd")
+	for id in ["downtown", "residential", "outskirts", "school"]:
+		var from_scene: Node2D = MapScript.new()
+		from_scene.call("build", db, id, false)
+		var from_data: Node2D = MapScript.new()
+		from_data.call("build_custom", db, db["town/zones/" + id])
+		var same := true
+		for key in ["blocked", "doors", "spots", "signs"]:
+			var a: Dictionary = from_scene.get(key)
+			var b: Dictionary = from_data.get(key)
+			if a.keys().size() != b.keys().size() or not a.keys().all(func(k: Variant) -> bool: return b.has(k)):
+				same = false
+				printerr("  %s %s differs: %d vs %d" % [id, key, a.size(), b.size()])
+		same = same and from_scene.get("exits").size() == from_data.get("exits").size()
+		check(same, "%s: the zone scene matches its data" % id)
+		from_scene.free()
+		from_data.free()
+
+
 ## VD Part 5: in demo mode the run ends with the thanks screen and the survey,
 ## saved as a feedback zip, then the title.
 func smoke_demo_end() -> void:

@@ -1,0 +1,12 @@
+[gd_scene format=4]
+
+[ext_resource type="TileSet" path="res://src/world/world_tileset.tres" id="1_784p2"]
+
+[node name="RoadVertical" type="Node2D" unique_id=1449324744]
+
+[node name="Ground" type="TileMapLayer" parent="." unique_id=187723649]
+tile_map_data = PackedByteArray("AAAAAAAAAQABAAUAAAABAAAAAQACAAUAAAAAAAEAAQABAAUAAAABAAEAAQACAAUAAAAAAAIAAQABAAUAAAABAAIAAQACAAUAAAAAAAMAAQABAAUAAAABAAMAAQACAAUAAAAAAAQAAQABAAUAAAABAAQAAQACAAUAAAAAAAUAAQABAAUAAAABAAUAAQACAAUAAAAAAAYAAQABAAUAAAABAAYAAQACAAUAAAAAAAcAAQABAAUAAAABAAcAAQACAAUAAAA=")
+tile_set = ExtResource("1_784p2")
+
+[node name="Objects" type="TileMapLayer" parent="." unique_id=229986843]
+tile_set = ExtResource("1_784p2")

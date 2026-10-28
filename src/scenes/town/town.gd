@@ -102,6 +102,13 @@ func _load_map(id: String, is_int: bool, loc: String, at: Vector2i) -> void:
 	else:
 		_camera.limit_top = -TILE
 		_camera.limit_bottom = h + TILE
+	# M12: a CameraBounds marker narrows the limits (never below one screen).
+	var cb: Rect2i = map.camera_rect
+	if cb.size.x * TILE >= view.x and cb.size.y * TILE >= view.y:
+		_camera.limit_left = cb.position.x * TILE
+		_camera.limit_right = cb.end.x * TILE
+		_camera.limit_top = cb.position.y * TILE - TILE
+		_camera.limit_bottom = cb.end.y * TILE + TILE
 	_camera.make_current()
 	_refresh_people()
 	_save_pos()
