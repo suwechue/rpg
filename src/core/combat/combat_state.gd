@@ -68,6 +68,7 @@ var last_party_card: Dictionary = {}  # the last card a party member played (Mir
 var reinforcements: Dictionary = {}   # { "round", "enemies": [records], "cells": [telegraphed spawn tiles] }
 var mutators: Array = []              # arena mutator records (data/arena/mutators.json) active in this fight
 var multi_vector_casts := 0           # party spells with two or more Vectors (arena score)
+var highest_hit := 0                  # the biggest single party hit (arena score screen, PT Part 6)
 
 
 func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) -> void:
@@ -1960,6 +1961,8 @@ func _damage(t: UnitScript, amount: int, source: UnitScript, vector: String, cau
 	t.shield -= absorbed
 	var rest := amount - absorbed
 	t.hp = maxi(0, t.hp - rest)
+	if source != null and source.team == "party" and cause == "hit":
+		highest_hit = maxi(highest_hit, rest + absorbed)
 	_emit({ "t": "damage", "unit": t.id, "amount": rest, "absorbed": absorbed, "crit": crit, "high": high, "vector": vector, "cause": cause,
 		"source": source.id if source != null else "", "note": _note })
 	_note = ""
@@ -3137,7 +3140,7 @@ func finish() -> Dictionary:
 	return {
 		"result": result, "xp": xp_total, "money": money_total, "party": party, "kills": kills,
 		"remaining": remaining, "wildSurges": wild_surges, "support": support_log,
-		"helpAnswered": answered, "helpIgnored": ignored, "rounds": round_num, "multiVector": multi_vector_casts,
+		"helpAnswered": answered, "helpIgnored": ignored, "rounds": round_num, "multiVector": multi_vector_casts, "highestHit": highest_hit,
 	}
 
 

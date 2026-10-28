@@ -285,6 +285,15 @@ Change these in `data/arena/*.json`.
 
 # Part C: Everything outside combat
 
+**Progression (PT Part 6):**
+- After **every wave**: pick 1 of 3 cards (or skip for 2 Scraps). Offers lean toward the party's Vectors (x3), get rarer as waves go up (common 6 / uncommon 3 / rare 1 early, 2 / 4 / 4 by wave 20), and 20% of the time include a Vector nobody in the party knows.
+- **Every checkpoint (5 waves)**: one party member picks 1 of 2 class perks (Techniques once PT Part 8 lands), plus Arena AP for rest, deck edits (removing a card costs 1), crafting, the Card Forge, teammates and equipment, and the mutator choice.
+- **The first round of every wave**: the whole party acts before any enemy.
+- **Pause** (P): Save and Quit restarts the current wave on Continue.
+- **Score screen**: waves, score, best runs, cards picked, perks taken and the highest single hit.
+
+Change these in `data/arena/waves.json` cardReward and checkpointPick.
+
 ## C1. Days, time and AP
 
 | Day part | AP |
@@ -468,7 +477,6 @@ Change these in `data/story/*.json`, `data/journal.json` and `data/endings.json`
 
 CT is done, with PT Parts 1 and 2 (2 Actions, Quicks, Cantrip, Hold, undo, deck rules) adopted inside it. Next, from `docs/PATCH_1.md`:
 
-- Part 6: arena progression (a card every wave, a Technique every 5).
 - Part 7: status synergies, 80 more cards, 24 more enemies, the Cone Form.
 - Part 8: the Vector expansion, fusion synergy and antagonism, Instability by Magnitude, Techniques.
 - Part 9: point-buy stats.

@@ -663,6 +663,13 @@
     "options.normal": "Normal",
     "options.colorblind": "Colorblind palette: %s",
     "options.on": "On",
-    "options.off": "Off"
+    "options.off": "Off",
+    "arena.pick_a_card": "Pick a card for the road (or skip it for Scraps).",
+    "arena.card_taken": "Taken: %s.",
+    "arena.skip_for_scraps": "Skip (+2 Scraps)",
+    "arena.perk_pick": "Pick a perk for someone (once per checkpoint)",
+    "arena.score_cards": "Cards picked: %s",
+    "arena.score_picks": "Perks taken: %s",
+    "arena.score_highest_hit": "Highest hit: %d"
   }
 }

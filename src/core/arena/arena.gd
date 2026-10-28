@@ -185,6 +185,97 @@ static func wave_won(db: Dictionary, arena: Dictionary, stats: Dictionary) -> Ar
 	return lines
 
 
+## PT Part 6: three cards to pick from after a wave, weighted toward the party's
+## Vectors, rarer as the waves go up, sometimes a Vector nobody knows yet.
+static func card_offer(db: Dictionary, arena: Dictionary, party: Array, wave: int) -> Array:
+	var cr: Dictionary = waves(db).get("cardReward", {})
+	var rng := rng_for(arena, wave, "offer")
+	var known := {}
+	for ch in party:
+		for v in ch.get("knownVectors", []):
+			known[str(v)] = true
+	var t := clampf(float(wave) / float(maxi(1, int(cr.get("lateWave", 20)))), 0.0, 1.0)
+	var early: Dictionary = cr.get("rarityWeights", {}).get("early", {})
+	var late: Dictionary = cr.get("rarityWeights", {}).get("late", {})
+	var pool: Array = []
+	var weights: Array = []
+	var fresh: Array = []
+	for c in DT.records_under(db, "cards/", "cards"):
+		if str(c.get("kind", "")) == "item" or str(c.get("id", "")) in ["card_strike", "card_guard"] or str(c.get("id", "")).begins_with("card_ember") or str(c.get("id", "")).begins_with("card_heat_shield") or str(c.get("id", "")).begins_with("card_frost_line"):
+			continue
+		var r := str(c.get("rarity", "common"))
+		var w := lerpf(float(early.get(r, 1)), float(late.get(r, 1)), t)
+		var axes: Array = c.get("vectors", {}).keys()
+		var party_axis := axes.is_empty()
+		for a in axes:
+			party_axis = party_axis or known.has(str(a))
+		if not axes.is_empty() and not party_axis:
+			fresh.append(str(c["id"]))
+			continue
+		if not axes.is_empty():
+			w *= float(cr.get("partyVectorWeight", 3.0))
+		pool.append(str(c["id"]))
+		weights.append(w)
+	var out: Array = []
+	var n := int(cr.get("choices", 3))
+	if not fresh.is_empty() and rng.randf() < float(cr.get("newVectorChance", 0.2)):
+		out.append(fresh[rng.randi_range(0, fresh.size() - 1)])
+	var guard := 0
+	while out.size() < n and not pool.is_empty() and guard < 200:
+		guard += 1
+		var total := 0.0
+		for w in weights:
+			total += float(w)
+		var roll := rng.randf() * total
+		for i in pool.size():
+			roll -= float(weights[i])
+			if roll <= 0.0:
+				if not out.has(pool[i]):
+					out.append(pool[i])
+				break
+	return out
+
+
+## Take an offered card: into the collection (and the picks list for the score).
+static func pick_card(db: Dictionary, arena: Dictionary, run: Dictionary, card_id: String) -> void:
+	var coll: Dictionary = run.get("collection", {})
+	coll[card_id] = int(coll.get(card_id, 0)) + 1
+	run["collection"] = coll
+	arena["picked"] = arena.get("picked", []) + [card_id]
+	arena["offer"] = []
+
+
+## Skip the offer for Scraps.
+static func skip_offer(db: Dictionary, arena: Dictionary, run: Dictionary) -> Dictionary:
+	var gain: Dictionary = waves(db).get("cardReward", {}).get("skipScraps", { "generic": 2 })
+	if not run.has("scraps"):
+		run["scraps"] = {}
+	for k in gain:
+		run["scraps"][k] = int(run["scraps"].get(k, 0)) + int(gain[k])
+	arena["offer"] = []
+	return gain
+
+
+## Checkpoint pick (PT Part 6): class perks this member doesn't have yet (Techniques after PT Part 8).
+static func perk_offer(db: Dictionary, arena: Dictionary, ch: Dictionary) -> Array:
+	var out: Array = []
+	for p in DT.records_under(db, "perks", "perks"):
+		if str(p.get("class", "")) == str(ch.get("class", "")) and not ch.get("perks", []).has(str(p["id"])):
+			out.append(str(p["id"]))
+	var rng := rng_for(arena, int(arena.get("wave", 0)), "perk" + str(ch.get("id", "")))
+	var n := int(waves(db).get("checkpointPick", {}).get("choices", 2))
+	var picked: Array = []
+	while picked.size() < n and not out.is_empty():
+		picked.append(out.pop_at(rng.randi_range(0, out.size() - 1)))
+	return picked
+
+
+static func take_perk(arena: Dictionary, ch: Dictionary, perk_id: String) -> void:
+	ch["perks"] = ch.get("perks", []) + [perk_id]
+	arena["perksTaken"] = arena.get("perksTaken", []) + [perk_id]
+	arena["perkPicked"] = int(arena.get("wave", 0))
+
+
 static func checkpoint_cfg(db: Dictionary) -> Dictionary:
 	return db.get("arena/checkpoint", {})
 

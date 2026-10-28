@@ -108,6 +108,9 @@ func _refresh() -> void:
 		_text(Strings.t("arena.lv_hp_mp") % [ch.get("name", "?"), int(ch.get("level", 1)), int(ch.get("hp", 0)), int(d["maxHp"]), int(ch.get("mp", 0)), int(d["maxMp"])], UiTheme.DIM)
 	for m in arena.get("mutators", []):
 		_text(Strings.t("arena.mutator") % [m.get("name", ""), m.get("text", "")], UiTheme.GOOD)
+	if not arena.get("offer", []).is_empty():
+		_card_pick()
+		return
 	if phase == "checkpoint":
 		_checkpoint()
 		return
@@ -168,6 +171,9 @@ func _after_wave() -> void:
 	for l in lines:
 		Narrator.say(str(l))
 	var wave := int(arena["wave"])
+	arena["highestHit"] = maxi(int(arena.get("highestHit", 0)), int(summary.get("highestHit", 0)))
+	# PT Part 6: a card pick after every wave.
+	arena["offer"] = Arena.card_offer(db, arena, Party.party(GameState.run), wave)
 	if wave % int(Arena.waves(db).get("narratorEvery", 5)) == 0:
 		Narrator.react("arena")
 	if Arena.is_checkpoint(db, wave):
@@ -217,6 +223,15 @@ func _over() -> void:
 		_text(Strings.t("arena.waves_cleared_final_score") % [int(arena["cleared"]), int(arena["score"]), Strings.t("arena.new_best") if bool(arena.get("newBest", false)) else ""], UiTheme.TEXT)
 		var scores: Dictionary = Journal.data.get("arena", {})
 		_text(Strings.t("arena.best_wave_ever") % int(scores.get("bestWave", 0)), UiTheme.DIM)
+		var names: Array = []
+		for id in arena.get("picked", []):
+			names.append(str(preload("res://src/core/card.gd").resolve(DataDB.all(), str(id), GameState.cards).get("name", id)))
+		_text(Strings.t("arena.score_cards") % (", ".join(PackedStringArray(names)) if not names.is_empty() else "-"), UiTheme.DIM)
+		var perks: Array = []
+		for id in arena.get("perksTaken", []):
+			perks.append(str(DataDB.record("perks", str(id)).get("name", id)))
+		_text(Strings.t("arena.score_picks") % (", ".join(PackedStringArray(perks)) if not perks.is_empty() else "-"), UiTheme.DIM)
+		_text(Strings.t("arena.score_highest_hit") % int(arena.get("highestHit", 0)), UiTheme.DIM)
 		for k in scores:
 			if str(k).begins_with("party"):
 				_text(Strings.t("arena.points_wave") % [str(k).replace("party", Strings.t("arena.party_of")).replace("_mut", Strings.t("arena.mutators")), int(scores[k]["score"]), int(scores[k]["wave"])], UiTheme.DIM)
@@ -257,6 +272,13 @@ func _checkpoint() -> void:
 	_text(Strings.t("arena.checkpoint_arena_ap_unspent_ap") % int(arena["ap"]), UiTheme.ACCENT)
 	var hz := Arena.hazard_set(db, int(arena["wave"]) + 1)
 	_text(Strings.t("arena.next_wave_s_terrain") % hz.get("name", "plain"), UiTheme.DIM)
+	_button(Strings.t("arena.perk_pick"), _perk_pick, int(arena.get("perkPicked", -1)) == int(arena["wave"]))
+	_button(Strings.t("forge.title"), func() -> void:
+		var fs := preload("res://src/scenes/ui/forge_screen.gd").new()
+		fs.spend_ap = _arena_spend
+		fs.ap_left = func() -> int: return int(arena["ap"])
+		await Flow.show_modal(fs)
+		_refresh())
 	var ap := int(arena["ap"])
 	_button(Strings.t("arena.rest_heal_half_hp_and") % int(costs.get("rest", 2)), func() -> void:
 		if Arena.spend(db, arena, "rest"):
@@ -289,6 +311,46 @@ func _checkpoint() -> void:
 	if story:
 		_button(Strings.t("arena.bank_and_leave_the_rift"), _leave)
 	_center()
+
+
+## PT Part 6: pick 1 of 3 cards after a wave, or skip for Scraps.
+func _card_pick() -> void:
+	var db: Dictionary = DataDB.all()
+	_text(Strings.t("arena.pick_a_card"), UiTheme.ACCENT)
+	var row := HBoxContainer.new()
+	_box.add_child(row)
+	for id in arena.get("offer", []):
+		var cid := str(id)
+		var card := preload("res://src/core/card.gd").resolve(db, cid, GameState.cards)
+		var cv := preload("res://src/scenes/combat/card_view.gd").new()
+		cv.setup(card, preload("res://src/core/card.gd").cost(db, card))
+		cv.pressed.connect(func() -> void:
+			Arena.pick_card(db, arena, GameState.run, cid)
+			Narrator.say(Strings.t("arena.card_taken") % str(card.get("name", cid)))
+			_refresh())
+		row.add_child(cv)
+	_button(Strings.t("arena.skip_for_scraps"), func() -> void:
+		Arena.skip_offer(db, arena, GameState.run)
+		_refresh())
+	_center()
+
+
+## PT Part 6: one perk pick per checkpoint for a party member of your choice.
+func _perk_pick() -> void:
+	var db: Dictionary = DataDB.all()
+	var m := preload("res://src/scenes/ui/modal.gd").new()
+	m.build(Strings.t("arena.perk_pick"), 380)
+	for ch in Party.party(GameState.run):
+		var c: Dictionary = ch
+		for pid in Arena.perk_offer(db, arena, c):
+			var rec := DataDB.record("perks", str(pid))
+			var p := str(pid)
+			m.add_button("%s: %s (%s)" % [str(c.get("name", "?")).split(" ")[0], rec.get("name", p), rec.get("text", "")], func() -> void:
+				Arena.take_perk(arena, c, p)
+				m.finish(p))
+	m.add_button(Strings.t("party_panel.close"), func() -> void: m.finish(null))
+	await Flow.show_modal(m)
+	_refresh()
 
 
 func _arena_spend(n: int, _kind: String) -> bool:
@@ -351,6 +413,17 @@ func _equipment() -> void:
 func _autoplay() -> void:
 	await get_tree().create_timer(0.3).timeout
 	var cap := int(GameState.run.get("devArenaWaves", 999))
+	if not arena.get("offer", []).is_empty():
+		# Autoplay takes the first card offered, and a perk at checkpoints (PT Part 6).
+		Arena.pick_card(DataDB.all(), arena, GameState.run, str(arena["offer"][0]))
+		_refresh()
+		_autoplay()
+		return
+	if str(arena.get("phase", "")) == "checkpoint" and int(arena.get("perkPicked", -1)) != int(arena["wave"]):
+		var ch: Dictionary = Party.party(GameState.run)[0]
+		var offer := Arena.perk_offer(DataDB.all(), arena, ch)
+		if not offer.is_empty():
+			Arena.take_perk(arena, ch, str(offer[0]))
 	match str(arena.get("phase", "ready")):
 		"ready":
 			if int(arena["wave"]) < cap:

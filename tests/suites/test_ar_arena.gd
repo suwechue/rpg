@@ -160,3 +160,32 @@ func test_toxic_fire_and_traps() -> void:
 	var hp: int = p.hp
 	st._enter_cell(p, Vector2i(3, 0))
 	check(p.statuses.has("root") and p.hp < hp, "a glyph trap roots and hurts")
+
+
+## PT Part 6: a card offer after every wave, perks at checkpoints.
+func test_pt_card_offer_and_perks() -> void:
+	var arena := Arena.new_arena(5, false)
+	var party: Array = [Char.create(db(), "mage", seeded(1), { "knownVectors": ["heat", "force"] })]
+	var offer := Arena.card_offer(db(), arena, party, 1)
+	check(offer.size() == 3, "three cards are offered (%s)" % str(offer))
+	check(offer == Arena.card_offer(db(), arena, party, 1), "offers are seeded")
+	var run := { "collection": {} }
+	Arena.pick_card(db(), arena, run, str(offer[0]))
+	check(int(run["collection"][str(offer[0])]) == 1 and arena["picked"].size() == 1, "a picked card joins the collection and the score list")
+	var gain := Arena.skip_offer(db(), arena, run)
+	check(int(run["scraps"]["generic"]) == int(gain["generic"]) and int(gain["generic"]) > 0, "skipping gives Scraps")
+	var rare_early := 0
+	var rare_late := 0
+	for w in 20:
+		for id in Arena.card_offer(db(), arena, party, w + 1):
+			if str(DT.index_under(db(), "cards/", "cards").get(str(id), {}).get("rarity", "")) == "rare":
+				rare_early += 1
+		for id in Arena.card_offer(db(), arena, party, w + 40):
+			if str(DT.index_under(db(), "cards/", "cards").get(str(id), {}).get("rarity", "")) == "rare":
+				rare_late += 1
+	check(rare_late > rare_early, "rarity improves with the wave (%d -> %d rares)" % [rare_early, rare_late])
+	var ch: Dictionary = party[0]
+	var perks := Arena.perk_offer(db(), arena, ch)
+	if not perks.is_empty():
+		Arena.take_perk(arena, ch, str(perks[0]))
+		check(ch["perks"].has(str(perks[0])) and arena["perksTaken"].size() == 1, "a checkpoint perk pick")

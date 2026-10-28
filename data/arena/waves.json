@@ -7,14 +7,96 @@
   "powerPerWave": 0.04,
   "eliteEvery": 5,
   "bossEvery": 10,
-  "eliteAffixes": [1, 2],
+  "eliteAffixes": [
+    1,
+    2
+  ],
   "bossAffixesPerCycle": 1,
   "mixedAfter": 10,
-  "waveForWeek": [[1, 1], [5, 2], [9, 3], [13, 4], [17, 5]],
-  "bosses": ["hollow_mascot", "cold_cut", "forge_revenant", "night_ward", "mirror_town"],
+  "waveForWeek": [
+    [
+      1,
+      1
+    ],
+    [
+      5,
+      2
+    ],
+    [
+      9,
+      3
+    ],
+    [
+      13,
+      4
+    ],
+    [
+      17,
+      5
+    ]
+  ],
+  "bosses": [
+    "hollow_mascot",
+    "cold_cut",
+    "forge_revenant",
+    "night_ward",
+    "mirror_town"
+  ],
   "breatherMp": 3,
-  "rewards": { "xpPerWave": 6, "moneyPerWave": 3, "shardEvery": 5, "cardEvery": 5, "cards": ["card_kindle", "card_shatter", "card_blink", "card_tether", "card_halo", "card_shove", "card_dazzle", "card_lunge"] },
-  "score": { "perWave": 10, "noDamage": 5, "fastClear": 3, "fastRounds": 4, "multiVector": 2, "perMutator": 3 },
-  "music": { "wave": "battle", "boss": "battle_boss", "hub": "dungeon" },
-  "narratorEvery": 5
+  "rewards": {
+    "xpPerWave": 6,
+    "moneyPerWave": 3,
+    "shardEvery": 5,
+    "cardEvery": 5,
+    "cards": [
+      "card_kindle",
+      "card_shatter",
+      "card_blink",
+      "card_tether",
+      "card_halo",
+      "card_shove",
+      "card_dazzle",
+      "card_lunge"
+    ]
+  },
+  "score": {
+    "perWave": 10,
+    "noDamage": 5,
+    "fastClear": 3,
+    "fastRounds": 4,
+    "multiVector": 2,
+    "perMutator": 3
+  },
+  "music": {
+    "wave": "battle",
+    "boss": "battle_boss",
+    "hub": "dungeon"
+  },
+  "narratorEvery": 5,
+  "cardReward": {
+    "comment": "PT Part 6: after every wave, pick 1 of 'choices' cards or skip for skipScraps. Rarity weights move from 'early' to 'late' by wave lateWave; cards in the party's Vectors are weighted by partyVectorWeight; newVectorChance is the chance one offer is a Vector nobody in the party knows.",
+    "choices": 3,
+    "skipScraps": {
+      "generic": 2
+    },
+    "partyVectorWeight": 3.0,
+    "newVectorChance": 0.2,
+    "lateWave": 20,
+    "rarityWeights": {
+      "early": {
+        "common": 6,
+        "uncommon": 3,
+        "rare": 1
+      },
+      "late": {
+        "common": 2,
+        "uncommon": 4,
+        "rare": 4
+      }
+    }
+  },
+  "checkpointPick": {
+    "comment": "PT Part 6: every checkpoint, one party member picks 1 of 'choices' perks (Techniques once PT Part 8 lands).",
+    "choices": 2
+  }
 }
