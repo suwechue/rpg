@@ -346,12 +346,9 @@ static func skip_offer(db: Dictionary, arena: Dictionary, run: Dictionary) -> Di
 	return gain
 
 
-## Checkpoint pick (PT Part 6): class perks this member doesn't have yet (Techniques after PT Part 8).
+## Checkpoint pick (PT Parts 6 and 8): Techniques this member could take now.
 static func perk_offer(db: Dictionary, arena: Dictionary, ch: Dictionary) -> Array:
-	var out: Array = []
-	for p in DT.records_under(db, "perks", "perks"):
-		if str(p.get("class", "")) == str(ch.get("class", "")) and not ch.get("perks", []).has(str(p["id"])):
-			out.append(str(p["id"]))
+	var out: Array = preload("res://src/core/progression/leveling.gd").technique_options(db, ch)
 	var rng := rng_for(arena, int(arena.get("wave", 0)), "perk" + str(ch.get("id", "")))
 	var n := int(waves(db).get("checkpointPick", {}).get("choices", 2))
 	var picked: Array = []
@@ -361,7 +358,7 @@ static func perk_offer(db: Dictionary, arena: Dictionary, ch: Dictionary) -> Arr
 
 
 static func take_perk(arena: Dictionary, ch: Dictionary, perk_id: String) -> void:
-	ch["perks"] = ch.get("perks", []) + [perk_id]
+	ch["techniques"] = ch.get("techniques", []) + [perk_id]
 	arena["perksTaken"] = arena.get("perksTaken", []) + [perk_id]
 	arena["perkPicked"] = int(arena.get("wave", 0))
 
@@ -424,6 +421,9 @@ static func spend(db: Dictionary, arena: Dictionary, action: String) -> bool:
 
 ## Rest: everyone back up to restPct of max HP and MP (on top of what they have).
 static func rest(db: Dictionary, party: Array) -> void:
+	for ch in party:
+		# Meditative Reserve (PT Part 8): +3 MP at checkpoints.
+		ch["mp"] = int(ch.get("mp", 0)) + int(Char.collect_mods(db, ch).get("rest", {}).get("mpBonus", 0))
 	var pct := float(checkpoint_cfg(db).get("restPct", 0.5))
 	for ch in party:
 		var d := Char.derived(db, ch)

@@ -96,7 +96,7 @@ Most numbers live in `data/` (JSON). The main files:
 | MP regen | **1 per turn**. MP is **not** refilled between fights in a night, only by rest rooms, food and sleeping | derived.mpRegen |
 | Spell cost | Magnitude cost (Minor 1, Standard 2, Major 4, Grand 7) + Form cost (0 to 3) + 1 if hybrid | `data/vectors.json` magnitudes; `data/forms.json` |
 | Magnitude | Minor 4 power, Standard 7, Major 14, Grand 25. Capped by Knowledge Tier (Tier 1: Standard, Tier 2: Major, Tier 3: Grand). Force pushes 1 tile per 7 power | `data/vectors.json`; `data/stats.json` pushPowerPerStep |
-| Card kinds | **Spell** (Vector + Form + Magnitude), **basic** (Lunge, Dash, Shove...), **item**. 152 card records plus generated spell designs. Every class has a **class card pool** of 10 to 15 cards (`data/cards/class_<id>.json`, only that class draws them as rewards) and there are 14 status setup and payoff cards (`data/cards/synergy_cards.json`). New Form: **Cone** (1-3-5 tiles, range 3 from the caster, x0.7, cost 2), also used by enemies | `data/cards/*.json`; `data/forms.json` |
+| Card kinds | **Spell** (Vector + Form + Magnitude), **basic** (Lunge, Dash, Shove...), **item**. 194 card records plus generated spell designs, including 42 for the new Vectors (`data/cards/advanced_vector_cards.json`). Every class has a **class card pool** of 10 to 15 cards (`data/cards/class_<id>.json`, only that class draws them as rewards) and there are 14 status setup and payoff cards (`data/cards/synergy_cards.json`). New Form: **Cone** (1-3-5 tiles, range 3 from the caster, x0.7, cost 2), also used by enemies | `data/cards/*.json`; `data/forms.json` |
 | Card text | Every card's text says when it applies: quick cards start with "Quick.", movement cards say "or next turn", once-per-fight cards say so. Short lines use the real power (`{power}`). A test checks this | `tests/suites/test_pt_turns.gd` |
 | Rarity and upgrades | Common, uncommon, rare. Upgraded versions ("Ember Bolt+") via crafting and arena rewards | card rarity, upgrade |
 | Can't play | Unaffordable cards, or ones needing a spent Action, are greyed out with the reason on hover | — |
@@ -287,6 +287,8 @@ Advanced classes (Class Change at levels 5 and 12): Elementalist, Kinetic Logici
 
 **Variety (PT Part 7):** every normal and elite enemy has **2 to 4 actions** with different shapes (single, line, cone, burst, ring, cross, charge, buff), some leaving statuses on whoever they hit (Wet, Marked, Exposed). 14 new base-Vector enemies (`data/enemies/patch_enemies.json`): Puddle Imp, Frost Fang, Ember Tick, Root Weaver, Spotlight Drone, Acid Drip, Gym Rope, Locker Leaper, Fire Alarm, Mop Golem (elite), Hall Monitor, Rust Bucket, Cinder Swarm, Frost Chorister (elite), palette swaps until there's art. Every elite has a **signature mechanic** by its Vector (Firebrand leaves fire, Permafrost makes you Wet, Juggernaut can't be pushed, Blur moves and attacks, Glare marks, Anchor roots, Rot exposes, Leech heals). Each boss has a new status attack (Foam Flood, Deep Freeze, Slag Spray, Sedative Mist, Spotlight Glare). The new Vectors' enemy families and combo encounter templates come with PT Part 8.
 
+**New Vectors' families (PT Part 8):** Static Imp (Lightning, chains through Wet), Hush Moth (Sound, scream Dazes), Gloom (Shadow), Sludge Slug (Poison, toxic trail), Grav Rock (Gravity), Ward Totem (shields allies; break it first), Mask of Whispers (Psychic), Echo (Cognition, copies your last card), Rust Hound (Corrosion), Entropic Wisp (Entropy, blows itself up). Slimes, golems and totems are **mindless** (Psychic does nothing to them). **Combo encounters:** Storm front (a Wet maker with Static Imps), Toxic garden (slugs and a healer), Gravity trap (a Grav Rock with fast enemies); template slots can name an enemy id.
+
 ## B12. The Endless Arena
 
 - **Two ways in:** from the title screen (a preset party: your class plus one of each other class, named Ash, Brick, Quill, Sage and Lyric), or in the story through **the Rift** (week 2+). In the story, losing knocks you out instead of killing you.
@@ -392,6 +394,25 @@ Change these in `data/school_classes.json`, `data/events/class_events.json`, `da
 - **Knowledge Tier:** Tier 2 at level 5 with INT 8; Tier 3 at level 10 with INT 12. It caps Magnitude and which new Vectors and Forms you can learn.
 
 Change these in `data/leveling.json`, `data/stats.json` and `data/classes.json`.
+
+**Techniques (PT Part 8, replacing the level 3, 6 and 9 perk picks):** picks at levels **2, 3, 6, 10, 14 and 18** from a shared pool of 24 in four categories (Forging, Alchemy, Kinetics, Meditation); each has a tier (minimum level 2, 3, 6, 10, 14, 18). Every class can take any category, but each starts with one (Mage Still Mind, Fighter Runic Toolkit, Rogue Vector Redirection, Healer Meditative Reserve, Bard Still Mind) and its leaning categories are listed first. **Reconfigure** one Technique at the night workbench (1 AP) or an arena checkpoint (1 Arena AP); arena checkpoints also offer one Technique pick per visit.
+
+| Technique | Active now | Effect |
+| --- | --- | --- |
+| Runic Toolkit | Yes | Learn Construct; Constructs +50% HP |
+| Efficient Forging, Lasting Rune | Lasting Rune yes | Constructs and Glyphs last +2 rounds (the cost cut is data, not wired yet) |
+| Vector Redirection, Perfect Counter | Yes | Reaction, 2 MP (0 with Perfect Counter): a single-target attack on you goes to another enemy within 3 |
+| Reactive Casting | Data | Cantrip at enemies stepping next to you |
+| Conversion Reflex | Yes | Reaction, 1 MP: a known Vector's damage is reduced by INT/2 + level/2 |
+| Mid-Flight Correction | Yes | Your ranged attacks ignore half cover |
+| Living Equation | Yes | Your Quick can be your Cantrip |
+| Still Mind, Resilient Mind | Yes | Instability rolls twice (first roll each fight / every roll), keep the best |
+| Meditative Reserve | Yes | +3 MP at rest rooms and arena checkpoints |
+| Internal Casting | Yes | Hazards don't hurt you on your own turn while you have 1+ MP |
+| One With the Formula | Yes | Instability thresholds +3 |
+| Modular Imbuement, Overcharged Construct, Living Foundry, all Alchemy, Deep Calculation | Planned | Listed greyed out until potions, acting constructs and once-per-night actions exist |
+
+Reactions use Options "reactions" (auto by default; "ask" acts like auto until the prompt is built; never). **Advanced classes** added: **Alchemist** (from Mage or Healer; needs Stored Formula) and **Runesmith** (from Mage or Fighter; needs Runic Toolkit); Smith-Mage is now the hidden upgraded Runesmith. Change them in `data/techniques.json` and `data/classes.json`.
 
 ## C4. Crafting cards
 
@@ -505,8 +526,9 @@ Change these in `data/story/*.json`, `data/journal.json` and `data/endings.json`
 
 ---
 
-# Part D: Changing next (Playtest Patch 1, PT)
+# Part D: Changing next
 
-CT is done, with PT Parts 1 and 2 (2 Actions, Quicks, Cantrip, Hold, undo, deck rules) adopted inside it. Next, from `docs/PATCH_1.md`:
-
-- Part 8: the Vector expansion, fusion synergy and antagonism, Instability by Magnitude, Techniques.
+PT (`docs/PATCH_1.md`) and P2 Parts 1 and 2 (`docs/PATCH_2.md`) are in. Next:
+- VD (`docs/VECTORS_DEMO.md`) Parts 1 to 4: audio and asset polish, combos and the Compendium, the spark quiz, the visual card builder.
+- P2 Part 3: the cutscene system (M14) and the intro and tutorial day (M15).
+- VD Parts 5 and 6: the demo build and feedback tools.

@@ -30,6 +30,17 @@ func _menu() -> void:
 	text(Strings.t("workbench.ap_left_a_new_design") % [int(ap_left.call()), craft_ap, int(DataDB.table("minigames").get("copyAp", 1))], UiTheme.DIM)
 	add_button(Strings.t("workbench.design_a_new_card"), _design, int(ap_left.call()) < craft_ap)
 	add_button(Strings.t("workbench.copy_a_design_you_own"), _copy_menu, int(ap_left.call()) < int(DataDB.table("minigames").get("copyAp", 1)))
+	var rc := int(DataDB.table("techniques").get("reconfigureCost", 1))
+	add_button(Strings.t("technique.reconfigure") % rc, func() -> void:
+		var owned: Array = GameState.player.get("techniques", [])
+		if owned.is_empty() or not bool(spend_ap.call(rc, "technique")):
+			return
+		var ts := preload("res://src/scenes/ui/technique_screen.gd").new()
+		ts.reconfigure_from = str(owned[0])
+		visible = false
+		await Flow.show_modal(ts)
+		visible = true
+		_menu(), int(ap_left.call()) < rc or GameState.player.get("techniques", []).is_empty())
 	add_button(Strings.t("forge.title"), func() -> void:
 		var fs := preload("res://src/scenes/ui/forge_screen.gd").new()
 		fs.spend_ap = spend_ap

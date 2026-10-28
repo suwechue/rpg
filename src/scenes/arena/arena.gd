@@ -242,7 +242,7 @@ func _over() -> void:
 		_text(Strings.t("arena.score_cards") % (", ".join(PackedStringArray(names)) if not names.is_empty() else "-"), UiTheme.DIM)
 		var perks: Array = []
 		for id in arena.get("perksTaken", []):
-			perks.append(str(DataDB.record("perks", str(id)).get("name", id)))
+			perks.append(str(preload("res://src/core/progression/leveling.gd").techniques(DataDB.all()).get(str(id), {}).get("name", id)))
 		_text(Strings.t("arena.score_picks") % (", ".join(PackedStringArray(perks)) if not perks.is_empty() else "-"), UiTheme.DIM)
 		_text(Strings.t("arena.score_highest_hit") % int(arena.get("highestHit", 0)), UiTheme.DIM)
 		for k in scores:
@@ -285,7 +285,7 @@ func _checkpoint() -> void:
 	_text(Strings.t("arena.checkpoint_arena_ap_unspent_ap") % int(arena["ap"]), UiTheme.ACCENT)
 	var hz := Arena.hazard_set(db, int(arena["wave"]) + 1)
 	_text(Strings.t("arena.next_wave_s_terrain") % hz.get("name", "plain"), UiTheme.DIM)
-	_button(Strings.t("arena.perk_pick"), _perk_pick, int(arena.get("perkPicked", -1)) == int(arena["wave"]))
+	_button(Strings.t("arena.technique_pick"), _perk_pick, int(arena.get("perkPicked", -1)) == int(arena["wave"]))
 	_button(Strings.t("forge.title"), func() -> void:
 		var fs := preload("res://src/scenes/ui/forge_screen.gd").new()
 		fs.spend_ap = _arena_spend
@@ -385,7 +385,7 @@ func _perk_pick() -> void:
 	for ch in Party.party(GameState.run):
 		var c: Dictionary = ch
 		for pid in Arena.perk_offer(db, arena, c):
-			var rec := DataDB.record("perks", str(pid))
+			var rec: Dictionary = preload("res://src/core/progression/leveling.gd").techniques(db).get(str(pid), {})
 			var p := str(pid)
 			m.add_button("%s: %s (%s)" % [str(c.get("name", "?")).split(" ")[0], rec.get("name", p), rec.get("text", "")], func() -> void:
 				Arena.take_perk(arena, c, p)

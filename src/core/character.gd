@@ -68,6 +68,8 @@ static func create(db: Dictionary, class_id: String, rng: RandomNumberGenerator,
 		"traits": opts.get("traits", []).duplicate(),
 		"perks": [],
 		"pendingPerks": [],
+		"techniques": [],
+		"pendingTechniques": [],
 		"deck": [],
 		"equipment": { "weapon": null, "armor": null, "trinket": null },
 		"dryVectorRolls": 0,
@@ -77,6 +79,10 @@ static func create(db: Dictionary, class_id: String, rng: RandomNumberGenerator,
 		"flags": {},
 		"isPlayer": bool(opts.get("isPlayer", false)),
 	}
+	# PT Part 8: each class starts with its leaning Technique.
+	var st_tech := str(class_data(db, class_id).get("startingTechnique", ""))
+	if st_tech != "":
+		ch["techniques"] = [st_tech]
 	ch["deck"] = starter_deck(db, ch)
 	var d := derived(db, ch)
 	ch["hp"] = int(d["maxHp"])
@@ -132,6 +138,10 @@ static func collect_mods(db: Dictionary, ch: Dictionary) -> Dictionary:
 	for p in ch.get("perks", []):
 		if perks.has(str(p)):
 			sources.append(perks[str(p)].get("mods", {}))
+	var techs := DT.index_under(db, "techniques", "techniques")
+	for t in ch.get("techniques", []):
+		if techs.has(str(t)) and not bool(techs[str(t)].get("planned", false)):
+			sources.append(techs[str(t)].get("mods", {}))
 	var items := DT.index_under(db, "items", "items")
 	var equipment: Dictionary = ch.get("equipment", {})
 	for slot in equipment:

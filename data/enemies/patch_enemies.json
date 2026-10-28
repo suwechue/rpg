@@ -549,7 +549,8 @@
       "money": 2,
       "sprite": "enemy_mop_golem",
       "trail": "ice",
-      "signatureText": "Wet Floor: leaves ice behind it."
+      "signatureText": "Wet Floor: leaves ice behind it.",
+      "mindless": true
     },
     {
       "id": "hall_monitor",

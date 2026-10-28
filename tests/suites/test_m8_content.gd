@@ -32,7 +32,7 @@ func test_advanced_class_data() -> void:
 			if bool(c.get("hidden", false)):
 				hidden += 1
 			check(c.has("requires") and c.has("growth") and c.has("perk"), "%s is complete" % c["id"])
-	check(adv == 10 and hidden == 3, "10 advanced classes, 3 hidden (%d, %d)" % [adv, hidden])
+	check(adv == 12 and hidden == 3, "12 advanced classes (Alchemist and Runesmith added in PT Part 8), 3 hidden (%d, %d)" % [adv, hidden])
 
 
 func test_class_change_at_5() -> void:
@@ -49,12 +49,11 @@ func test_class_change_at_5() -> void:
 	check(not locked_ids.has("deli_knight") and not o["available"].has("deli_knight"), "hidden classes don't show while locked")
 	check(not o["available"].has("upside_touched"), "Tier 3 waits for level 12")
 	Lv.auto_perks(db(), p)
-	var keep := str(p["perks"][0])
-	CC.apply(db(), run, p, "elementalist", keep)
-	check(p["class"] == "elementalist" and p["perks"] == [keep] and not p.has("pendingClassChange"), "class changed, one perk kept")
+	CC.apply(db(), run, p, "elementalist", "")
+	check(p["class"] == "elementalist" and not p.has("pendingClassChange"), "class changed (Techniques replace perk picks, PT Part 8)")
 	check(p["knownForms"].has("burst"), "Elementalist grants Burst")
 	check(float(Char.collect_mods(db(), p).get("combat", {}).get("spellDamagePct", 0.0)) >= 0.1, "class mods apply")
-	check(Lv.perk_options(db(), p, 6).size() == 2, "perks at 6 still come from the old class tree")
+	check(not Lv.technique_options(db(), p).is_empty(), "Techniques are on offer after the change")
 
 
 func test_hidden_and_tier3_gates() -> void:

@@ -1,0 +1,579 @@
+{
+  "comment": "PT Part 8: enemy families for the new Vectors.",
+  "enemies": [
+    {
+      "id": "static_imp",
+      "name": "Static Imp",
+      "tier": "normal",
+      "weeks": [
+        2,
+        3
+      ],
+      "text": "Chains through anything wet.",
+      "hp": 13,
+      "movement": 3,
+      "initiative": 6,
+      "physDefense": 1,
+      "magicResist": 2,
+      "stability": 6,
+      "stats": {
+        "str": 6,
+        "dex": 6
+      },
+      "weakTo": [
+        "binding"
+      ],
+      "strongAgainst": [
+        "lightning"
+      ],
+      "signature": {
+        "lightning": 1.0
+      },
+      "disposition": {
+        "courage": 50,
+        "curiosity": 30
+      },
+      "actions": [
+        {
+          "id": "zap",
+          "name": "Zap",
+          "form": "bolt",
+          "magnitude": "minor",
+          "vectors": {
+            "lightning": 1
+          },
+          "damage": 8,
+          "statusAfter": "conductive"
+        },
+        {
+          "id": "arc",
+          "name": "Arc Line",
+          "form": "line",
+          "magnitude": "minor",
+          "vectors": {
+            "lightning": 1
+          },
+          "damage": 7
+        }
+      ],
+      "xp": 9,
+      "money": 3,
+      "sprite": "enemy_static_imp"
+    },
+    {
+      "id": "hush_moth",
+      "name": "Hush Moth",
+      "tier": "normal",
+      "weeks": [
+        2,
+        4
+      ],
+      "text": "Its scream steals your next quick move.",
+      "hp": 12,
+      "movement": 3,
+      "initiative": 6,
+      "physDefense": 1,
+      "magicResist": 2,
+      "stability": 6,
+      "stats": {
+        "str": 6,
+        "dex": 6
+      },
+      "weakTo": [
+        "heat"
+      ],
+      "strongAgainst": [
+        "sound"
+      ],
+      "signature": {
+        "sound": 1.0
+      },
+      "disposition": {
+        "courage": 50,
+        "curiosity": 30
+      },
+      "actions": [
+        {
+          "id": "scream",
+          "name": "Scream Ring",
+          "form": "burst",
+          "magnitude": "minor",
+          "vectors": {
+            "sound": 1
+          },
+          "damage": 7,
+          "statusAfter": "dazed"
+        },
+        {
+          "id": "flutter",
+          "name": "Flutter",
+          "kind": "strike",
+          "damage": 8
+        }
+      ],
+      "xp": 9,
+      "money": 3,
+      "sprite": "enemy_hush_moth"
+    },
+    {
+      "id": "gloom",
+      "name": "Gloom",
+      "tier": "normal",
+      "weeks": [
+        3,
+        5
+      ],
+      "text": "Hides in Shadow tiles; only Light shows it.",
+      "hp": 14,
+      "movement": 3,
+      "initiative": 6,
+      "physDefense": 1,
+      "magicResist": 2,
+      "stability": 6,
+      "stats": {
+        "str": 6,
+        "dex": 6
+      },
+      "weakTo": [
+        "light"
+      ],
+      "strongAgainst": [
+        "shadow"
+      ],
+      "signature": {
+        "shadow": 1.0
+      },
+      "disposition": {
+        "courage": 50,
+        "curiosity": 30
+      },
+      "actions": [
+        {
+          "id": "grasp",
+          "name": "Grasp",
+          "kind": "strike",
+          "damage": 11
+        },
+        {
+          "id": "dim",
+          "name": "Dim",
+          "form": "cone",
+          "magnitude": "minor",
+          "vectors": {
+            "shadow": 1
+          },
+          "damage": 6,
+          "statusAfter": "blind"
+        }
+      ],
+      "xp": 9,
+      "money": 3,
+      "sprite": "enemy_gloom"
+    },
+    {
+      "id": "sludge_slug",
+      "name": "Sludge Slug",
+      "tier": "normal",
+      "weeks": [
+        2,
+        4
+      ],
+      "text": "Leaves a toxic trail. Mindless.",
+      "hp": 18,
+      "movement": 2,
+      "initiative": 6,
+      "physDefense": 1,
+      "magicResist": 2,
+      "stability": 6,
+      "stats": {
+        "str": 6,
+        "dex": 6
+      },
+      "weakTo": [
+        "heat"
+      ],
+      "strongAgainst": [
+        "poison"
+      ],
+      "signature": {
+        "poison": 1.0
+      },
+      "disposition": {
+        "courage": 50,
+        "curiosity": 30
+      },
+      "actions": [
+        {
+          "id": "spit",
+          "name": "Toxic Spit",
+          "form": "bolt",
+          "magnitude": "minor",
+          "vectors": {
+            "poison": 1
+          },
+          "damage": 7,
+          "statusAfter": "poisoned"
+        },
+        {
+          "id": "ooze",
+          "name": "Ooze",
+          "kind": "strike",
+          "damage": 9
+        }
+      ],
+      "xp": 9,
+      "money": 3,
+      "sprite": "enemy_sludge_slug",
+      "trail": "toxic",
+      "mindless": true
+    },
+    {
+      "id": "grav_rock",
+      "name": "Grav Rock",
+      "tier": "normal",
+      "weeks": [
+        3,
+        5
+      ],
+      "text": "Pulls everyone a tile toward itself. Mindless.",
+      "hp": 22,
+      "movement": 1,
+      "initiative": 6,
+      "physDefense": 1,
+      "magicResist": 2,
+      "stability": 6,
+      "stats": {
+        "str": 6,
+        "dex": 6
+      },
+      "weakTo": [
+        "sound"
+      ],
+      "strongAgainst": [
+        "gravity"
+      ],
+      "signature": {
+        "gravity": 1.0
+      },
+      "disposition": {
+        "courage": 50,
+        "curiosity": 30
+      },
+      "actions": [
+        {
+          "id": "pull",
+          "name": "Pull",
+          "form": "burst",
+          "magnitude": "minor",
+          "vectors": {
+            "gravity": 1
+          },
+          "damage": 6
+        },
+        {
+          "id": "slam",
+          "name": "Rock Slam",
+          "kind": "strike",
+          "damage": 12
+        }
+      ],
+      "xp": 9,
+      "money": 3,
+      "sprite": "enemy_grav_rock",
+      "mindless": true
+    },
+    {
+      "id": "ward_totem",
+      "name": "Ward Totem",
+      "tier": "normal",
+      "weeks": [
+        3,
+        5
+      ],
+      "text": "Shields its friends. Break it first. Mindless.",
+      "hp": 16,
+      "movement": 0,
+      "initiative": 6,
+      "physDefense": 1,
+      "magicResist": 2,
+      "stability": 6,
+      "stats": {
+        "str": 6,
+        "dex": 6
+      },
+      "weakTo": [
+        "force",
+        "sound"
+      ],
+      "strongAgainst": [
+        "warding"
+      ],
+      "signature": {
+        "warding": 1.0
+      },
+      "disposition": {
+        "courage": 50,
+        "curiosity": 30
+      },
+      "actions": [
+        {
+          "id": "ward",
+          "name": "Ward Pulse",
+          "form": "shield",
+          "magnitude": "minor",
+          "vectors": {
+            "light": 1
+          },
+          "power": 8
+        },
+        {
+          "id": "zap",
+          "name": "Totem Zap",
+          "form": "bolt",
+          "magnitude": "minor",
+          "vectors": {
+            "warding": 1
+          },
+          "damage": 6
+        }
+      ],
+      "xp": 9,
+      "money": 3,
+      "sprite": "enemy_ward_totem",
+      "behavior": "healer",
+      "mindless": true
+    },
+    {
+      "id": "mask_of_whispers",
+      "name": "Mask of Whispers",
+      "tier": "normal",
+      "weeks": [
+        4,
+        5
+      ],
+      "text": "Confuses whoever listens.",
+      "hp": 15,
+      "movement": 3,
+      "initiative": 6,
+      "physDefense": 1,
+      "magicResist": 2,
+      "stability": 6,
+      "stats": {
+        "str": 6,
+        "dex": 6
+      },
+      "weakTo": [
+        "light"
+      ],
+      "strongAgainst": [
+        "psychic"
+      ],
+      "signature": {
+        "psychic": 1.0
+      },
+      "disposition": {
+        "courage": 50,
+        "curiosity": 30
+      },
+      "actions": [
+        {
+          "id": "whisper",
+          "name": "Whisper",
+          "form": "bolt",
+          "magnitude": "standard",
+          "vectors": {
+            "psychic": 1
+          },
+          "damage": 9,
+          "statusAfter": "dazed"
+        },
+        {
+          "id": "dread",
+          "name": "Dread Cone",
+          "form": "cone",
+          "magnitude": "minor",
+          "vectors": {
+            "psychic": 1
+          },
+          "damage": 7
+        }
+      ],
+      "xp": 9,
+      "money": 3,
+      "sprite": "enemy_mask_of_whispers"
+    },
+    {
+      "id": "echo",
+      "name": "Echo",
+      "tier": "normal",
+      "weeks": [
+        4,
+        5
+      ],
+      "text": "Copies the last card played.",
+      "hp": 14,
+      "movement": 3,
+      "initiative": 6,
+      "physDefense": 1,
+      "magicResist": 2,
+      "stability": 6,
+      "stats": {
+        "str": 6,
+        "dex": 6
+      },
+      "weakTo": [
+        "shadow"
+      ],
+      "strongAgainst": [
+        "cognition"
+      ],
+      "signature": {
+        "cognition": 1.0
+      },
+      "disposition": {
+        "courage": 50,
+        "curiosity": 30
+      },
+      "actions": [
+        {
+          "id": "copy",
+          "name": "Echo Bolt",
+          "form": "bolt",
+          "magnitude": "standard",
+          "vectors": {
+            "cognition": 1,
+            "light": 1
+          },
+          "damage": 9
+        },
+        {
+          "id": "jab",
+          "name": "Echo Jab",
+          "kind": "strike",
+          "damage": 9
+        }
+      ],
+      "xp": 9,
+      "money": 3,
+      "sprite": "enemy_echo",
+      "behavior": "mirror"
+    },
+    {
+      "id": "rust_hound",
+      "name": "Rust Hound",
+      "tier": "normal",
+      "weeks": [
+        3,
+        5
+      ],
+      "text": "Shreds Defense and eats cover.",
+      "hp": 17,
+      "movement": 5,
+      "initiative": 6,
+      "physDefense": 1,
+      "magicResist": 2,
+      "stability": 6,
+      "stats": {
+        "str": 6,
+        "dex": 6
+      },
+      "weakTo": [
+        "light"
+      ],
+      "strongAgainst": [
+        "corrosion"
+      ],
+      "signature": {
+        "corrosion": 1.0
+      },
+      "disposition": {
+        "courage": 50,
+        "curiosity": 30
+      },
+      "actions": [
+        {
+          "id": "bite",
+          "name": "Rust Bite",
+          "kind": "strike",
+          "damage": 12,
+          "vectors": {
+            "corrosion": 1
+          },
+          "statusAfter": "exposed"
+        },
+        {
+          "id": "lunge",
+          "name": "Corroding Lunge",
+          "form": "line",
+          "magnitude": "minor",
+          "vectors": {
+            "corrosion": 1
+          },
+          "damage": 8
+        }
+      ],
+      "xp": 9,
+      "money": 3,
+      "sprite": "enemy_rust_hound"
+    },
+    {
+      "id": "entropic_wisp",
+      "name": "Entropic Wisp",
+      "tier": "normal",
+      "weeks": [
+        5
+      ],
+      "text": "Unstable: it blows itself up when it's losing.",
+      "hp": 12,
+      "movement": 3,
+      "initiative": 6,
+      "physDefense": 1,
+      "magicResist": 2,
+      "stability": 6,
+      "stats": {
+        "str": 6,
+        "dex": 6
+      },
+      "weakTo": [
+        "warding"
+      ],
+      "strongAgainst": [
+        "entropy"
+      ],
+      "signature": {
+        "entropy": 1.0
+      },
+      "disposition": {
+        "courage": 50,
+        "curiosity": 30
+      },
+      "actions": [
+        {
+          "id": "decay",
+          "name": "Decay",
+          "form": "bolt",
+          "magnitude": "standard",
+          "vectors": {
+            "entropy": 1
+          },
+          "damage": 10
+        },
+        {
+          "id": "burst",
+          "name": "Unstable Burst",
+          "form": "burst",
+          "magnitude": "standard",
+          "vectors": {
+            "entropy": 1
+          },
+          "damage": 14,
+          "selfDestruct": true
+        }
+      ],
+      "xp": 9,
+      "money": 3,
+      "sprite": "enemy_entropic_wisp",
+      "behavior": "bomber"
+    }
+  ]
+}

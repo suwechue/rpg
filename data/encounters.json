@@ -1,39 +1,391 @@
 {
-  "comment": "Encounters (docs/ARENA.md Part 4b). Fights are built from templates whose role slots are filled with this week's enemies (weighted by the week's signature). 'counts' is the enemy budget per room type and week; minions count as half. Roles come from enemy data: minion, healer, summoner, front (shield bearers, anchors), ranged (snipers and casters), hazard, fast (movement 5+ or chargers), elite, fighter (anyone).",
+  "comment": "Encounters (docs/ARENA.md Part 4b). Fights are built from templates whose role slots are filled with this week's enemies (weighted by the week's signature). 'counts' is the enemy budget per room type and week; minions count as half. Roles come from enemy data: minion, healer, summoner, front (shield bearers, anchors), ranged (snipers and casters), hazard, fast (movement 5+ or chargers), elite, fighter (anyone). PT Part 8: slots can name an enemy 'id' (used when that enemy belongs to the week; otherwise the slot's role) for combo-themed groups (Storm front, Toxic garden, Gravity trap).",
   "counts": {
-    "1": { "combat": [4, 5], "elite": [4, 4] },
-    "2": { "combat": [5, 6], "elite": [4, 5] },
-    "3": { "combat": [5, 7], "elite": [5, 5] },
-    "4": { "combat": [6, 7], "elite": [5, 6] },
-    "5": { "combat": [6, 8], "elite": [6, 6] }
+    "1": {
+      "combat": [
+        4,
+        5
+      ],
+      "elite": [
+        4,
+        4
+      ]
+    },
+    "2": {
+      "combat": [
+        5,
+        6
+      ],
+      "elite": [
+        4,
+        5
+      ]
+    },
+    "3": {
+      "combat": [
+        5,
+        7
+      ],
+      "elite": [
+        5,
+        5
+      ]
+    },
+    "4": {
+      "combat": [
+        6,
+        7
+      ],
+      "elite": [
+        5,
+        6
+      ]
+    },
+    "5": {
+      "combat": [
+        6,
+        8
+      ],
+      "elite": [
+        6,
+        6
+      ]
+    }
   },
   "minionWeight": 0.5,
   "partyScale": {
-    "1": { "count": 0.75, "min": 2, "power": 0.85 },
-    "2": { "count": 0.9, "min": 2, "power": 0.92 },
-    "3": { "count": 1.0, "min": 2, "power": 1.0 },
-    "4": { "count": 1.0, "min": 2, "power": 1.0, "extra": 1 }
+    "1": {
+      "count": 0.75,
+      "min": 2,
+      "power": 0.85
+    },
+    "2": {
+      "count": 0.9,
+      "min": 2,
+      "power": 0.92
+    },
+    "3": {
+      "count": 1.0,
+      "min": 2,
+      "power": 1.0
+    },
+    "4": {
+      "count": 1.0,
+      "min": 2,
+      "power": 1.0,
+      "extra": 1
+    }
   },
-  "eliteAffixes": [1, 1],
-  "templates": [
-    { "id": "pack", "name": "Pack", "weights": { "1": 3, "2": 2, "3": 2, "4": 1, "5": 1 }, "formation": "surround",
-      "slots": [{ "role": "fast", "fill": true, "same": true }] },
-    { "id": "front_back", "name": "Front and back", "weights": { "1": 2, "2": 3, "3": 3, "4": 3, "5": 3 }, "formation": "front_back",
-      "slots": [{ "role": "front", "count": 1, "fallback": "fighter" }, { "role": "ranged", "fill": true }] },
-    { "id": "swarm", "name": "Swarm", "weights": { "1": 1, "2": 2, "3": 2, "4": 2, "5": 2 }, "formation": "surround", "big": true,
-      "slots": [{ "role": "fighter", "count": 1, "leader": true }, { "role": "minion", "fill": true }], "minionBonus": 4, "twist": "leaderScatter" },
-    { "id": "healer_core", "name": "Healer core", "weights": { "1": 1, "2": 2, "3": 2, "4": 3, "5": 2 }, "formation": "front_back",
-      "slots": [{ "role": "healer", "count": 1 }, { "role": "fighter", "fill": true }] },
-    { "id": "ambush", "name": "Ambush", "weights": { "1": 0, "2": 1, "3": 2, "4": 2, "5": 3 }, "formation": "ambush", "big": true,
-      "slots": [{ "role": "fighter", "fill": true }] },
-    { "id": "reinforcements", "name": "Reinforcements", "weights": { "1": 1, "2": 2, "3": 2, "4": 2, "5": 2 }, "formation": "default",
-      "slots": [{ "role": "fighter", "fill": true, "share": 0.6 }], "reinforce": { "round": 3, "share": 0.4, "role": "fighter" } },
-    { "id": "summoner_nest", "name": "Summoner nest", "weights": { "1": 0, "2": 2, "3": 2, "4": 1, "5": 2 }, "formation": "front_back",
-      "slots": [{ "role": "summoner", "count": 1 }, { "role": "front", "count": 1, "fallback": "fighter" }, { "role": "fighter", "fill": true }] },
-    { "id": "hazard_lords", "name": "Hazard lords", "weights": { "1": 0, "2": 1, "3": 3, "4": 1, "5": 1 }, "formation": "default", "layoutTag": "hazard",
-      "slots": [{ "role": "hazard", "count": 2, "fallback": "fighter" }, { "role": "fighter", "fill": true }] },
-    { "id": "elite_escort", "name": "Elite escort", "weights": {}, "elite": true, "formation": "front_back",
-      "slots": [{ "role": "elite", "count": 1, "fallback": "fighter", "affixes": true }, { "role": "fighter", "fill": true }] }
+  "eliteAffixes": [
+    1,
+    1
   ],
-  "bossAdds": { "comment": "Boss floors from week 3 get a reinforcement wave mid-fight.", "3": { "round": 4, "enemies": ["spark_imp", "spark_imp", "rust_mite"] }, "4": { "round": 4, "enemies": ["pill_bug", "bandage_wisp", "pill_bug"] }, "5": { "round": 4, "enemies": ["glass_shard", "echo_kid", "glass_shard", "echo_kid"] } }
+  "templates": [
+    {
+      "id": "pack",
+      "name": "Pack",
+      "weights": {
+        "1": 3,
+        "2": 2,
+        "3": 2,
+        "4": 1,
+        "5": 1
+      },
+      "formation": "surround",
+      "slots": [
+        {
+          "role": "fast",
+          "fill": true,
+          "same": true
+        }
+      ]
+    },
+    {
+      "id": "front_back",
+      "name": "Front and back",
+      "weights": {
+        "1": 2,
+        "2": 3,
+        "3": 3,
+        "4": 3,
+        "5": 3
+      },
+      "formation": "front_back",
+      "slots": [
+        {
+          "role": "front",
+          "count": 1,
+          "fallback": "fighter"
+        },
+        {
+          "role": "ranged",
+          "fill": true
+        }
+      ]
+    },
+    {
+      "id": "swarm",
+      "name": "Swarm",
+      "weights": {
+        "1": 1,
+        "2": 2,
+        "3": 2,
+        "4": 2,
+        "5": 2
+      },
+      "formation": "surround",
+      "big": true,
+      "slots": [
+        {
+          "role": "fighter",
+          "count": 1,
+          "leader": true
+        },
+        {
+          "role": "minion",
+          "fill": true
+        }
+      ],
+      "minionBonus": 4,
+      "twist": "leaderScatter"
+    },
+    {
+      "id": "healer_core",
+      "name": "Healer core",
+      "weights": {
+        "1": 1,
+        "2": 2,
+        "3": 2,
+        "4": 3,
+        "5": 2
+      },
+      "formation": "front_back",
+      "slots": [
+        {
+          "role": "healer",
+          "count": 1
+        },
+        {
+          "role": "fighter",
+          "fill": true
+        }
+      ]
+    },
+    {
+      "id": "ambush",
+      "name": "Ambush",
+      "weights": {
+        "1": 0,
+        "2": 1,
+        "3": 2,
+        "4": 2,
+        "5": 3
+      },
+      "formation": "ambush",
+      "big": true,
+      "slots": [
+        {
+          "role": "fighter",
+          "fill": true
+        }
+      ]
+    },
+    {
+      "id": "reinforcements",
+      "name": "Reinforcements",
+      "weights": {
+        "1": 1,
+        "2": 2,
+        "3": 2,
+        "4": 2,
+        "5": 2
+      },
+      "formation": "default",
+      "slots": [
+        {
+          "role": "fighter",
+          "fill": true,
+          "share": 0.6
+        }
+      ],
+      "reinforce": {
+        "round": 3,
+        "share": 0.4,
+        "role": "fighter"
+      }
+    },
+    {
+      "id": "summoner_nest",
+      "name": "Summoner nest",
+      "weights": {
+        "1": 0,
+        "2": 2,
+        "3": 2,
+        "4": 1,
+        "5": 2
+      },
+      "formation": "front_back",
+      "slots": [
+        {
+          "role": "summoner",
+          "count": 1
+        },
+        {
+          "role": "front",
+          "count": 1,
+          "fallback": "fighter"
+        },
+        {
+          "role": "fighter",
+          "fill": true
+        }
+      ]
+    },
+    {
+      "id": "hazard_lords",
+      "name": "Hazard lords",
+      "weights": {
+        "1": 0,
+        "2": 1,
+        "3": 3,
+        "4": 1,
+        "5": 1
+      },
+      "formation": "default",
+      "layoutTag": "hazard",
+      "slots": [
+        {
+          "role": "hazard",
+          "count": 2,
+          "fallback": "fighter"
+        },
+        {
+          "role": "fighter",
+          "fill": true
+        }
+      ]
+    },
+    {
+      "id": "elite_escort",
+      "name": "Elite escort",
+      "weights": {},
+      "elite": true,
+      "formation": "front_back",
+      "slots": [
+        {
+          "role": "elite",
+          "count": 1,
+          "fallback": "fighter",
+          "affixes": true
+        },
+        {
+          "role": "fighter",
+          "fill": true
+        }
+      ]
+    },
+    {
+      "id": "storm_front",
+      "name": "Storm front",
+      "weights": {
+        "2": 1,
+        "3": 2,
+        "4": 2,
+        "5": 2
+      },
+      "formation": "front_back",
+      "slots": [
+        {
+          "id": "puddle_imp",
+          "count": 1,
+          "role": "fighter"
+        },
+        {
+          "id": "static_imp",
+          "count": 2,
+          "role": "ranged"
+        },
+        {
+          "role": "fighter",
+          "fill": true
+        }
+      ]
+    },
+    {
+      "id": "toxic_garden",
+      "name": "Toxic garden",
+      "weights": {
+        "2": 1,
+        "3": 2,
+        "4": 2,
+        "5": 2
+      },
+      "formation": "default",
+      "slots": [
+        {
+          "id": "sludge_slug",
+          "count": 2,
+          "role": "hazard"
+        },
+        {
+          "role": "healer",
+          "count": 1,
+          "fallback": "fighter"
+        },
+        {
+          "role": "fighter",
+          "fill": true
+        }
+      ]
+    },
+    {
+      "id": "gravity_trap",
+      "name": "Gravity trap",
+      "weights": {
+        "3": 2,
+        "4": 2,
+        "5": 2
+      },
+      "formation": "surround",
+      "slots": [
+        {
+          "id": "grav_rock",
+          "count": 1,
+          "role": "front"
+        },
+        {
+          "role": "fast",
+          "fill": true
+        }
+      ]
+    }
+  ],
+  "bossAdds": {
+    "comment": "Boss floors from week 3 get a reinforcement wave mid-fight.",
+    "3": {
+      "round": 4,
+      "enemies": [
+        "spark_imp",
+        "spark_imp",
+        "rust_mite"
+      ]
+    },
+    "4": {
+      "round": 4,
+      "enemies": [
+        "pill_bug",
+        "bandage_wisp",
+        "pill_bug"
+      ]
+    },
+    "5": {
+      "round": 4,
+      "enemies": [
+        "glass_shard",
+        "echo_kid",
+        "glass_shard",
+        "echo_kid"
+      ]
+    }
+  }
 }

@@ -10,7 +10,7 @@ The demo (VD Part 5): the intro through the week 1 boss, the Endless Arena from 
 | Endless Arena (waves, hazards, checkpoints, mutators, card and perk picks, score) | Have | Owner choice and effects strip done (P2 Parts 1 and 2); campfire later (AC) |
 | Point buy, Party panel, pause menu, options | Have | Check that options open from the title screen (VD Part 5) |
 | Art, audio and UI by asset id | Mostly | VD Part 1: audio situation map, voice blips, `docs/CUSTOMIZE.md`, audit test |
-| Advanced Vectors and Techniques | In progress | PT Part 8 (Vectors, fusion and Instability done; Techniques and content next) |
+| Advanced Vectors and Techniques | Have | PT Part 8: 14 Techniques active, 10 planned (potions, acting constructs) |
 | Multi-Vector combos and the Compendium | Missing | VD Part 2 |
 | Spark quiz | Missing | VD Part 3 (standalone screen until M15) |
 | Visual card builder and crafting juice | Missing | VD Part 4 |

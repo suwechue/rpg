@@ -232,7 +232,8 @@
       ],
       "xp": 2,
       "money": 1,
-      "sprite": "enemy_slimelet"
+      "sprite": "enemy_slimelet",
+      "mindless": true
     },
     {
       "id": "spark_imp",

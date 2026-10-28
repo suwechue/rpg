@@ -1,0 +1,286 @@
+{
+  "comment": "PT Part 8: Techniques (adapted from the user's Arcanist Axiomatic Techniques). Picks at levels 2, 3, 6, 10, 14 and 18 (data/leveling.json techniqueLevels) from a shared pool; minLevel by tier. Every class can take any category; classes lean (data/classes.json techniqueLean). Reconfigure at the night workbench (1 AP) or an arena checkpoint (1 Arena AP). 'planned' ones are listed but not active yet (they need potions, constructs acting or once-per-night systems).",
+  "techniques": [
+    {
+      "id": "runic_toolkit",
+      "name": "Runic Toolkit",
+      "category": "forging",
+      "tier": 1,
+      "minLevel": 2,
+      "text": "Learn the Construct Form. Your Constructs have +50% HP.",
+      "mods": {
+        "combat": {
+          "constructHpPct": 0.5
+        }
+      },
+      "grants": {
+        "form": "construct"
+      }
+    },
+    {
+      "id": "modular_imbuement",
+      "name": "Modular Imbuement",
+      "category": "forging",
+      "tier": 2,
+      "minLevel": 3,
+      "text": "Weapon Infusion can store a Glyph: your next Strike places it.",
+      "planned": true
+    },
+    {
+      "id": "efficient_forging",
+      "name": "Efficient Forging",
+      "category": "forging",
+      "tier": 3,
+      "minLevel": 6,
+      "text": "Constructs and Glyphs cost 1 less MP.",
+      "mods": {
+        "combat": {
+          "constructGlyphCostDelta": -1
+        }
+      }
+    },
+    {
+      "id": "lasting_rune",
+      "name": "Lasting Rune",
+      "category": "forging",
+      "tier": 4,
+      "minLevel": 10,
+      "text": "Constructs and Glyphs last 2 rounds longer.",
+      "mods": {
+        "combat": {
+          "constructGlyphTurns": 2
+        }
+      }
+    },
+    {
+      "id": "overcharged_construct",
+      "name": "Overcharged Construct",
+      "category": "forging",
+      "tier": 5,
+      "minLevel": 14,
+      "text": "Your Constructs pulse their Vector each round.",
+      "planned": true
+    },
+    {
+      "id": "living_foundry",
+      "name": "Living Foundry",
+      "category": "forging",
+      "tier": 6,
+      "minLevel": 18,
+      "text": "Once per fight, a Construct acts as an ally for 3 rounds.",
+      "planned": true
+    },
+    {
+      "id": "stored_formula",
+      "name": "Stored Formula",
+      "category": "alchemy",
+      "tier": 1,
+      "minLevel": 2,
+      "text": "Once per night, brew a spell card into a one-use Potion any party member can play as a Quick.",
+      "planned": true
+    },
+    {
+      "id": "reactive_terrain",
+      "name": "Reactive Terrain",
+      "category": "alchemy",
+      "tier": 2,
+      "minLevel": 3,
+      "text": "Once per fight, saturate a 3x3 area with your Vector for 3 rounds.",
+      "planned": true
+    },
+    {
+      "id": "volatile_brewing",
+      "name": "Volatile Brewing",
+      "category": "alchemy",
+      "tier": 3,
+      "minLevel": 6,
+      "text": "Potions come out one Magnitude higher, with a 1-in-6 Instability chance.",
+      "planned": true
+    },
+    {
+      "id": "damage_type_fluency",
+      "name": "Damage Type Fluency",
+      "category": "alchemy",
+      "tier": 4,
+      "minLevel": 10,
+      "text": "Once per turn, change a card's Vector to another you know.",
+      "planned": true
+    },
+    {
+      "id": "grand_reagent",
+      "name": "Grand Reagent",
+      "category": "alchemy",
+      "tier": 5,
+      "minLevel": 14,
+      "text": "Once per week, brew a Grand potion early.",
+      "planned": true
+    },
+    {
+      "id": "mutation_mastery",
+      "name": "Mutation Mastery",
+      "category": "alchemy",
+      "tier": 6,
+      "minLevel": 18,
+      "text": "Choose the volatile outcome instead of rolling it.",
+      "planned": true
+    },
+    {
+      "id": "vector_redirection",
+      "name": "Vector Redirection",
+      "category": "kinetics",
+      "tier": 1,
+      "minLevel": 2,
+      "text": "Reaction, 2 MP: an attack aimed only at you is redirected to another enemy within 3 of you.",
+      "mods": {
+        "combat": {
+          "redirect": true,
+          "redirectCost": 2
+        }
+      }
+    },
+    {
+      "id": "reactive_casting",
+      "name": "Reactive Casting",
+      "category": "kinetics",
+      "tier": 2,
+      "minLevel": 3,
+      "text": "Once per round, cast your Cantrip at an enemy that steps next to you.",
+      "mods": {
+        "combat": {
+          "reactiveCantrip": true
+        }
+      }
+    },
+    {
+      "id": "conversion_reflex",
+      "name": "Conversion Reflex",
+      "category": "kinetics",
+      "tier": 3,
+      "minLevel": 6,
+      "text": "Reaction, 1 MP: damage of a Vector you know is reduced by INT/2 + level/2.",
+      "mods": {
+        "combat": {
+          "conversionReflex": true
+        }
+      }
+    },
+    {
+      "id": "mid_flight_correction",
+      "name": "Mid-Flight Correction",
+      "category": "kinetics",
+      "tier": 4,
+      "minLevel": 10,
+      "text": "Your Projectiles and Lines ignore half cover.",
+      "mods": {
+        "combat": {
+          "ignoreHalfCover": true
+        }
+      }
+    },
+    {
+      "id": "perfect_counter",
+      "name": "Perfect Counter",
+      "category": "kinetics",
+      "tier": 5,
+      "minLevel": 14,
+      "text": "Vector Redirection costs 0 MP.",
+      "mods": {
+        "combat": {
+          "redirectCost": 0
+        }
+      }
+    },
+    {
+      "id": "living_equation",
+      "name": "Living Equation",
+      "category": "kinetics",
+      "tier": 6,
+      "minLevel": 18,
+      "text": "Your Quick Strike can be your Cantrip instead (a Quick).",
+      "mods": {
+        "combat": {
+          "quickCantrip": true
+        }
+      }
+    },
+    {
+      "id": "still_mind",
+      "name": "Still Mind",
+      "category": "meditation",
+      "tier": 1,
+      "minLevel": 2,
+      "text": "Your first Instability roll each fight rolls twice and keeps the best.",
+      "mods": {
+        "combat": {
+          "stillMind": true
+        }
+      }
+    },
+    {
+      "id": "meditative_reserve",
+      "name": "Meditative Reserve",
+      "category": "meditation",
+      "tier": 2,
+      "minLevel": 3,
+      "text": "Rest rooms and arena checkpoints restore +3 MP.",
+      "mods": {
+        "rest": {
+          "mpBonus": 3
+        }
+      }
+    },
+    {
+      "id": "resilient_mind",
+      "name": "Resilient Mind",
+      "category": "meditation",
+      "tier": 3,
+      "minLevel": 6,
+      "text": "All Instability rolls roll twice and keep the best.",
+      "mods": {
+        "combat": {
+          "stableRolls": true
+        }
+      }
+    },
+    {
+      "id": "internal_casting",
+      "name": "Internal Casting",
+      "category": "meditation",
+      "tier": 4,
+      "minLevel": 10,
+      "text": "Hazards don't hurt you on your own turn while you have at least 1 MP.",
+      "mods": {
+        "combat": {
+          "internalCasting": true
+        }
+      }
+    },
+    {
+      "id": "deep_calculation",
+      "name": "Deep Calculation",
+      "category": "meditation",
+      "tier": 5,
+      "minLevel": 14,
+      "text": "Once per night, restore full MP as an Action.",
+      "planned": true
+    },
+    {
+      "id": "one_with_the_formula",
+      "name": "One With the Formula",
+      "category": "meditation",
+      "tier": 6,
+      "minLevel": 18,
+      "text": "Instability thresholds +3.",
+      "mods": {
+        "combat": {
+          "thresholdBonus": 3
+        }
+      }
+    }
+  ],
+  "reconfigureCost": 1,
+  "reactions": {
+    "comment": "Reactions (Redirection, Conversion Reflex): Options 'reactions' = auto (default), ask (acts like auto until the prompt exists), never.",
+    "default": "auto"
+  }
+}

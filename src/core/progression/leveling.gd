@@ -55,6 +55,10 @@ static func level_up(db: Dictionary, ch: Dictionary, rng: RandomNumberGenerator)
 	if not choices.is_empty():
 		report["perkChoices"] = choices
 		ch["pendingPerks"] = ch.get("pendingPerks", []) + [level]
+	# PT Part 8: Technique picks replace the old perk levels.
+	if cfg(db).get("techniqueLevels", []).has(float(level)) or cfg(db).get("techniqueLevels", []).has(level):
+		ch["pendingTechniques"] = ch.get("pendingTechniques", []) + [level]
+		report["techniquePick"] = true
 	var after := Char.derived(db, ch)
 	ch["hp"] = int(ch.get("hp", 0)) + maxi(0, int(after["maxHp"]) - int(before["maxHp"]))
 	ch["mp"] = int(ch.get("mp", 0)) + maxi(0, int(after["maxMp"]) - int(before["maxMp"]))
@@ -218,3 +222,71 @@ static func auto_perks(db: Dictionary, ch: Dictionary) -> void:
 			ch["pendingPerks"].remove_at(0)
 		else:
 			choose_perk(db, ch, str(options[0]))
+
+
+# --- Techniques (PT Part 8) --------------------------------------------------
+
+static func techniques(db: Dictionary) -> Dictionary:
+	return DT.index_under(db, "techniques", "techniques")
+
+
+## Techniques this character can pick now: not owned, minLevel reached, not
+## "planned"; the class's leaning categories first.
+static func technique_options(db: Dictionary, ch: Dictionary) -> Array:
+	var lean: Array = Char.class_data(db, str(ch.get("class", ""))).get("techniqueLean", [])
+	var out: Array = []
+	for t in DT.records_under(db, "techniques", "techniques"):
+		if ch.get("techniques", []).has(str(t["id"])) or bool(t.get("planned", false)):
+			continue
+		if int(t.get("minLevel", 2)) > int(ch.get("level", 1)):
+			continue
+		out.append(t)
+	out.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		var la := lean.has(str(a.get("category", "")))
+		var lb := lean.has(str(b.get("category", "")))
+		if la != lb:
+			return la
+		return int(a.get("tier", 1)) < int(b.get("tier", 1)))
+	return out.map(func(t: Dictionary) -> String: return str(t["id"]))
+
+
+static func choose_technique(db: Dictionary, ch: Dictionary, id: String) -> bool:
+	if not technique_options(db, ch).has(id):
+		return false
+	var pending: Array = ch.get("pendingTechniques", [])
+	if not pending.is_empty():
+		pending.remove_at(0)
+	ch["pendingTechniques"] = pending
+	ch["techniques"] = ch.get("techniques", []) + [id]
+	var rec: Dictionary = techniques(db).get(id, {})
+	var form := str(rec.get("grants", {}).get("form", ""))
+	if form != "" and not ch.get("knownForms", []).has(form):
+		ch["knownForms"] = ch.get("knownForms", []) + [form]
+	Char.clamp_pools(db, ch)
+	return true
+
+
+## Swap one Technique for another (night workbench 1 AP, arena checkpoint 1 Arena AP).
+static func reconfigure(db: Dictionary, ch: Dictionary, old_id: String, new_id: String) -> bool:
+	var owned: Array = ch.get("techniques", [])
+	if not owned.has(old_id):
+		return false
+	owned.erase(old_id)
+	ch["techniques"] = owned
+	if not technique_options(db, ch).has(new_id):
+		owned.append(old_id)
+		return false
+	ch["techniques"] = owned + [new_id]
+	return true
+
+
+## Auto-pick the first offered Technique for every pending level (NPCs, autoplay, tests).
+static func auto_techniques(db: Dictionary, ch: Dictionary) -> void:
+	var guard := 0
+	while not ch.get("pendingTechniques", []).is_empty() and guard < 10:
+		guard += 1
+		var opts := technique_options(db, ch)
+		if opts.is_empty():
+			ch["pendingTechniques"] = []
+			return
+		choose_technique(db, ch, str(opts[0]))

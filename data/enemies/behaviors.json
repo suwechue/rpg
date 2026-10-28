@@ -594,7 +594,8 @@
       ],
       "xp": 10,
       "money": 3,
-      "sprite": "enemy_split_slime"
+      "sprite": "enemy_split_slime",
+      "mindless": true
     },
     {
       "id": "ember_crawler",
@@ -906,7 +907,8 @@
       ],
       "xp": 14,
       "money": 6,
-      "sprite": "enemy_anchor_golem"
+      "sprite": "enemy_anchor_golem",
+      "mindless": true
     }
   ]
 }

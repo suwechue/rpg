@@ -95,7 +95,12 @@
       "perk": {
         "id": "overchannel",
         "text": "Once per fight, improvise at normal card cost"
-      }
+      },
+      "techniqueLean": [
+        "kinetics",
+        "meditation"
+      ],
+      "startingTechnique": "still_mind"
     },
     {
       "id": "fighter",
@@ -184,7 +189,11 @@
       "perk": {
         "id": "second_wind",
         "text": "Heal 20% HP once per fight under 30% HP"
-      }
+      },
+      "techniqueLean": [
+        "forging"
+      ],
+      "startingTechnique": "runic_toolkit"
     },
     {
       "id": "rogue",
@@ -273,7 +282,11 @@
       "perk": {
         "id": "backstab",
         "text": "+50% damage from behind or flank"
-      }
+      },
+      "techniqueLean": [
+        "kinetics"
+      ],
+      "startingTechnique": "vector_redirection"
     },
     {
       "id": "healer",
@@ -359,7 +372,12 @@
       "perk": {
         "id": "triage",
         "text": "Healing cards cost 1 less MP on allies under half HP"
-      }
+      },
+      "techniqueLean": [
+        "alchemy",
+        "meditation"
+      ],
+      "startingTechnique": "meditative_reserve"
     },
     {
       "id": "bard",
@@ -439,7 +457,11 @@
       "perk": {
         "id": "hype",
         "text": "Party gains initiative and +1 draw on turn 1"
-      }
+      },
+      "techniqueLean": [
+        "meditation"
+      ],
+      "startingTechnique": "still_mind"
     },
     {
       "id": "elementalist",
@@ -816,7 +838,8 @@
         "id": "constructor",
         "text": "Constructs have double HP and last 2 rounds longer; +2 Strike power."
       },
-      "text": "Builds constructs and gear mid-fight."
+      "text": "Builds constructs and gear mid-fight. The hidden upgraded Runesmith.",
+      "upgradeOf": "runesmith"
     },
     {
       "id": "upside_touched",
@@ -852,6 +875,148 @@
         "text": "Improvised casts skip the +3 Instability penalty; spells +20% damage."
       },
       "text": "Unstable, very strong improvised casts."
+    },
+    {
+      "id": "alchemist",
+      "name": "Alchemist",
+      "tier": 2,
+      "growth": {
+        "int": 35,
+        "wil": 25,
+        "per": 15,
+        "str": 5,
+        "dex": 7,
+        "con": 7,
+        "cha": 6
+      },
+      "hpBonus": 0,
+      "mpBonus": 2,
+      "hpPerLevel": 1,
+      "startStats": {
+        "str": 4,
+        "dex": 5,
+        "con": 5,
+        "int": 7,
+        "per": 5,
+        "wil": 6,
+        "cha": 4
+      },
+      "vectorAffinity": {
+        "heat": 20,
+        "cold": 20,
+        "force": 15,
+        "motion": 15,
+        "binding": 15,
+        "light": 15
+      },
+      "formAffinity": {
+        "bolt": 20,
+        "burst": 15,
+        "shield": 15,
+        "line": 10,
+        "projectile": 10,
+        "sphere": 8,
+        "glyph": 8,
+        "touch": 5,
+        "aura": 5,
+        "construct": 4
+      },
+      "startVectors": 2,
+      "startForms": [
+        "bolt",
+        "shield",
+        "burst",
+        "line"
+      ],
+      "perk": {
+        "id": "brewmaster",
+        "name": "Brewmaster",
+        "text": "More Potion slots per night; party Potions are Quicks."
+      },
+      "techniqueLean": [
+        "alchemy"
+      ],
+      "from": "mage",
+      "requires": {
+        "classes": [
+          "mage",
+          "healer"
+        ],
+        "techniques": [
+          "stored_formula"
+        ]
+      }
+    },
+    {
+      "id": "runesmith",
+      "name": "Runesmith",
+      "tier": 2,
+      "growth": {
+        "int": 35,
+        "wil": 25,
+        "per": 15,
+        "str": 5,
+        "dex": 7,
+        "con": 7,
+        "cha": 6
+      },
+      "hpBonus": 0,
+      "mpBonus": 2,
+      "hpPerLevel": 1,
+      "startStats": {
+        "str": 4,
+        "dex": 5,
+        "con": 5,
+        "int": 7,
+        "per": 5,
+        "wil": 6,
+        "cha": 4
+      },
+      "vectorAffinity": {
+        "heat": 20,
+        "cold": 20,
+        "force": 15,
+        "motion": 15,
+        "binding": 15,
+        "light": 15
+      },
+      "formAffinity": {
+        "bolt": 20,
+        "burst": 15,
+        "shield": 15,
+        "line": 10,
+        "projectile": 10,
+        "sphere": 8,
+        "glyph": 8,
+        "touch": 5,
+        "aura": 5,
+        "construct": 4
+      },
+      "startVectors": 2,
+      "startForms": [
+        "bolt",
+        "shield",
+        "burst",
+        "line"
+      ],
+      "perk": {
+        "id": "runeforged",
+        "name": "Runeforged",
+        "text": "Strong Constructs and Glyphs; fuses Infusions at the forge for free."
+      },
+      "techniqueLean": [
+        "forging"
+      ],
+      "from": "fighter",
+      "requires": {
+        "classes": [
+          "mage",
+          "fighter"
+        ],
+        "techniques": [
+          "runic_toolkit"
+        ]
+      }
     }
   ]
 }

@@ -669,7 +669,7 @@
     "arena.skip_for_scraps": "Skip (+2 Scraps)",
     "arena.perk_pick": "Pick a perk for someone (once per checkpoint)",
     "arena.score_cards": "Cards picked: %s",
-    "arena.score_picks": "Perks taken: %s",
+    "arena.score_picks": "Techniques taken: %s",
     "arena.score_highest_hit": "Highest hit: %d",
     "card.sets_up": "Sets up: %s.",
     "card.pays_off": "Pays off: %s.",
@@ -727,6 +727,13 @@
     "party_panel.tab_members": "Members",
     "party_panel.tab_effects": "Effects",
     "party_panel.run_wide": "Run-wide",
-    "combat.perk_fired": "%s: %s works."
+    "combat.perk_fired": "%s: %s works.",
+    "class_change.needs_technique": "Needs the Technique %s",
+    "technique.title": "Pick a Technique (level %d)",
+    "technique.pick_one": "Every class can take any category; yours leans toward the first ones listed.",
+    "technique.reconfigure": "Reconfigure Techniques (%d AP)",
+    "technique.swap_out": "Swap out %s for:",
+    "technique.planned": "(coming later)",
+    "arena.technique_pick": "Pick a Technique for someone (once per checkpoint)"
   }
 }

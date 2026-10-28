@@ -46,6 +46,9 @@ static func requirement_error(db: Dictionary, run: Dictionary, ch: Dictionary, c
 			any = any or ch.get("knownVectors", []).has(v)
 		if not any:
 			return Str.t(db, "class_change.needs_to_know") % Str.t(db, "class_change.or").join(PackedStringArray(Array(req["knownVectorsAny"]).map(func(v: Variant) -> String: return str(v).capitalize())))
+	for t in req.get("techniques", []):
+		if not ch.get("techniques", []).has(t):
+			return Str.t(db, "class_change.needs_technique") % str(DT.index_under(db, "techniques", "techniques").get(str(t), {}).get("name", t))
 	for f in req.get("knownForms", []):
 		if not ch.get("knownForms", []).has(f):
 			return Str.t(db, "class_change.needs_the_form") % str(f).capitalize()

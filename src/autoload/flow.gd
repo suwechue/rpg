@@ -64,6 +64,8 @@ func _on_part_started() -> void:
 		screens.push_front("class_change")
 	if not GameState.player.get("pendingPerks", []).is_empty() and not screens.has("dungeon"):
 		screens.push_front("perk_pick")
+	if not GameState.player.get("pendingTechniques", []).is_empty() and not screens.has("dungeon"):
+		screens.push_front("technique_pick")
 	if Calendar.day_name() == "sun" and Calendar.part_id() == "weekend_evening":
 		var tease := str(preload("res://src/core/dungeon/signature.gd").week_rec(DataDB.all(), Calendar.week()).get("sundayTease", ""))
 		if tease != "":
@@ -118,6 +120,14 @@ func _next() -> void:
 			while not GameState.player.get("pendingPerks", []).is_empty():
 				await show_modal(preload("res://src/scenes/ui/perk_screen.gd").new())
 				_drop_empty_perk_levels()
+			_next()
+		"technique_pick":
+			const Lv := preload("res://src/core/progression/leveling.gd")
+			while not GameState.player.get("pendingTechniques", []).is_empty():
+				if GameState.dev_autoplay or Lv.technique_options(DataDB.all(), GameState.player).is_empty():
+					Lv.auto_techniques(DataDB.all(), GameState.player)
+					break
+				await show_modal(preload("res://src/scenes/ui/technique_screen.gd").new())
 			_next()
 		"class_change":
 			await show_modal(preload("res://src/scenes/ui/class_change_screen.gd").new())

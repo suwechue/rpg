@@ -1,0 +1,886 @@
+{
+  "comment": "PT Part 8: cards for the new Vectors (6 per new Tier 2 Vector, 4 per new Tier 3).",
+  "cards": [
+    {
+      "id": "card_grav_bolt",
+      "name": "Grav Bolt",
+      "kind": "spell",
+      "vectors": {
+        "gravity": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "standard",
+      "rarity": "common",
+      "cost": 2,
+      "short": "Bolt {power}",
+      "text": "A Gravity Bolt that pulls the target 1 tile toward the impact.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "major"
+      }
+    },
+    {
+      "id": "card_crush",
+      "name": "Crush",
+      "kind": "spell",
+      "vectors": {
+        "gravity": 1.0
+      },
+      "form": "touch",
+      "magnitude": "standard",
+      "rarity": "common",
+      "cost": 2,
+      "short": "Touch {power}",
+      "text": "A Gravity touch. +50% against the Rooted.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "major"
+      }
+    },
+    {
+      "id": "card_singularity",
+      "name": "Singularity",
+      "kind": "spell",
+      "vectors": {
+        "gravity": 1.0
+      },
+      "form": "burst",
+      "magnitude": "standard",
+      "rarity": "uncommon",
+      "cost": 4,
+      "short": "Burst {power}",
+      "text": "A Gravity Burst that pulls everything in it toward the center.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "major"
+      }
+    },
+    {
+      "id": "card_graviton_line",
+      "name": "Graviton Line",
+      "kind": "spell",
+      "vectors": {
+        "gravity": 1.0
+      },
+      "form": "line",
+      "magnitude": "minor",
+      "rarity": "common",
+      "cost": 2,
+      "short": "Line {power}",
+      "text": "A Gravity Line that drags everything in it a tile.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "standard"
+      }
+    },
+    {
+      "id": "card_anchor_point",
+      "name": "Anchor Point",
+      "kind": "spell",
+      "vectors": {
+        "gravity": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "minor",
+      "rarity": "common",
+      "cost": 1,
+      "short": "Anchor",
+      "text": "Root an enemy where it stands (no damage).",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "effects": [
+        {
+          "op": "status_target",
+          "status": "root",
+          "turns": 1
+        }
+      ],
+      "targeting": {
+        "type": "enemy",
+        "range": 4
+      },
+      "effectsOnly": true
+    },
+    {
+      "id": "card_event_horizon",
+      "name": "Event Horizon",
+      "kind": "spell",
+      "vectors": {
+        "gravity": 1.0
+      },
+      "form": "sphere",
+      "magnitude": "major",
+      "rarity": "rare",
+      "cost": 6,
+      "short": "Sphere {power}",
+      "text": "A huge Gravity Sphere around you that pulls everyone in.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "grand"
+      }
+    },
+    {
+      "id": "card_spark_bolt",
+      "name": "Spark Bolt",
+      "kind": "spell",
+      "vectors": {
+        "lightning": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "standard",
+      "rarity": "common",
+      "cost": 2,
+      "short": "Bolt {power}",
+      "text": "A Lightning Bolt that arcs to one more enemy within 2; Wet and Conductive targets keep the chain going.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "major"
+      }
+    },
+    {
+      "id": "card_chain_line",
+      "name": "Chain Line",
+      "kind": "spell",
+      "vectors": {
+        "lightning": 1.0
+      },
+      "form": "line",
+      "magnitude": "minor",
+      "rarity": "common",
+      "cost": 2,
+      "short": "Line {power}",
+      "text": "A Lightning Line. Every hit arcs on.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "standard"
+      }
+    },
+    {
+      "id": "card_thunderclap",
+      "name": "Thunderclap",
+      "kind": "spell",
+      "vectors": {
+        "lightning": 1.0
+      },
+      "form": "burst",
+      "magnitude": "standard",
+      "rarity": "uncommon",
+      "cost": 4,
+      "short": "Burst {power}",
+      "text": "A Lightning Burst. Makes targets Conductive.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "major"
+      }
+    },
+    {
+      "id": "card_static_touch",
+      "name": "Static Touch",
+      "kind": "spell",
+      "vectors": {
+        "lightning": 1.0
+      },
+      "form": "touch",
+      "magnitude": "minor",
+      "rarity": "common",
+      "cost": 1,
+      "short": "Touch {power}",
+      "text": "Quick. Quick. A Lightning touch that makes the target Conductive.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "quick": true
+    },
+    {
+      "id": "card_storm_front",
+      "name": "Storm Front",
+      "kind": "spell",
+      "vectors": {
+        "lightning": 1.0
+      },
+      "form": "cone",
+      "magnitude": "minor",
+      "rarity": "common",
+      "cost": 3,
+      "short": "Cone {power}",
+      "text": "A Lightning Cone. Pays off Wet targets.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "standard"
+      }
+    },
+    {
+      "id": "card_ball_lightning",
+      "name": "Ball Lightning",
+      "kind": "spell",
+      "vectors": {
+        "lightning": 1.0
+      },
+      "form": "projectile",
+      "magnitude": "major",
+      "rarity": "rare",
+      "cost": 5,
+      "short": "Shot {power}",
+      "text": "A Lightning Shot that hits the first unit in a line and arcs.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "grand"
+      }
+    },
+    {
+      "id": "card_shout",
+      "name": "Shout",
+      "kind": "spell",
+      "vectors": {
+        "sound": 1.0
+      },
+      "form": "cone",
+      "magnitude": "minor",
+      "rarity": "common",
+      "cost": 3,
+      "short": "Cone {power}",
+      "text": "A Sound Cone that Dazes.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "standard"
+      }
+    },
+    {
+      "id": "card_resonance",
+      "name": "Resonance",
+      "kind": "spell",
+      "vectors": {
+        "sound": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "standard",
+      "rarity": "common",
+      "cost": 2,
+      "short": "Bolt {power}",
+      "text": "A Sound Bolt. Shatters the Frozen; cancels charges.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "major"
+      }
+    },
+    {
+      "id": "card_sonic_boom",
+      "name": "Sonic Boom",
+      "kind": "spell",
+      "vectors": {
+        "sound": 1.0
+      },
+      "form": "burst",
+      "magnitude": "standard",
+      "rarity": "uncommon",
+      "cost": 4,
+      "short": "Burst {power}",
+      "text": "A Sound Burst that Dazes and cracks walls.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "major"
+      }
+    },
+    {
+      "id": "card_whistle",
+      "name": "Whistle",
+      "kind": "spell",
+      "vectors": {
+        "sound": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "minor",
+      "rarity": "common",
+      "cost": 1,
+      "short": "Bolt {power}",
+      "text": "Quick. Quick. A shrill Sound Bolt that cancels a charge-up.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "quick": true
+    },
+    {
+      "id": "card_drumline",
+      "name": "Drumline",
+      "kind": "spell",
+      "vectors": {
+        "sound": 1.0
+      },
+      "form": "line",
+      "magnitude": "minor",
+      "rarity": "common",
+      "cost": 2,
+      "short": "Line {power}",
+      "text": "A Sound Line. Double damage to walls and constructs.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "standard"
+      }
+    },
+    {
+      "id": "card_crescendo_wave",
+      "name": "Crescendo Wave",
+      "kind": "spell",
+      "vectors": {
+        "sound": 1.0
+      },
+      "form": "sphere",
+      "magnitude": "major",
+      "rarity": "rare",
+      "cost": 6,
+      "short": "Sphere {power}",
+      "text": "A Sound Sphere around you that Dazes everything.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "grand"
+      }
+    },
+    {
+      "id": "card_shroud",
+      "name": "Shroud",
+      "kind": "spell",
+      "vectors": {
+        "shadow": 1.0
+      },
+      "form": "burst",
+      "magnitude": "minor",
+      "rarity": "common",
+      "cost": 3,
+      "short": "Burst {power}",
+      "text": "No damage: darken a plus shape for 2 rounds; allies in it become Shadowed.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "noDamage": true
+    },
+    {
+      "id": "card_umbra_step",
+      "name": "Umbra Step",
+      "kind": "spell",
+      "vectors": {
+        "shadow": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "minor",
+      "rarity": "common",
+      "cost": 1,
+      "short": "Umbra",
+      "text": "Quick. Quick. No damage: Shadow an ally within 4 until their next turn.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "effects": [
+        {
+          "op": "status_target",
+          "status": "shadowed",
+          "turns": 2
+        }
+      ],
+      "targeting": {
+        "type": "ally",
+        "range": 4
+      },
+      "quick": true,
+      "effectsOnly": true
+    },
+    {
+      "id": "card_eclipse",
+      "name": "Eclipse",
+      "kind": "spell",
+      "vectors": {
+        "shadow": 1.0
+      },
+      "form": "sphere",
+      "magnitude": "standard",
+      "rarity": "uncommon",
+      "cost": 4,
+      "short": "Sphere {power}",
+      "text": "No damage: darken everything around you; you and nearby allies become Shadowed.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "major"
+      },
+      "noDamage": true
+    },
+    {
+      "id": "card_dark_veil",
+      "name": "Dark Veil",
+      "kind": "spell",
+      "vectors": {
+        "shadow": 1.0
+      },
+      "form": "aura",
+      "magnitude": "minor",
+      "rarity": "common",
+      "cost": 3,
+      "short": "Dark",
+      "text": "No damage: you and adjacent allies are Shadowed until your next turn.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "effects": [
+        {
+          "op": "status_self",
+          "status": "shadowed",
+          "turns": 2,
+          "adjacent": true
+        }
+      ],
+      "targeting": {
+        "type": "self",
+        "range": 1
+      },
+      "effectsOnly": true
+    },
+    {
+      "id": "card_night_line",
+      "name": "Night Line",
+      "kind": "spell",
+      "vectors": {
+        "shadow": 1.0
+      },
+      "form": "line",
+      "magnitude": "minor",
+      "rarity": "common",
+      "cost": 2,
+      "short": "Line {power}",
+      "text": "No damage: a line of Shadow tiles for 2 rounds.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "noDamage": true
+    },
+    {
+      "id": "card_blackout",
+      "name": "Blackout",
+      "kind": "spell",
+      "vectors": {
+        "shadow": 1.0
+      },
+      "form": "burst",
+      "magnitude": "major",
+      "rarity": "rare",
+      "cost": 6,
+      "short": "Burst {power}",
+      "text": "No damage: a 3x3 of Shadow tiles; enemies in it can't see past 2 tiles.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "grand"
+      },
+      "noDamage": true
+    },
+    {
+      "id": "card_ward_bolt",
+      "name": "Ward Bolt",
+      "kind": "spell",
+      "vectors": {
+        "warding": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "standard",
+      "rarity": "common",
+      "cost": 2,
+      "short": "Bolt {power}",
+      "text": "A Warding Bolt: Exposes an enemy, or shields an ally it hits.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "major"
+      }
+    },
+    {
+      "id": "card_bulwark_rune",
+      "name": "Bulwark Rune",
+      "kind": "spell",
+      "vectors": {
+        "warding": 1.0
+      },
+      "form": "shield",
+      "magnitude": "standard",
+      "rarity": "common",
+      "cost": 3,
+      "short": "Shield {power}",
+      "text": "A Warding Shield on an ally (refreshes to the better value).",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "major"
+      }
+    },
+    {
+      "id": "card_aegis",
+      "name": "Aegis",
+      "kind": "spell",
+      "vectors": {
+        "warding": 1.0
+      },
+      "form": "aura",
+      "magnitude": "minor",
+      "rarity": "common",
+      "cost": 3,
+      "short": "Aura {power}",
+      "text": "Allies next to you get a Warding shield; enemies there are Exposed.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "standard"
+      }
+    },
+    {
+      "id": "card_expose",
+      "name": "Expose",
+      "kind": "spell",
+      "vectors": {
+        "warding": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "minor",
+      "rarity": "common",
+      "cost": 1,
+      "short": "Expose",
+      "text": "Quick. Quick. Expose an enemy within 4: no resistances, x1.25 from its weaknesses.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "effects": [
+        {
+          "op": "status_target",
+          "status": "exposed",
+          "turns": 1
+        }
+      ],
+      "targeting": {
+        "type": "enemy",
+        "range": 4
+      },
+      "quick": true,
+      "effectsOnly": true
+    },
+    {
+      "id": "card_ward_line",
+      "name": "Ward Line",
+      "kind": "spell",
+      "vectors": {
+        "warding": 1.0
+      },
+      "form": "line",
+      "magnitude": "minor",
+      "rarity": "common",
+      "cost": 2,
+      "short": "Line {power}",
+      "text": "A Warding Line: shields allies, Exposes enemies in it.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "standard"
+      }
+    },
+    {
+      "id": "card_sanctum",
+      "name": "Sanctum",
+      "kind": "spell",
+      "vectors": {
+        "warding": 1.0
+      },
+      "form": "sphere",
+      "magnitude": "major",
+      "rarity": "rare",
+      "cost": 6,
+      "short": "Sphere {power}",
+      "text": "A Warding Sphere: big shields for every ally around you.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "grand"
+      }
+    },
+    {
+      "id": "card_venom_bolt",
+      "name": "Venom Bolt",
+      "kind": "spell",
+      "vectors": {
+        "poison": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "standard",
+      "rarity": "common",
+      "cost": 2,
+      "short": "Bolt {power}",
+      "text": "A Poison Bolt: Poisoned (stacks; halves healing).",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "major"
+      }
+    },
+    {
+      "id": "card_toxic_cloud",
+      "name": "Toxic Cloud",
+      "kind": "spell",
+      "vectors": {
+        "poison": 1.0
+      },
+      "form": "burst",
+      "magnitude": "minor",
+      "rarity": "common",
+      "cost": 3,
+      "short": "Burst {power}",
+      "text": "A Poison Burst. Everyone in it is Poisoned.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "standard"
+      }
+    },
+    {
+      "id": "card_blight",
+      "name": "Blight",
+      "kind": "spell",
+      "vectors": {
+        "poison": 1.0
+      },
+      "form": "cone",
+      "magnitude": "minor",
+      "rarity": "uncommon",
+      "cost": 3,
+      "short": "Cone {power}",
+      "text": "A Poison Cone.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "standard"
+      }
+    },
+    {
+      "id": "card_virulence",
+      "name": "Virulence",
+      "kind": "spell",
+      "vectors": {
+        "poison": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "major",
+      "rarity": "rare",
+      "cost": 4,
+      "short": "Bolt {power}",
+      "text": "A heavy Poison Bolt. Pair it with Corrosion to double the stacks.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "grand"
+      }
+    },
+    {
+      "id": "card_mind_spike",
+      "name": "Mind Spike",
+      "kind": "spell",
+      "vectors": {
+        "psychic": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "standard",
+      "rarity": "common",
+      "cost": 2,
+      "short": "Bolt {power}",
+      "text": "A Psychic Bolt. Ignores Physical Defense; nothing for mindless enemies.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "major"
+      }
+    },
+    {
+      "id": "card_dread",
+      "name": "Dread",
+      "kind": "spell",
+      "vectors": {
+        "psychic": 1.0
+      },
+      "form": "cone",
+      "magnitude": "minor",
+      "rarity": "common",
+      "cost": 3,
+      "short": "Cone {power}",
+      "text": "A Psychic Cone that Dazes.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "standard"
+      }
+    },
+    {
+      "id": "card_psionic_burst",
+      "name": "Psionic Burst",
+      "kind": "spell",
+      "vectors": {
+        "psychic": 1.0
+      },
+      "form": "burst",
+      "magnitude": "standard",
+      "rarity": "uncommon",
+      "cost": 4,
+      "short": "Burst {power}",
+      "text": "A Psychic Burst.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "major"
+      }
+    },
+    {
+      "id": "card_migraine",
+      "name": "Migraine",
+      "kind": "spell",
+      "vectors": {
+        "psychic": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "major",
+      "rarity": "rare",
+      "cost": 4,
+      "short": "Bolt {power}",
+      "text": "A crushing Psychic Bolt.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "grand"
+      }
+    },
+    {
+      "id": "card_insight",
+      "name": "Insight",
+      "kind": "spell",
+      "vectors": {
+        "cognition": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "minor",
+      "rarity": "common",
+      "cost": 1,
+      "short": "Bolt {power}",
+      "text": "No damage: Mark an enemy and reveal the next 2 plans.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "noDamage": true
+    },
+    {
+      "id": "card_foresight",
+      "name": "Foresight",
+      "kind": "spell",
+      "vectors": {
+        "cognition": 1.0
+      },
+      "form": "aura",
+      "magnitude": "minor",
+      "rarity": "common",
+      "cost": 3,
+      "short": "Foresight",
+      "text": "Quick. Quick. No damage: every enemy plan stays visible for 2 rounds.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "effects": [
+        {
+          "op": "reveal",
+          "turns": 2
+        }
+      ],
+      "targeting": {
+        "type": "self",
+        "range": 1
+      },
+      "quick": true,
+      "effectsOnly": true
+    },
+    {
+      "id": "card_analyze",
+      "name": "Analyze",
+      "kind": "spell",
+      "vectors": {
+        "cognition": 1.0
+      },
+      "form": "burst",
+      "magnitude": "minor",
+      "rarity": "common",
+      "cost": 3,
+      "short": "Burst {power}",
+      "text": "No damage: Mark everything in a plus shape.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "noDamage": true
+    },
+    {
+      "id": "card_illusion",
+      "name": "Illusion",
+      "kind": "spell",
+      "vectors": {
+        "cognition": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "standard",
+      "rarity": "uncommon",
+      "cost": 2,
+      "short": "Illusion",
+      "text": "No damage: an illusory decoy draws attacks for 2 rounds.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "upgrade": {
+        "magnitude": "major"
+      },
+      "effects": [
+        {
+          "op": "decoy",
+          "hp": 6,
+          "lasts": 2
+        }
+      ],
+      "targeting": {
+        "type": "empty",
+        "range": 4
+      },
+      "effectsOnly": true
+    }
+  ]
+}

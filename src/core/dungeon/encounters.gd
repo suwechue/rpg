@@ -70,6 +70,12 @@ static func _pick(db: Dictionary, run: Dictionary, week: int, role: String, fall
 
 
 ## The enemy budget for a room type this week (an inclusive [min, max] range rolled with the rng).
+static func _in_week(db: Dictionary, id: String, week: int) -> bool:
+	var rec: Dictionary = DT.index_under(db, "enemies/", "enemies").get(id, {})
+	var weeks: Array = rec.get("weeks", [])
+	return weeks.has(week) or weeks.has(float(week))
+
+
 static func budget(db: Dictionary, week: int, room_type: String, rng: RandomNumberGenerator) -> int:
 	var counts: Dictionary = cfg(db).get("counts", {})
 	var wk := str(clampi(week, 1, 5))
@@ -121,6 +127,9 @@ static func build(db: Dictionary, run: Dictionary, week: int, room_type: String,
 		var placed := 0
 		while (count > 0 and placed < count) or (bool(slot.get("fill", false)) and spent < main_budget - 0.01):
 			var id := same_id if same_id != "" else _pick(db, run, week, role, str(slot.get("fallback", "fighter")), rng)
+			if slot.has("id") and _in_week(db, str(slot["id"]), week):
+				# Combo-themed groups name their key enemy (PT Part 8).
+				id = str(slot["id"])
 			if id == "":
 				break
 			if bool(slot.get("same", false)):

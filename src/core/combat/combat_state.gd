@@ -956,7 +956,8 @@ func _enter_cell(u: UnitScript, cell: Vector2i) -> bool:
 			_hit_unit(caster, u, spec, false)
 			_apply_vector_effects(caster, spec, [cell], [u])
 			return true
-	if grid.get_terrain(cell) == GridScript.HAZARD:
+	var internal := bool(u.mods.get("combat", {}).get("internalCasting", false)) and u == current and u.mp >= 1
+	if grid.get_terrain(cell) == GridScript.HAZARD and not internal:
 		_damage(u, int(cfg.get("hazardDamage", 4)), null, "", "hazard")
 		return not u.alive()
 	if grid.burning.has(cell):
@@ -1744,6 +1745,8 @@ func cover_mul(from: Vector2i, cell: Vector2i, ranged: bool) -> float:
 	var att := unit_at(from)
 	if att != null and att.statuses.has("shadowed"):
 		return 1.0
+	if att != null and ranged and bool(att.mods.get("combat", {}).get("ignoreHalfCover", false)):
+		return 1.0
 	return float(cover_cfg().get("rangedMul" if ranged else "meleeMul", 0.5 if ranged else 0.75))
 
 
@@ -1852,14 +1855,15 @@ func _resolve_spec(u: UnitScript, spec: Dictionary, target: Vector2i) -> void:
 			var hp_value := maxi(4, roundi(float(spec["power"]) * float(Res.combat_cfg(db).get("constructHpPerPower", 1))))
 			if u.perk == "constructor":
 				hp_value *= 2
-			var prop := UnitScript.make_prop("construct", hp_value, int(form.get("turns", 3)) + (2 if u.perk == "constructor" else 0))
+			hp_value = roundi(float(hp_value) * (1.0 + float(u.mods.get("combat", {}).get("constructHpPct", 0.0))))
+			var prop := UnitScript.make_prop("construct", hp_value, int(form.get("turns", 3)) + (2 if u.perk == "constructor" else 0) + int(u.mods.get("combat", {}).get("constructGlyphTurns", 0)))
 			prop.cell = target
 			prop.name = Str.t(db, "combat_state.construct") % str(spec["name"]).split(" ")[0]
 			_add_unit(prop)
 			_emit({ "t": "spawn", "unit": prop.id, "cell": target, "prop": true })
 			return
 		"glyph":
-			glyphs.append({ "cell": target, "spec": spec, "team": u.team, "caster": u, "turns": int(form.get("turns", 6)) })
+			glyphs.append({ "cell": target, "spec": spec, "team": u.team, "caster": u, "turns": int(form.get("turns", 6)) + int(u.mods.get("combat", {}).get("constructGlyphTurns", 0)) })
 			_emit({ "t": "glyph_set", "cell": target, "team": u.team })
 			return
 	var cells := Forms.footprint(grid, form, u.cell, target, occupied())
@@ -1885,6 +1889,18 @@ func _resolve_spec(u: UnitScript, spec: Dictionary, target: Vector2i) -> void:
 func _hit_unit(u: UnitScript, t: UnitScript, spec: Dictionary, can_miss: bool) -> bool:
 	if not t.alive():
 		return false
+	# Techniques (PT Part 8): Vector Redirection sends a single-target attack to
+	# another enemy near the target; Conversion Reflex soaks part of a known Vector.
+	if u.team == "enemy" and t.team == "party" and bool(t.mods.get("combat", {}).get("redirect", false)) and reactions_on() and not bool(spec.get("redirected", false)):
+		var rc := int(t.mods.get("combat", {}).get("redirectCost", 2))
+		if t.mp >= rc and str(spec.get("form", {}).get("footprint", "single_los")) in ["single_los", "adjacent"]:
+			for o in opponents_of(t):
+				if o != u and o.alive() and GridScript.manhattan(o.cell, t.cell) <= 3:
+					t.mp -= rc
+					var rs := spec.duplicate()
+					rs["redirected"] = true
+					perk_fired(t, "Vector Redirection")
+					return _hit_unit(u, o, rs, can_miss)
 	var guard_ally := _interceptor(t) if u.team == "enemy" else null
 	if guard_ally != null:
 		guard_ally.statuses.erase("intercept")
@@ -2183,6 +2199,11 @@ func _damage(t: UnitScript, amount: int, source: UnitScript, vector: String, cau
 		return
 	if t.downed or t.statuses.has("burrowed"):
 		return
+	if cause == "hit" and t.team == "party" and vector != "" and bool(t.mods.get("combat", {}).get("conversionReflex", false)) and reactions_on() \
+			and t.mp >= 1 and t.known_vectors.has(vector) and amount > 0:
+		t.mp -= 1
+		amount = maxi(0, amount - (int(t.stats.get("int", 5)) / 2 + int(t.source.get("level", 1)) / 2))
+		perk_fired(t, "Conversion Reflex")
 	if hp_floor and t.team == "party" and not t.is_prop():
 		# The tutorial's training floor: hits land for real but can't drop you.
 		amount = mini(amount, t.hp - 1)
@@ -2531,10 +2552,14 @@ func cantrip_targets(u: UnitScript) -> Array:
 
 
 func cast_cantrip(u: UnitScript, target: Vector2i) -> bool:
-	if result != "" or u != current or not u.alive() or act_block(u) != "" or not cantrip_targets(u).has(target):
+	var as_quick := bool(u.mods.get("combat", {}).get("quickCantrip", false)) and quick_block(u) == "" and act_block(u) != ""
+	if result != "" or u != current or not u.alive() or (act_block(u) != "" and not as_quick) or not cantrip_targets(u).has(target):
 		return false
 	_push_undo(u)
-	spend_action(u)
+	if as_quick:
+		u.quick_used = true
+	else:
+		spend_action(u)
 	var spec := cantrip_spec(u)
 	var t := unit_at(target)
 	_face_toward(u, target)
@@ -2592,6 +2617,11 @@ func give_encore(t: UnitScript) -> void:
 	order.insert(turn_index + 1, t)
 	t.statuses["encore"] = 1
 	_emit({ "t": "status", "unit": t.id, "status": "encore" })
+
+
+## Options "reactions": auto (default), ask (auto until the prompt exists), never.
+func reactions_on() -> bool:
+	return str(db.get("techniques", {}).get("reactions", {}).get("default", "auto")) != "never"
 
 
 ## Intercept: an adjacent ally with Intercept up takes the hit instead.

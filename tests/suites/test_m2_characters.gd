@@ -134,9 +134,12 @@ func test_xp_curve() -> void:
 		for s in r["stats"]:
 			gained += int(r["stats"][s])
 	check(gained == 6, "3 stat points per level")
-	check(reports[1]["perkChoices"].size() == 2, "a pick of 2 perks at level 3")
-	check(Lv.choose_perk(db(), ch, str(reports[1]["perkChoices"][1])), "perk chosen")
-	check(ch["pendingPerks"].is_empty() and ch["perks"].size() == 1, "perk recorded")
+	# PT Part 8: Technique picks at levels 2 and 3 replace the old perk levels.
+	check(bool(reports[0].get("techniquePick", false)) and bool(reports[1].get("techniquePick", false)) and ch["pendingTechniques"].size() == 2, "Technique picks at levels 2 and 3")
+	var start := (ch["techniques"] as Array).size()
+	var opts := Lv.technique_options(db(), ch)
+	check(not opts.is_empty() and Lv.choose_technique(db(), ch, str(opts[0])), "a Technique chosen")
+	check(ch["pendingTechniques"].size() == 1 and (ch["techniques"] as Array).size() == start + 1, "Technique recorded")
 
 
 func test_learning_pity() -> void:

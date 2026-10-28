@@ -81,7 +81,7 @@ static func rest(db: Dictionary, run: Dictionary, room: Dictionary) -> Array:
 	for ch in party_chars(run):
 		var d := Char.derived(db, ch)
 		ch["hp"] = int(d["maxHp"]) if not bool(ch.get("downed", false)) else maxi(1, int(ch.get("hp", 1)))
-		ch["mp"] = int(d["maxMp"])
+		ch["mp"] = int(d["maxMp"]) + int(Char.collect_mods(db, ch).get("rest", {}).get("mpBonus", 0))
 	room["cleared"] = true
 	lines.append(Str.t(db, "night.you_rest_by_a_fire"))
 	return lines
