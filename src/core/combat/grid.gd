@@ -17,7 +17,7 @@ const COLLAPSE := "collapse"      # arena: gives way the second time someone ste
 const DARK := "dark"              # arena: units here can't be targeted unless Light has lit the tile
 const CONVEYORS := { "conv_r": Vector2i(1, 0), "conv_l": Vector2i(-1, 0), "conv_u": Vector2i(0, -1), "conv_d": Vector2i(0, 1) }
 
-const LEGEND := { ".": FLOOR, "#": WALL, "c": COVER, "h": HAZARD, "w": WATER, "i": ICE, "p": PIT, "k": COLLAPSE, "d": DARK,
+const LEGEND := { ".": FLOOR, "#": WALL, "c": FLOOR, "h": HAZARD, "w": WATER, "i": ICE, "p": PIT, "k": COLLAPSE, "d": DARK,
 	"R": "conv_r", "L": "conv_l", "U": "conv_u", "D": "conv_d", "t": FLOOR, "f": FLOOR, "g": FLOOR }
 const DIRS := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
 
@@ -40,7 +40,8 @@ var theme := ""
 
 ## layout: { "cols", "rows", "map": ["P..x...E", ...], "theme" }
 ## Map letters: . floor, # wall, c cover, h hazard, w water, i ice,
-## P party spawn, E enemy spawn, < exit (floor), x crate prop (floor under it).
+## P party spawn, E enemy spawn, < exit (floor), x crate prop (floor under it),
+## c low wall prop (cover, floor under it).
 func _init(layout: Dictionary = {}) -> void:
 	var map: Array = layout.get("map", [])
 	rows = maxi(1, map.size()) if not map.is_empty() else int(layout.get("rows", 5))
@@ -62,6 +63,9 @@ func _init(layout: Dictionary = {}) -> void:
 					exits.append(cell)
 				"x":
 					prop_spawns.append({ "cell": cell, "prop": "crate" })
+				"c":
+					# Cover is a destructible low wall standing on floor (CT Part 3).
+					prop_spawns.append({ "cell": cell, "prop": "low_wall" })
 				"t":
 					toxic[cell] = 999
 				"f":

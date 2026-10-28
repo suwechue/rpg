@@ -163,12 +163,15 @@ func monday(run: Dictionary, lunch: int, disruption: int, lantern: int, shortcut
 	var dis := DT.record(db(), "events/class_events", "story_w1_disruption")
 	School.resolve_event(db(), run, dis, disruption, seeded(1), {})
 	var steps: Array = StoryRules.find(db(), "w1_evening")["steps"]
-	Fx.apply(db(), run, steps[2]["event"]["choices"][lantern]["effects"], seeded(1), {})
-	var fight: Dictionary = steps[4]
+	# The tutorial floor (CT Part 7) keeps the Kelly Risk beats: lantern, the help call (room 8), shortcut, panic.
+	var events: Array = steps.filter(func(s: Dictionary) -> bool: return str(s.get("type", "")) == "event")
+	Fx.apply(db(), run, events[0]["event"]["choices"][lantern]["effects"], seeded(1), {})
 	var summary := { "helpIgnored": 0 if help else 1, "support": { "kelly": 1 if help else 0 } }
-	run["kelly_risk"] = int(run["kelly_risk"]) + StoryRules.combat_risk(fight, summary, "kelly")
-	Fx.apply(db(), run, steps[5]["event"]["choices"][shortcut]["effects"], seeded(1), {})
-	var p: Dictionary = steps[7]["event"]["choices"][panic]
+	for fight in steps:
+		if str(fight.get("type", "")) == "combat":
+			run["kelly_risk"] = int(run["kelly_risk"]) + StoryRules.combat_risk(fight, summary, "kelly")
+	Fx.apply(db(), run, events[1]["event"]["choices"][shortcut]["effects"], seeded(1), {})
+	var p: Dictionary = events[2]["event"]["choices"][panic]
 	if Fx.conditions_met(db(), run, p.get("cond", {}), {}):
 		Fx.apply(db(), run, p["effects"], seeded(1), {})
 	return StoryRules.kelly_outcome(db(), run, "w1_evening")

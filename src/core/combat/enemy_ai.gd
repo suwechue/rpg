@@ -44,6 +44,9 @@ static func options(state: StateScript, u: UnitScript) -> Array:
 	var act_reach := reach
 	if state.turn_mode == "move_or_act" and not state._moves_and_acts(u):
 		act_reach = { u.cell: 0 }
+	elif state.uses_actions(u) and u.actions_left < 2:
+		# Two Actions (PT Part 1): with one left, it's a move or an act, not both.
+		act_reach = { u.cell: 0 }
 	if state.act_block(u) != "":
 		act_reach = {}
 	var opponents := state.opponents_of(u)
@@ -54,7 +57,12 @@ static func options(state: StateScript, u: UnitScript) -> Array:
 	var danger := {}
 	if u.team == "party":
 		for m in reach:
-			danger[m] = float(state.threat_at(m, u.team)) * float(c.get("dodgeWeight", 1.2))
+			var cell: Vector2i = m
+			var d := float(state.threat_at(cell, u.team))
+			if cell != u.cell:
+				# Moving doesn't dodge a tracking attack unless it gets out of reach.
+				d += float(state.tracking_threat(u, cell))
+			danger[m] = d * float(c.get("dodgeWeight", 1.2))
 	# Teamwork (AR): enemies stay out of each other's telegraphs and spread their
 	# own over different tiles, so the safe ground keeps shrinking.
 	var claimed := {}
@@ -83,9 +91,15 @@ static func options(state: StateScript, u: UnitScript) -> Array:
 				if u.team == "enemy" and (bool(spec.get("ranged", false)) or keep_back):
 					# Ranged enemies keep their distance.
 					var gap := 99
+					var nearest: UnitScript = null
 					for o in opponents:
-						gap = mini(gap, GridScript.manhattan(o.cell, m))
+						if GridScript.manhattan(o.cell, m) < gap:
+							gap = GridScript.manhattan(o.cell, m)
+							nearest = o
 					ev += float(mini(gap, 4)) * float(c.get("rangedSpacing", 0.6))
+					# Snipers and casters like to shoot from behind cover (CT Part 3).
+					if nearest != null:
+						ev += (1.0 - state.cover_mul(nearest.cell, m, true)) * float(c.get("coverSeek", 1.5))
 				if best.is_empty() or ev > float(best["ev"]):
 					best = { "kind": act["kind"], "move": m, "target": t, "ev": ev, "profile": act["profile"],
 						"action": act.get("action", {}), "hand": act.get("hand", -1), "card": act.get("card", {}) }
@@ -188,6 +202,9 @@ static func plan_intent(state: StateScript, u: UnitScript) -> Dictionary:
 		return {}
 	match str(plan["kind"]):
 		"move":
+			if state.turn_mode == "two_actions":
+				# Nothing in reach: both Actions are moves.
+				return { "kind": "move", "move": _far_move(state, u, plan["move"]), "cells": [], "double_move": true }
 			return { "kind": "move", "move": plan["move"], "cells": [] }
 		"guard":
 			return { "kind": "defend", "move": u.cell, "cells": [] }
@@ -201,25 +218,47 @@ static func plan_intent(state: StateScript, u: UnitScript) -> Dictionary:
 	if charge > 0:
 		# Charging attacks are aimed from where the unit stands now.
 		m = u.cell
-	var cells: Array
+	var cells := attack_cells(state, u, action, m, target)
+	var tracked := state.unit_at(target)
+	# Attacks lock their tiles (dodge by stepping off them). Tracking attacks,
+	# which follow their target, are rare and marked in data ("intent": "tracking").
+	var mode := str(action.get("intent", u.source.get("intent", "locked")))
+	var it := { "kind": "special" if charge > 0 or action.has("pattern") else "attack", "action": action, "move": m, "target": target,
+		"cells": cells, "mode": mode, "unit": tracked.id if tracked != null else "", "charge": charge }
+	if u.double_attack and m == u.cell and charge == 0 and not action.has("pattern") and not bool(action.get("summon", false)):
+		# Already in reach: both Actions are this attack (PT Part 1).
+		it["repeat"] = 2
+	return it
+
+
+## A move + move plan: carry on in the planned direction with double Movement.
+static func _far_move(state: StateScript, u: UnitScript, first: Vector2i) -> Vector2i:
+	if first == u.cell:
+		return first
+	var aim := first + (first - u.cell)
+	var reach := state.grid.reachable(u.cell, u.movement * 2, state.occupied(u))
+	var best := first
+	for c in reach:
+		var cell: Vector2i = c
+		if state.unit_at(cell) == null and GridScript.manhattan(cell, aim) < GridScript.manhattan(best, aim):
+			best = cell
+	return best
+
+
+## The tiles an action hits when used from cell m at target.
+static func attack_cells(state: StateScript, u: UnitScript, action: Dictionary, m: Vector2i, target: Vector2i) -> Array:
+	var spec := state.action_spec(u, action)
 	if action.has("pattern"):
 		var saved := u.cell
 		u.cell = m
-		cells = state.pattern_cells(u, str(action["pattern"]), target)
+		var cells := state.pattern_cells(u, str(action["pattern"]), target)
 		u.cell = saved
-	elif str(spec["kind"]) == "strike":
-		cells = [target]
-	else:
-		var occ := state.occupied(u)
-		occ[m] = u
-		cells = Forms.footprint(state.grid, spec["form"], m, target, occ)
-	var tracked := state.unit_at(target)
-	# Single-target attacks follow their target (dodge by getting out of reach);
-	# area attacks and patterns lock their tiles (dodge by stepping off them).
-	var single: bool = cells.size() <= 1 and not action.has("pattern") and charge == 0 and tracked != null
-	var mode := str(action.get("intent", u.source.get("intent", "tracking" if single else "locked")))
-	return { "kind": "special" if charge > 0 or action.has("pattern") else "attack", "action": action, "move": m, "target": target,
-		"cells": cells, "mode": mode, "unit": tracked.id if tracked != null else "", "charge": charge }
+		return cells
+	if str(spec["kind"]) == "strike":
+		return [target]
+	var occ := state.occupied(u)
+	occ[m] = u
+	return Forms.footprint(state.grid, spec["form"], m, target, occ)
 
 
 ## Behaviors that plan differently from "pick the best action" (docs/ARENA.md Part 4).
@@ -257,6 +296,8 @@ static func take_turn(state: StateScript, u: UnitScript) -> Dictionary:
 			if state.result == "" and state.current == u:
 				state.end_turn()
 			return it
+	if state.uses_actions(u):
+		return _party_turn(state, u)
 	var plan := choose(state, u)
 	if plan.is_empty():
 		u.intent = {}
@@ -282,12 +323,58 @@ static func take_turn(state: StateScript, u: UnitScript) -> Dictionary:
 	return plan
 
 
+## A party turn under two Actions: pick and carry out plans until the Actions
+## run out (a plan can be move + act), then Strike with the Quick if a foe is
+## adjacent, then end the turn.
+static func _party_turn(state: StateScript, u: UnitScript) -> Dictionary:
+	var last := {}
+	for i in 4:
+		if state.result != "" or not u.alive() or state.current != u:
+			break
+		var before := [u.actions_left, u.quick_used, u.cell, u.mp]
+		var plan := choose(state, u)
+		if plan.is_empty():
+			break
+		last = plan
+		if str(plan["kind"]) == "guard":
+			state.guard(u)
+			break
+		if plan["move"] != u.cell:
+			state.move(u, plan["move"])
+		if state.result == "" and u.alive():
+			match str(plan["kind"]):
+				"card":
+					var idx := _find_hand(u, plan["card"])
+					if idx >= 0:
+						state.play_card(u, idx, plan["target"])
+				"strike":
+					state.strike(u, plan["target"])
+				"cantrip":
+					state.cast_cantrip(u, plan["target"])
+		if [u.actions_left, u.quick_used, u.cell, u.mp] == before:
+			break
+	if state.result == "" and state.current == u and u.alive() and state.quick_block(u) == "":
+		var adj := state._adjacent_hostiles(u, 1)
+		if not adj.is_empty():
+			state.strike(u, adj[0])
+	if state.result == "" and state.current == u:
+		state.end_turn()
+	return last
+
+
 ## An effect's number on a card ("heal" amount, "lunge" tiles), or 0.
 static func _effect_amount(card: Dictionary, op: String, key: String) -> int:
 	for e in card.get("effects", []):
 		if str(e.get("op", "")) == op:
 			return int(e.get(key, 1))
 	return 0
+
+
+static func _has_op(card: Dictionary, op: String) -> bool:
+	for e in card.get("effects", []):
+		if str(e.get("op", "")) == op:
+			return true
+	return false
 
 
 static func _find_hand(u: UnitScript, card: Dictionary) -> int:
@@ -332,12 +419,18 @@ static func _actions(state: StateScript, u: UnitScript) -> Array:
 					continue
 				# Effect-only and no-damage cards aren't damage casts; the AI uses the ones it understands below.
 				if bool(card.get("effectsOnly", false)) or bool(card.get("noDamage", false)):
-					var heal := _effect_amount(card, "heal", "amount")
+					var heal := _effect_amount(card, "heal", "amount") + _effect_amount(card, "ward", "amount")
 					if heal > 0:
 						out.append({ "kind": "card", "card": card, "spec": { "kind": "spell", "heal": true, "power": float(heal), "vectors": {}, "form": { "footprint": "single_los", "target": "ally", "range": int(card.get("targeting", {}).get("range", 3)) }, "mult": 1.0, "ranged": true },
 							"profile": c.get("guard", { "loyalty": 0.5 }), "targets": "card" })
 					continue
 				out.append({ "kind": "card", "card": card, "spec": state._spell_spec(u, card), "profile": c.get("attack", { "courage": 0.6 }) })
+			elif str(card.get("action", "")) == "effects" and (_effect_amount(card, "hit_and_run", "tiles") > 0 or _has_op(card, "shadow_step")):
+				# Hit and Run, Shadow Step: a DEX strike (Shadow Step from range 3).
+				var eff: Dictionary = card["effects"][0]
+				var hb := float(u.stats.get(str(eff.get("stat", "dex")), 5)) * float(eff.get("mult", 1.0))
+				out.append({ "kind": "card", "card": card, "spec": { "kind": "strike", "base": hb, "vectors": {}, "form": state.form_rec("touch"), "power": 0.0, "mult": 1.0, "heal": false, "ranged": false },
+					"profile": c.get("attack", { "courage": 0.6 }), "targets": "card" })
 			elif str(card.get("action", "")) == "effects" and _effect_amount(card, "lunge", "tiles") > 0:
 				# Lunge: closes in and strikes in one action.
 				var lb := float(u.stats.get("str", 5)) * float(card["effects"][0].get("mult", 1.0))
@@ -347,7 +440,9 @@ static func _actions(state: StateScript, u: UnitScript) -> Array:
 				var base := float(u.stats.get(str(card.get("stat", "str")), 5)) * float(card.get("mult", 1.0))
 				out.append({ "kind": "card", "card": card, "spec": { "kind": "strike", "base": base, "vectors": {}, "form": state.form_rec("touch"), "power": 0.0, "mult": 1.0, "heal": false, "ranged": false },
 					"profile": c.get("attack", { "courage": 0.6 }) })
-	if not u.action_used:
+	if u.team == "party" and state.turn_mode == "two_actions" and not state.cantrip_spec(u).is_empty() and state.act_block(u) == "":
+		out.append({ "kind": "cantrip", "spec": state.cantrip_spec(u), "profile": c.get("attack", { "courage": 0.6 }) })
+	if (state.quick_block(u) == "") if (u.team == "party" and state.turn_mode == "two_actions") else not u.action_used:
 		var base := float(u.stats.get("str", 5))
 		out.append({ "kind": "strike", "spec": { "kind": "strike", "base": base, "vectors": {}, "form": state.form_rec("touch"), "power": 0.0, "mult": 1.0, "heal": false, "ranged": false },
 			"profile": c.get("attack", { "courage": 0.6 }) })

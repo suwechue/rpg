@@ -40,16 +40,14 @@
           "id": "team_spirit_slam",
           "name": "Team Spirit Slam",
           "kind": "strike",
-          "stat": "str",
-          "mult": 1.0,
-          "power": 3,
           "vectors": {
             "force": 1
           },
           "profile": {
             "pride": 0.6,
             "courage": 0.6
-          }
+          },
+          "damage": 15
         },
         {
           "id": "megaphone_roar",
@@ -58,10 +56,10 @@
           "vectors": {
             "force": 1
           },
-          "power": 6,
           "profile": {
             "pride": 0.9
-          }
+          },
+          "damage": 11
         }
       ],
       "phases": [
@@ -85,24 +83,22 @@
               "vectors": {
                 "light": 1
               },
-              "power": 7,
               "profile": {
                 "pride": 1.0
-              }
+              },
+              "damage": 36
             },
             {
               "id": "team_spirit_slam",
               "name": "Team Spirit Slam",
               "kind": "strike",
-              "stat": "str",
-              "mult": 1.1,
-              "power": 4,
               "vectors": {
                 "force": 1
               },
               "profile": {
                 "courage": 0.8
-              }
+              },
+              "damage": 17
             }
           ]
         },
@@ -127,10 +123,10 @@
                 "force": 0.6,
                 "light": 0.4
               },
-              "power": 9,
               "profile": {
                 "courage": 1.0
-              }
+              },
+              "damage": 36
             },
             {
               "id": "target_the_star",
@@ -139,11 +135,11 @@
               "vectors": {
                 "light": 1
               },
-              "power": 9,
               "target": "strongest",
               "profile": {
                 "pride": 1.0
-              }
+              },
+              "damage": 13
             }
           ],
           "summon": [
@@ -195,15 +191,13 @@
           "id": "slab_slam",
           "name": "Slab Slam",
           "kind": "strike",
-          "stat": "str",
-          "mult": 1.0,
-          "power": 5,
           "vectors": {
             "force": 1
           },
           "profile": {
             "courage": 0.8
-          }
+          },
+          "damage": 18
         },
         {
           "id": "cold_snap",
@@ -212,10 +206,10 @@
           "vectors": {
             "cold": 1
           },
-          "power": 9,
           "profile": {
             "greed": 0.7
-          }
+          },
+          "damage": 11
         }
       ],
       "phases": [
@@ -239,24 +233,22 @@
               "vectors": {
                 "cold": 1
               },
-              "power": 11,
               "profile": {
                 "greed": 0.9
-              }
+              },
+              "damage": 41
             },
             {
               "id": "slab_slam",
               "name": "Slab Slam",
               "kind": "strike",
-              "stat": "str",
-              "mult": 1.0,
-              "power": 6,
               "vectors": {
                 "force": 1
               },
               "profile": {
                 "courage": 0.8
-              }
+              },
+              "damage": 21
             }
           ]
         },
@@ -276,10 +268,10 @@
                 "cold": 0.7,
                 "force": 0.3
               },
-              "power": 13,
               "profile": {
                 "courage": 1.0
-              }
+              },
+              "damage": 48
             },
             {
               "id": "cleaver",
@@ -288,11 +280,11 @@
               "vectors": {
                 "force": 1
               },
-              "power": 13,
               "target": "strongest",
               "profile": {
                 "pride": 1.0
-              }
+              },
+              "damage": 17
             }
           ],
           "summon": [
@@ -344,15 +336,13 @@
           "id": "hammer",
           "name": "Hammer",
           "kind": "strike",
-          "stat": "str",
-          "mult": 1.0,
-          "power": 6,
           "vectors": {
             "heat": 1
           },
           "profile": {
             "courage": 0.9
-          }
+          },
+          "damage": 21
         },
         {
           "id": "chains",
@@ -361,10 +351,10 @@
           "vectors": {
             "binding": 1
           },
-          "power": 11,
           "profile": {
             "pride": 0.7
-          }
+          },
+          "damage": 11
         }
       ],
       "phases": [
@@ -388,10 +378,10 @@
               "vectors": {
                 "heat": 1
               },
-              "power": 13,
               "profile": {
                 "courage": 0.9
-              }
+              },
+              "damage": 48
             },
             {
               "id": "chains",
@@ -400,10 +390,10 @@
               "vectors": {
                 "binding": 1
               },
-              "power": 12,
               "profile": {
                 "pride": 0.7
-              }
+              },
+              "damage": 13
             }
           ]
         },
@@ -423,10 +413,10 @@
                 "heat": 0.6,
                 "binding": 0.4
               },
-              "power": 15,
               "profile": {
                 "courage": 1.0
-              }
+              },
+              "damage": 55
             },
             {
               "id": "quench",
@@ -435,11 +425,11 @@
               "vectors": {
                 "heat": 1
               },
-              "power": 15,
               "target": "strongest",
               "profile": {
                 "pride": 1.0
-              }
+              },
+              "damage": 21
             }
           ],
           "summon": [
@@ -496,10 +486,10 @@
           "vectors": {
             "binding": 1
           },
-          "power": 12,
           "profile": {
             "loyalty": 0.8
-          }
+          },
+          "damage": 16
         },
         {
           "id": "bloodwork",
@@ -508,10 +498,10 @@
           "vectors": {
             "vitality": 1
           },
-          "power": 12,
           "profile": {
             "greed": 0.6
-          }
+          },
+          "damage": 21
         }
       ],
       "phases": [
@@ -535,10 +525,10 @@
               "vectors": {
                 "vitality": 1
               },
-              "power": 13,
               "profile": {
                 "loyalty": 0.8
-              }
+              },
+              "damage": 48
             },
             {
               "id": "sedate",
@@ -547,10 +537,10 @@
               "vectors": {
                 "binding": 1
               },
-              "power": 13,
               "profile": {
                 "loyalty": 0.8
-              }
+              },
+              "damage": 17
             }
           ]
         },
@@ -569,10 +559,10 @@
                 "vitality": 0.6,
                 "binding": 0.4
               },
-              "power": 16,
               "profile": {
                 "courage": 1.0
-              }
+              },
+              "damage": 62
             },
             {
               "id": "discharge_papers",
@@ -581,10 +571,10 @@
               "vectors": {
                 "binding": 1
               },
-              "power": 15,
               "profile": {
                 "pride": 1.0
-              }
+              },
+              "damage": 14
             }
           ],
           "summon": [
@@ -645,10 +635,10 @@
           "vectors": {
             "binding": 1
           },
-          "power": 13,
           "profile": {
             "pride": 0.9
-          }
+          },
+          "damage": 14
         },
         {
           "id": "reflect",
@@ -657,10 +647,10 @@
           "vectors": {
             "light": 1
           },
-          "power": 12,
           "profile": {
             "pride": 0.7
-          }
+          },
+          "damage": 11
         },
         {
           "id": "expel",
@@ -669,11 +659,11 @@
           "vectors": {
             "force": 1
           },
-          "power": 14,
           "target": "strongest",
           "profile": {
             "pride": 1.0
-          }
+          },
+          "damage": 18
         }
       ],
       "phases": [
@@ -699,10 +689,10 @@
                 "force": 0.25,
                 "light": 0.25
               },
-              "power": 14,
               "profile": {
                 "pride": 0.9
-              }
+              },
+              "damage": 51
             },
             {
               "id": "policy",
@@ -711,10 +701,10 @@
               "vectors": {
                 "binding": 1
               },
-              "power": 14,
               "profile": {
                 "pride": 0.9
-              }
+              },
+              "damage": 15
             }
           ]
         },
@@ -738,10 +728,10 @@
                 "force": 0.5,
                 "binding": 0.5
               },
-              "power": 17,
               "profile": {
                 "courage": 1.0
-              }
+              },
+              "damage": 62
             },
             {
               "id": "expel",
@@ -750,11 +740,11 @@
               "vectors": {
                 "corrosion": 1
               },
-              "power": 17,
               "target": "strongest",
               "profile": {
                 "pride": 1.0
-              }
+              },
+              "damage": 21
             }
           ]
         }

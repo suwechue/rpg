@@ -23,7 +23,7 @@ func test_new_run() -> void:
 	var run := fresh()
 	check(run["player"]["class"] == "mage" and run["player"]["isPlayer"], "player built")
 	check(run["schedule"].size() == 3, "default schedule")
-	check(int(run["collection"].get("card_guard", 0)) == 1 and int(run["collection"].get("card_blink", 0)) == 1, "starter deck goes into the collection")
+	check(int(run["collection"].get("card_shove", 0)) == 1 and int(run["collection"].get("card_blink", 0)) == 1, "starter deck goes into the collection")
 	check(run["money"] == int(db()["economy"]["startMoney"]), "start money from data")
 
 
@@ -187,7 +187,7 @@ func test_craft_and_copy() -> void:
 
 func test_property_effects_on_cards() -> void:
 	var card := CardRules.make_spell(db(), { "heat": 1 }, "bolt", "standard", ["searing_edge"])
-	check_near(CardRules.power(db(), card), 11.5, "Searing Edge +15% power")
+	check_near(CardRules.power(db(), card), 8.05, "Searing Edge +15% power")
 	var quick := CardRules.make_spell(db(), { "motion": 1 }, "bolt", "minor", ["quickcast"])
 	check(CardRules.spell_cost(db(), quick) == 0, "Quickcast -1 cost, min 0")
 
@@ -197,7 +197,7 @@ func test_deck_rules() -> void:
 	var p: Dictionary = run["player"]
 	var deck: Array = p["deck"].duplicate()
 	check(Crafting.deck_error(db(), run, p, deck) == "", "starter deck is legal")
-	var small := deck.slice(0, 9)
+	var small := deck.slice(0, int(db()["leveling"]["deckMin"]) - 1)
 	check(Crafting.deck_error(db(), run, p, small) != "", "too small")
 	var four := deck.duplicate()
 	four.append("card_guard")

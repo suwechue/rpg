@@ -472,6 +472,32 @@
         -1.0,
         0.0
       ]
+    },
+    "turn_start_party": {
+      "ids": [
+        "sfx_turn_party"
+      ],
+      "pitch": [
+        0.98,
+        1.02
+      ],
+      "volumeDb": [
+        -6.0,
+        -5.0
+      ]
+    },
+    "turn_start_enemy": {
+      "ids": [
+        "sfx_turn_enemy"
+      ],
+      "pitch": [
+        0.95,
+        1.0
+      ],
+      "volumeDb": [
+        -8.0,
+        -7.0
+      ]
     }
   }
 }

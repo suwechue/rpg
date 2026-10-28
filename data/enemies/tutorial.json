@@ -1,0 +1,407 @@
+{
+  "comment": "CT Part 7: tutorial floor enemies (no weeks, so encounters never pick them). weakToPlayer / strongToPlayer / strongToHand are filled in from the player when the room starts.",
+  "enemies": [
+    {
+      "id": "tut_slip",
+      "name": "Practice Slip",
+      "tier": "minion",
+      "weeks": [],
+      "tutorial": true,
+      "text": "A training shape the Upside-Down made out of your first day.",
+      "hp": 6,
+      "movement": 2,
+      "initiative": 4,
+      "physDefense": 0,
+      "magicResist": 0,
+      "stability": 5,
+      "stats": {
+        "str": 3,
+        "dex": 4
+      },
+      "weakTo": [],
+      "strongAgainst": [],
+      "signature": {
+        "binding": 1.0
+      },
+      "disposition": {
+        "courage": 40
+      },
+      "actions": [
+        {
+          "id": "flutter",
+          "name": "Flutter",
+          "kind": "strike",
+          "damage": 3
+        }
+      ],
+      "xp": 4,
+      "money": 1,
+      "sprite": "enemy_detention_slip"
+    },
+    {
+      "id": "tut_red_tiles",
+      "name": "Hall Monitor",
+      "tier": "normal",
+      "weeks": [],
+      "tutorial": true,
+      "text": "A training shape the Upside-Down made out of your first day.",
+      "hp": 16,
+      "movement": 1,
+      "initiative": 4,
+      "physDefense": 0,
+      "magicResist": 0,
+      "stability": 5,
+      "stats": {
+        "str": 3,
+        "dex": 4
+      },
+      "weakTo": [],
+      "strongAgainst": [],
+      "signature": {
+        "binding": 1.0
+      },
+      "disposition": {
+        "courage": 40
+      },
+      "actions": [
+        {
+          "id": "sweep",
+          "name": "Slow Sweep",
+          "form": "burst",
+          "magnitude": "minor",
+          "vectors": {
+            "force": 1
+          },
+          "damage": 8,
+          "intent": "locked"
+        }
+      ],
+      "xp": 4,
+      "money": 1,
+      "sprite": "enemy_locker_lurker"
+    },
+    {
+      "id": "tut_tracker",
+      "name": "Homework Hound",
+      "tier": "normal",
+      "weeks": [],
+      "tutorial": true,
+      "text": "A training shape the Upside-Down made out of your first day.",
+      "hp": 14,
+      "movement": 4,
+      "initiative": 4,
+      "physDefense": 0,
+      "magicResist": 0,
+      "stability": 5,
+      "stats": {
+        "str": 3,
+        "dex": 4
+      },
+      "weakTo": [],
+      "strongAgainst": [],
+      "signature": {
+        "binding": 1.0
+      },
+      "disposition": {
+        "courage": 40
+      },
+      "actions": [
+        {
+          "id": "nip",
+          "name": "Nip",
+          "kind": "strike",
+          "damage": 7,
+          "intent": "tracking"
+        }
+      ],
+      "xp": 4,
+      "money": 1,
+      "sprite": "enemy_frost_wolf"
+    },
+    {
+      "id": "tut_gap_slip",
+      "name": "Paper Wasp",
+      "tier": "minion",
+      "weeks": [],
+      "tutorial": true,
+      "text": "A training shape the Upside-Down made out of your first day.",
+      "hp": 6,
+      "movement": 0,
+      "initiative": 4,
+      "physDefense": 0,
+      "magicResist": 0,
+      "stability": 5,
+      "stats": {
+        "str": 3,
+        "dex": 4
+      },
+      "weakTo": [],
+      "strongAgainst": [],
+      "signature": {
+        "binding": 1.0
+      },
+      "disposition": {
+        "courage": 40
+      },
+      "actions": [
+        {
+          "id": "sting",
+          "name": "Sting",
+          "form": "bolt",
+          "vectors": {
+            "motion": 1
+          },
+          "damage": 3
+        }
+      ],
+      "xp": 4,
+      "money": 1,
+      "sprite": "enemy_paper_wasp"
+    },
+    {
+      "id": "tut_weak",
+      "name": "Soft Spot",
+      "tier": "normal",
+      "weeks": [],
+      "tutorial": true,
+      "text": "A training shape the Upside-Down made out of your first day.",
+      "hp": 12,
+      "movement": 3,
+      "initiative": 4,
+      "physDefense": 0,
+      "magicResist": 0,
+      "stability": 5,
+      "stats": {
+        "str": 3,
+        "dex": 4
+      },
+      "weakTo": [],
+      "strongAgainst": [],
+      "signature": {
+        "binding": 1.0
+      },
+      "disposition": {
+        "courage": 40
+      },
+      "actions": [
+        {
+          "id": "poke",
+          "name": "Poke",
+          "kind": "strike",
+          "damage": 4
+        }
+      ],
+      "xp": 4,
+      "money": 1,
+      "sprite": "enemy_detention_slip",
+      "weakToPlayer": true
+    },
+    {
+      "id": "tut_strong",
+      "name": "Hard Shell",
+      "tier": "normal",
+      "weeks": [],
+      "tutorial": true,
+      "text": "A training shape the Upside-Down made out of your first day.",
+      "hp": 12,
+      "movement": 3,
+      "initiative": 4,
+      "physDefense": 0,
+      "magicResist": 0,
+      "stability": 5,
+      "stats": {
+        "str": 3,
+        "dex": 4
+      },
+      "weakTo": [
+        "light"
+      ],
+      "strongAgainst": [],
+      "signature": {
+        "binding": 1.0
+      },
+      "disposition": {
+        "courage": 40
+      },
+      "actions": [
+        {
+          "id": "poke",
+          "name": "Poke",
+          "kind": "strike",
+          "damage": 4
+        }
+      ],
+      "xp": 4,
+      "money": 1,
+      "sprite": "enemy_detention_slip",
+      "strongToPlayer": true
+    },
+    {
+      "id": "tut_sniper",
+      "name": "Rubber Band Sniper",
+      "tier": "normal",
+      "weeks": [],
+      "tutorial": true,
+      "text": "A training shape the Upside-Down made out of your first day.",
+      "hp": 12,
+      "movement": 2,
+      "initiative": 4,
+      "physDefense": 0,
+      "magicResist": 0,
+      "stability": 5,
+      "stats": {
+        "str": 3,
+        "dex": 4
+      },
+      "weakTo": [],
+      "strongAgainst": [],
+      "signature": {
+        "binding": 1.0
+      },
+      "disposition": {
+        "courage": 40
+      },
+      "actions": [
+        {
+          "id": "snap",
+          "name": "Snap",
+          "form": "bolt",
+          "magnitude": "standard",
+          "vectors": {
+            "force": 1
+          },
+          "damage": 7,
+          "intent": "locked"
+        }
+      ],
+      "xp": 4,
+      "money": 1,
+      "sprite": "enemy_megaphone_mimic",
+      "behavior": "sniper"
+    },
+    {
+      "id": "tut_hot",
+      "name": "Hot Plate",
+      "tier": "normal",
+      "weeks": [],
+      "tutorial": true,
+      "text": "A training shape the Upside-Down made out of your first day.",
+      "hp": 10,
+      "movement": 1,
+      "initiative": 4,
+      "physDefense": 0,
+      "magicResist": 0,
+      "stability": 5,
+      "stats": {
+        "str": 3,
+        "dex": 4
+      },
+      "weakTo": [],
+      "strongAgainst": [],
+      "signature": {
+        "binding": 1.0
+      },
+      "disposition": {
+        "courage": 40
+      },
+      "actions": [
+        {
+          "id": "sizzle",
+          "name": "Sizzle",
+          "form": "burst",
+          "magnitude": "minor",
+          "vectors": {
+            "heat": 1
+          },
+          "damage": 5,
+          "intent": "locked"
+        }
+      ],
+      "xp": 4,
+      "money": 1,
+      "sprite": "enemy_detention_slip"
+    },
+    {
+      "id": "tut_charger",
+      "name": "Gym Bull",
+      "tier": "normal",
+      "weeks": [],
+      "tutorial": true,
+      "text": "A training shape the Upside-Down made out of your first day.",
+      "hp": 18,
+      "movement": 3,
+      "initiative": 4,
+      "physDefense": 0,
+      "magicResist": 0,
+      "stability": 5,
+      "stats": {
+        "str": 3,
+        "dex": 4
+      },
+      "weakTo": [],
+      "strongAgainst": [],
+      "signature": {
+        "binding": 1.0
+      },
+      "disposition": {
+        "courage": 40
+      },
+      "actions": [
+        {
+          "id": "stampede",
+          "name": "Stampede",
+          "form": "line",
+          "magnitude": "standard",
+          "vectors": {
+            "force": 1
+          },
+          "damage": 10,
+          "charge": 1,
+          "run": true
+        }
+      ],
+      "xp": 4,
+      "money": 1,
+      "sprite": "enemy_hall_rusher",
+      "behavior": "charger"
+    },
+    {
+      "id": "tut_resistant",
+      "name": "Everything Proof",
+      "tier": "normal",
+      "weeks": [],
+      "tutorial": true,
+      "text": "A training shape the Upside-Down made out of your first day.",
+      "hp": 14,
+      "movement": 3,
+      "initiative": 4,
+      "physDefense": 0,
+      "magicResist": 0,
+      "stability": 5,
+      "stats": {
+        "str": 3,
+        "dex": 4
+      },
+      "weakTo": [],
+      "strongAgainst": [],
+      "signature": {
+        "binding": 1.0
+      },
+      "disposition": {
+        "courage": 40
+      },
+      "actions": [
+        {
+          "id": "shrug",
+          "name": "Shrug",
+          "kind": "strike",
+          "damage": 5
+        }
+      ],
+      "xp": 4,
+      "money": 1,
+      "sprite": "enemy_detention_slip",
+      "strongToHand": true
+    }
+  ]
+}

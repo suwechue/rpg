@@ -11,7 +11,7 @@
   "knowledgeTier": 1,
   "resistances": {},
   "traits": [],
-  "deck": ["card_ember_bolt", "card_ember_bolt", "card_ember_bolt", "card_heat_shield", "card_heat_shield", "card_strike", "card_strike", "card_guard"],
+  "deck": ["card_ember_bolt", "card_ember_bolt", "card_ember_bolt", "card_heat_shield", "card_heat_shield", "card_quick_stab", "card_dash", "card_blink"],
   "equipment": { "weapon": null, "armor": null, "trinket": null },
   "flags": {}
 }

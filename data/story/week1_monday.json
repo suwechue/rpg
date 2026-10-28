@@ -1,64 +1,312 @@
 {
-  "comment": "Week 1 Monday (DESIGN.md Section 13, 'Kelly and the first-night betrayal'). Kelly Risk sources: mock her at lunch +2 (a misheard joke counts), side with the laughers in the class disruption +1 (class_events story_w1_disruption), ignore her call for help in the first fight +2, take the shortcut she begs you not to +1, refuse to let her carry the lantern +1, defend her -2 (disruption), shield or heal her in combat -2, kind reassurance when she panics -1. At the panic moment, Risk 4+ kills you. The narrator foreshadows twice before it.",
+  "comment": "Week 1 Monday (DESIGN.md Section 13, 'Kelly and the first-night betrayal'). Kelly Risk sources: mock her at lunch +2 (a misheard joke counts), side with the laughers in the class disruption +1 (class_events story_w1_disruption), ignore her call for help in the first fight +2, take the shortcut she begs you not to +1, refuse to let her carry the lantern +1, defend her -2 (disruption), shield or heal her in combat -2, kind reassurance when she panics -1. At the panic moment, Risk 4+ kills you. The narrator foreshadows twice before it. CT Part 7: the evening is now the 10-room tutorial floor (data/story/tutorial_floor.json); the Kelly Risk choices (lantern, shortcut, help call in room 8, panic) are unchanged.",
   "kellyRiskDeath": 4,
   "stories": [
-    { "id": "w1_lunch", "trigger": { "week": 1, "day": "mon", "part": "lunch" }, "inline": true,
+    {
+      "id": "w1_lunch",
+      "trigger": {
+        "week": 1,
+        "day": "mon",
+        "part": "lunch"
+      },
+      "inline": true,
       "steps": [
-        { "type": "event", "event": {
-          "title": "Lunch, Monday", "speaker": "Kelly",
-          "text": "You're halfway to an empty table when Kelly's voice cuts across the cafeteria. \"Wow. New kid. Nice shoes. Did they come with the house?\" The center table laughs on cue. Kara laughs a beat late. Kayla doesn't laugh at all.",
-          "choices": [
-            { "label": "\"At least my personality didn't come with a pom-pom.\"", "effects": { "kellyRisk": 2, "bond": { "kelly": -6, "kara": -2 }, "flag": "w1_mocked_kelly" },
-              "result": "The table goes \"OHHH.\" Kelly smiles with her mouth only. You've made an impression. Not the good kind." },
-            { "label": "Make a joke about it (risky)", "misheard": { "risk": 0.2, "effects": { "kellyRisk": 2, "bond": { "kelly": -5 }, "flag": "w1_mocked_kelly" },
-                "result": "You meant: \"Nice shoes are wasted on me.\" They heard: \"Nice SHOES? Is that the best you've got?\" The table goes quiet. Kelly's eyes narrow." },
-              "effects": { "bond": { "kelly": 3, "kayla": 2 } },
-              "result": "\"Joke's on them, the house came with worse.\" Kelly snorts before she can stop herself. Then she pretends she didn't." },
-            { "label": "\"Your routine at the pep rally was actually good.\"", "cond": { "minStat": { "cha": 6 } }, "lockedHint": "CHA 6",
-              "effects": { "kellyRisk": -1, "bond": { "kelly": 4 } },
-              "result": "Kelly blinks. Nobody compliments Kelly; they just agree with her. \"...Obviously.\" She turns back to her table a little too fast." },
-            { "label": "Ignore her and eat your sandwich", "effects": {},
-              "result": "You eat. She loses interest. Somewhere, the narrator writes down 'neutral' and underlines it." }
-          ] } }
-      ] },
-    { "id": "w1_evening", "trigger": { "week": 1, "day": "mon", "part": "evening" }, "inline": false, "theme": "school",
+        {
+          "type": "event",
+          "event": {
+            "title": "Lunch, Monday",
+            "speaker": "Kelly",
+            "text": "You're halfway to an empty table when Kelly's voice cuts across the cafeteria. \"Wow. New kid. Nice shoes. Did they come with the house?\" The center table laughs on cue. Kara laughs a beat late. Kayla doesn't laugh at all.",
+            "choices": [
+              {
+                "label": "\"At least my personality didn't come with a pom-pom.\"",
+                "effects": {
+                  "kellyRisk": 2,
+                  "bond": {
+                    "kelly": -6,
+                    "kara": -2
+                  },
+                  "flag": "w1_mocked_kelly"
+                },
+                "result": "The table goes \"OHHH.\" Kelly smiles with her mouth only. You've made an impression. Not the good kind."
+              },
+              {
+                "label": "Make a joke about it (risky)",
+                "misheard": {
+                  "risk": 0.2,
+                  "effects": {
+                    "kellyRisk": 2,
+                    "bond": {
+                      "kelly": -5
+                    },
+                    "flag": "w1_mocked_kelly"
+                  },
+                  "result": "You meant: \"Nice shoes are wasted on me.\" They heard: \"Nice SHOES? Is that the best you've got?\" The table goes quiet. Kelly's eyes narrow."
+                },
+                "effects": {
+                  "bond": {
+                    "kelly": 3,
+                    "kayla": 2
+                  }
+                },
+                "result": "\"Joke's on them, the house came with worse.\" Kelly snorts before she can stop herself. Then she pretends she didn't."
+              },
+              {
+                "label": "\"Your routine at the pep rally was actually good.\"",
+                "cond": {
+                  "minStat": {
+                    "cha": 6
+                  }
+                },
+                "lockedHint": "CHA 6",
+                "effects": {
+                  "kellyRisk": -1,
+                  "bond": {
+                    "kelly": 4
+                  }
+                },
+                "result": "Kelly blinks. Nobody compliments Kelly; they just agree with her. \"...Obviously.\" She turns back to her table a little too fast."
+              },
+              {
+                "label": "Ignore her and eat your sandwich",
+                "effects": {},
+                "result": "You eat. She loses interest. Somewhere, the narrator writes down 'neutral' and underlines it."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "w1_evening",
+      "trigger": {
+        "week": 1,
+        "day": "mon",
+        "part": "evening"
+      },
+      "inline": false,
+      "theme": "school",
       "steps": [
-        { "type": "narrate", "text": "Dusk. The streetlights flicker on, then off, then on in the wrong colors. A tug behind your ribs, like a fishing line. The spark has found you." },
-        { "type": "guest", "add": "kelly" },
-        { "type": "event", "event": {
-          "title": "The Upside-Down", "speaker": "Kelly",
-          "text": "You land on cold linoleum. The school, but wrong: the trophy case is full of teeth, and the hallway goes on further than the building does. Someone is breathing hard beside you. Kelly. \"What did you DO?\" She's holding a lantern she definitely didn't bring. \"Give me that. No. Wait. You hold it. No. Give it.\"",
-          "choices": [
-            { "label": "Let her carry the lantern", "effects": { "bond": { "kelly": 3 } }, "result": "She grabs it with both hands like a life jacket. The light steadies. So does she, a little." },
-            { "label": "Keep the lantern. You need it more.", "effects": { "kellyRisk": 1, "bond": { "kelly": -3 } }, "result": "\"Fine. FINE.\" She walks a half-step closer to you than she'd like, in the dark." }
-          ] } },
-        { "type": "foreshadow" },
-        { "type": "combat", "enemies": ["detention_slip", "detention_slip"], "layout": "open_field", "guest": "kelly",
-          "intro": "Something giggles in the lockers. Kelly will shout if she needs you. Shield or heal her if you can.",
-          "helpIgnoredRisk": 2, "supportRisk": -2 },
-        { "type": "event", "event": {
-          "title": "Two hallways", "speaker": "Kelly",
-          "text": "The hall forks. To the left, a shortcut under the bleachers, where the dark is thick and something ticks. To the right, the long way around, past the flooded gym. Kelly grabs your sleeve. \"Not the bleachers. Please. I don't-- not the bleachers.\"",
-          "choices": [
-            { "label": "Take the shortcut. It's faster.", "effects": { "kellyRisk": 1, "bond": { "kelly": -4 } }, "result": "You duck under the bleachers. She follows, because the alternative is being alone. She doesn't let go of your sleeve the whole way." },
-            { "label": "Go the long way, like she asked", "effects": { "hp": -4, "bond": { "kelly": 3 } }, "result": "The flooded gym is colder than water should be. You come out soaked and shivering, but she's breathing easier." }
-          ] } },
-        { "type": "foreshadow" },
-        { "type": "event", "event": {
-          "title": "The panic", "speaker": "Kelly",
-          "text": "The exit door is right there, glowing. Then the ceiling groans. Dust rains down. Kelly freezes. Her breathing goes short and fast, and the lantern starts to shake so hard the light strobes. \"I can't-- I can't-- it's coming down, it's all coming DOWN--\"",
-          "choices": [
-            { "label": "\"Hey. Look at me. We're almost out. I've got you.\"", "cond": { "minStat": { "cha": 5 } }, "lockedHint": "CHA 5",
-              "effects": { "kellyRisk": -1 }, "result": "She looks at you. Really looks. Her breathing slows, one shaky breath at a time." },
-            { "label": "Take her hand, gently, and walk", "cond": { "flag": "w1_defended_kelly" }, "lockedHint": "If she trusted you earlier",
-              "effects": { "kellyRisk": -1 }, "result": "She remembers who stood up for her today. She lets you lead." },
-            { "label": "\"Pull it together, Kelly!\"", "effects": {}, "result": "It comes out harder than you meant. She flinches." },
-            { "label": "Run for the door", "effects": {}, "result": "You run. You hear her behind you. Or something behind you." }
-          ] } },
-        { "type": "kellyCheck" }
+        {
+          "type": "narrate",
+          "text": "Dusk. The streetlights flicker on, then off, then on in the wrong colors. A tug behind your ribs, like a fishing line. The spark has found you."
+        },
+        {
+          "type": "guest",
+          "add": "kelly"
+        },
+        {
+          "type": "tutorialSkip"
+        },
+        {
+          "type": "narrate",
+          "textKey": "tut_r0_a"
+        },
+        {
+          "type": "event",
+          "event": {
+            "title": "The Upside-Down",
+            "speaker": "Kelly",
+            "text": "You land on cold linoleum. The school, but wrong: the trophy case is full of teeth, and the hallway goes on further than the building does. Someone is breathing hard beside you. Kelly. \"What did you DO?\" She's holding a lantern she definitely didn't bring. \"Give me that. No. Wait. You hold it. No. Give it.\"",
+            "choices": [
+              {
+                "label": "Let her carry the lantern",
+                "effects": {
+                  "bond": {
+                    "kelly": 3
+                  }
+                },
+                "result": "She grabs it with both hands like a life jacket. The light steadies. So does she, a little."
+              },
+              {
+                "label": "Keep the lantern. You need it more.",
+                "effects": {
+                  "kellyRisk": 1,
+                  "bond": {
+                    "kelly": -3
+                  }
+                },
+                "result": "\"Fine. FINE.\" She walks a half-step closer to you than she'd like, in the dark."
+              }
+            ]
+          }
+        },
+        {
+          "type": "combat",
+          "tutorial": 1,
+          "guest": "kelly",
+          "helpIgnoredRisk": 0,
+          "supportRisk": 0
+        },
+        {
+          "type": "combat",
+          "tutorial": 2,
+          "guest": "kelly",
+          "helpIgnoredRisk": 0,
+          "supportRisk": 0
+        },
+        {
+          "type": "combat",
+          "tutorial": 3,
+          "guest": "kelly",
+          "helpIgnoredRisk": 0,
+          "supportRisk": 0
+        },
+        {
+          "type": "combat",
+          "tutorial": 4,
+          "guest": "kelly",
+          "helpIgnoredRisk": 0,
+          "supportRisk": 0
+        },
+        {
+          "type": "combat",
+          "tutorial": 5,
+          "guest": "kelly",
+          "helpIgnoredRisk": 0,
+          "supportRisk": 0
+        },
+        {
+          "type": "combat",
+          "tutorial": 6,
+          "guest": "kelly",
+          "helpIgnoredRisk": 0,
+          "supportRisk": 0
+        },
+        {
+          "type": "foreshadow"
+        },
+        {
+          "type": "tutorialRest",
+          "textKey": "tut_rest_a"
+        },
+        {
+          "type": "event",
+          "event": {
+            "title": "Two hallways",
+            "speaker": "Kelly",
+            "text": "The hall forks. To the left, a shortcut under the bleachers, where the dark is thick and something ticks. To the right, the long way around, past the flooded gym. Kelly grabs your sleeve. \"Not the bleachers. Please. I don't-- not the bleachers.\"",
+            "choices": [
+              {
+                "label": "Take the shortcut. It's faster.",
+                "effects": {
+                  "kellyRisk": 1,
+                  "bond": {
+                    "kelly": -4
+                  },
+                  "flag": [
+                    "w1_shortcut"
+                  ]
+                },
+                "result": "You duck under the bleachers. She follows, because the alternative is being alone. She doesn't let go of your sleeve the whole way."
+              },
+              {
+                "label": "Go the long way, like she asked",
+                "effects": {
+                  "hp": -4,
+                  "bond": {
+                    "kelly": 3
+                  }
+                },
+                "result": "The flooded gym is colder than water should be. You come out soaked and shivering, but she's breathing easier."
+              }
+            ]
+          }
+        },
+        {
+          "type": "combat",
+          "tutorial": 7,
+          "guest": "kelly",
+          "skipIfFlag": "w1_shortcut",
+          "helpIgnoredRisk": 0,
+          "supportRisk": 0
+        },
+        {
+          "type": "combat",
+          "tutorial": 8,
+          "guest": "kelly",
+          "helpIgnoredRisk": 2,
+          "supportRisk": -2
+        },
+        {
+          "type": "combat",
+          "tutorial": 9,
+          "guest": "kelly",
+          "helpIgnoredRisk": 0,
+          "supportRisk": 0
+        },
+        {
+          "type": "combat",
+          "tutorial": 10,
+          "guest": "kelly",
+          "helpIgnoredRisk": 0,
+          "supportRisk": 0
+        },
+        {
+          "type": "foreshadow"
+        },
+        {
+          "type": "narrate",
+          "textKey": "tut_exit"
+        },
+        {
+          "type": "event",
+          "event": {
+            "title": "The panic",
+            "speaker": "Kelly",
+            "text": "The exit door is right there, glowing. Then the ceiling groans. Dust rains down. Kelly freezes. Her breathing goes short and fast, and the lantern starts to shake so hard the light strobes. \"I can't-- I can't-- it's coming down, it's all coming DOWN--\"",
+            "choices": [
+              {
+                "label": "\"Hey. Look at me. We're almost out. I've got you.\"",
+                "cond": {
+                  "minStat": {
+                    "cha": 5
+                  }
+                },
+                "lockedHint": "CHA 5",
+                "effects": {
+                  "kellyRisk": -1
+                },
+                "result": "She looks at you. Really looks. Her breathing slows, one shaky breath at a time."
+              },
+              {
+                "label": "Take her hand, gently, and walk",
+                "cond": {
+                  "flag": "w1_defended_kelly"
+                },
+                "lockedHint": "If she trusted you earlier",
+                "effects": {
+                  "kellyRisk": -1
+                },
+                "result": "She remembers who stood up for her today. She lets you lead."
+              },
+              {
+                "label": "\"Pull it together, Kelly!\"",
+                "effects": {},
+                "result": "It comes out harder than you meant. She flinches."
+              },
+              {
+                "label": "Run for the door",
+                "effects": {},
+                "result": "You run. You hear her behind you. Or something behind you."
+              }
+            ]
+          }
+        },
+        {
+          "type": "kellyCheck"
+        }
       ],
-      "survive": { "flag": ["survived_w1_monday"], "narrate": "Kelly's grip on the lantern loosens. The door opens. You fall out onto the cold grass by the woods, both of you breathing like you ran a mile. She doesn't say thank you. She doesn't have to. You both go home without a word, and the night lets you." },
-      "death": { "cause": "kelly", "narrate": "Kelly's scream is the last thing you hear. The lantern hits the floor. The panic pours out of her like a wave, hits the ceiling, and the ceiling comes down. She didn't mean to. That's the worst part. She looks for you in the dust, and you're not there anymore. Some people panic under pressure. You were the pressure." }
+      "survive": {
+        "flag": [
+          "survived_w1_monday"
+        ],
+        "narrate": "Kelly's grip on the lantern loosens. The door opens. You fall out onto the cold grass by the woods, both of you breathing like you ran a mile. She doesn't say thank you. She doesn't have to. You both go home without a word, and the night lets you."
+      },
+      "death": {
+        "cause": "kelly",
+        "narrate": "Kelly's scream is the last thing you hear. The lantern hits the floor. The panic pours out of her like a wave, hits the ceiling, and the ceiling comes down. She didn't mean to. That's the worst part. She looks for you in the dust, and you're not there anymore. Some people panic under pressure. You were the pressure."
+      }
     }
   ]
 }

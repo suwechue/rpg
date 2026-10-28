@@ -97,6 +97,16 @@ static func recover(db: Dictionary, run: Dictionary, share: float) -> void:
 			ch["hp"] = mini(int(d["maxHp"]), int(ch.get("hp", 0)) + roundi(float(d["maxHp"]) * share))
 
 
+## Fight rooms (combat, elite, boss) on the floor not won yet. The exit stays
+## sealed until this is 0 (CT Part 6).
+static func fights_left(floor_data: Dictionary) -> int:
+	var n := 0
+	for r in floor_data.get("rooms", []):
+		if str(r.get("type", "")) in ["combat", "elite", "boss"] and not bool(r.get("cleared", false)):
+			n += 1
+	return n
+
+
 static func party_chars(run: Dictionary) -> Array:
 	var out: Array = [run["player"]]
 	for id in run.get("party_ids", []):

@@ -50,6 +50,7 @@ func _ready() -> void:
 ##   --jump=week,day_index,part_index  --town=zone:x,y (start position in the town)
 ##   --section=Art (with --debug)  --custom=C:/folder (use another custom art folder)
 ##   --hand=ids --hovercard=N --card=N --hover=x,y (combat previews, see _combat_dev_args)
+##   --tutorial=N (tutorial floor room N with its lesson; use with --scene=res://src/scenes/combat/combat.tscn)
 ##   --arena --size=4 --level=3 --arenawave=N --waves=N (Endless Arena; --autoplay plays it)
 ## --debug opens this menu; --shot saves the viewport after N frames and quits.
 func _dev_args() -> void:
@@ -72,6 +73,13 @@ func _dev_args() -> void:
 		var t := str(args["town"]).split(":")
 		var xy := t[1].split(",")
 		GameState.run["town_pos"] = { "map": t[0], "interior": false, "loc": "", "cell": [int(xy[0]), int(xy[1])] }
+	if args.has("tutorial"):
+		# --tutorial=N: tutorial room N with its lesson (CT Part 7 screenshots).
+		if GameState.run.is_empty():
+			GameState.new_run(int(args.get("seed", "1")), str(args.get("class", "mage")))
+		var opts := preload("res://src/core/story/tutorial.gd").setup_opts(DataDB.all(), int(args["tutorial"]), GameState.player, GameState.run.get("flags", {}))
+		opts["intro"] = Strings.t(str(opts["intro"]))
+		GameState.pending_combat = GameState.combat_setup(opts["enemies"], str(opts["layout"]), opts)
 	if args.has("fight"):
 		GameState.pending_combat = GameState.combat_setup(str(args["fight"]).split(","), str(args.get("layout", "boss_stage")), { "boss": true })
 	if args.has("scene"):

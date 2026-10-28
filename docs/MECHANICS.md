@@ -1,11 +1,11 @@
 # Project Vector: Mechanics Reference
 
-Every mechanic in the game as it works **right now** (written from the code at commit `d51771d`, after the Arena milestone, Oct 25, 2026), with the numbers and the file where each one is set. Use it to explain the game to playtesters, to nitpick, and to decide what to change.
+Every mechanic in the game as it works **right now** (rewritten for CT, the Combat Tuning milestone, with PT Parts 1 and 2 adopted inside it, Oct 28, 2026), with the numbers and the file where each one is set. Use it to explain the game to playtesters, to nitpick, and to decide what to change.
 
 - **Part A** is a one-page "how to play" for playtesters.
 - **Part B** is the full combat reference.
 - **Part C** covers everything outside combat.
-- **Part D** lists what the Combat Tuning milestone (CT, `docs/COMBAT_TUNING.md`) is about to change.
+- **Part D** lists what is changing next (PT, `docs/PATCH_1.md`, Parts 3 to 9).
 
 **Claude Code keeps this file current:** whenever a mechanic, number or file changes, update the matching row here in the same commit.
 
@@ -47,8 +47,11 @@ Most numbers live in `data/` (JSON). The main files:
 
 **Combat in 30 seconds:**
 - Fights are on a grid. Each of your characters takes a turn in **initiative order** (the bar at the top).
-- On a turn you **either move or act** (play a card, Strike or Guard), not both. You can also play **one quick card**.
-- Enemies **telegraph**: red tiles show where they'll hit next. Step out of the red, or kill or disable them first.
+- Every turn you get **2 Actions** (a Move, or a card) and **1 Quick** (Strike, Guard or a quick card). Move + card, card + move, card + card and move + move are all fine.
+- Casters always have a **Cantrip** (0 MP, 1 Action) in their first Vector.
+- You draw **back up to 3 cards** every turn; unplayed cards are discarded at End Turn unless you **Hold** one (1 Action).
+- **Undo** anything until a die rolls or something new is revealed.
+- Enemies **telegraph** right before their turn: red tiles and a dotted move arrow show where they'll go and hit. Step out of the red, hide behind cover, block their path, or kill or disable them first.
 - Cards cost **MP**. MP barely refills during a night, so spend it carefully.
 - Every spell has a **Vector** (element). Enemies are **weak** (x1.5 damage) or **strong** (x0.6) against certain Vectors.
 - **Hover a card** to see its range, area and damage before you play it.
@@ -61,32 +64,38 @@ Most numbers live in `data/` (JSON). The main files:
 
 | Mechanic | How it works now | Change it in |
 | --- | --- | --- |
-| Turn order | Every unit acts once per **round** in **initiative** order (DEX + PER/2). Party and enemies interleave. A "Round N" banner starts each round; the timeline shows this round and the next with portraits | `data/stats.json` derived.initiative |
-| Turn mode | **Move OR act** (default): a unit either moves up to its Movement or takes one action. Other modes: move-then-act, move-and-act. F1 > Fights switches it mid-fight | `data/combat_rules.json` turnMode |
-| Actions | Play a card, Strike (adjacent, uses STR), Guard (until your next turn: +3 Defense, +15% Magic Resistance), or improvise with the Vector Wheel | `data/stats.json` combat.guardDefense, guardMagicResistPct |
-| Quick cards | Cards marked quick don't use your action or move. Limit: **1 quick card per turn** | card `"quick": true` |
-| Undo move | Before acting, you can undo this turn's move (Esc or Back) | — |
-| Movement | 3 + DEX/5 tiles. 4-way, blocked by walls, water, units and props | `data/stats.json` derived.movement |
-| Selection | Idle → card selected (targets shown) → hover a target (preview) → confirm. Click the card again, right-click or Esc to cancel. A click on floor while a card is selected only cancels the card | — |
-| Previews | Hovering a card or target shows range, area (in the Vector's color), damage, statuses, push landings, collisions, hazards, slides and whether it interrupts a telegraph | — |
+| Turn order | Every unit acts once per **round** in **initiative** order (DEX + PER/2). Party and enemies interleave. In the **arena's first round of a wave, the whole party acts first**. A "Round N" banner starts each round; the timeline shows past turns faded, the current portrait enlarged, and the next round | `data/stats.json` derived.initiative; `data/combat_rules.json` actions.partyFirstInArena |
+| Turn rule | **2 Actions + 1 Quick** (PT Part 1). An Action is a **Move** (up to your Movement: 3 + DEX/5, so 4 for most) or a **non-quick card**. Any order: move + card, card + move, card + card, move + move. Older rules (move-or-act and friends) stay in F1 > Fights | `data/combat_rules.json` turnMode, actions.actionsPerTurn |
+| Quicks | **1 per turn**: the built-in **Strike** (adjacent, STR), the built-in **Guard** (+3 Defense, +15% Magic Resistance until your next turn), or a **quick card**. Usable before or after moving and after your Actions. Strike and Guard are not cards any more | actions.quicksPerTurn; `data/stats.json` combat.guardDefense |
+| Cantrip | Everyone who knows a Vector has a built-in **0 MP, 1 Action** single-target Bolt in their first Vector (range 4, 3 to 4 damage, no riders) | `data/combat_rules.json` cantrip |
+| Hold | **1 Action:** keep 1 card in hand for next turn (a pin on the card). Everything else is discarded at End Turn | actions.holdCost, holdMax |
+| Undo | Until End Turn, undo any step that didn't roll dice (crit, miss, Stability), draw a card or reveal something. From that point back the Undo button greys out and says why. Snapshots live in `CombatState` | — |
+| Action pips | Two Action pips and one Quick pip above the buttons. Hovering a card says whether it uses an Action or your Quick | — |
+| Movement cards | Dash and other "+Movement" cards: with an Action left, the next Move this turn goes further; with none left, it carries over to next turn (a "Movement saved" chip). Never wasted. Hit and Run and Smoke Bomb give a **free move** that costs no Action | `data/stats.json` hasteMoveBonus |
+| Opportunity strike | Standing on the tile an enemy's telegraph says it will move to blocks its plan. If it ends up next to you, you get a **free Strike** (doesn't use your Quick). Hovering your tile says "Blocks X's path" | `data/combat_rules.json` opportunityStrike |
+| Selection | Idle → card selected (targets shown) → hover a target (preview) → confirm. Click the card again, right-click or Esc to cancel | — |
+| Previews | Hovering a card or target shows range, area (in the Vector's color), damage, cover ("in cover: x0.5"), statuses, push landings, collisions, hazards, slides and whether it interrupts a telegraph | — |
+| Whose turn | The active unit is in full color with a pulsing ring and a small bob; everyone else is dimmed and desaturated (HP bars, icons, telegraphs and cover icons stay bright). Units that already acted this round get a check mark. The banner shows the portrait and "Quill's turn: 2 enemies act next". The hand shows whose cards they are, each card with a border in that character's color. Sounds: turn_start_party, turn_start_enemy | `data/ui.json` spotlight, partyColors; `data/audio_events.json` |
 | Enemy turns | Played one beat at a time: banner, highlight, move, wind-up, hit, log line. Combat speed setting; hold a key to fast-forward | — |
-| Fleeing | Allowed in non-boss fights (not boss floors) | fight setup fleeAllowed |
-| Combat difficulty | Chosen at new run. **Normal:** enemies either move or attack. **Hard:** enemies move, then attack | `data/combat_rules.json` difficulties |
+| Fleeing | Allowed in non-boss fights (not boss floors). The room stays uncleared | fight setup fleeAllowed |
+| Combat difficulty | Chosen at new run. Enemies get **2 Actions** like you: move + attack, or move + move when nothing is in reach. **Double attack chance** (an enemy already in reach attacks twice): Normal minion 40%, normal 50%, elite 35%, boss 50%; Hard 75%. **Hard** also gives enemies x1.2 HP and x1.25 damage | `data/combat_rules.json` difficulties.enemyDoubleAttackChance |
 
 ## B2. Cards, hand and MP
 
 | Mechanic | How it works now | Change it in |
 | --- | --- | --- |
-| Deck | Each character has their own deck (10 to 20 cards, max 3 copies of a design) | `data/leveling.json` deckMin, deckMaxBase |
-| Hand | **Opening hand 5**, then **draw 2** at the start of each of your turns (including the first). **Hand limit 7**: extra draws stay in the deck | `data/stats.json` combat.openingHand, drawPerTurn, handLimit |
+| Deck | Each character has their own deck: **at least 8 cards, no maximum** (a huge deck means more reshuffles, and Fatigue). Max 3 copies of a design (0 = no limit). Crafted cards go **straight into the deck**. Adding cards is free; **removing one costs 1 AP** (1 Arena AP at checkpoints) | `data/leveling.json` deckMin, deckMaxBase (0 = none), maxCopies, removeCardCost; `data/arena/checkpoint.json` costs.removeCard |
+| Deck editor | Shows count, cost curve, Vector mix and quick count, filters (All, Quick, each Vector) and the full card details on hover | — |
+| Hand | **Opening hand 3**; at the start of each of your turns **draw back up to 3**. Unplayed cards go to the discard pile at End Turn, except one **held** card | `data/stats.json` combat.openingHand, drawUpTo, handLimit |
 | Running out | When the deck is empty, the discard pile reshuffles and that character takes **Fatigue** damage (1, then +1 each reshuffle) | combat.fatigueStart, fatigueStep |
 | Max MP | 4 + INT/2 + WIL/3 + class bonus, +0.5 per level. Roughly 8 to 12 at level 1 | `data/stats.json` derived.maxMp; classes mpBonus |
 | MP regen | **1 per turn**. MP is **not** refilled between fights in a night, only by rest rooms, food and sleeping | derived.mpRegen |
 | Spell cost | Magnitude cost (Minor 1, Standard 2, Major 4, Grand 7) + Form cost (0 to 3) + 1 if hybrid | `data/vectors.json` magnitudes; `data/forms.json` |
-| Magnitude | Minor 5 power, Standard 10, Major 20, Grand 35. Capped by Knowledge Tier (Tier 1: Standard, Tier 2: Major, Tier 3: Grand) | `data/vectors.json` |
-| Card kinds | **Spell** (Vector + Form + Magnitude), **basic** (Strike, Guard, Lunge, Dash...), **item**. 75 card records plus generated spell designs | `data/cards/*.json` |
+| Magnitude | Minor 4 power, Standard 7, Major 14, Grand 25. Capped by Knowledge Tier (Tier 1: Standard, Tier 2: Major, Tier 3: Grand). Force pushes 1 tile per 7 power | `data/vectors.json`; `data/stats.json` pushPowerPerStep |
+| Card kinds | **Spell** (Vector + Form + Magnitude), **basic** (Lunge, Dash, Shove...), **item**. 84 card records plus generated spell designs | `data/cards/*.json` |
+| Card text | Every card's text says when it applies: quick cards start with "Quick.", movement cards say "or next turn", once-per-fight cards say so. Short lines use the real power (`{power}`). A test checks this | `tests/suites/test_pt_turns.gd` |
 | Rarity and upgrades | Common, uncommon, rare. Upgraded versions ("Ember Bolt+") via crafting and arena rewards | card rarity, upgrade |
-| Can't play | Unaffordable cards, or ones needing a used action, are greyed out with the reason on hover | — |
+| Can't play | Unaffordable cards, or ones needing a spent Action, are greyed out with the reason on hover | — |
 
 ## B3. Damage and defense
 
@@ -99,10 +108,11 @@ Most numbers live in `data/` (JSON). The main files:
 | **Typing (matchups)** | Each enemy is **weak to** some Vectors (x1.5) and **strong against** others (x0.6); everything else is x1.0. Shown with icons on the enemy | enemy weakTo, strongAgainst; `data/matchups.json` |
 | Back attack | Hitting a unit from behind (relative to its facing): x1.15, for everyone | combat.backMul |
 | Flank (Backstab) | Rogue perk: x1.5 from behind or from a different row within 1 column | combat.flankMul |
-| Cover | Standing on a cover tile: **ranged attacks deal x0.75**. That's all cover does right now | combat.halfCoverRangedMul |
+| Cover | **Directional half cover** (CT Part 3). Crates (8 HP) and low walls (15 HP) are destructible props. A unit **next to** a cover piece takes **x0.5 from ranged and area** and **x0.75 from melee** when the attacker is mostly across the cover. Attacks from the side or behind (45 degrees or wider) **flank** and ignore it. Walls block line of sight entirely. Telegraphs use the attacker's planned spot, so hiding is a way to answer a telegraph. Force deals x2 to cover; Heat x2 to crates; pushing a unit into cover is a collision. A shield icon marks units in cover from the current attacker; tiles next to cover are outlined while moving. Every combat layout has 3 to 6 cover pieces | `data/stats.json` combat.cover; layouts ("c" low wall, "x" crate) |
 | Friend nearby | +5% damage when standing next to a Friend-tier ally | combat.adjacentFriendDamagePct |
 | Area falloff | Area attacks hit the first 2 targets in full, then x0.75 to each extra target | `data/combat_rules.json` areaFalloff |
-| Enemy damage knobs | Enemy HP x0.65 (bosses x1.5). Telegraphed attacks x2.0. Difficulty damage x2.3 (Normal) or x2.0 (Hard) | combat_rules enemyHpMul, bossHpMul, difficulties; stats telegraphDamageMul |
+| Enemy damage | Every damaging enemy action has one **damage** number (before Defense and Magic Resistance), times the week scale and the difficulty multiplier (Normal x1.0, Hard x1.25). Previews, telegraphs, the threat view and the hit all use the same number. Enemy HP x1.0 (bosses x2.0) | enemy action `"damage"`; combat_rules enemyHpMul, bossHpMul, difficulties |
+| Kill-time targets | Week 1, Normal (measured by `tools/sim_balance.gd`): a minion dies to 1 player action, a normal enemy to 2 or 3, an elite to 5 to 7. One normal enemy hit takes 20 to 30% of a party member's HP, a heavy or charged hit 35 to 50%, a boss's big charged hit 60 to 80% | `data/combat_rules.json` balanceTargets |
 | Downed | A party member at 0 HP is **downed**: they stay on the grid and any heal revives them. Still down when the fight ends = **injured** (misses the next dungeon) | `data/leveling.json` injuryDays |
 | Death | **The player** at 0 HP ends the run (permadeath) | — |
 | Second Wind | Fighter perk: heal 20% once per fight below 30% HP | combat.secondWind* |
@@ -157,15 +167,17 @@ Change these in `data/vectors.json` improvise and failures; `src/core/combat/res
 
 | Mechanic | How it works now |
 | --- | --- |
-| When | At the start of a party member's turn, every enemy without an intent picks one and commits to it. It resolves on that enemy's turn |
-| Intent icons | Attack, special, buff, defend, move, over the enemy's head |
-| Locked tiles | Red tiles; the attack hits **whoever stands there** when it resolves, including other enemies. Move out to dodge |
-| Tracking | A different icon: the attack follows its target and can't be dodged by moving (used sparingly) |
-| Charge-ups | Big attacks charge for a turn first, with a bigger telegraph. Bosses use patterns (cross, ring, rows, checkerboard, line) |
+| When | **Just in time** (CT Part 2): an enemy reveals its plan at the start of the **last party turn before its own**. Enemies that act back-to-back all reveal on the same party turn. On its turn it carries the plan out at once. An enemy that acts before any party turn in a fight only moves |
+| The plan | Both Actions are shown: a **dotted move arrow** to where it will stand, and the **red tiles** it will hit from there (both hits counted when it attacks twice) |
+| Last chance | The timeline draws a small red link after the party turn that is the last chance before enemies act, and the banner says "Kelly's turn: 2 enemies act next" |
+| Intent icons | Attack, special, buff, defend, move, tracking, over the enemy's head |
+| Locked tiles | The default. The attack hits **whoever stands there** when it resolves, including other enemies. Dodge by leaving the red, or hide behind cover |
+| Blocking | If its planned tile is taken or it's rooted, it gets as close as it can and re-aims at the same target if still in reach, otherwise it **loses the attack**. A party member standing on the planned tile gets an opportunity strike |
+| Tracking | Rare (3 enemies, marked in data): the attack follows its target and can't be dodged by moving. Guard, cover and getting out of reach are the answers. The party AI knows moving doesn't dodge these |
+| Charge-ups | Big attacks charge for a turn first, with a stronger pulse. Bosses use patterns (cross, ring, rows, checkerboard, line) |
 | Interrupts | Light cancels a charge, Cold delays it, pushes move it with the enemy, killing the enemy cancels it. The preview tells you when your card will interrupt |
-| Re-aiming | If the target is gone, the enemy moves instead and re-telegraphs |
-| Overlaps | Tiles hit by several telegraphs show combined damage. Hold the threat key for the **threat view** (every tile shaded by incoming damage) |
-| Damage | Telegraphed attacks deal x2.0 (they can be dodged) |
+| Overlaps | Tiles hit by several telegraphs show combined damage. Hold the threat key for the **threat view** (every tile shaded by incoming damage). Enemies planning in a row stagger their targets and avoid each other's red tiles |
+| Damage | The telegraph shows the attack's real damage (from the enemy's planned spot, so cover counts) |
 
 Change these in `src/core/combat/enemy_ai.gd`, `data/ai.json` and enemy action data.
 
@@ -214,28 +226,30 @@ Change layouts in `data/rooms/combat_layouts.json` and `data/arena/layouts.json`
 
 ## B10. Classes in combat (starting kits)
 
-| Class (arena name) | Role now | Starting deck | Perk |
-| --- | --- | --- | --- |
-| Mage (Ash) | Ranged and area damage | 2+2 Standard Bolts (two Vectors), Minor Burst, Minor Line, Minor Shield, Strike, Guard, Blink | Overchannel |
-| Fighter (Brick) | Melee front line | 2 Strike, 2 Heavy Swing, 2 Lunge, Parry, Brace, Shove, Standard Weapon Infusion | Second Wind |
-| Rogue (**Quill**) | Mobile skirmisher | 2 Strike, 2 Quick Stab, **2 Dash**, Blink, Afterimage, Throw, 1 Standard Bolt | Backstab |
-| Healer (**Sage**) | Support | 2 Mend, Halo, Beacon, Standard Shield, 2 Standard Bolts (Light), Strike, 2 Guard | Triage |
-| Bard (Lyric) | Buffs and tempo | Haste, Tailwind, 2 Dazzle, Rally, 2 Standard Bolts, 2 Strike, Guard | Hype |
+Strike and Guard are built-in Quicks for everyone, so no deck carries them (PT Part 1). Every deck is 8 to 10 cards (CT Part 5).
 
-Change these in `data/classes.json` starterDeck and `src/core/arena/arena_party.gd` (arena names).
+| Class (arena name) | Role | How it plays | Starting deck | Perk |
+| --- | --- | --- | --- | --- |
+| Mage (Ash) | Area and control, glass cannon | Shapes the field with areas and pushes; fragile, so cover matters most | 2+2 Standard Bolts (two Vectors), Minor Burst, Minor Line, Minor Shield, Blink, Shove | Overchannel |
+| Fighter (Brick) | Front line: holds space and soaks | Stands in enemy paths (opportunity strikes), takes hits for allies, breaks cover | **Intercept**, 2 Heavy Swing, Shoulder Shove, 2 Lunge, Brace, Parry, Taunt, Standard Weapon Infusion | Second Wind |
+| Rogue (**Quill**) | Skirmisher and assassin: moves **and** hits | Attacks carry movement; flanking ignores cover and triggers Backstab | 2 **Hit and Run** (strike, then a free move 2), **Shadow Step** (teleport behind and strike), 2 Quick Stab (quick), Lunge, Throw, **Smoke Bomb** (blind adjacent, free move 1), Dash, 1 Bolt | Backstab |
+| Healer (**Sage**) | Protector: stops damage before it lands, then heals | Reads telegraphs: shields the target, pulls allies out of the red, makes a safe zone | 2 **Ward** (shield 8, doubled against a telegraph), 2 Mend (heal 14), **Guiding Light** (pull an ally 3), **Sanctuary** (telegraphed hits x0.5 nearby), Beacon (taunt), 2 Sunbeam, **Cleanse** (quick) | Triage |
+| Bard (Lyric) | Tempo: makes allies' turns better | Haste (+2 tiles per Move next turn), Tailwind, blinds, Rally, and **Encore** (an ally who already acted takes another turn now with 1 Action at half effect, once per fight) | Haste, Tailwind, 2 Dazzle, Rally, **Encore**, 3 Standard Bolts | Hype |
 
-Advanced classes (Class Change at levels 5 and 12): Elementalist, Kinetic Logician, Spellblade, Guardian, Trickster, Medic, Idol, Deli Knight, Smith-Mage, Upside-Touched. Each has its own perk.
+Change these in `data/classes.json` starterDeck, `data/cards/class_cards.json` and `src/core/arena/arena_party.gd` (arena names).
+
+Advanced classes (Class Change at levels 5 and 12): Elementalist, Kinetic Logician, Spellblade, Guardian, Trickster, Medic, Idol, Deli Knight, Smith-Mage, Upside-Touched. Each has its own perk and keeps the base class deck.
 
 ## B11. Enemies
 
 | Mechanic | How it works now | Change it in |
 | --- | --- | --- |
-| Stats | HP (x0.65 Normal), Movement, initiative, Defense, Magic Resistance, weak/strong Vectors, actions with power or stat multipliers, a disposition | `data/enemies/week1..5.json` |
+| Stats | HP, Movement, initiative, Defense, Magic Resistance, weak/strong Vectors, actions with an explicit damage number (heals and shields use power), a disposition | `data/enemies/week1..5.json` |
 | AI | Scores actions by expected value x how well they suit its personality, picks with some randomness. Surrounds, staggers telegraphs, protects healers, focuses wounded or isolated targets, avoids its own allies' telegraphs | `data/ai.json`, `src/core/combat/enemy_ai.gd` |
 | Behaviors (12) | Charger, Bomber, Healer, Summoner, Shield bearer, Burrower, Sniper, Splitter, Hazard maker, Mirror, Leech, Anchor | enemy behavior |
 | Elite affixes | Hasted, Armored, Burning, Vampiric, Shielded, Explosive (icons over the enemy) | `data/enemy_affixes.json` |
 | Minions | Weak, often one-hit; count as half an enemy | `data/encounters.json` minionWeight |
-| Encounters | Built from templates: Pack, Front and back, Swarm, Healer core, Ambush, Reinforcements, Summoner nest, Hazard lords, Elite escort. Count per week: 3–4, 4–5, 4–6, 5–6, 5–7 (elite rooms 4 to 7). Smaller parties face fewer, weaker enemies | `data/encounters.json` |
+| Encounters | Built from templates: Pack, Front and back, Swarm, Healer core, Ambush, Reinforcements, Summoner nest, Hazard lords, Elite escort. Count per week (raised for 2 Actions): 4–5, 5–6, 5–7, 6–7, 6–8 (elite rooms 4, 4–5, 5, 5–6, 6; elites get 1 affix). Smaller parties face fewer, weaker enemies | `data/encounters.json` |
 | Bosses | 5 (Hollow Mascot, Cold Cut, Forge Revenant, Night Ward, Mirror Town), with phases, adds and reinforcements from week 3 | `data/enemies/bosses.json` |
 
 ## B12. The Endless Arena
@@ -340,6 +354,7 @@ Change these in `data/leveling.json`, `data/stats.json` and `data/classes.json`.
   - Precision: a timing bar.
   - Alignment: lock spinning rings.
   - Chemical: an arrow sequence.
+- Property gates (the Vector strength a Property needs) are on the same scale as spell power (lowered x0.7 with the CT power change).
 - **Performance** sets how many **Properties** (bonuses from a bank of 15) the card rolls: below 0.35 gives none, below 0.8 gives one, otherwise two. A score of 0.95+ adds a Magnitude step.
 - The card collection is shared. Each deck can use up to the copies you own (max 3).
 
@@ -391,7 +406,26 @@ Change these in `data/town/*.json` and `docs/TOWN.md`.
   - Monday to Thursday floors are generated rooms: combat, elite, treasure, rest, event, merchant and exit.
   - Friday is the **boss floor:** returning encounters (ones you fled from come first), a rest room, then the boss.
 - You walk in through the woods edge and choose your party.
-- **The exit** currently lets you leave as soon as you reach it, even with rooms uncleared. CT changes this (Part D).
+- **The exit is sealed** until every combat, elite and boss room on the floor is won (CT Part 6). The HUD shows "fights left N" and the exit says "Sealed (N fights left)". Fleeing leaves the room uncleared: go back and win it. Treasure, rest, event and merchant rooms are optional.
+- **Monday evening of week 1 is the combat tutorial floor** (CT Part 7, `data/story/tutorial_floor.json`): 10 small rooms with Kelly as a guest, one lesson each, taught with the 2-Action rules:
+  1. First Contact: turn order, 2 Actions, Strike as a Quick.
+  2. The Red Tiles: telegraphs and dodging.
+  3. Brace Yourself: Guard and tracking attacks.
+  4. Cards on the Table: the hand of 3, MP, hover previews, range, area and Hold.
+  5. Weak Spots: matchups.
+  6. Walls and Cover: line of sight, cover and flanking.
+  7. A rest room (campfire, chest), then Hot Floor: hazards, pushes and friendly fire. Taking the shortcut skips Hot Floor.
+  8. Quick Thinking: quick cards, Dash and interrupts.
+  9. Off the Script: the Vector Wheel, with the first improvise guaranteed.
+  10. The Whole Mess: priorities and the threat view.
+
+  How the floor plays:
+  - The hand is greyed out until room 4, the Wheel until room 9 and the threat view until room 10.
+  - There are no crits until room 9.
+  - A training HP floor means the party can't drop below 1 HP.
+  - Lessons wait for what they teach (moving, dodging, striking, guarding, hovering, playing, holding, improvising) and give a hint after 20 seconds stuck.
+  - The Kelly Risk choices are unchanged: the lantern, the shortcut, the help call (room 8) and the panic moment.
+  - Once the floor is cleared in any run, later runs offer "Skip the lessons": the fights stay and the prompts go.
 
 Change these in `data/dungeon.json`, `data/weeks.json` and `data/encounters.json`.
 
@@ -405,15 +439,14 @@ Change these in `data/story/*.json`, `data/journal.json` and `data/endings.json`
 
 ---
 
-# Part D: Changing next (Combat Tuning, CT)
+# Part D: Changing next (Playtest Patch 1, PT)
 
-From the Oct 25 playtest. See `docs/COMBAT_TUNING.md` for details.
+CT is done, with PT Parts 1 and 2 (2 Actions, Quicks, Cantrip, Hold, undo, deck rules) adopted inside it. Next, from `docs/PATCH_1.md`:
 
-- Player damage down and enemy HP and damage up, to new kill-time targets.
-- Enemies telegraph right before their own turn, then **move and attack** immediately.
-- Cover becomes directional and meaningful.
-- Hand size becomes **3**.
-- Dash and other movement cards work before moving or carry over to the next turn.
-- Clear roles for every class (Rogue and Healer first).
-- The exit only opens when every fight on the floor is won.
-- A full **combat tutorial floor** with Kelly, one new mechanic per room.
+- Part 3: clarity fixes (party panel and character sheet, shield numbers, see-through units, full enemy info, numbered duplicate enemies, quick badges, shape diagrams, bleed-out, arena pause and save).
+- Part 4: rules fixes (Afterimage absorbs tracking hits, Taunt re-plans, Blind keeps telegraphs, push rules, Blink as a Quick, hazards can kill, tracking at 60% damage, Lunge over hazards, wall types, high crits).
+- Part 5: the Card Forge (fuse, salvage, upgrade, riders).
+- Part 6: arena progression (a card every wave, a Technique every 5).
+- Part 7: status synergies, 80 more cards, 24 more enemies, the Cone Form.
+- Part 8: the Vector expansion, fusion synergy and antagonism, Instability by Magnitude, Techniques.
+- Part 9: point-buy stats.

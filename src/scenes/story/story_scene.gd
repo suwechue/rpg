@@ -5,6 +5,8 @@
 extends Node2D
 
 const StoryRules := preload("res://src/core/story/story.gd")
+const Tutorial := preload("res://src/core/story/tutorial.gd")
+const Night := preload("res://src/core/dungeon/night.gd")
 const TOWN := "res://src/scenes/town/town.tscn"
 const SELF := "res://src/scenes/story/story_scene.tscn"
 
@@ -69,11 +71,21 @@ func _run(from: int) -> void:
 	for i in range(from, steps.size()):
 		_save(i)
 		var step: Dictionary = steps[i]
+		if step.has("skipIfFlag") and GameState.flag(str(step["skipIfFlag"])):
+			continue
 		match str(step.get("type", "")):
+			"tutorialSkip":
+				# Later runs: the Journal remembers the floor, so the lessons are optional.
+				if bool(Journal.data.get(str(Tutorial.cfg(DataDB.all()).get("skipFlag", "tutorial_cleared")), false)):
+					await Flow.show_event({ "title": Strings.t("tut_skip_title"), "text": Strings.t("tut_skip_text"),
+						"choices": [{ "label": Strings.t("tut_skip_yes"), "effects": { "flag": ["tut_skip_lessons"] } }, { "label": Strings.t("tut_skip_no"), "effects": {} }] })
+			"tutorialRest":
+				var lines := Night.rest(DataDB.all(), GameState.run, {})
+				await Flow.show_event({ "title": "", "text": Strings.t(str(step.get("textKey", "tut_rest_a"))) + "\n" + " ".join(PackedStringArray(lines)) })
 			"event":
 				await Flow.show_event(step["event"])
 			"narrate":
-				await Flow.show_event({ "title": "", "text": str(step["text"]) })
+				await Flow.show_event({ "title": "", "text": Strings.t(str(step["textKey"])) if step.has("textKey") else str(step["text"]) })
 			"foreshadow":
 				var l := Narrator.line("foreshadow")
 				Narrator.say(l)
@@ -83,7 +95,13 @@ func _run(from: int) -> void:
 					StoryRules.make_guest(DataDB.all(), GameState.run, str(step["add"]), Rng.stream("npc"))
 			"combat":
 				_save(i, i)
-				var setup := GameState.combat_setup(step.get("enemies", []), str(step.get("layout", "open_field")), { "intro": str(step.get("intro", "")) })
+				var setup: Dictionary
+				if step.has("tutorial"):
+					var opts := Tutorial.setup_opts(DataDB.all(), int(step["tutorial"]), GameState.player, GameState.run.get("flags", {}), not GameState.flag("tut_skip_lessons"))
+					opts["intro"] = Strings.t(str(opts["intro"]))
+					setup = GameState.combat_setup(opts["enemies"], str(opts["layout"]), opts)
+				else:
+					setup = GameState.combat_setup(step.get("enemies", []), str(step.get("layout", "open_field")), { "intro": str(step.get("intro", "")) })
 				GameState.start_combat(setup, SELF)
 				return
 			"kellyCheck":
@@ -102,6 +120,11 @@ func _run(from: int) -> void:
 
 func _finish() -> void:
 	GameState.set_flag("story_done_" + str(story["id"]))
+	for s in story.get("steps", []):
+		if (s as Dictionary).has("tutorial"):
+			Journal.data[str(Tutorial.cfg(DataDB.all()).get("skipFlag", "tutorial_cleared"))] = true
+			Journal.save_journal()
+			break
 	StoryRules.clear_guests(GameState.run)
 	GameState.run["story_pos"] = {}
 	GameState.run.erase("resume_scene")

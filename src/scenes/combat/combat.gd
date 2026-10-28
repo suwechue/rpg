@@ -43,6 +43,18 @@ var _timeline: HBoxContainer
 var _unit_panel: Label
 var _info: Label
 var _banner: Label
+var _banner_face: Control
+var _hand_owner: Label
+var _pips: HBoxContainer
+const Tutorial := preload("res://src/core/story/tutorial.gd")
+var _lesson: Tutorial.Lesson = null    # CT Part 7: the tutorial room's lesson, or null
+var _lesson_box: PanelContainer
+var _lesson_label: Label
+var _lesson_next: Button
+var _lesson_mark: ReferenceRect
+var _ui_open: Dictionary = { "hand": true, "wheel": true, "threat": true }
+var _mocked := false
+var _stayed_in_red := ""
 var _hand: HBoxContainer
 var _buttons: Dictionary = {}
 var _wheel: PanelContainer
@@ -60,7 +72,8 @@ var _last_turn_team := ""
 
 func _process(_delta: float) -> void:
 	# Hold the threat view key to shade every tile by the damage waiting there.
-	var tv := Input.is_action_pressed("threat_view")
+	var tv := Input.is_action_pressed("threat_view") and bool(_ui_open.get("threat", true))
+	_tick_lesson(_delta_hint())
 	if field != null and tv != field.threat_view:
 		field.threat_view = tv
 		field.queue_redraw()
@@ -91,6 +104,7 @@ func _ready() -> void:
 	_fx.z_index = 200
 	add_child(_fx)
 	_build_ui()
+	_start_lesson(setup)
 	_sync_views()
 	_play_events()
 	if setup.has("intro"):
@@ -153,6 +167,10 @@ func _sync_views() -> void:
 		v.shield = u.shield
 		v.downed = u.downed
 		v.highlight = u == state.current and not _done
+		v.active = v.highlight
+		v.spotlight = state.current != null and u != state.current and not _done
+		v.acted = state.acted_this_round(u) and not _done
+		v.covered = _covered(u)
 		v.face(u.facing)
 		v.statuses = state.status_list(u)
 		v.intent_icon = _intent_icon(u)
@@ -234,6 +252,43 @@ func _build_ui() -> void:
 	_banner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_banner.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_ui.add_child(_banner)
+	_banner_face = Control.new()
+	_banner_face.position = Vector2(118, 22)
+	_banner_face.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_ui.add_child(_banner_face)
+	# Two Action pips and one Quick pip for the active unit (PT Part 1).
+	_pips = HBoxContainer.new()
+	_pips.theme_type_variation = "CompactBox"
+	_pips.position = Vector2(view.x - 82, hand_y - 8)
+	for i in 3:
+		var pip := ColorRect.new()
+		pip.custom_minimum_size = Vector2(6, 6) if i < 2 else Vector2(4, 6)
+		pip.tooltip_text = Strings.t("combat.uses_action") if i < 2 else Strings.t("combat.uses_quick")
+		_pips.add_child(pip)
+	_ui.add_child(_pips)
+	_lesson_box = PanelContainer.new()
+	_lesson_box.position = Vector2(118, 40)
+	_lesson_box.custom_minimum_size = Vector2(view.x - 248, 0)
+	_lesson_box.visible = false
+	var lb := VBoxContainer.new()
+	_lesson_box.add_child(lb)
+	_lesson_label = UiTheme.label("")
+	_lesson_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_lesson_label.custom_minimum_size = Vector2(view.x - 260, 0)
+	lb.add_child(_lesson_label)
+	_lesson_next = UiTheme.button(Strings.t("combat.lesson_next"), func() -> void: _lesson_event("next"))
+	lb.add_child(_lesson_next)
+	_ui.add_child(_lesson_box)
+	_lesson_mark = ReferenceRect.new()
+	_lesson_mark.editor_only = false
+	_lesson_mark.border_color = UiTheme.ACCENT
+	_lesson_mark.border_width = 2.0
+	_lesson_mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_lesson_mark.visible = false
+	_ui.add_child(_lesson_mark)
+	_hand_owner = UiTheme.label("", UiTheme.DIM)
+	_hand_owner.position = Vector2(4, hand_y - UiTheme.FONT_SIZE - 3)
+	_ui.add_child(_hand_owner)
 	_hand = HBoxContainer.new()
 	_hand.position = Vector2(4, hand_y)
 	_hand.theme_type_variation = "CompactBox"
@@ -246,13 +301,16 @@ func _build_ui() -> void:
 	for spec in [["end", "End", Strings.t("combat.end_turn_space")], ["strike", "Strike", Strings.t("combat.basic_strike_adjacent_str_uses")],
 			["guard", "Guard", Strings.t("combat.basic_guard_defense_until_your")],
 			["wheel", "Wheel", Strings.t("combat.vector_wheel_improvise_a_spell_2")], ["flee", "Flee", Strings.t("combat.flee_when_everyone_stands_on")],
-			["undo", "Undo", Strings.t("combat.undo_this_turn_s_move")]]:
+			["undo", "Undo", Strings.t("combat.undo_this_turn_s_move")], ["cantrip", Strings.t("combat.cantrip"), Strings.t("combat.cantrip_tip")],
+			["hold", Strings.t("combat.hold"), Strings.t("combat.hold_tip")]]:
 		var key: String = spec[0]
 		var b := UiTheme.button(spec[1], func() -> void: _on_button(key))
 		b.custom_minimum_size = Vector2(39, 18)
 		b.tooltip_text = spec[2]
 		col.add_child(b)
 		_buttons[key] = b
+	# Keep the button grid on screen however wide the labels are.
+	col.position.x = view.x - col.get_combined_minimum_size().x - 2
 	# The combat log: everything that happened, scrollable, newest at the bottom.
 	var lp := PanelContainer.new()
 	lp.position = Vector2(2, 64)
@@ -288,6 +346,20 @@ func _refresh_hud() -> void:
 		if list.is_empty() or left <= 0:
 			continue
 		_timeline.add_child(UiTheme.label("R%d" % group[1], UiTheme.DIM))
+		if group[0] == "now":
+			# Turns already taken this round, faded.
+			var past: Array = []
+			for i in range(0, maxi(0, state.turn_index)):
+				var pu: UnitScript = state.order[i]
+				if pu.alive():
+					past.append(pu)
+			for pu in past.slice(maxi(0, past.size() - int(tl.get("pastCount", 4)))):
+				var pb := PanelContainer.new()
+				pb.theme_type_variation = "TimelineParty" if pu.team == "party" else "TimelineEnemy"
+				pb.add_child(_portrait(pu, int(tl.get("portrait", 20))))
+				pb.modulate.a = float(tl.get("pastAlpha", 0.35))
+				pb.tooltip_text = pu.name
+				_timeline.add_child(pb)
 		# Identical minions in a row show as one chip ("Gremlin x4").
 		var runs: Array = []
 		for u in list:
@@ -302,18 +374,33 @@ func _refresh_hud() -> void:
 			box.theme_type_variation = "TimelineCurrent" if u == state.current and group[0] == "now" else ("TimelineParty" if u.team == "party" else "TimelineEnemy")
 			var inner := HBoxContainer.new()
 			inner.theme_type_variation = "CompactBox"
-			inner.add_child(_portrait(u, int(tl.get("portrait", 20))))
+			var is_now: bool = u == state.current and group[0] == "now"
+			inner.add_child(_portrait(u, int(tl.get("portraitCurrent", 26)) if is_now else int(tl.get("portrait", 20))))
 			if int(r["n"]) > 1:
 				inner.add_child(UiTheme.label("x%d" % int(r["n"])))
 			box.add_child(inner)
 			box.tooltip_text = Strings.t("combat.init") % [u.name, " x%d" % int(r["n"]) if int(r["n"]) > 1 else "", u.initiative]
 			_timeline.add_child(box)
 			left -= 1
+			# The red "last chance" link: this party turn is the last one before these enemies act.
+			if u.team == "party" and group[0] == "now":
+				var next := state.acts_next(u)
+				if not next.is_empty():
+					var link := ColorRect.new()
+					link.color = UiTheme.color("bad")
+					link.custom_minimum_size = Vector2(int(tl.get("linkWidth", 4)), int(tl.get("linkHeight", 2)))
+					link.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+					link.tooltip_text = Strings.t("combat.last_chance") % ", ".join(PackedStringArray(next.map(func(o: UnitScript) -> String: return o.name)))
+					link.mouse_filter = Control.MOUSE_FILTER_PASS
+					_timeline.add_child(link)
 	var u := state.current
 	if u != null:
 		var lines: Array = ["%s%s" % [u.name, Strings.t("combat.ai") if u.ai_controlled else ""], Strings.t("combat.hp_mp") % [u.hp, u.max_hp, u.mp, u.max_mp]]
 		if u.team == "party" and not u.ai_controlled:
-			lines.append(Strings.t("combat.move") % [u.move_left, Strings.t("combat.action_used") if u.action_used else Strings.t("combat.action_ready")])
+			if state.uses_actions(u):
+				lines.append(Strings.t("combat.actions_left") % [u.actions_left, state.actions_per_turn(), Strings.t("combat.quick_ready") if not u.quick_used else Strings.t("combat.quick_spent")])
+			else:
+				lines.append(Strings.t("combat.move") % [u.move_left, Strings.t("combat.action_used") if u.action_used else Strings.t("combat.action_ready")])
 			if u.deck != null:
 				lines.append(Strings.t("combat.deck_discard") % [u.deck.draw_pile.size(), u.deck.discard.size()])
 		if u.shield > 0:
@@ -323,11 +410,23 @@ func _refresh_hud() -> void:
 	var player_turn := _player_turn()
 	_buttons["end"].disabled = not player_turn
 	var act_block := state.act_block(u) if u != null else "-"
-	_buttons["strike"].disabled = not player_turn or act_block != ""
-	_buttons["guard"].disabled = not player_turn or act_block != ""
-	_buttons["wheel"].disabled = not player_turn or act_block != "" or u.known_vectors.is_empty()
+	var quick_block := state.quick_block(u) if u != null else "-"
+	_buttons["strike"].disabled = not player_turn or quick_block != "" or (u != null and state._adjacent_hostiles(u, 1).is_empty())
+	_buttons["guard"].disabled = not player_turn or quick_block != ""
+	_buttons["wheel"].disabled = not player_turn or act_block != "" or u.known_vectors.is_empty() or not bool(_ui_open.get("wheel", true))
 	_buttons["flee"].disabled = not player_turn or not state.can_flee()
 	_buttons["undo"].disabled = not player_turn or not state.can_undo_move(u)
+	_buttons["undo"].tooltip_text = Strings.t("combat.undo_this_turn_s_move") if u == null or state.can_undo_move(u) else Strings.t("combat.undo_locked") % state.undo_reason(u)
+	_buttons["cantrip"].disabled = not player_turn or act_block != "" or state.cantrip_targets(u).is_empty()
+	_buttons["hold"].disabled = not player_turn or state.hold_block(u) != ""
+	_pips.visible = u != null and state.uses_actions(u)
+	if _pips.visible:
+		for i in _pips.get_child_count():
+			var pip := _pips.get_child(i) as ColorRect
+			if i < 2:
+				pip.color = UiTheme.ACCENT if u.actions_left > i else Color(UiTheme.DIM, 0.4)
+			else:
+				pip.color = UiTheme.GOOD if not u.quick_used else Color(UiTheme.DIM, 0.4)
 	if mode == "idle" and _hover_card < 0:
 		_info.text = _turn_hint()
 
@@ -341,6 +440,9 @@ func _turn_hint() -> String:
 	if not can_act and not state.can_move(u):
 		_buttons["end"].grab_focus.call_deferred()
 		return Strings.t("combat.turn_done_end_turn_space")
+	if state.uses_actions(u):
+		return Strings.t("combat.actions_left") % [u.actions_left, state.actions_per_turn(),
+			Strings.t("combat.quick_ready") if not u.quick_used else Strings.t("combat.quick_spent")]
 	var parts: Array = []
 	if state.can_move(u):
 		parts.append(Strings.t("combat.move_2") % u.move_left)
@@ -357,16 +459,25 @@ func _refresh_hand() -> void:
 		_hand.remove_child(c)
 		c.queue_free()
 	var u := state.current
+	_hand_owner.text = ""
 	if u == null or u.deck == null or u.team != "party" or u.ai_controlled:
 		return
+	# The hand belongs to someone: their name above it, their color around each card.
+	_hand_owner.text = Strings.t("combat.hand_of") % u.name
+	var owner_color := _party_color(u)
+	_hand_owner.add_theme_color_override("font_color", owner_color)
 	for i in u.deck.hand.size():
 		var card := state.card_of(u, i)
 		var b := CardView.new()
 		var cost := state.card_cost(u, card)
 		b.setup(card, cost)
+		b.owner_color = owner_color
 		b.selected = (mode == "card" and selected_hand == i) or (mode == "wheel_target" and wheel_fuel == i)
 		var block := state.card_block(u, card)
-		b.disabled = not _player_turn() or (block != "" and mode != "fuel")
+		b.disabled = not _player_turn() or (block != "" and mode != "fuel" and mode != "hold") or not bool(_ui_open.get("hand", true))
+		b.held = str(u.deck.hand[i]) == u.held_id
+		if state.uses_actions(u):
+			b.tooltip_text += "\n" + (Strings.t("combat.uses_quick") if bool(card.get("quick", false)) and not u.quick_used else Strings.t("combat.uses_action"))
 		if _player_turn() and block != "":
 			b.tooltip_text += "\n" + block
 		elif bool(card.get("quick", false)):
@@ -380,6 +491,27 @@ func _refresh_hand() -> void:
 		_hand.add_child(b)
 	if _focus_card >= 0 and _focus_card < _hand.get_child_count():
 		(_hand.get_child(_focus_card) as Control).grab_focus.call_deferred()
+
+
+## A shield icon on units in cover: enemies against the active party member,
+## party members against the hovered enemy's planned spot (CT Part 3).
+func _covered(u: UnitScript) -> bool:
+	if u.is_prop() or not u.alive() or state.current == null:
+		return false
+	if u.team == "enemy" and state.current.team == "party":
+		return state.cover_piece(state.current.cell, u.cell) != null
+	var hov := state.unit_at(hover_cell)
+	if u.team == "party" and hov != null and hov.team == "enemy" and hov.alive():
+		return state.cover_piece(hov.intent.get("move", hov.cell), u.cell) != null
+	return false
+
+
+## Each party member's color (data/ui.json "partyColors", by party order).
+func _party_color(u: UnitScript) -> Color:
+	var colors: Array = DataDB.table("ui").get("partyColors", [])
+	var party: Array = state.units.filter(func(o: UnitScript) -> bool: return o.team == "party" and not o.is_prop())
+	var i := party.find(u)
+	return Color(str(colors[i % colors.size()])) if i >= 0 and not colors.is_empty() else UiTheme.TEXT
 
 
 ## A small picture of a unit for the timeline: their portrait if they have one,
@@ -407,6 +539,8 @@ func _portrait(u: UnitScript, size: int) -> TextureRect:
 ## Hovering (or focusing) a card previews it on the grid without selecting it.
 func _hover_card_changed(i: int) -> void:
 	_hover_card = i
+	if i >= 0:
+		_lesson_event("hovered_card")
 	if i >= 0:
 		_show_card_info(i)
 	_refresh_overlays()
@@ -447,6 +581,7 @@ func _is_ai(u: UnitScript) -> bool:
 # --- Overlays and previews --------------------------------------------------------------------
 
 func _refresh_overlays() -> void:
+	field.cover_cells = []
 	field.reach_cells = []
 	field.target_cells = []
 	field.footprint_cells = []
@@ -459,6 +594,14 @@ func _refresh_overlays() -> void:
 		match mode:
 			"idle":
 				field.reach_cells = state.reachable_cells(u).keys() if state.can_move(u) else []
+				# Tiles next to cover get an outline while choosing where to move.
+				var cov: Array = []
+				for c in field.reach_cells:
+					for d in GridScript.DIRS:
+						if state.is_cover(state.unit_at(c + d)):
+							cov.append(c)
+							break
+				field.cover_cells = cov
 				if _hover_card >= 0 and _hover_card < u.deck.hand.size():
 					var card := state.card_of(u, _hover_card)
 					field.target_cells = state.card_targets(u, card)
@@ -469,6 +612,8 @@ func _refresh_overlays() -> void:
 				_preview(card, false)
 			"strike":
 				field.target_cells = state._adjacent_hostiles(u, 1)
+			"cantrip":
+				field.target_cells = state.cantrip_targets(u)
 			"wheel_target":
 				var card := _wheel_card()
 				field.target_cells = state.card_targets(u, card)
@@ -502,6 +647,8 @@ func _preview(card: Dictionary, improvised: bool, guess: bool = false) -> void:
 		if h.has("damage"):
 			hostile += 1
 			tag = "-%d" % int(h["damage"])
+			if float(h.get("cover", 1.0)) < 1.0:
+				tag += " " + Strings.t("combat.in_cover") % str(snappedf(float(h["cover"]), 0.01))
 			for s in h.get("status", []):
 				tag += " " + str(UiTheme.status_info(str(s)).get("name", s))
 		else:
@@ -588,6 +735,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			_on_button("strike")
 		elif k == KEY_G:
 			_on_button("guard")
+		elif k == KEY_C:
+			_on_button("cantrip")
+		elif k == KEY_H:
+			_on_button("hold")
 		elif k == KEY_V:
 			_on_button("wheel")
 		elif k == KEY_F:
@@ -637,6 +788,10 @@ func _update_hover_info(at: Vector2) -> void:
 		var src := state.unit_by_id(str(h["unit"]))
 		if src != null:
 			lines.append(Strings.t("combat.threatened_by") % [src.name, int(h["damage"])])
+	var here := state.unit_at(hover_cell)
+	if here != null and here.team == "party":
+		for e in state.blocking(here):
+			lines.append(Strings.t("combat.blocks_path") % e.name)
 	if lines.is_empty():
 		_hover_info.visible = false
 		return
@@ -666,6 +821,12 @@ func _on_card(i: int) -> void:
 		return
 	var u := state.current
 	if u.deck == null or i < 0 or i >= u.deck.hand.size():
+		return
+	if mode == "hold":
+		mode = "idle"
+		if state.hold_card(u, i):
+			_lesson_event("held")
+			_after_action()
 		return
 	if mode == "fuel":
 		wheel_fuel = i
@@ -707,6 +868,7 @@ func _on_button(key: String) -> void:
 				_refresh_overlays()
 		"guard":
 			if state.guard(u):
+				_lesson_event("guarded")
 				_after_action()
 		"wheel":
 			_open_wheel()
@@ -717,6 +879,15 @@ func _on_button(key: String) -> void:
 			_cancel()
 			if state.undo_move(u):
 				_after_action()
+		"hold":
+			if state.hold_block(u) == "":
+				mode = "hold"
+				_info.text = Strings.t("combat.pick_card_to_hold")
+				_refresh_hud()
+		"cantrip":
+			if state.act_block(u) == "" and not state.cantrip_targets(u).is_empty():
+				mode = "cantrip"
+				_refresh_overlays()
 
 
 ## Idle: a reachable tile moves you. With a card (or Strike, or an aimed
@@ -729,10 +900,13 @@ func _click_cell(c: Vector2i) -> void:
 	match mode:
 		"idle":
 			if state.can_move(u) and state.reachable_cells(u).has(c):
-				state.move(u, c)
+				var was_red := state.threat_at(u.cell, u.team) > 0
+				if state.move(u, c):
+					_lesson_event("dodged" if was_red and state.threat_at(u.cell, u.team) == 0 else "moved")
 				_after_action()
 		"card":
 			if state.play_card(u, selected_hand, c):
+				_lesson_event("played_card")
 				mode = "idle"
 				selected_hand = -1
 				_after_action()
@@ -740,12 +914,21 @@ func _click_cell(c: Vector2i) -> void:
 				_cancel()
 		"strike":
 			if state.strike(u, c):
+				_lesson_event("struck")
+				mode = "idle"
+				_after_action()
+			else:
+				_cancel()
+		"cantrip":
+			if state.cast_cantrip(u, c):
+				_lesson_event("cantrip")
 				mode = "idle"
 				_after_action()
 			else:
 				_cancel()
 		"wheel_target":
 			if state.improvise(u, wheel_vectors, wheel_form, wheel_magnitude, wheel_fuel, c):
+				_lesson_event("improvised")
 				mode = "idle"
 				wheel_fuel = -1
 				_after_action()
@@ -935,6 +1118,17 @@ func _play_event(e: Dictionary) -> void:
 			await _nudge_back()
 			var u := state.unit_by_id(str(e["unit"]))
 			if u != null:
+				if u.team == "party":
+					Audio.event("turn_start_party")
+					var next := state.acts_next(u)
+					if next.size() == 1:
+						_say_banner(Strings.t("combat.enemy_acts_next") % u.name, u)
+					elif next.size() > 1:
+						_say_banner(Strings.t("combat.enemies_act_next") % [u.name, next.size()], u)
+					else:
+						_say_banner(Strings.t("combat.unit_turn") % u.name, u)
+				else:
+					Audio.event("turn_start_enemy")
 				if u.team == "party" and not _is_ai(u):
 					cursor_cell = u.cell
 					_focus_card = -1
@@ -974,6 +1168,12 @@ func _play_event(e: Dictionary) -> void:
 			if str(e["t"]) == "slide":
 				_note(Strings.t("combat.slides_across_the_ice") % _uname(str(e["unit"])))
 		"undo":
+			if bool(e.get("full", false)):
+				# A full undo can remove units that were spawned after the snapshot.
+				for x in views.keys():
+					if not state.units.has(x):
+						views[x].queue_free()
+						views.erase(x)
 			_sync_views()
 		"cast":
 			var u := state.unit_by_id(str(e["unit"]))
@@ -1020,6 +1220,11 @@ func _play_event(e: Dictionary) -> void:
 		"damage":
 			var v := _view_for_id(str(e["unit"]))
 			var amt := int(e["amount"])
+			var hurt := state.unit_by_id(str(e["unit"]))
+			if not _mocked and _stayed_in_red != "" and hurt != null and hurt.is_player and str(e.get("cause", "")) == "hit":
+				# Tutorial room 2: you stood in the red; the training floor catches you.
+				_mocked = true
+				Narrator.say(Strings.t(_stayed_in_red))
 			var txt := "-%d" % amt
 			if int(e.get("absorbed", 0)) > 0:
 				txt += " (%d)" % int(e["absorbed"])
@@ -1187,12 +1392,93 @@ func randf_range_seeded(amount: float) -> float:
 	return Rng.stream("fx").randf_range(-amount, amount)
 
 
-func _say_banner(text: String) -> void:
+# --- Tutorial lessons (CT Part 7) ------------------------------------------------
+
+func _start_lesson(setup: Dictionary) -> void:
+	_ui_open = setup.get("ui", { "hand": true, "wheel": true, "threat": true })
+	_stayed_in_red = str(setup.get("stayedInRed", ""))
+	if not bool(_ui_open.get("hand", true)):
+		_hand.modulate = Color(1, 1, 1, 0.35)
+	var steps: Array = setup.get("lesson", [])
+	if steps.is_empty():
+		return
+	_lesson = Tutorial.Lesson.new(steps)
+	_show_lesson_step()
+
+
+func _lesson_event(ev: String) -> void:
+	if _lesson != null and _lesson.notify(ev):
+		_show_lesson_step()
+
+
+var _last_tick := 0
+
+
+func _delta_hint() -> float:
+	var now := Time.get_ticks_msec()
+	var d := 0.0 if _last_tick == 0 else float(now - _last_tick) / 1000.0
+	_last_tick = now
+	return d
+
+
+func _tick_lesson(delta: float) -> void:
+	if _lesson == null or _lesson.done():
+		return
+	var hint_after := float(DataDB.table("story/tutorial_floor").get("hintSeconds", 20))
+	if _lesson.tick(delta, hint_after) and not _lesson_label.text.ends_with(")"):
+		_lesson_label.text += "\n(" + Strings.t(str(_lesson.current().get("hint", ""))) + ")"
+
+
+func _show_lesson_step() -> void:
+	if _lesson == null or _lesson.done():
+		_lesson_box.visible = false
+		_lesson_mark.visible = false
+		return
+	var st := _lesson.current()
+	_lesson_box.visible = true
+	_lesson_label.text = Strings.t(str(st.get("say", "")))
+	_lesson_next.visible = str(st.get("wait", "next")) == "next"
+	if str(st.get("speaker", "narrator")) == "kelly":
+		Audio.voice("kelly")
+	var target := _highlight_control(str(st.get("highlight", "")))
+	_lesson_mark.visible = target != null
+	if target != null:
+		var r := target.get_global_rect()
+		_lesson_mark.position = r.position - Vector2(2, 2)
+		_lesson_mark.size = r.size + Vector2(4, 4)
+
+
+func _highlight_control(key: String) -> Control:
+	match key:
+		"timeline":
+			return _timeline
+		"pips":
+			return _pips
+		"hand":
+			return _hand
+		"mp":
+			return _unit_panel
+		"strike", "guard", "hold", "wheel", "cantrip":
+			return _buttons.get(key, null)
+	return null
+
+
+func _say_banner(text: String, who: UnitScript = null) -> void:
 	_banner.text = text
 	_banner.modulate = Color.WHITE
 	var tw := create_tween()
 	tw.tween_interval(1.4)
 	tw.tween_property(_banner, "modulate:a", 0.0, 0.4)
+	# The active unit's portrait next to "Quill's turn" (CT Part 2b).
+	for c in _banner_face.get_children():
+		_banner_face.remove_child(c)
+		c.queue_free()
+	if who != null:
+		_banner_face.add_child(_portrait(who, int(DataDB.table("ui").get("spotlight", {}).get("bannerPortrait", 24))))
+		_banner_face.modulate = Color.WHITE
+		var tf := create_tween()
+		tf.tween_interval(1.4)
+		tf.tween_property(_banner_face, "modulate:a", 0.0, 0.4)
 
 
 func _note(text: String) -> void:

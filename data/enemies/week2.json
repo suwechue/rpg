@@ -1,7 +1,8 @@
 {
   "enemies": [
     {
-      "id": "frost_wolf", "intent": "tracking",
+      "id": "frost_wolf",
+      "intent": "tracking",
       "name": "Frost Wolf",
       "tier": "normal",
       "weeks": [
@@ -37,15 +38,13 @@
           "id": "frost_bite",
           "name": "Frost Bite",
           "kind": "strike",
-          "stat": "str",
-          "mult": 1.0,
-          "power": 2,
           "vectors": {
             "cold": 1
           },
           "profile": {
             "courage": 0.8
-          }
+          },
+          "damage": 20
         },
         {
           "id": "howl",
@@ -54,11 +53,11 @@
           "vectors": {
             "cold": 1
           },
-          "power": 5,
           "profile": {
             "pride": 0.5,
             "courage": 0.4
-          }
+          },
+          "damage": 11
         }
       ],
       "xp": 10,
@@ -103,15 +102,13 @@
           "id": "cling",
           "name": "Cling",
           "kind": "strike",
-          "stat": "str",
-          "mult": 1.0,
-          "power": 5,
           "vectors": {
             "binding": 1
           },
           "profile": {
             "greed": 0.7
-          }
+          },
+          "damage": 21
         },
         {
           "id": "chill",
@@ -120,10 +117,10 @@
           "vectors": {
             "cold": 1
           },
-          "power": 5,
           "profile": {
             "courage": 0.6
-          }
+          },
+          "damage": 18
         }
       ],
       "xp": 9,
@@ -170,10 +167,10 @@
           "vectors": {
             "motion": 1
           },
-          "power": 5,
           "profile": {
             "courage": 0.7
-          }
+          },
+          "damage": 11
         },
         {
           "id": "swing",
@@ -182,10 +179,10 @@
           "vectors": {
             "force": 1
           },
-          "power": 5,
           "profile": {
             "pride": 0.6
-          }
+          },
+          "damage": 11
         }
       ],
       "xp": 10,
@@ -234,10 +231,10 @@
           "vectors": {
             "cold": 1
           },
-          "power": 4,
           "profile": {
             "curiosity": 0.6
-          }
+          },
+          "damage": 11
         }
       ],
       "xp": 7,
@@ -282,15 +279,13 @@
           "id": "cleave",
           "name": "Cleave",
           "kind": "strike",
-          "stat": "str",
-          "mult": 1.0,
-          "power": 4,
           "vectors": {
             "force": 1
           },
           "profile": {
             "courage": 0.8
-          }
+          },
+          "damage": 19
         },
         {
           "id": "flash_freeze",
@@ -299,10 +294,10 @@
           "vectors": {
             "cold": 1
           },
-          "power": 8,
           "profile": {
             "pride": 0.9
-          }
+          },
+          "damage": 11
         },
         {
           "id": "order_up",
@@ -311,11 +306,11 @@
           "vectors": {
             "force": 1
           },
-          "power": 8,
           "target": "strongest",
           "profile": {
             "pride": 1.0
-          }
+          },
+          "damage": 14
         }
       ],
       "xp": 30,

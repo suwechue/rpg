@@ -182,7 +182,8 @@ func combat_setup(enemies: Array, layout_id: String, opts: Dictionary = {}) -> D
 		"boss": bool(opts.get("boss", false)),
 		"library": cards,
 	}
-	for key in ["intro", "fleeAllowed", "context", "formation", "roles", "reinforcements", "turnMode"]:
+	for key in ["intro", "fleeAllowed", "context", "formation", "roles", "reinforcements", "turnMode",
+			"tutorial", "playerDeck", "addCards", "ui", "fair", "hpFloor", "guaranteeImprovise", "lesson", "stayedInRed", "partyFirst"]:
 		if opts.has(key):
 			setup[key] = opts[key]
 	setup["difficulty"] = combat_difficulty

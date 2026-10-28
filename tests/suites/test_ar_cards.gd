@@ -63,7 +63,7 @@ func play(st: StateScript, id: String, target: Vector2i) -> bool:
 
 func test_card_counts() -> void:
 	var new := 0
-	for key in ["cards/vector_cards", "cards/basic_cards", "cards/tier3_cards"]:
+	for key in ["cards/vector_cards", "cards/basic_cards", "cards/tier3_cards", "cards/class_cards"]:
 		new += db()[key]["cards"].size()
 	check(new >= 48, "at least 48 new cards (%d)" % new)
 	var per := {}
@@ -94,8 +94,14 @@ func test_upgrades() -> void:
 
 
 func test_class_decks() -> void:
-	var expect := { "fighter": ["card_lunge", "card_parry", "card_brace"], "rogue": ["card_dash", "card_blink", "card_afterimage"],
-		"healer": ["card_mend", "card_halo", "card_beacon"], "bard": ["card_haste", "card_tailwind", "card_dazzle"] }
+	var expect := { "fighter": ["card_intercept", "card_lunge", "card_parry", "card_brace", "card_taunt"], "rogue": ["card_hit_and_run", "card_shadow_step", "card_dash", "card_smoke_bomb"],
+		"healer": ["card_ward", "card_mend", "card_guiding_light", "card_sanctuary", "card_cleanse"], "bard": ["card_haste", "card_tailwind", "card_dazzle", "card_encore"] }
+	for c in db()["classes"]["classes"]:
+		if int(c.get("tier", 1)) > 1:
+			continue
+		var deck := Char.create(db(), str(c["id"]), seeded(4))["deck"] as Array
+		check(not deck.has("card_strike") and not deck.has("card_guard"), "%s: Strike and Guard are built-in Quicks, not cards (PT Part 1)" % c["id"])
+		check(deck.size() >= int(db()["leveling"]["deckMin"]), "%s starts with at least the minimum deck (%d)" % [c["id"], deck.size()])
 	for cls in expect:
 		var ch := Char.create(db(), cls, seeded(4))
 		for id in expect[cls]:
@@ -265,7 +271,7 @@ func test_tier3_cards() -> void:
 
 func test_effect_ops_are_all_used() -> void:
 	var used := {}
-	for key in ["cards/vector_cards", "cards/basic_cards", "cards/tier3_cards"]:
+	for key in ["cards/vector_cards", "cards/basic_cards", "cards/tier3_cards", "cards/class_cards"]:
 		for c in db()[key]["cards"]:
 			for e in c.get("effects", []):
 				used[str(e["op"])] = true

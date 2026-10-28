@@ -1,0 +1,298 @@
+{
+  "comment": "CT Part 5: class role cards (Rogue, Healer, Fighter, Bard). Timing words (Quick, until your next turn, once per fight) are in the text.",
+  "cards": [
+    {
+      "kind": "basic",
+      "action": "effects",
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "id": "card_hit_and_run",
+      "name": "Hit and Run",
+      "rarity": "common",
+      "cost": 1,
+      "short": "Hit, move 2",
+      "text": "Strike an adjacent enemy (DEX), then move up to 2 tiles for free.",
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "hit_and_run",
+          "stat": "dex",
+          "mult": 1.0,
+          "tiles": 2
+        }
+      ],
+      "upgrade": {
+        "effects": [
+          {
+            "op": "hit_and_run",
+            "stat": "dex",
+            "mult": 1.2,
+            "tiles": 3
+          }
+        ]
+      }
+    },
+    {
+      "kind": "basic",
+      "action": "effects",
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "id": "card_shadow_step",
+      "name": "Shadow Step",
+      "rarity": "uncommon",
+      "cost": 2,
+      "short": "Port+stab",
+      "text": "Teleport behind an enemy within 3, then Strike it (DEX). Strikes from behind ignore cover.",
+      "targeting": {
+        "type": "enemy",
+        "range": 3
+      },
+      "effects": [
+        {
+          "op": "shadow_step",
+          "stat": "dex",
+          "mult": 1.2
+        }
+      ],
+      "upgrade": {
+        "effects": [
+          {
+            "op": "shadow_step",
+            "stat": "dex",
+            "mult": 1.5
+          }
+        ]
+      }
+    },
+    {
+      "kind": "basic",
+      "action": "effects",
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "id": "card_smoke_bomb",
+      "name": "Smoke Bomb",
+      "rarity": "common",
+      "cost": 1,
+      "short": "Blind, move 1",
+      "text": "Blind every adjacent enemy for 1 round, then move 1 tile for free.",
+      "targeting": {
+        "type": "self",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "blind_adjacent",
+          "turns": 1
+        },
+        {
+          "op": "free_move",
+          "tiles": 1
+        }
+      ],
+      "upgrade": {
+        "effects": [
+          {
+            "op": "blind_adjacent",
+            "turns": 1
+          },
+          {
+            "op": "free_move",
+            "tiles": 2
+          }
+        ]
+      }
+    },
+    {
+      "kind": "spell",
+      "vectors": {
+        "light": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "minor",
+      "effectsOnly": true,
+      "vfx": "vfx_light_bolt",
+      "sfx": "card_play_light",
+      "id": "card_ward",
+      "name": "Ward",
+      "rarity": "common",
+      "cost": 1,
+      "short": "Shield 8",
+      "text": "Shield an ally within 3 for 8 until your next turn; double if a telegraph is aimed at them.",
+      "targeting": {
+        "type": "ally",
+        "range": 3
+      },
+      "effects": [
+        {
+          "op": "ward",
+          "amount": 8
+        }
+      ],
+      "upgrade": {
+        "effects": [
+          {
+            "op": "ward",
+            "amount": 11
+          }
+        ]
+      }
+    },
+    {
+      "kind": "spell",
+      "vectors": {
+        "light": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "minor",
+      "effectsOnly": true,
+      "vfx": "vfx_light_bolt",
+      "sfx": "card_play_light",
+      "id": "card_guiding_light",
+      "name": "Guiding Light",
+      "rarity": "common",
+      "cost": 1,
+      "short": "Pull ally",
+      "text": "Pull an ally within 4 up to 3 tiles toward you (out of the red).",
+      "targeting": {
+        "type": "ally",
+        "range": 4
+      },
+      "effects": [
+        {
+          "op": "pull_ally",
+          "steps": 3
+        }
+      ],
+      "upgrade": {
+        "effects": [
+          {
+            "op": "pull_ally",
+            "steps": 4
+          }
+        ]
+      }
+    },
+    {
+      "kind": "spell",
+      "vectors": {
+        "light": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "standard",
+      "effectsOnly": true,
+      "vfx": "vfx_light_bolt",
+      "sfx": "card_play_light",
+      "id": "card_sanctuary",
+      "name": "Sanctuary",
+      "rarity": "uncommon",
+      "cost": 2,
+      "short": "Safe zone",
+      "text": "You and allies next to you take half damage from telegraphed attacks until your next turn.",
+      "targeting": {
+        "type": "self",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "sanctuary",
+          "radius": 1,
+          "turns": 1
+        }
+      ],
+      "upgrade": {
+        "effects": [
+          {
+            "op": "sanctuary",
+            "radius": 2,
+            "turns": 1
+          }
+        ]
+      }
+    },
+    {
+      "kind": "spell",
+      "vectors": {
+        "light": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "minor",
+      "effectsOnly": true,
+      "vfx": "vfx_light_bolt",
+      "sfx": "card_play_light",
+      "id": "card_cleanse",
+      "name": "Cleanse",
+      "rarity": "common",
+      "cost": 1,
+      "quick": true,
+      "short": "Cleanse",
+      "text": "Quick. Remove Root, Slow, Blind and Tether from an ally within 3.",
+      "targeting": {
+        "type": "ally",
+        "range": 3
+      },
+      "effects": [
+        {
+          "op": "cleanse",
+          "all": true
+        }
+      ],
+      "upgrade": {
+        "effects": [
+          {
+            "op": "cleanse",
+            "all": true,
+            "heal": 4
+          }
+        ]
+      }
+    },
+    {
+      "kind": "basic",
+      "action": "effects",
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "id": "card_intercept",
+      "name": "Intercept",
+      "rarity": "common",
+      "cost": 0,
+      "quick": true,
+      "short": "Take hit",
+      "text": "Quick. Until your next turn, the next attack aimed at an adjacent ally hits you instead.",
+      "targeting": {
+        "type": "self",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "intercept",
+          "turns": 1
+        }
+      ]
+    },
+    {
+      "kind": "basic",
+      "action": "effects",
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "id": "card_encore",
+      "name": "Encore",
+      "rarity": "rare",
+      "cost": 2,
+      "short": "Encore",
+      "oncePerFight": true,
+      "text": "Once per fight. An ally who already acted this round takes another turn right now with 1 Action, at half effect.",
+      "targeting": {
+        "type": "ally",
+        "range": 4
+      },
+      "effects": [
+        {
+          "op": "encore"
+        }
+      ]
+    }
+  ]
+}

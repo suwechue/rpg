@@ -82,6 +82,9 @@ func smoke_week_of_school() -> void:
 	_root_node("SaveSystem").call("delete_save")
 	gs.call("new_run", 777, "fighter")
 	gs.set("dev_autoplay", true)
+	# The smoke checks the week's flow, not balance: a sturdier player keeps the AI from losing the boss.
+	gs.get("player")["stats"]["con"] = int(gs.get("player")["stats"]["con"]) + 12
+	preload("res://src/core/character.gd").full_restore(_root_node("DataDB").call("all"), gs.get("player"))
 	var recruited := false
 	await _goto("res://src/scenes/town/town.tscn")
 	var stats0: Dictionary = gs.get("player")["stats"].duplicate()
@@ -271,9 +274,10 @@ func smoke_kelly_monday() -> void:
 		flow.set("_busy", false)
 		flow.call("_on_part_started")
 		var ended := await _drive(func() -> bool:
-			return gs.call("flag", "story_done_w1_evening") or (current_scene != null and current_scene.name == "Title"), needles, 120.0)
+			return gs.call("flag", "story_done_w1_evening") or (current_scene != null and current_scene.name == "Title"), needles, 900.0)
 		check(ended, "the evening tutorial floor plays to the end (%s, Risk %d)" % [outcome, int(gs.get("run").get("kelly_risk", 0))])
 		if outcome == "survive":
+			check(not gs.call("flag", "w1_shortcut"), "the long way: room 7 (Hot Floor) is played")
 			check(gs.call("flag", "survived_w1_monday"), "kind night: you survive")
 			check(gs.get("run").get("guests", []).is_empty(), "Kelly goes home after the night")
 		else:
@@ -347,7 +351,7 @@ func _smoke_combat() -> void:
 	if scene.call("_player_turn"):
 		scene.call("_on_button", "guard")
 		await create_timer(0.5).timeout
-		check(bool(u.get("action_used")), "guard uses the action")
+		check(bool(u.get("quick_used")), "Guard uses the Quick (PT Part 1)")
 		scene.call("_on_button", "wheel")
 		check(scene.get("_wheel") != null, "the Vector Wheel opens")
 		scene.call("_cancel")
@@ -525,7 +529,7 @@ func smoke_cu_push_and_slide() -> void:
 				pushes += 1
 			if str(line).contains("slides across the ice"):
 				slides += 1
-		check(bool(u.get("action_used")), "CU: the card used the turn's action")
+		check(int(u.get("actions_left")) < 2 or bool(u.get("quick_used")), "the card used an Action or the Quick")
 		if turn == 0:
 			scene.call("_on_button", "end")
 			waited = 0

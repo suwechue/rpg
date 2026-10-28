@@ -7,10 +7,12 @@
   "formRollEvery": 2,
   "perkLevels": [3, 6, 9],
   "classChangeLevels": [5, 12],
-  "deckMaxBase": 20,
+  "deckMaxBase": 0,
   "deckMaxGrowth": [ { "level": 5, "add": 2 }, { "level": 12, "add": 2 } ],
-  "deckMin": 10,
+  "deckMin": 8,
   "maxCopies": 3,
+  "deckRulesComment": "PT Part 2: deckMaxBase 0 means no deck maximum (Fatigue on reshuffle is the cost of a big deck). maxCopies 0 means no copy limit. Removing a card from a deck costs removeCardCost AP (arena: checkpoint cost removeCard); adding is free. Crafted cards go straight into the crafter's deck.",
+  "removeCardCost": 1,
   "knowledgeTiers": [
     { "tier": 2, "minLevel": 5, "minInt": 8 },
     { "tier": 3, "minLevel": 10, "minInt": 12 }

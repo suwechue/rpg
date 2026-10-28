@@ -30,7 +30,7 @@ func test_card_summary_is_short() -> void:
 		var line := CardRules.summary(db(), c)
 		check(line.length() > 0 and line.length() <= 10, "%s one-line effect fits a card: '%s'" % [c["id"], line])
 	var spell := CardRules.make_spell(db(), { "heat": 1.0 }, "bolt", "standard")
-	check(CardRules.summary(db(), spell) == "Bolt 10", "spell summary is form and power: %s" % CardRules.summary(db(), spell))
+	check(CardRules.summary(db(), spell) == "Bolt 7", "spell summary is form and power: %s" % CardRules.summary(db(), spell))
 
 
 func test_card_art_ids() -> void:

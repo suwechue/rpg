@@ -3,6 +3,7 @@
 class_name TownShop
 extends RefCounted
 
+const Crafting := preload("res://src/core/progression/crafting.gd")
 const Str := preload("res://src/core/strings.gd")
 
 const DT := preload("res://src/core/data_tables.gd")
@@ -83,9 +84,7 @@ static func buy(db: Dictionary, run: Dictionary, shop_id: String, entry: Diction
 		"card":
 			var cid := str(entry["card"])
 			run["collection"][cid] = int(run["collection"].get(cid, 0)) + 1
-			var deck: Array = run["player"]["deck"]
-			if deck.size() < Char.deck_max(db, run["player"]) and deck.count(cid) < int(db.get("leveling", {}).get("maxCopies", 3)):
-				deck.append(cid)
+			if Crafting.add_to_deck(db, run["player"], cid):
 				lines.append(Str.t(db, "shop.added_to_your_deck") % entry_name(db, entry))
 			else:
 				lines.append(Str.t(db, "shop.added_to_your_collection") % entry_name(db, entry))

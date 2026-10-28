@@ -4,10 +4,22 @@
   "titleSize": 18,
   "fonts": {
     "comment": "Fonts by role: an asset id and a size. Keep sizes at the font's native size or a whole multiple so pixels stay crisp.",
-    "ui": { "id": "font_ui", "size": 9 },
-    "dialogue": { "id": "font_dialogue", "size": 9 },
-    "title": { "id": "font_title", "size": 18 },
-    "damage": { "id": "font_damage_numbers", "size": 9 }
+    "ui": {
+      "id": "font_ui",
+      "size": 9
+    },
+    "dialogue": {
+      "id": "font_dialogue",
+      "size": 9
+    },
+    "title": {
+      "id": "font_title",
+      "size": 18
+    },
+    "damage": {
+      "id": "font_damage_numbers",
+      "size": 9
+    }
   },
   "colors": {
     "bg": "#141824ee",
@@ -27,62 +39,329 @@
     "shield": "#7cc7e8",
     "heal": "#8fd694",
     "damage": "#ff7a6a",
-    "crit": "#ffd966"
+    "crit": "#ffd966",
+    "cover": "#7cc7e8"
   },
   "skin": {
-    "panel": { "id": "ui_panel", "margin": 6, "padding": [4, 3] },
-    "tooltip": { "id": "ui_panel_tooltip", "margin": 6, "padding": [4, 3] },
-    "button": { "normal": "ui_button", "hover": "ui_button_hover", "pressed": "ui_button_pressed", "disabled": "ui_button_disabled", "focus": "ui_button_focus", "margin": 4, "padding": [4, 2] },
-    "field": { "id": "ui_field", "margin": 4, "padding": [3, 2] },
-    "barBg": { "id": "ui_bar_bg", "margin": 2 },
-    "barFill": { "id": "ui_bar_fill", "margin": 2 },
+    "panel": {
+      "id": "ui_panel",
+      "margin": 6,
+      "padding": [
+        4,
+        3
+      ]
+    },
+    "tooltip": {
+      "id": "ui_panel_tooltip",
+      "margin": 6,
+      "padding": [
+        4,
+        3
+      ]
+    },
+    "button": {
+      "normal": "ui_button",
+      "hover": "ui_button_hover",
+      "pressed": "ui_button_pressed",
+      "disabled": "ui_button_disabled",
+      "focus": "ui_button_focus",
+      "margin": 4,
+      "padding": [
+        4,
+        2
+      ]
+    },
+    "field": {
+      "id": "ui_field",
+      "margin": 4,
+      "padding": [
+        3,
+        2
+      ]
+    },
+    "barBg": {
+      "id": "ui_bar_bg",
+      "margin": 2
+    },
+    "barFill": {
+      "id": "ui_bar_fill",
+      "margin": 2
+    },
     "cursor": "ui_cursor",
-    "cards": { "spell": "ui_card_spell", "basic": "ui_card_basic", "item": "ui_card_item", "select": "ui_card_select", "artPos": [4, 13], "costPos": [4, 2], "textPos": [4, 64] }
+    "cards": {
+      "spell": "ui_card_spell",
+      "basic": "ui_card_basic",
+      "item": "ui_card_item",
+      "select": "ui_card_select",
+      "artPos": [
+        4,
+        13
+      ],
+      "costPos": [
+        4,
+        2
+      ],
+      "textPos": [
+        4,
+        64
+      ]
+    }
   },
   "colorblind": false,
   "vectorColors": {
-    "heat": "#e8663c", "cold": "#7cc7e8", "force": "#c9a66b", "motion": "#9be36d", "binding": "#b07ce8",
-    "light": "#f5e27a", "transmutation": "#e87cc9", "vitality": "#5fd98a", "corrosion": "#8a9b3c"
+    "heat": "#e8663c",
+    "cold": "#7cc7e8",
+    "force": "#c9a66b",
+    "motion": "#9be36d",
+    "binding": "#b07ce8",
+    "light": "#f5e27a",
+    "transmutation": "#e87cc9",
+    "vitality": "#5fd98a",
+    "corrosion": "#8a9b3c"
   },
   "vectorColorsColorblind": {
-    "heat": "#d55e00", "cold": "#56b4e9", "force": "#e69f00", "motion": "#009e73", "binding": "#cc79a7",
-    "light": "#f0e442", "transmutation": "#dddddd", "vitality": "#0072b2", "corrosion": "#999933"
+    "heat": "#d55e00",
+    "cold": "#56b4e9",
+    "force": "#e69f00",
+    "motion": "#009e73",
+    "binding": "#cc79a7",
+    "light": "#f0e442",
+    "transmutation": "#dddddd",
+    "vitality": "#0072b2",
+    "corrosion": "#999933"
   },
   "vectorPatterns": {
     "comment": "Drawn faintly behind card text so color never carries meaning alone: none, stripes, backslash, dots, grid, waves, rings, checks, cross.",
-    "heat": "stripes", "cold": "dots", "force": "grid", "motion": "backslash", "binding": "rings",
-    "light": "none", "transmutation": "checks", "vitality": "waves", "corrosion": "cross"
+    "heat": "stripes",
+    "cold": "dots",
+    "force": "grid",
+    "motion": "backslash",
+    "binding": "rings",
+    "light": "none",
+    "transmutation": "checks",
+    "vitality": "waves",
+    "corrosion": "cross"
   },
   "statuses": {
-    "root": { "name": "Rooted", "text": "Can't move this turn.", "icon": "icon_status_root", "color": "#b07ce8" },
-    "slow": { "name": "Slowed", "text": "-1 Movement.", "icon": "icon_status_slow", "color": "#7cc7e8" },
-    "blind": { "name": "Blinded", "text": "Attacks can miss.", "icon": "icon_status_blind", "color": "#f5e27a" },
-    "haste": { "name": "Hasted", "text": "Extra Movement.", "icon": "icon_status_haste", "color": "#9be36d" },
-    "rally": { "name": "Rallied", "text": "+20% damage.", "icon": "icon_status_rally", "color": "#e87cc9" },
-    "infusion": { "name": "Infused", "text": "The next attack carries a Vector.", "icon": "icon_status_infusion", "color": "#e8663c" },
-    "guard": { "name": "Guarding", "text": "+Defense and Magic Resistance until their next turn.", "icon": "icon_status_guard", "color": "#c9c9c9" },
-    "shield": { "name": "Shielded", "text": "A Shield absorbs damage first.", "icon": "icon_status_shield", "color": "#7cc7e8" },
-    "rime": { "name": "Rime", "text": "Melee attackers who hit it are Slowed.", "icon": "icon_status_shield", "color": "#cfefff" },
-    "tether": { "name": "Tethered", "text": "Hits on it also hurt the unit it's linked to.", "icon": "icon_vector_binding", "color": "#b07ce8" },
-    "pact": { "name": "Pact", "text": "Damage is split with its partner.", "icon": "icon_vector_binding", "color": "#8fd694" },
-    "regen": { "name": "Regenerating", "text": "Heals at the start of each turn.", "icon": "icon_vector_vitality", "color": "#5fd98a" },
-    "taunting": { "name": "Taunting", "text": "Enemy attacks aimed nearby turn toward it.", "icon": "icon_status_rally", "color": "#f5e27a" },
-    "brace": { "name": "Braced", "text": "Can't be pushed or pulled until its next turn.", "icon": "icon_status_guard", "color": "#c9a66b" },
-    "parry": { "name": "Parrying", "text": "The next melee hit against it is countered.", "icon": "icon_kind_basic", "color": "#ffffff" },
-    "haste_full": { "name": "Hasted", "text": "May move and act this turn.", "icon": "icon_status_haste", "color": "#9be36d" },
-    "empowered": { "name": "Empowered", "text": "Its next card of a Vector hits harder.", "icon": "icon_status_infusion", "color": "#e8663c" },
-    "corroded": { "name": "Corroded", "text": "Defense and Resistance shredded.", "icon": "icon_vector_corrosion", "color": "#8a9b3c" }
+    "root": {
+      "name": "Rooted",
+      "text": "Can't move this turn.",
+      "icon": "icon_status_root",
+      "color": "#b07ce8"
+    },
+    "slow": {
+      "name": "Slowed",
+      "text": "-1 Movement.",
+      "icon": "icon_status_slow",
+      "color": "#7cc7e8"
+    },
+    "blind": {
+      "name": "Blinded",
+      "text": "Attacks can miss.",
+      "icon": "icon_status_blind",
+      "color": "#f5e27a"
+    },
+    "haste": {
+      "name": "Hasted",
+      "text": "Extra Movement.",
+      "icon": "icon_status_haste",
+      "color": "#9be36d"
+    },
+    "rally": {
+      "name": "Rallied",
+      "text": "+20% damage.",
+      "icon": "icon_status_rally",
+      "color": "#e87cc9"
+    },
+    "infusion": {
+      "name": "Infused",
+      "text": "The next attack carries a Vector.",
+      "icon": "icon_status_infusion",
+      "color": "#e8663c"
+    },
+    "guard": {
+      "name": "Guarding",
+      "text": "+Defense and Magic Resistance until their next turn.",
+      "icon": "icon_status_guard",
+      "color": "#c9c9c9"
+    },
+    "shield": {
+      "name": "Shielded",
+      "text": "A Shield absorbs damage first.",
+      "icon": "icon_status_shield",
+      "color": "#7cc7e8"
+    },
+    "rime": {
+      "name": "Rime",
+      "text": "Melee attackers who hit it are Slowed.",
+      "icon": "icon_status_shield",
+      "color": "#cfefff"
+    },
+    "tether": {
+      "name": "Tethered",
+      "text": "Hits on it also hurt the unit it's linked to.",
+      "icon": "icon_vector_binding",
+      "color": "#b07ce8"
+    },
+    "pact": {
+      "name": "Pact",
+      "text": "Damage is split with its partner.",
+      "icon": "icon_vector_binding",
+      "color": "#8fd694"
+    },
+    "regen": {
+      "name": "Regenerating",
+      "text": "Heals at the start of each turn.",
+      "icon": "icon_vector_vitality",
+      "color": "#5fd98a"
+    },
+    "taunting": {
+      "name": "Taunting",
+      "text": "Enemy attacks aimed nearby turn toward it.",
+      "icon": "icon_status_rally",
+      "color": "#f5e27a"
+    },
+    "brace": {
+      "name": "Braced",
+      "text": "Can't be pushed or pulled until its next turn.",
+      "icon": "icon_status_guard",
+      "color": "#c9a66b"
+    },
+    "parry": {
+      "name": "Parrying",
+      "text": "The next melee hit against it is countered.",
+      "icon": "icon_kind_basic",
+      "color": "#ffffff"
+    },
+    "haste_full": {
+      "name": "Hasted",
+      "text": "May move and act this turn.",
+      "icon": "icon_status_haste",
+      "color": "#9be36d"
+    },
+    "empowered": {
+      "name": "Empowered",
+      "text": "Its next card of a Vector hits harder.",
+      "icon": "icon_status_infusion",
+      "color": "#e8663c"
+    },
+    "corroded": {
+      "name": "Corroded",
+      "text": "Defense and Resistance shredded.",
+      "icon": "icon_vector_corrosion",
+      "color": "#8a9b3c"
+    },
+    "move_next": {
+      "name": "Movement saved",
+      "text": "Extra Movement at the start of the next turn (from a movement card played after moving).",
+      "icon": "icon_status_haste",
+      "color": "#9be36d"
+    },
+    "sanctuary": {
+      "name": "Sanctuary",
+      "text": "Telegraphed hits deal half.",
+      "icon": "icon_status_guard",
+      "color": "#f5e27a"
+    },
+    "intercept": {
+      "name": "Intercepting",
+      "text": "Takes the next attack aimed at an adjacent ally.",
+      "icon": "icon_status_guard",
+      "color": "#e8a87c"
+    },
+    "encore": {
+      "name": "Encore",
+      "text": "A bonus turn at half effect.",
+      "icon": "icon_status_rally",
+      "color": "#e87cc9"
+    }
   },
   "affixes": {
-    "hasted": { "name": "Hasted", "text": "Moves and acts in one turn, and moves far.", "icon": "icon_status_haste", "color": "#9be36d" },
-    "armored": { "name": "Armored", "text": "Extra Defense and Resistance.", "icon": "icon_status_guard", "color": "#c9c9c9" },
-    "burning": { "name": "Burning", "text": "Leaves fire where it walks; attacks burn.", "icon": "icon_vector_heat", "color": "#e8663c" },
-    "vampiric": { "name": "Vampiric", "text": "Heals from the damage it deals.", "icon": "icon_vector_vitality", "color": "#e8746a" },
-    "shielded": { "name": "Shielded", "text": "Starts with a big Shield.", "icon": "icon_status_shield", "color": "#7cc7e8" },
-    "explosive": { "name": "Explosive", "text": "Explodes when it dies, hurting everyone next to it.", "icon": "icon_intent_special", "color": "#ffd966" }
+    "hasted": {
+      "name": "Hasted",
+      "text": "Moves and acts in one turn, and moves far.",
+      "icon": "icon_status_haste",
+      "color": "#9be36d"
+    },
+    "armored": {
+      "name": "Armored",
+      "text": "Extra Defense and Resistance.",
+      "icon": "icon_status_guard",
+      "color": "#c9c9c9"
+    },
+    "burning": {
+      "name": "Burning",
+      "text": "Leaves fire where it walks; attacks burn.",
+      "icon": "icon_vector_heat",
+      "color": "#e8663c"
+    },
+    "vampiric": {
+      "name": "Vampiric",
+      "text": "Heals from the damage it deals.",
+      "icon": "icon_vector_vitality",
+      "color": "#e8746a"
+    },
+    "shielded": {
+      "name": "Shielded",
+      "text": "Starts with a big Shield.",
+      "icon": "icon_status_shield",
+      "color": "#7cc7e8"
+    },
+    "explosive": {
+      "name": "Explosive",
+      "text": "Explodes when it dies, hurting everyone next to it.",
+      "icon": "icon_intent_special",
+      "color": "#ffd966"
+    }
   },
-  "kindIcons": { "spell": "icon_kind_spell", "basic": "icon_kind_basic", "item": "icon_kind_item" },
-  "intentIcons": { "attack": "icon_intent_attack", "special": "icon_intent_special", "buff": "icon_intent_buff", "defend": "icon_intent_defend", "move": "icon_intent_move", "tracking": "icon_intent_tracking" },
-  "combatSpeed": { "comment": "Seconds of enemy-turn pauses are multiplied by the chosen speed; holding Fast-forward (Shift, pad X) multiplies again.", "setting": "normal", "normal": 1.0, "fast": 0.45, "instant": 0.0, "holdMul": 0.2 },
-  "timeline": { "count": 12, "portrait": 20 }
+  "kindIcons": {
+    "spell": "icon_kind_spell",
+    "basic": "icon_kind_basic",
+    "item": "icon_kind_item"
+  },
+  "intentIcons": {
+    "attack": "icon_intent_attack",
+    "special": "icon_intent_special",
+    "buff": "icon_intent_buff",
+    "defend": "icon_intent_defend",
+    "move": "icon_intent_move",
+    "tracking": "icon_intent_tracking"
+  },
+  "combatSpeed": {
+    "comment": "Seconds of enemy-turn pauses are multiplied by the chosen speed; holding Fast-forward (Shift, pad X) multiplies again.",
+    "setting": "normal",
+    "normal": 1.0,
+    "fast": 0.45,
+    "instant": 0.0,
+    "holdMul": 0.2
+  },
+  "timeline": {
+    "count": 12,
+    "portrait": 20,
+    "portraitCurrent": 26,
+    "pastAlpha": 0.35,
+    "pastCount": 4,
+    "linkWidth": 4,
+    "linkHeight": 2
+  },
+  "spotlight": {
+    "comment": "CT Part 2b: during any turn every unit but the active one is dimmed and desaturated. HP bars, intent icons, telegraphs, statuses and cover icons are never dimmed. Set enabled to false to turn it off.",
+    "enabled": true,
+    "brightness": 0.55,
+    "saturation": 0.5,
+    "actedBrightness": 0.42,
+    "fade": 0.2,
+    "ringPulse": 5.0,
+    "bob": 1.0,
+    "bobSpeed": 4.0,
+    "bannerPortrait": 24
+  },
+  "partyColors": [
+    "#f2c94c",
+    "#6fcf97",
+    "#56ccf2",
+    "#bb6bd9",
+    "#f2994a"
+  ],
+  "coverIcon": "icon_status_guard"
 }

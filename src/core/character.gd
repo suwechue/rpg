@@ -238,10 +238,12 @@ static func affinity_odds(db: Dictionary, ch: Dictionary) -> Dictionary:
 	return VO.normalize_sum(table)
 
 
-## Max deck size at this level.
+## Max deck size at this level; 0 means no maximum (PT Part 2).
 static func deck_max(db: Dictionary, ch: Dictionary) -> int:
 	var lv: Dictionary = db.get("leveling", {})
-	var n := int(lv.get("deckMaxBase", 20))
+	var n := int(lv.get("deckMaxBase", 0))
+	if n <= 0:
+		return 0
 	for g in lv.get("deckMaxGrowth", []):
 		if int(ch.get("level", 1)) >= int(g["level"]):
 			n += int(g["add"])

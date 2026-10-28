@@ -14,7 +14,8 @@ const UnitScript := preload("res://src/core/combat/unit.gd")
 const OPS := ["burn_tiles", "fire_wall", "empower", "detonate", "self_burn", "steam", "cleanse", "ice_tiles", "cancel_charge", "rime",
 	"delayed", "push", "pin", "gravity", "breach", "brace", "recoil", "dash", "blink", "swap", "haste_full", "reposition", "lunge", "decoy",
 	"tailwind", "tether", "leash", "regen", "root_area", "pact", "heal", "taunt", "reveal", "halo", "radiance", "parry", "throw", "overwatch",
-	"transmute_ground", "strip", "toxic_tiles", "shred", "once_heal_pct"]
+	"transmute_ground", "strip", "toxic_tiles", "shred", "once_heal_pct",
+	"hit_and_run", "shadow_step", "blind_adjacent", "free_move", "ward", "pull_ally", "sanctuary", "intercept", "encore"]
 const TARGETING := ["self", "enemy", "ally", "unit", "empty", "any", "dir"]
 
 ## Statuses that count as "bad" for Cleanse.
@@ -92,7 +93,8 @@ static func _op(st, u: UnitScript, card: Dictionary, fx: Dictionary, target: Vec
 					if t.statuses.has(s):
 						t.statuses.erase(s)
 						st._emit({ "t": "log", "text": Str.t(st.db, "card_effects.shakes_off") % [t.name, s] })
-						break
+						if not bool(fx.get("all", false)):
+							break
 				if fx.has("heal"):
 					st._heal(u, t, int(fx["heal"]))
 		# --- Cold ---
@@ -165,8 +167,7 @@ static func _op(st, u: UnitScript, card: Dictionary, fx: Dictionary, target: Vec
 			st._push(u, u, back, int(fx.get("self", 1)), false)
 		# --- Motion ---
 		"dash":
-			u.move_left += int(fx.get("tiles", 2))
-			u.statuses["dash"] = 1
+			st.grant_move(u, int(fx.get("tiles", 2)))
 		"blink":
 			if st.unit_at(target) == null and grid.walkable_terrain(target):
 				var from := u.cell
@@ -228,7 +229,7 @@ static func _op(st, u: UnitScript, card: Dictionary, fx: Dictionary, target: Vec
 				a.statuses["haste"] = 1
 				a.statuses["haste_amount"] = int(fx.get("tiles", 1))
 				if a == u:
-					a.move_left += int(fx.get("tiles", 1))
+					st.grant_move(u, int(fx.get("tiles", 1)))
 				st._emit({ "t": "status", "unit": a.id, "status": "haste" })
 		# --- Binding ---
 		"tether":
@@ -284,6 +285,60 @@ static func _op(st, u: UnitScript, card: Dictionary, fx: Dictionary, target: Vec
 					o.statuses.erase("burrowed")
 					st._emit({ "t": "log", "text": Str.t(st.db, "card_effects.is_dragged_into_the_light") % o.name })
 			st._emit({ "t": "log", "text": Str.t(st.db, "card_effects.every_enemy_plan_is_laid") })
+		# --- Class roles (CT Part 5) ---
+		"hit_and_run":
+			var t: UnitScript = st.unit_at(target)
+			if t != null and t.alive():
+				st._basic(u, { "action": "strike", "stat": str(fx.get("stat", "dex")), "mult": float(fx.get("mult", 1.0)), "name": str(card.get("name", "")) }, t.cell)
+			st.grant_free_move(u, int(fx.get("tiles", 2)))
+		"free_move":
+			st.grant_free_move(u, int(fx.get("tiles", 1)))
+		"shadow_step":
+			var t: UnitScript = st.unit_at(target)
+			if t != null and t.alive():
+				var spots: Array = [t.cell - Vector2i(t.facing, 0)]
+				for dd in GridScript.DIRS:
+					spots.append(t.cell + dd)
+				for c in spots:
+					var cell: Vector2i = c
+					if grid.in_bounds(cell) and grid.walkable_terrain(cell) and st.unit_at(cell) == null:
+						var from := u.cell
+						u.cell = cell
+						st._emit({ "t": "blink", "unit": u.id, "from": from, "to": cell })
+						break
+				if GridScript.manhattan(u.cell, t.cell) == 1:
+					st._face_toward(u, t.cell)
+					st._basic(u, { "action": "strike", "stat": str(fx.get("stat", "dex")), "mult": float(fx.get("mult", 1.2)), "name": str(card.get("name", "")) }, t.cell)
+		"blind_adjacent":
+			for t in st.opponents_of(u):
+				if t.alive() and GridScript.manhattan(t.cell, u.cell) == 1:
+					t.statuses["blind"] = int(fx.get("turns", 1))
+					st._emit({ "t": "status", "unit": t.id, "status": "blind" })
+		"ward":
+			var t: UnitScript = st.unit_at(target)
+			if t != null and t.alive() and t.team == u.team:
+				var amount := int(fx.get("amount", 8))
+				if st.threat_at(t.cell, t.team) > 0 or st.tracking_threat(t, t.cell) > 0:
+					amount *= 2
+				t.shield += amount
+				t.shield_turns = maxi(t.shield_turns, 1)
+				st._emit({ "t": "shield", "unit": t.id, "amount": amount })
+		"pull_ally":
+			var t: UnitScript = st.unit_at(target)
+			if t != null and t != u and t.team == u.team:
+				st._push(u, t, Forms.direction_to(t.cell, u.cell), mini(int(fx.get("steps", 3)), GridScript.manhattan(t.cell, u.cell) - 1), false)
+		"sanctuary":
+			for a in st.allies_of(u, true):
+				if GridScript.manhattan(a.cell, u.cell) <= int(fx.get("radius", 1)):
+					a.statuses["sanctuary"] = int(fx.get("turns", 1)) + 1
+					st._emit({ "t": "status", "unit": a.id, "status": "sanctuary" })
+		"intercept":
+			u.statuses["intercept"] = int(fx.get("turns", 1)) + 1
+			st._emit({ "t": "status", "unit": u.id, "status": "intercept" })
+		"encore":
+			var t: UnitScript = st.unit_at(target)
+			if t != null and t.alive() and t != u and st.acted_this_round(t):
+				st.give_encore(t)
 		"halo":
 			for a in st.allies_of(u):
 				if GridScript.manhattan(a.cell, u.cell) <= 1:

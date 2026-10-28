@@ -21,6 +21,7 @@ var push_marks: Array = []           # [{ "from", "to", "collide", "hazard", "sl
 var preview_labels: Dictionary = {}  # cell -> text drawn above the unit there
 var support_cells: Array = []        # enemy heals and summons (green)
 var threat_view := false             # held: every tile shaded by incoming damage
+var cover_cells: Array = []          # reachable tiles next to cover (outlined while moving)
 var move_marks: Array = []           # enemy plans: [{ "from", "to" }] where they'll walk first
 var hover_cell := Vector2i(-1, -1)
 var cursor_cell := Vector2i(-1, -1)
@@ -51,6 +52,8 @@ func _draw() -> void:
 		_draw_threat_view()
 		return
 	_draw_overlay(reach_cells, Color(0.45, 0.75, 1.0, 0.28))
+	for c in cover_cells:
+		draw_polyline(_closed(proj.cell_polygon(c)), Color(0.5, 0.8, 1.0, 0.9), 1.0)
 	_draw_threats()
 	_draw_overlay(support_cells, Color(UiTheme.GOOD, 0.3))
 	for m in move_marks:

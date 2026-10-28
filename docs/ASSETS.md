@@ -18,7 +18,7 @@ Sizes: tiles 32x32, characters 32x32 (up to 32x48 for tall ones), portraits 64x6
 
 Pack art is a placeholder: the 16x16 packs are scaled up 2x (nearest neighbour) to fit the 32x32 grid until you replace them.
 
-Replaced so far: Characters (walk sheets) 0/39, Portraits 0/35, Enemies and bosses 0/52, Tilesets 0/4, Single tiles 0/120, UI 0/19, Icons 0/26, Card art 0/11, VFX 0/0, Music 0/30, Sound effects 0/36, Ambience 0/9, Voice blips 0/10.
+Replaced so far: Characters (walk sheets) 0/39, Portraits 0/35, Enemies and bosses 0/52, Tilesets 0/4, Single tiles 0/120, UI 0/19, Icons 0/26, Card art 0/11, VFX 0/0, Music 0/30, Sound effects 0/38, Ambience 0/9, Voice blips 0/10.
 
 ## Characters (walk sheets) (39)
 
@@ -423,7 +423,7 @@ Background music by situation (data/audio.json). Tracks loop; jingles play once.
 | [ ] | `music_cutscene_funny` | - | - | - | pack: ninja_adventure | Looping track (.ogg). |
 | [ ] | `music_arena` | - | - | - | pack: ninja_adventure | Looping track (.ogg). |
 
-## Sound effects (36)
+## Sound effects (38)
 
 Short sound effects.
 
@@ -437,6 +437,8 @@ Short sound effects.
 | [ ] | `sfx_lose` | - | - | - | pack: ninja_adventure | Short one-shot (.wav or .ogg). |
 | [ ] | `sfx_levelup` | - | - | - | pack: ninja_adventure | Short one-shot (.wav or .ogg). |
 | [ ] | `sfx_click` | - | - | - | pack: ninja_adventure | Short one-shot (.wav or .ogg). |
+| [ ] | `sfx_turn_party` | - | - | - | pack: ninja_adventure | Soft cue when a party member's turn starts (CT Part 2b). |
+| [ ] | `sfx_turn_enemy` | - | - | - | pack: ninja_adventure | Cue when an enemy's turn starts (CT Part 2b). |
 | [ ] | `sfx_cancel` | - | - | - | pack: ninja_adventure | Short one-shot (.wav or .ogg). |
 | [ ] | `sfx_coin` | - | - | - | pack: ninja_adventure | Short one-shot (.wav or .ogg). |
 | [ ] | `sfx_door` | - | - | - | pack: ninja_adventure | Short one-shot (.wav or .ogg). |

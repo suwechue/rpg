@@ -9,6 +9,8 @@ const CardRules := preload("res://src/core/card.gd")
 var card: Dictionary = {}
 var cost := 0
 var selected := false
+var owner_color := Color(0, 0, 0, 0)   # CT Part 2b: thin border in the owner's color
+var held := false                     # PT Part 2: kept over from last turn (a small pin)
 var _axes: Array = []
 var _frame: Texture2D
 var _art: Texture2D
@@ -69,6 +71,13 @@ func _draw() -> void:
 	var name_w := _frame.get_width() - cost_pos.x - fs - 2
 	draw_string(f, cost_pos + Vector2(fs, 0), str(card.get("name", "")), HORIZONTAL_ALIGNMENT_LEFT, name_w, fs, UiTheme.TEXT * dim)
 	draw_string(f, text_pos + Vector2(0, fs - 1), CardRules.summary(DataDB.all(), card), HORIZONTAL_ALIGNMENT_LEFT, box.size.x, fs, UiTheme.TEXT * dim)
+	if owner_color.a > 0.0:
+		draw_rect(Rect2(lift, _frame.get_size()), owner_color * dim, false, 1.0)
+	if bool(card.get("quick", false)):
+		# Quick cards: a bright edge and a QUICK badge (PT Part 3 asks for more; this marks them now).
+		draw_rect(Rect2(lift + Vector2(1, 1), _frame.get_size() - Vector2(2, 2)), Color(UiTheme.GOOD, 0.8) * dim, false, 1.0)
+	if held:
+		draw_circle(lift + Vector2(_frame.get_width() - 4, 4), 2.5, UiTheme.ACCENT)
 	if selected:
 		draw_texture(Assets.texture(str(UiTheme.skin("cards").get("select", ""))), lift)
 

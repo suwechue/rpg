@@ -124,13 +124,13 @@ static func deck_error(db: Dictionary, run: Dictionary, ch: Dictionary, deck: Ar
 	var lv: Dictionary = db.get("leveling", {})
 	if deck.size() < int(lv.get("deckMin", 10)):
 		return Str.t(db, "crafting.a_deck_needs_at_least") % int(lv.get("deckMin", 10))
-	if deck.size() > Char.deck_max(db, ch):
+	if Char.deck_max(db, ch) > 0 and deck.size() > Char.deck_max(db, ch):
 		return Str.t(db, "crafting.this_deck_can_hold_at") % Char.deck_max(db, ch)
 	var counts := {}
 	for id in deck:
 		counts[id] = int(counts.get(id, 0)) + 1
 	for id in counts:
-		if int(counts[id]) > int(lv.get("maxCopies", 3)):
+		if int(lv.get("maxCopies", 3)) > 0 and int(counts[id]) > int(lv.get("maxCopies", 3)):
 			return Str.t(db, "crafting.no_more_than_copies_of") % int(lv.get("maxCopies", 3))
 		if int(counts[id]) > owned(run, ch, str(id)):
 			return Str.t(db, "crafting.you_only_own_of") % [owned(run, ch, str(id)), id]
@@ -158,6 +158,52 @@ static func owned(run: Dictionary, ch: Dictionary, card_id: String) -> int:
 				own += 1
 		n = maxi(n, own)
 	return n
+
+
+## Whether one more copy of this card fits the copy limit (0 = no limit).
+static func copies_ok(db: Dictionary, deck: Array, card_id: String) -> bool:
+	var cap := int(db.get("leveling", {}).get("maxCopies", 3))
+	return cap <= 0 or deck.count(card_id) < cap
+
+
+## Crafted (and bought) cards go straight into the deck when the rules allow (PT Part 2).
+static func add_to_deck(db: Dictionary, ch: Dictionary, card_id: String) -> bool:
+	var deck: Array = ch.get("deck", [])
+	if Char.deck_max(db, ch) > 0 and deck.size() >= Char.deck_max(db, ch):
+		return false
+	if not copies_ok(db, deck, card_id):
+		return false
+	deck.append(card_id)
+	ch["deck"] = deck
+	return true
+
+
+## How many cards the new deck drops compared with the old one (removals cost AP).
+static func removals(old_deck: Array, new_deck: Array) -> int:
+	var left := new_deck.duplicate()
+	var n := 0
+	for id in old_deck:
+		if left.has(id):
+			left.erase(id)
+		else:
+			n += 1
+	return n
+
+
+## Deck numbers for the editor: cost curve, Vector mix and quick count.
+static func deck_stats(db: Dictionary, run: Dictionary, deck: Array) -> Dictionary:
+	var curve := {}
+	var mix := {}
+	var quick := 0
+	for id in deck:
+		var card := CardRules.resolve(db, str(id), run.get("cards", {}))
+		var c := CardRules.cost(db, card)
+		curve[c] = int(curve.get(c, 0)) + 1
+		for axis in card.get("vectors", {}):
+			mix[str(axis)] = int(mix.get(str(axis), 0)) + 1
+		if bool(card.get("quick", false)):
+			quick += 1
+	return { "curve": curve, "mix": mix, "quick": quick, "size": deck.size() }
 
 
 static func set_deck(db: Dictionary, run: Dictionary, ch: Dictionary, deck: Array) -> String:

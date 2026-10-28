@@ -1,0 +1,410 @@
+{
+  "comment": "CT Part 7 (taught with PT Part 1 and 2 rules): the authored combat tutorial floor for Monday evening, week 1, with Kelly as a guest. Each room teaches one thing. Lesson steps: say (a tut_ string key), speaker (narrator or kelly), wait (next, moved, dodged, struck, guarded, hovered_card, played_card, held, improvised), highlight (timeline, pips, strike, guard, telegraph, hand, mp, hold, cover, wheel, threat), hint (shown after hintSeconds stuck), ifFlag. ui hides elements (greyed, not removed) until the room that teaches them. fair: no crits; hpFloor: the party can't drop below 1 HP here.",
+  "hintSeconds": 20,
+  "skipFlag": "tutorial_cleared",
+  "rooms": [
+    {
+      "id": 1,
+      "name": "tut_r1_name",
+      "teaches": "The grid, initiative, 2 Actions, Strike as a Quick",
+      "layout": "tut_r1",
+      "enemies": [
+        "tut_slip"
+      ],
+      "ui": {
+        "hand": false,
+        "wheel": false,
+        "threat": false
+      },
+      "fair": true,
+      "hpFloor": true,
+      "playerDeck": [],
+      "lesson": [
+        {
+          "say": "tut_r1_a",
+          "speaker": "narrator",
+          "wait": "next",
+          "highlight": "timeline"
+        },
+        {
+          "say": "tut_r1_b",
+          "speaker": "narrator",
+          "wait": "moved",
+          "highlight": "pips",
+          "hint": "tut_r1_hint"
+        },
+        {
+          "say": "tut_r1_c",
+          "speaker": "narrator",
+          "wait": "struck",
+          "highlight": "strike",
+          "hint": "tut_r1_hint2"
+        },
+        {
+          "say": "tut_r1_kelly",
+          "speaker": "kelly",
+          "wait": "next"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "tut_r2_name",
+      "teaches": "Telegraphs: read the red tiles, step out",
+      "layout": "tut_r2",
+      "enemies": [
+        "tut_red_tiles"
+      ],
+      "ui": {
+        "hand": false,
+        "wheel": false,
+        "threat": false
+      },
+      "fair": true,
+      "hpFloor": true,
+      "playerDeck": [],
+      "lesson": [
+        {
+          "say": "tut_r2_a",
+          "speaker": "narrator",
+          "wait": "next",
+          "highlight": "telegraph"
+        },
+        {
+          "say": "tut_r2_b",
+          "speaker": "narrator",
+          "wait": "dodged",
+          "hint": "tut_r2_hint"
+        },
+        {
+          "say": "tut_r2_c",
+          "speaker": "narrator",
+          "wait": "struck"
+        }
+      ],
+      "stayedInRed": "tut_r2_mock"
+    },
+    {
+      "id": 3,
+      "name": "tut_r3_name",
+      "teaches": "Guard (a Quick), and tracking attacks",
+      "layout": "tut_r3",
+      "enemies": [
+        "tut_tracker"
+      ],
+      "ui": {
+        "hand": false,
+        "wheel": false,
+        "threat": false
+      },
+      "fair": true,
+      "hpFloor": true,
+      "playerDeck": [],
+      "lesson": [
+        {
+          "say": "tut_r3_kelly",
+          "speaker": "kelly",
+          "wait": "next"
+        },
+        {
+          "say": "tut_r3_a",
+          "speaker": "narrator",
+          "wait": "next",
+          "highlight": "telegraph"
+        },
+        {
+          "say": "tut_r3_b",
+          "speaker": "narrator",
+          "wait": "guarded",
+          "highlight": "guard",
+          "hint": "tut_r3_hint"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "tut_r4_name",
+      "teaches": "The hand of 3, MP, hover previews, range, area, Hold",
+      "layout": "tut_r4",
+      "enemies": [
+        "tut_gap_slip",
+        "tut_gap_slip"
+      ],
+      "ui": {
+        "hand": true,
+        "wheel": false,
+        "threat": false
+      },
+      "fair": true,
+      "hpFloor": true,
+      "playerDeck": [
+        "spell:bolt:standard",
+        "spell:burst:minor",
+        "card_dash",
+        "spell:bolt:standard",
+        "spell:burst:minor",
+        "card_dash",
+        "spell:bolt:standard",
+        "card_dash"
+      ],
+      "lesson": [
+        {
+          "say": "tut_r4_a",
+          "speaker": "narrator",
+          "wait": "next",
+          "highlight": "hand"
+        },
+        {
+          "say": "tut_r4_b",
+          "speaker": "narrator",
+          "wait": "hovered_card",
+          "hint": "tut_r4_hint"
+        },
+        {
+          "say": "tut_r4_c",
+          "speaker": "narrator",
+          "wait": "next",
+          "highlight": "mp"
+        },
+        {
+          "say": "tut_r4_d",
+          "speaker": "narrator",
+          "wait": "played_card"
+        },
+        {
+          "say": "tut_r4_e",
+          "speaker": "narrator",
+          "wait": "next",
+          "highlight": "hold"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "tut_r5_name",
+      "teaches": "Typing: weak and strong matchups",
+      "layout": "tut_r5",
+      "enemies": [
+        "tut_weak",
+        "tut_strong"
+      ],
+      "ui": {
+        "hand": true,
+        "wheel": false,
+        "threat": false
+      },
+      "fair": true,
+      "hpFloor": true,
+      "lesson": [
+        {
+          "say": "tut_r5_a",
+          "speaker": "narrator",
+          "wait": "next"
+        },
+        {
+          "say": "tut_r5_kelly",
+          "speaker": "kelly",
+          "wait": "next"
+        },
+        {
+          "say": "tut_r5_b",
+          "speaker": "narrator",
+          "wait": "played_card"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "tut_r6_name",
+      "teaches": "Line of sight, walls, directional cover, flanking",
+      "layout": "tut_r6",
+      "enemies": [
+        "tut_sniper"
+      ],
+      "ui": {
+        "hand": true,
+        "wheel": false,
+        "threat": false
+      },
+      "fair": true,
+      "hpFloor": true,
+      "lesson": [
+        {
+          "say": "tut_r6_a",
+          "speaker": "narrator",
+          "wait": "next",
+          "highlight": "cover"
+        },
+        {
+          "say": "tut_r6_b",
+          "speaker": "narrator",
+          "wait": "next"
+        },
+        {
+          "say": "tut_r6_c",
+          "speaker": "narrator",
+          "wait": "moved",
+          "hint": "tut_r6_hint"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "tut_r7_name",
+      "teaches": "Hazards, push, collisions, enemies hitting each other",
+      "layout": "tut_r7",
+      "enemies": [
+        "tut_hot",
+        "tut_hot"
+      ],
+      "skipIfFlag": "w1_shortcut",
+      "ui": {
+        "hand": true,
+        "wheel": false,
+        "threat": false
+      },
+      "fair": true,
+      "hpFloor": true,
+      "addCards": [
+        "card_shove_basic",
+        "card_shove"
+      ],
+      "lesson": [
+        {
+          "say": "tut_r7_kelly",
+          "speaker": "kelly",
+          "wait": "next"
+        },
+        {
+          "say": "tut_r7_a",
+          "speaker": "narrator",
+          "wait": "next"
+        },
+        {
+          "say": "tut_r7_b",
+          "speaker": "narrator",
+          "wait": "played_card"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "tut_r8_name",
+      "teaches": "Quick cards, Dash before moving, protecting an ally, interrupts",
+      "layout": "tut_r8",
+      "enemies": [
+        "tut_charger"
+      ],
+      "ui": {
+        "hand": true,
+        "wheel": false,
+        "threat": false
+      },
+      "fair": true,
+      "hpFloor": true,
+      "addCards": [
+        "card_dash",
+        "card_dash"
+      ],
+      "helpCall": true,
+      "lesson": [
+        {
+          "say": "tut_r8_a",
+          "speaker": "narrator",
+          "wait": "next",
+          "highlight": "telegraph"
+        },
+        {
+          "say": "tut_r8_b",
+          "speaker": "narrator",
+          "wait": "next",
+          "highlight": "hand"
+        },
+        {
+          "say": "tut_r8_kelly",
+          "speaker": "kelly",
+          "wait": "next"
+        },
+        {
+          "say": "tut_r8_c",
+          "speaker": "narrator",
+          "wait": "played_card"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "tut_r9_name",
+      "teaches": "Improvising (the Vector Wheel), Instability, fuel",
+      "layout": "tut_r9",
+      "enemies": [
+        "tut_resistant"
+      ],
+      "ui": {
+        "hand": true,
+        "wheel": true,
+        "threat": false
+      },
+      "fair": false,
+      "hpFloor": true,
+      "guaranteeImprovise": true,
+      "lesson": [
+        {
+          "say": "tut_r9_a",
+          "speaker": "narrator",
+          "wait": "next",
+          "highlight": "wheel"
+        },
+        {
+          "say": "tut_r9_b",
+          "speaker": "narrator",
+          "wait": "improvised",
+          "hint": "tut_r9_hint"
+        },
+        {
+          "say": "tut_r9_c",
+          "speaker": "narrator",
+          "wait": "next"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "name": "tut_r10_name",
+      "teaches": "Enemy types together, priority, the threat view",
+      "layout": "tut_r10",
+      "enemies": [
+        "hall_rusher",
+        "nurse_moth",
+        "dust_gremlin",
+        "dust_gremlin"
+      ],
+      "ui": {
+        "hand": true,
+        "wheel": true,
+        "threat": true
+      },
+      "fair": false,
+      "hpFloor": true,
+      "lesson": [
+        {
+          "say": "tut_r10_a",
+          "speaker": "narrator",
+          "wait": "next",
+          "highlight": "threat"
+        },
+        {
+          "say": "tut_r10_b",
+          "speaker": "narrator",
+          "wait": "next"
+        },
+        {
+          "say": "tut_r10_shortcut",
+          "speaker": "narrator",
+          "wait": "next",
+          "ifFlag": "w1_shortcut"
+        }
+      ]
+    }
+  ]
+}

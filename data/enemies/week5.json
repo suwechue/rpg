@@ -41,24 +41,22 @@
           "vectors": {
             "light": 1
           },
-          "power": 8,
           "profile": {
             "curiosity": 0.8
-          }
+          },
+          "damage": 20
         },
         {
           "id": "shove",
           "name": "Shove",
           "kind": "strike",
-          "stat": "str",
-          "mult": 1.0,
-          "power": 3,
           "vectors": {
             "force": 1
           },
           "profile": {
             "courage": 0.7
-          }
+          },
+          "damage": 21
         }
       ],
       "xp": 13,
@@ -66,7 +64,8 @@
       "sprite": "enemy_mirror_kid"
     },
     {
-      "id": "glass_hound", "intent": "tracking",
+      "id": "glass_hound",
+      "intent": "tracking",
       "name": "Glass Hound",
       "tier": "normal",
       "weeks": [
@@ -104,15 +103,13 @@
           "id": "shatter_bite",
           "name": "Shatter Bite",
           "kind": "strike",
-          "stat": "str",
-          "mult": 1.0,
-          "power": 4,
           "vectors": {
             "cold": 1
           },
           "profile": {
             "courage": 0.9
-          }
+          },
+          "damage": 21
         }
       ],
       "xp": 13,
@@ -160,10 +157,10 @@
           "vectors": {
             "binding": 1
           },
-          "power": 8,
           "profile": {
             "pride": 0.7
-          }
+          },
+          "damage": 13
         },
         {
           "id": "pull",
@@ -172,10 +169,10 @@
           "vectors": {
             "motion": 1
           },
-          "power": 7,
           "profile": {
             "courage": 0.5
-          }
+          },
+          "damage": 16
         }
       ],
       "xp": 12,
@@ -225,11 +222,11 @@
           "vectors": {
             "binding": 1
           },
-          "power": 11,
           "target": "strongest",
           "profile": {
             "pride": 1.0
-          }
+          },
+          "damage": 19
         },
         {
           "id": "rot",
@@ -238,24 +235,22 @@
           "vectors": {
             "corrosion": 1
           },
-          "power": 10,
           "profile": {
             "greed": 0.8
-          }
+          },
+          "damage": 12
         },
         {
           "id": "detain",
           "name": "Detain",
           "kind": "strike",
-          "stat": "str",
-          "mult": 1.0,
-          "power": 5,
           "vectors": {
             "binding": 1
           },
           "profile": {
             "courage": 0.8
-          }
+          },
+          "damage": 19
         }
       ],
       "xp": 46,

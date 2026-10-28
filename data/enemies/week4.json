@@ -40,10 +40,10 @@
           "vectors": {
             "vitality": 1
           },
-          "power": 6,
           "profile": {
             "greed": 0.8
-          }
+          },
+          "damage": 14
         }
       ],
       "xp": 11,
@@ -87,15 +87,13 @@
           "id": "run_over",
           "name": "Run Over",
           "kind": "strike",
-          "stat": "str",
-          "mult": 1.0,
-          "power": 4,
           "vectors": {
             "force": 1
           },
           "profile": {
             "courage": 0.9
-          }
+          },
+          "damage": 21
         }
       ],
       "xp": 12,
@@ -143,10 +141,10 @@
           "vectors": {
             "binding": 1
           },
-          "power": 7,
           "profile": {
             "loyalty": 0.7
-          }
+          },
+          "damage": 16
         },
         {
           "id": "bedrest",
@@ -207,10 +205,10 @@
           "vectors": {
             "binding": 1
           },
-          "power": 9,
           "profile": {
             "pride": 0.8
-          }
+          },
+          "damage": 13
         },
         {
           "id": "triage_drain",
@@ -219,10 +217,10 @@
           "vectors": {
             "vitality": 1
           },
-          "power": 9,
           "profile": {
             "greed": 0.8
-          }
+          },
+          "damage": 11
         },
         {
           "id": "discharge",
@@ -231,11 +229,11 @@
           "vectors": {
             "force": 1
           },
-          "power": 10,
           "target": "strongest",
           "profile": {
             "pride": 1.0
-          }
+          },
+          "damage": 17
         }
       ],
       "xp": 40,

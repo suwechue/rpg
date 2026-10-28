@@ -473,7 +473,7 @@ Every weekday evening you enter the Upside-Down, a twisted mirror of the town; M
 - Generation: a seeded random walk lays rooms on a grid (seed = run seed + week + day); each room is a hand-built chunk from the week's theme set (twisted classrooms, a frozen deli, a burning forge).
 - Room types: combat, elite, treasure, rest, event (narrator scenes, choices), merchant, exit.
 - You explore in top-down view; touching an enemy group or entering a combat room starts a grid fight on that room's layout.
-- The night ends when you reach the exit room. You can leave as soon as you find it, trading loot and XP for safety.
+- The night ends at the exit room, which stays **sealed until every combat, elite and boss room on the floor is won** (CT Part 6; a counter on the HUD shows how many are left). Treasure, rest, event and merchant rooms are optional. Fleeing leaves a room uncleared.
 
 ### Friday: the boss floor
 
@@ -871,3 +871,8 @@ These answers override anything marked "proposed" or "open" earlier in this doc.
 | Display and art size (Phase 2, Oct 24, 2026) | 32x32 tiles at a 640x360 base, 32x32 characters (up to 32x48), 64x64 portraits; overrides the 16x16 / 480x270 setup in Sections 1 and 16 and the Art row above. Sizes live in `data/display.json`; art is referenced by asset id (`data/assets/manifest.json`, `docs/ASSETS.md`). See docs/ROADMAP.md. |
 | Leveling pace (alpha build) | 45 x level XP per level, tuned so a run ends around level 12 to 14. |
 | Recruit pacing (alpha build) | Core Four from week 1 (week 2 brings them to your table); Sam, Baxter, Jon week 2; Kris, Diane, Penny, Jake (after the forge), Phase (after 3 deli shifts) week 3; Mel week 4; Kelly at Bond 60 after a kind first night. |
+| Turn economy (CT with PT Part 1, Oct 28, 2026) | Every party turn is **2 Actions** (a Move or a non-quick card) **plus 1 Quick** (built-in Strike, built-in Guard, or a quick card). Replaces move-or-act (AR) and the CU "Move + 1 Action" turn. Everyone with a Vector has a 0 MP Cantrip. Undo works back to the last roll, draw or reveal. Enemies also get 2 Actions; a per-tier chance lets an enemy already in reach attack twice (replacing CT's move-and-act chance). |
+| Hand (CT with PT Part 2) | Hand of 3, drawn back up to 3 each turn; unplayed cards are discarded at End Turn except one card held for 1 Action. No deck maximum (minimum 8). Removing a card costs 1 AP. Replaces CT Part 4's "discard 1, draw 1 for 1 MP". |
+| Telegraphs (CT Part 2) | Just in time: revealed on the last party turn before the enemy acts, carried out at once. Attacks lock their tiles by default; tracking attacks are rare and marked in data. |
+| Cover (CT Part 3) | Directional half cover from crates and low walls (destructible props); flanking at 45 degrees or more ignores it; walls block sight. |
+| Monday evening, week 1 (CT Part 7) | The 10-room combat tutorial floor in data/story/tutorial_floor.json replaces the one-fight evening; the Kelly Risk beats are unchanged. |

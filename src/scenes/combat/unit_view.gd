@@ -19,6 +19,11 @@ var charge := 0            # turns left charging a big attack
 var friend_link := false   # next to a Friend-tier ally (+5% damage)
 var affixes: Array = []    # elite affix ids (icons from data/ui.json "affixes")
 var burrowed := false
+var active := false        # CT Part 2b: the unit whose turn it is (ring, bob, full color)
+var acted := false         # already took its turn this round (check mark, a bit darker)
+var spotlight := false
+var covered := false       # in cover against the relevant attacker (CT Part 3)     # someone else's turn: dim and desaturate the sprite only
+var _dim := 0.0            # 0 = full color, 1 = fully dimmed (tweened)
 var _frame := Vector2i.ONE
 var _walker := false
 var _bob := 0.0
@@ -44,6 +49,34 @@ func setup(id: String, p_team: String, sprite_id: String, prop_kind: String = ""
 		sprite = w
 		_walker = true
 	add_child(sprite)
+	var mat := ShaderMaterial.new()
+	mat.shader = _spot_shader()
+	sprite.material = mat
+
+
+static var _shader: Shader
+
+
+## Brightness and saturation for the spotlight, on the sprite only, so HP bars,
+## icons and telegraphs drawn by this node stay bright.
+static func _spot_shader() -> Shader:
+	if _shader == null:
+		_shader = Shader.new()
+		_shader.code = """shader_type canvas_item;
+uniform float brightness = 1.0;
+uniform float saturation = 1.0;
+void fragment() {
+	vec4 c = texture(TEXTURE, UV) * COLOR;
+	float g = dot(c.rgb, vec3(0.299, 0.587, 0.114));
+	c.rgb = mix(vec3(g), c.rgb, saturation) * brightness;
+	COLOR = c;
+}
+"""
+	return _shader
+
+
+func _spot() -> Dictionary:
+	return DataDB.table("ui").get("spotlight", {})
 
 
 func face(dir: int) -> void:
@@ -64,9 +97,19 @@ func stop_walk() -> void:
 
 
 func _process(delta: float) -> void:
+	var sp := _spot()
+	var want := 1.0 if spotlight and bool(sp.get("enabled", true)) else 0.0
+	var fade := maxf(0.01, float(sp.get("fade", 0.2)))
+	_dim = move_toward(_dim, want, delta / fade)
+	if sprite != null and sprite.material is ShaderMaterial:
+		var lo := float(sp.get("actedBrightness", 0.42)) if acted else float(sp.get("brightness", 0.55))
+		(sprite.material as ShaderMaterial).set_shader_parameter("brightness", lerpf(1.0, lo, _dim))
+		(sprite.material as ShaderMaterial).set_shader_parameter("saturation", lerpf(1.0, float(sp.get("saturation", 0.5)), _dim))
 	if downed or is_prop:
 		return
 	_bob += delta
+	if sprite != null:
+		sprite.position.y = -absf(sin(_bob * float(sp.get("bobSpeed", 4.0)))) * float(sp.get("bob", 1.0)) if active else 0.0
 	queue_redraw()
 
 
@@ -84,7 +127,16 @@ func _draw() -> void:
 		var a := TAU * float(i) / float(segments)
 		pts.append(Vector2(cos(a) * w, sin(a) * 3.5))
 	draw_colored_polygon(pts, Color(0, 0, 0, 0.35))
-	if is_prop:
+	if is_prop and unit_id.begins_with("low_wall"):
+		# A low stone wall: wide and short, so it reads as cover, not a crate.
+		var lh := sprite_height() * 0.6
+		var lw := Display.tile * 0.45
+		draw_rect(Rect2(-lw, -lh, lw * 2.0, lh), Color("8a8f98"))
+		draw_rect(Rect2(-lw, -lh, lw * 2.0, 3), Color("b3b8c0"))
+		draw_line(Vector2(-lw * 0.3, -lh + 3), Vector2(-lw * 0.3, 0), Color("5c6068"), 1.0)
+		draw_line(Vector2(lw * 0.4, -lh + 3), Vector2(lw * 0.4, 0), Color("5c6068"), 1.0)
+		draw_rect(Rect2(-lw, -lh, lw * 2.0, lh), Color("4a4d54"), false, 1.0)
+	elif is_prop:
 		var h := sprite_height()
 		var hw := Display.tile * 0.35
 		draw_rect(Rect2(-hw, -h, hw * 2.0, h), Color("7a5a3a"))
@@ -92,7 +144,8 @@ func _draw() -> void:
 		draw_rect(Rect2(-hw, -h, hw * 2.0, h), Color("3d2b1a"), false, 1.0)
 		draw_line(Vector2(-hw, -h), Vector2(hw, 0), Color("3d2b1a"), 1.0)
 	if highlight:
-		draw_arc(Vector2.ZERO, w + 2.0, 0, TAU, 20, Color("ffd966"), 1.0)
+		var pulse := 0.5 + 0.5 * sin(_bob * float(_spot().get("ringPulse", 5.0)))
+		draw_arc(Vector2.ZERO, w + 2.0 + pulse, 0, TAU, 20, Color(UiTheme.ACCENT, 0.6 + 0.4 * pulse), 1.0)
 	var top := -sprite_height() - 5.0
 	var bar_w := 20.0
 	draw_rect(Rect2(-bar_w / 2.0, top, bar_w, 3), Color(0, 0, 0, 0.7))
@@ -111,6 +164,15 @@ func _draw() -> void:
 		var tex := Assets.texture(str(info.get("icon", "")))
 		draw_texture_rect(tex, Rect2(x, 3, icon_w, icon_w), false, Color(str(info.get("color", "#ffffff"))))
 		x += icon_w
+	if covered and not downed:
+		var sh := Assets.texture(str(DataDB.table("ui").get("coverIcon", "icon_status_guard")))
+		draw_texture_rect(sh, Rect2(-Display.tile * 0.55, top - Display.tile * 0.15, Display.tile / 2.0, Display.tile / 2.0), false, UiTheme.color("cover", Color("7cc7e8")))
+	if acted and not downed and not is_prop:
+		# A small check mark: this unit already acted this round.
+		var cx := Display.tile * 0.3
+		var cy := top - 1.0
+		draw_line(Vector2(cx, cy), Vector2(cx + 2, cy + 2), UiTheme.GOOD, 1.0)
+		draw_line(Vector2(cx + 2, cy + 2), Vector2(cx + 6, cy - 3), UiTheme.GOOD, 1.0)
 	if friend_link:
 		var link := Assets.texture("icon_vector_binding")
 		draw_texture_rect(link, Rect2(Display.tile * 0.35, -Display.tile * 0.3, Display.tile / 2.0, Display.tile / 2.0), false, UiTheme.GOOD)

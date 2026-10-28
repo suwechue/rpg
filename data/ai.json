@@ -12,6 +12,7 @@
   "guardBase": 0.05,
   "dodgeWeight": 1.2,
   "rangedSpacing": 0.6,
+  "coverSeek": 1.5,
   "avoidOwnTelegraphs": 3.0,
   "staggerPenalty": 1.5,
   "approachFactor": 0.6,

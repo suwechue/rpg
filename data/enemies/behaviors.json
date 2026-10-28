@@ -1,17 +1,665 @@
 {
   "comment": "AR Part 4: one enemy per behavior (charger, bomber, healer, summoner, shield bearer, burrower, sniper, splitter, hazard maker, mirror, leech, anchor).",
   "enemies": [
-    {"id": "hall_rusher", "name": "Hall Rusher", "tier": "normal", "weeks": [1, 2], "text": "Charger. Telegraphs a straight-line charge, then runs the whole line.", "hp": 24, "movement": 3, "initiative": 5, "physDefense": 0, "magicResist": 1, "stability": 5, "stats": {"str": 7, "dex": 4}, "weakTo": ["binding"], "strongAgainst": ["force"], "signature": {"force": 0.8, "motion": 0.2}, "disposition": {"courage": 70, "pride": 20}, "behavior": "charger", "actions": [{"id": "stampede", "name": "Stampede", "form": "line", "vectors": {"force": 1}, "power": 8, "pattern": "charge_line", "charge": 1, "run": true, "profile": {"courage": 0.8}}, {"id": "shove", "name": "Shoulder Check", "kind": "strike", "stat": "str", "mult": 1.0, "power": 2, "profile": {"courage": 0.8}}], "xp": 10, "money": 4, "sprite": "enemy_hall_rusher"},
-    {"id": "firecracker_imp", "name": "Firecracker Imp", "tier": "normal", "weeks": [2, 3], "text": "Bomber. Telegraphs a 3x3 blast around itself, then goes up with it.", "hp": 10, "movement": 4, "initiative": 7, "physDefense": 0, "magicResist": 1, "stability": 5, "stats": {"str": 3, "dex": 6}, "weakTo": ["cold"], "strongAgainst": ["heat"], "signature": {"heat": 0.9, "force": 0.1}, "disposition": {"courage": 90, "kindness": -30}, "behavior": "bomber", "actions": [{"id": "pop", "name": "Big Pop", "form": "burst", "vectors": {"heat": 1}, "power": 13, "pattern": "square_self", "charge": 1, "selfDestruct": true, "profile": {"courage": 0.9}}], "xp": 8, "money": 3, "sprite": "enemy_firecracker_imp"},
-    {"id": "nurse_moth", "name": "Nurse Moth", "tier": "normal", "weeks": [1, 4], "text": "Healer. Stays back and patches up its friends (green telegraph).", "hp": 16, "movement": 4, "initiative": 6, "physDefense": 0, "magicResist": 1, "stability": 5, "stats": {"str": 2, "dex": 6}, "weakTo": ["heat"], "strongAgainst": ["vitality"], "signature": {"vitality": 0.6, "light": 0.4}, "disposition": {"kindness": 70, "courage": -30, "loyalty": 50}, "behavior": "healer", "actions": [{"id": "patch_up", "name": "Patch Up", "form": "shield", "vectors": {"vitality": 1}, "power": 8, "profile": {"kindness": 0.9, "loyalty": 0.4}}, {"id": "dust", "name": "Moth Dust", "form": "bolt", "vectors": {"light": 1}, "power": 3, "profile": {"courage": 0.3}}], "xp": 9, "money": 3, "sprite": "enemy_nurse_moth"},
-    {"id": "locker_hive", "name": "Locker Hive", "tier": "normal", "weeks": [2, 3, 5], "text": "Summoner. Calls a Dust Gremlin every 2 turns.", "hp": 22, "movement": 2, "initiative": 3, "physDefense": 0, "magicResist": 1, "stability": 5, "stats": {"str": 4, "dex": 3}, "weakTo": ["heat"], "strongAgainst": ["corrosion"], "signature": {"corrosion": 0.6, "binding": 0.4}, "disposition": {"courage": -20, "loyalty": 60}, "behavior": "summoner", "summons": "dust_gremlin", "summonEvery": 2, "actions": [{"id": "spore", "name": "Spore Puff", "form": "bolt", "vectors": {"corrosion": 1}, "power": 4, "profile": {"courage": 0.3}}], "xp": 12, "money": 5, "sprite": "enemy_locker_hive"},
-    {"id": "riot_shield", "name": "Riot Shield", "tier": "normal", "weeks": [2, 3, 4], "text": "Shield bearer. Blocks hits from the front; flank it or push it around.", "hp": 30, "movement": 2, "initiative": 3, "physDefense": 2, "magicResist": 1, "stability": 5, "stats": {"str": 7, "dex": 3}, "weakTo": ["motion"], "strongAgainst": ["force"], "signature": {"force": 0.7, "binding": 0.3}, "disposition": {"courage": 50, "loyalty": 70}, "behavior": "shield_bearer", "frontGuard": 0.75, "actions": [{"id": "bash", "name": "Shield Bash", "kind": "strike", "stat": "str", "mult": 1.1, "power": 2, "vectors": {"force": 1}, "profile": {"courage": 0.8}}], "xp": 12, "money": 4, "sprite": "enemy_riot_shield"},
-    {"id": "pothole", "name": "Pothole", "tier": "normal", "weeks": [1, 3], "text": "Burrower. Digs in and resurfaces under a telegraphed tile.", "hp": 18, "movement": 3, "initiative": 6, "physDefense": 0, "magicResist": 1, "stability": 5, "stats": {"str": 6, "dex": 5}, "weakTo": ["light"], "strongAgainst": ["force"], "signature": {"force": 0.5, "corrosion": 0.5}, "disposition": {"courage": 30, "curiosity": 50}, "behavior": "burrower", "resurfacePower": 9, "actions": [{"id": "chomp", "name": "Chomp", "kind": "strike", "stat": "str", "mult": 1.0, "power": 2, "profile": {"courage": 0.8}}], "xp": 10, "money": 4, "sprite": "enemy_pothole"},
-    {"id": "bell_tower_eye", "name": "Bell Tower Eye", "tier": "normal", "weeks": [2, 3, 5], "text": "Sniper. A long shot, telegraphed two turns ahead.", "hp": 14, "movement": 1, "initiative": 5, "physDefense": 0, "magicResist": 1, "stability": 5, "stats": {"str": 2, "dex": 8}, "weakTo": ["motion"], "strongAgainst": ["light"], "signature": {"light": 0.8, "motion": 0.2}, "disposition": {"courage": -20, "pride": 60}, "behavior": "sniper", "actions": [{"id": "long_shot", "name": "Long Shot", "form": "projectile", "vectors": {"light": 1}, "power": 12, "charge": 1, "profile": {"pride": 0.8}}], "xp": 10, "money": 4, "sprite": "enemy_bell_tower_eye"},
-    {"id": "split_slime", "name": "Split Slime", "tier": "normal", "weeks": [2, 4], "text": "Splitter. Splits into two Slimelets when it dies.", "hp": 20, "movement": 3, "initiative": 4, "physDefense": 0, "magicResist": 1, "stability": 5, "stats": {"str": 5, "dex": 4}, "weakTo": ["heat"], "strongAgainst": ["corrosion"], "signature": {"corrosion": 0.6, "vitality": 0.4}, "disposition": {"courage": 40, "curiosity": 40}, "behavior": "splitter", "splitInto": "slimelet", "splitCount": 2, "actions": [{"id": "slap", "name": "Gloop", "kind": "strike", "stat": "str", "mult": 1.0, "power": 1, "vectors": {"corrosion": 1}, "profile": {"courage": 0.8}}], "xp": 10, "money": 3, "sprite": "enemy_split_slime"},
-    {"id": "ember_crawler", "name": "Ember Crawler", "tier": "normal", "weeks": [3], "text": "Hazard maker. Leaves burning ground wherever it walks.", "hp": 20, "movement": 4, "initiative": 5, "physDefense": 0, "magicResist": 1, "stability": 5, "stats": {"str": 5, "dex": 6}, "weakTo": ["cold"], "strongAgainst": ["heat"], "signature": {"heat": 0.9, "motion": 0.1}, "disposition": {"courage": 50, "greed": 20}, "behavior": "hazard_maker", "trail": "burning", "actions": [{"id": "scorch", "name": "Scorch", "kind": "strike", "stat": "str", "mult": 1.0, "power": 2, "vectors": {"heat": 1}, "profile": {"courage": 0.8}}], "xp": 11, "money": 4, "sprite": "enemy_ember_crawler"},
-    {"id": "mirror_mime", "name": "Mirror Mime", "tier": "normal", "weeks": [4, 5], "text": "Mirror. Copies the last card you played.", "hp": 18, "movement": 3, "initiative": 7, "physDefense": 0, "magicResist": 1, "stability": 5, "stats": {"str": 4, "dex": 7}, "weakTo": ["force"], "strongAgainst": ["transmutation"], "signature": {"transmutation": 0.6, "light": 0.4}, "disposition": {"curiosity": 80, "pride": 40}, "behavior": "mirror", "actions": [{"id": "mime", "name": "Mime Slap", "kind": "strike", "stat": "dex", "mult": 1.0, "power": 1, "profile": {"curiosity": 0.6}}], "xp": 12, "money": 5, "sprite": "enemy_mirror_mime"},
-    {"id": "static_leech", "name": "Static Leech", "tier": "normal", "weeks": [2, 3], "text": "Leech. Drains MP instead of doing much damage.", "hp": 16, "movement": 3, "initiative": 6, "physDefense": 0, "magicResist": 1, "stability": 5, "stats": {"str": 4, "dex": 5}, "weakTo": ["binding"], "strongAgainst": ["motion"], "signature": {"motion": 0.5, "vitality": 0.5}, "disposition": {"greed": 70, "courage": 30}, "behavior": "leech", "leech": 0.8, "actions": [{"id": "zap", "name": "Static Bite", "kind": "strike", "stat": "dex", "mult": 0.7, "power": 1, "vectors": {"motion": 1}, "profile": {"courage": 0.8}}], "xp": 10, "money": 6, "sprite": "enemy_static_leech"},
-    {"id": "anchor_golem", "name": "Anchor Golem", "tier": "normal", "weeks": [3, 4, 5], "text": "Anchor. Roots everyone next to it at the start of its turn.", "hp": 34, "movement": 2, "initiative": 2, "physDefense": 2, "magicResist": 1, "stability": 5, "stats": {"str": 8, "dex": 2}, "weakTo": ["motion"], "strongAgainst": ["binding"], "signature": {"binding": 0.9, "force": 0.1}, "disposition": {"courage": 40, "loyalty": 60}, "behavior": "anchor", "anchorRoot": true, "actions": [{"id": "slam", "name": "Anchor Slam", "kind": "strike", "stat": "str", "mult": 1.2, "power": 3, "vectors": {"binding": 1}, "profile": {"courage": 0.8}}], "xp": 14, "money": 6, "sprite": "enemy_anchor_golem"}
+    {
+      "id": "hall_rusher",
+      "name": "Hall Rusher",
+      "tier": "normal",
+      "weeks": [
+        1,
+        2
+      ],
+      "text": "Charger. Telegraphs a straight-line charge, then runs the whole line.",
+      "hp": 24,
+      "movement": 3,
+      "initiative": 5,
+      "physDefense": 0,
+      "magicResist": 1,
+      "stability": 5,
+      "stats": {
+        "str": 7,
+        "dex": 4
+      },
+      "weakTo": [
+        "binding"
+      ],
+      "strongAgainst": [
+        "force"
+      ],
+      "signature": {
+        "force": 0.8,
+        "motion": 0.2
+      },
+      "disposition": {
+        "courage": 70,
+        "pride": 20
+      },
+      "behavior": "charger",
+      "actions": [
+        {
+          "id": "stampede",
+          "name": "Stampede",
+          "form": "line",
+          "vectors": {
+            "force": 1
+          },
+          "pattern": "charge_line",
+          "charge": 1,
+          "run": true,
+          "profile": {
+            "courage": 0.8
+          },
+          "damage": 25
+        },
+        {
+          "id": "shove",
+          "name": "Shoulder Check",
+          "kind": "strike",
+          "profile": {
+            "courage": 0.8
+          },
+          "damage": 21
+        }
+      ],
+      "xp": 10,
+      "money": 4,
+      "sprite": "enemy_hall_rusher"
+    },
+    {
+      "id": "firecracker_imp",
+      "name": "Firecracker Imp",
+      "tier": "normal",
+      "weeks": [
+        2,
+        3
+      ],
+      "text": "Bomber. Telegraphs a 3x3 blast around itself, then goes up with it.",
+      "hp": 10,
+      "movement": 4,
+      "initiative": 7,
+      "physDefense": 0,
+      "magicResist": 1,
+      "stability": 5,
+      "stats": {
+        "str": 3,
+        "dex": 6
+      },
+      "weakTo": [
+        "cold"
+      ],
+      "strongAgainst": [
+        "heat"
+      ],
+      "signature": {
+        "heat": 0.9,
+        "force": 0.1
+      },
+      "disposition": {
+        "courage": 90,
+        "kindness": -30
+      },
+      "behavior": "bomber",
+      "actions": [
+        {
+          "id": "pop",
+          "name": "Big Pop",
+          "form": "burst",
+          "vectors": {
+            "heat": 1
+          },
+          "pattern": "square_self",
+          "charge": 1,
+          "selfDestruct": true,
+          "profile": {
+            "courage": 0.9
+          },
+          "damage": 32
+        }
+      ],
+      "xp": 8,
+      "money": 3,
+      "sprite": "enemy_firecracker_imp"
+    },
+    {
+      "id": "nurse_moth",
+      "name": "Nurse Moth",
+      "tier": "normal",
+      "weeks": [
+        1,
+        4
+      ],
+      "text": "Healer. Stays back and patches up its friends (green telegraph).",
+      "hp": 16,
+      "movement": 4,
+      "initiative": 6,
+      "physDefense": 0,
+      "magicResist": 1,
+      "stability": 5,
+      "stats": {
+        "str": 2,
+        "dex": 6
+      },
+      "weakTo": [
+        "heat"
+      ],
+      "strongAgainst": [
+        "vitality"
+      ],
+      "signature": {
+        "vitality": 0.6,
+        "light": 0.4
+      },
+      "disposition": {
+        "kindness": 70,
+        "courage": -30,
+        "loyalty": 50
+      },
+      "behavior": "healer",
+      "actions": [
+        {
+          "id": "patch_up",
+          "name": "Patch Up",
+          "form": "shield",
+          "vectors": {
+            "vitality": 1
+          },
+          "power": 8,
+          "profile": {
+            "kindness": 0.9,
+            "loyalty": 0.4
+          }
+        },
+        {
+          "id": "dust",
+          "name": "Moth Dust",
+          "form": "bolt",
+          "vectors": {
+            "light": 1
+          },
+          "profile": {
+            "courage": 0.3
+          },
+          "damage": 11
+        }
+      ],
+      "xp": 9,
+      "money": 3,
+      "sprite": "enemy_nurse_moth"
+    },
+    {
+      "id": "locker_hive",
+      "name": "Locker Hive",
+      "tier": "normal",
+      "weeks": [
+        2,
+        3,
+        5
+      ],
+      "text": "Summoner. Calls a Dust Gremlin every 2 turns.",
+      "hp": 22,
+      "movement": 2,
+      "initiative": 3,
+      "physDefense": 0,
+      "magicResist": 1,
+      "stability": 5,
+      "stats": {
+        "str": 4,
+        "dex": 3
+      },
+      "weakTo": [
+        "heat"
+      ],
+      "strongAgainst": [
+        "corrosion"
+      ],
+      "signature": {
+        "corrosion": 0.6,
+        "binding": 0.4
+      },
+      "disposition": {
+        "courage": -20,
+        "loyalty": 60
+      },
+      "behavior": "summoner",
+      "summons": "dust_gremlin",
+      "summonEvery": 2,
+      "actions": [
+        {
+          "id": "spore",
+          "name": "Spore Puff",
+          "form": "bolt",
+          "vectors": {
+            "corrosion": 1
+          },
+          "profile": {
+            "courage": 0.3
+          },
+          "damage": 11
+        }
+      ],
+      "xp": 12,
+      "money": 5,
+      "sprite": "enemy_locker_hive"
+    },
+    {
+      "id": "riot_shield",
+      "name": "Riot Shield",
+      "tier": "normal",
+      "weeks": [
+        2,
+        3,
+        4
+      ],
+      "text": "Shield bearer. Blocks hits from the front; flank it or push it around.",
+      "hp": 30,
+      "movement": 2,
+      "initiative": 3,
+      "physDefense": 2,
+      "magicResist": 1,
+      "stability": 5,
+      "stats": {
+        "str": 7,
+        "dex": 3
+      },
+      "weakTo": [
+        "motion"
+      ],
+      "strongAgainst": [
+        "force"
+      ],
+      "signature": {
+        "force": 0.7,
+        "binding": 0.3
+      },
+      "disposition": {
+        "courage": 50,
+        "loyalty": 70
+      },
+      "behavior": "shield_bearer",
+      "frontGuard": 0.75,
+      "actions": [
+        {
+          "id": "bash",
+          "name": "Shield Bash",
+          "kind": "strike",
+          "vectors": {
+            "force": 1
+          },
+          "profile": {
+            "courage": 0.8
+          },
+          "damage": 21
+        }
+      ],
+      "xp": 12,
+      "money": 4,
+      "sprite": "enemy_riot_shield"
+    },
+    {
+      "id": "pothole",
+      "name": "Pothole",
+      "tier": "normal",
+      "weeks": [
+        1,
+        3
+      ],
+      "text": "Burrower. Digs in and resurfaces under a telegraphed tile.",
+      "hp": 18,
+      "movement": 3,
+      "initiative": 6,
+      "physDefense": 0,
+      "magicResist": 1,
+      "stability": 5,
+      "stats": {
+        "str": 6,
+        "dex": 5
+      },
+      "weakTo": [
+        "light"
+      ],
+      "strongAgainst": [
+        "force"
+      ],
+      "signature": {
+        "force": 0.5,
+        "corrosion": 0.5
+      },
+      "disposition": {
+        "courage": 30,
+        "curiosity": 50
+      },
+      "behavior": "burrower",
+      "resurfacePower": 9,
+      "actions": [
+        {
+          "id": "chomp",
+          "name": "Chomp",
+          "kind": "strike",
+          "profile": {
+            "courage": 0.8
+          },
+          "damage": 20
+        }
+      ],
+      "xp": 10,
+      "money": 4,
+      "sprite": "enemy_pothole"
+    },
+    {
+      "id": "bell_tower_eye",
+      "name": "Bell Tower Eye",
+      "tier": "normal",
+      "weeks": [
+        2,
+        3,
+        5
+      ],
+      "text": "Sniper. A long shot, telegraphed two turns ahead.",
+      "hp": 14,
+      "movement": 1,
+      "initiative": 5,
+      "physDefense": 0,
+      "magicResist": 1,
+      "stability": 5,
+      "stats": {
+        "str": 2,
+        "dex": 8
+      },
+      "weakTo": [
+        "motion"
+      ],
+      "strongAgainst": [
+        "light"
+      ],
+      "signature": {
+        "light": 0.8,
+        "motion": 0.2
+      },
+      "disposition": {
+        "courage": -20,
+        "pride": 60
+      },
+      "behavior": "sniper",
+      "actions": [
+        {
+          "id": "long_shot",
+          "name": "Long Shot",
+          "form": "projectile",
+          "vectors": {
+            "light": 1
+          },
+          "charge": 1,
+          "profile": {
+            "pride": 0.8
+          },
+          "damage": 42
+        }
+      ],
+      "xp": 10,
+      "money": 4,
+      "sprite": "enemy_bell_tower_eye"
+    },
+    {
+      "id": "split_slime",
+      "name": "Split Slime",
+      "tier": "normal",
+      "weeks": [
+        2,
+        4
+      ],
+      "text": "Splitter. Splits into two Slimelets when it dies.",
+      "hp": 20,
+      "movement": 3,
+      "initiative": 4,
+      "physDefense": 0,
+      "magicResist": 1,
+      "stability": 5,
+      "stats": {
+        "str": 5,
+        "dex": 4
+      },
+      "weakTo": [
+        "heat"
+      ],
+      "strongAgainst": [
+        "corrosion"
+      ],
+      "signature": {
+        "corrosion": 0.6,
+        "vitality": 0.4
+      },
+      "disposition": {
+        "courage": 40,
+        "curiosity": 40
+      },
+      "behavior": "splitter",
+      "splitInto": "slimelet",
+      "splitCount": 2,
+      "actions": [
+        {
+          "id": "slap",
+          "name": "Gloop",
+          "kind": "strike",
+          "vectors": {
+            "corrosion": 1
+          },
+          "profile": {
+            "courage": 0.8
+          },
+          "damage": 14
+        }
+      ],
+      "xp": 10,
+      "money": 3,
+      "sprite": "enemy_split_slime"
+    },
+    {
+      "id": "ember_crawler",
+      "name": "Ember Crawler",
+      "tier": "normal",
+      "weeks": [
+        3
+      ],
+      "text": "Hazard maker. Leaves burning ground wherever it walks.",
+      "hp": 20,
+      "movement": 4,
+      "initiative": 5,
+      "physDefense": 0,
+      "magicResist": 1,
+      "stability": 5,
+      "stats": {
+        "str": 5,
+        "dex": 6
+      },
+      "weakTo": [
+        "cold"
+      ],
+      "strongAgainst": [
+        "heat"
+      ],
+      "signature": {
+        "heat": 0.9,
+        "motion": 0.1
+      },
+      "disposition": {
+        "courage": 50,
+        "greed": 20
+      },
+      "behavior": "hazard_maker",
+      "trail": "burning",
+      "actions": [
+        {
+          "id": "scorch",
+          "name": "Scorch",
+          "kind": "strike",
+          "vectors": {
+            "heat": 1
+          },
+          "profile": {
+            "courage": 0.8
+          },
+          "damage": 16
+        }
+      ],
+      "xp": 11,
+      "money": 4,
+      "sprite": "enemy_ember_crawler"
+    },
+    {
+      "id": "mirror_mime",
+      "name": "Mirror Mime",
+      "tier": "normal",
+      "weeks": [
+        4,
+        5
+      ],
+      "text": "Mirror. Copies the last card you played.",
+      "hp": 18,
+      "movement": 3,
+      "initiative": 7,
+      "physDefense": 0,
+      "magicResist": 1,
+      "stability": 5,
+      "stats": {
+        "str": 4,
+        "dex": 7
+      },
+      "weakTo": [
+        "force"
+      ],
+      "strongAgainst": [
+        "transmutation"
+      ],
+      "signature": {
+        "transmutation": 0.6,
+        "light": 0.4
+      },
+      "disposition": {
+        "curiosity": 80,
+        "pride": 40
+      },
+      "behavior": "mirror",
+      "actions": [
+        {
+          "id": "mime",
+          "name": "Mime Slap",
+          "kind": "strike",
+          "profile": {
+            "curiosity": 0.6
+          },
+          "damage": 20
+        }
+      ],
+      "xp": 12,
+      "money": 5,
+      "sprite": "enemy_mirror_mime"
+    },
+    {
+      "id": "static_leech",
+      "name": "Static Leech",
+      "tier": "normal",
+      "weeks": [
+        2,
+        3
+      ],
+      "text": "Leech. Drains MP instead of doing much damage.",
+      "hp": 16,
+      "movement": 3,
+      "initiative": 6,
+      "physDefense": 0,
+      "magicResist": 1,
+      "stability": 5,
+      "stats": {
+        "str": 4,
+        "dex": 5
+      },
+      "weakTo": [
+        "binding"
+      ],
+      "strongAgainst": [
+        "motion"
+      ],
+      "signature": {
+        "motion": 0.5,
+        "vitality": 0.5
+      },
+      "disposition": {
+        "greed": 70,
+        "courage": 30
+      },
+      "behavior": "leech",
+      "leech": 0.8,
+      "actions": [
+        {
+          "id": "zap",
+          "name": "Static Bite",
+          "kind": "strike",
+          "vectors": {
+            "motion": 1
+          },
+          "profile": {
+            "courage": 0.8
+          },
+          "damage": 11
+        }
+      ],
+      "xp": 10,
+      "money": 6,
+      "sprite": "enemy_static_leech"
+    },
+    {
+      "id": "anchor_golem",
+      "name": "Anchor Golem",
+      "tier": "normal",
+      "weeks": [
+        3,
+        4,
+        5
+      ],
+      "text": "Anchor. Roots everyone next to it at the start of its turn.",
+      "hp": 34,
+      "movement": 2,
+      "initiative": 2,
+      "physDefense": 2,
+      "magicResist": 1,
+      "stability": 5,
+      "stats": {
+        "str": 8,
+        "dex": 2
+      },
+      "weakTo": [
+        "motion"
+      ],
+      "strongAgainst": [
+        "binding"
+      ],
+      "signature": {
+        "binding": 0.9,
+        "force": 0.1
+      },
+      "disposition": {
+        "courage": 40,
+        "loyalty": 60
+      },
+      "behavior": "anchor",
+      "anchorRoot": true,
+      "actions": [
+        {
+          "id": "slam",
+          "name": "Anchor Slam",
+          "kind": "strike",
+          "vectors": {
+            "binding": 1
+          },
+          "profile": {
+            "courage": 0.8
+          },
+          "damage": 21
+        }
+      ],
+      "xp": 14,
+      "money": 6,
+      "sprite": "enemy_anchor_golem"
+    }
   ]
 }

@@ -347,6 +347,8 @@
     "sfx_lose": {"type": "sfx", "kind": "sfx", "source": "res://assets/packs/ninja_adventure/Audio/Jingles/GameOver.wav", "notes": "Short one-shot (.wav or .ogg)."},
     "sfx_levelup": {"type": "sfx", "kind": "sfx", "source": "res://assets/packs/ninja_adventure/Audio/Jingles/LevelUp1.wav", "notes": "Short one-shot (.wav or .ogg)."},
     "sfx_click": {"type": "sfx", "kind": "sfx", "source": "res://assets/packs/ninja_adventure/Audio/Sounds/Menu/Accept.wav", "notes": "Short one-shot (.wav or .ogg)."},
+    "sfx_turn_party": {"type": "sfx", "kind": "sfx", "source": "res://assets/packs/ninja_adventure/Audio/Sounds/Menu/Accept3.wav", "notes": "Soft cue when a party member's turn starts (CT Part 2b)."},
+    "sfx_turn_enemy": {"type": "sfx", "kind": "sfx", "source": "res://assets/packs/ninja_adventure/Audio/Sounds/Alert/Alert2.wav", "notes": "Cue when an enemy's turn starts (CT Part 2b)."},
     "sfx_cancel": {"type": "sfx", "kind": "sfx", "source": "res://assets/packs/ninja_adventure/Audio/Sounds/Menu/Cancel.wav", "notes": "Short one-shot (.wav or .ogg)."},
     "sfx_coin": {"type": "sfx", "kind": "sfx", "source": "res://assets/packs/ninja_adventure/Audio/Sounds/Bonus/Coin.wav", "notes": "Short one-shot (.wav or .ogg)."},
     "sfx_door": {"type": "sfx", "kind": "sfx", "source": "res://assets/packs/ninja_adventure/Audio/Sounds/Menu/Menu5.wav", "notes": "Short one-shot (.wav or .ogg)."},

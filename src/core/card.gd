@@ -210,7 +210,8 @@ static func describe(db: Dictionary, card: Dictionary) -> String:
 ## for a card. Basics and items use their "short" text from data.
 static func summary(db: Dictionary, card: Dictionary) -> String:
 	if card.has("short"):
-		return str(card["short"])
+		# "{power}" in a short line is filled in from the real power (CT Part 4 text audit).
+		return str(card["short"]).replace("{power}", str(roundi(power(db, card))))
 	if not is_spell(card):
 		return str(card.get("name", "")).split(" ")[0]
 	var form_rec := DT.record(db, "forms", str(card.get("form", "")))

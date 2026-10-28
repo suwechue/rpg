@@ -110,7 +110,7 @@ func _new_run() -> void:
 				(x as Button).theme_type_variation = "SelectedButton" if x.get_meta("id") == did else "")
 		b.set_meta("id", did)
 		b.theme_type_variation = "SelectedButton" if did == diff["id"] else ""
-		b.tooltip_text = Strings.t("title.enemies_show_what_they_ll") % (Strings.t("title.on_hard_they_move_then") if bool(diffs[d].get("enemyMoveAndAct", false)) else Strings.t("title.on_normal_they_either_attack"))
+		b.tooltip_text = Strings.t("title.enemies_show_what_they_ll") % (Strings.t("title.move_and_attack_chance") % roundi(100.0 * _chance(diffs[d].get("enemyMoveAndActChance", 0.0))))
 		diff_buttons.append(b)
 		diff_row.add_child(b)
 	for cls in db.get("classes", {}).get("classes", []):
@@ -226,3 +226,10 @@ func _show_journal() -> void:
 	m.text(Strings.t("title.endless_arena_best_wave") % int(j.get("arena", {}).get("bestWave", 0)), UiTheme.DIM)
 	m.add_button(Strings.t("title.close"), func() -> void: m.finish(null))
 	await Flow.show_modal(m)
+
+
+## A difficulty's move-and-attack chance for normal enemies (a number or one per tier).
+func _chance(c: Variant) -> float:
+	if c is Dictionary:
+		return float((c as Dictionary).get("normal", (c as Dictionary).get("default", 0.0)))
+	return float(c)

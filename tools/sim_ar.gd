@@ -24,7 +24,7 @@ func _initialize() -> void:
 	var db := DT.tables()
 	var runs := 40
 	var week := 1
-	var modes: Array = ["move_or_act"]
+	var modes: Array = [str(db["combat_rules"]["turnMode"])]
 	var diffs: Array = ["normal", "hard"]
 	for a in OS.get_cmdline_user_args():
 		var kv := str(a).trim_prefix("--").split("=")
@@ -36,6 +36,15 @@ func _initialize() -> void:
 			modes = db["combat_rules"]["turnModes"]
 		elif kv[0] == "difficulty":
 			diffs = [kv[1]]
+		elif kv[0] == "set":
+			# --set=table.key.key=JSON;table.key=JSON (try a tuning change without editing data)
+			for pair in str(a).trim_prefix("--set=").split(";"):
+				var pv := pair.split("=", true, 1)
+				var path := pv[0].split(".")
+				var node: Variant = db
+				for k in path.slice(0, path.size() - 1):
+					node = node[k]
+				node[path[-1]] = JSON.parse_string(pv[1])
 	print("week %d, %d fights per row (normal fights from templates; boss from the week's boss room)" % [week, runs])
 	print("%-14s %-18s %8s %8s %8s %8s" % ["mode", "case", "win%", "rounds", "dmg/fight", "hits/fight"])
 	for diff in diffs:

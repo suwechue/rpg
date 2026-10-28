@@ -86,15 +86,22 @@ func test_deck_draw_and_fatigue() -> void:
 	for i in 10:
 		ids.append("c%d" % i)
 	var deck = DeckClass.new(ids, rng, db()["stats"]["combat"])
-	var r: Dictionary = deck.draw(5, rng)
-	check(deck.hand.size() == 5 and r["fatigue"] == 0, "opening hand 5, no fatigue")
+	var r: Dictionary = deck.draw(3, rng)
+	check(deck.hand.size() == 3 and r["fatigue"] == 0, "opening hand 3, no fatigue")
 	deck.draw(5, rng)
-	check(deck.hand.size() == 7, "hand limit 7")
-	check(deck.draw_pile.size() == 3, "cards beyond the limit stay in the pile")
-	for i in 7:
+	check(deck.hand.size() == 3, "hand limit 3 (CT Part 4)")
+	check(deck.draw_pile.size() == 7, "cards beyond the limit stay in the pile")
+	for i in 3:
 		deck.play(0)
 	deck.draw(3, rng)
+	for i in 3:
+		deck.play(0)
+	deck.draw(3, rng)
+	for i in 3:
+		deck.play(0)
+	deck.draw(1, rng)
 	check(deck.draw_pile.is_empty(), "pile emptied")
+	deck.play(0)
 	r = deck.draw(2, rng)
 	check(r["fatigue"] == 1, "first reshuffle costs 1 fatigue")
 	check(deck.total_cards() == 10, "no cards lost")

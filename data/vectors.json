@@ -1,9 +1,9 @@
 {
   "magnitudes": {
-    "minor":    { "power": 5,  "cost": 1, "minTier": 1, "name": "Minor" },
-    "standard": { "power": 10, "cost": 2, "minTier": 1, "name": "Standard" },
-    "major":    { "power": 20, "cost": 4, "minTier": 2, "name": "Major" },
-    "grand":    { "power": 35, "cost": 7, "minTier": 3, "name": "Grand" }
+    "minor":    { "power": 4,  "cost": 1, "minTier": 1, "name": "Minor" },
+    "standard": { "power": 7, "cost": 2, "minTier": 1, "name": "Standard" },
+    "major":    { "power": 14, "cost": 4, "minTier": 2, "name": "Major" },
+    "grand":    { "power": 25, "cost": 7, "minTier": 3, "name": "Grand" }
   },
   "magnitudeOrder": ["minor", "standard", "major", "grand"],
   "hybridExtraCost": 1,

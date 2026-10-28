@@ -1,80 +1,303 @@
 {
   "layouts": [
-    { "id": "open_field", "theme": "school", "weight": 3,
+    {
+      "id": "open_field",
+      "theme": "school",
+      "weight": 3,
       "map": [
-        "<P.....E.",
+        "<P....cE.",
         "<P..c..E.",
         "<P......E",
-        "<P..c..E.",
+        "<P..c.cE.",
         "<P.....E."
-      ] },
-    { "id": "bleachers", "theme": "school", "weight": 2,
+      ]
+    },
+    {
+      "id": "bleachers",
+      "theme": "school",
+      "weight": 2,
       "map": [
-        "<P..##.E.",
+        "<Pc.##cE.",
         "<P.....E.",
         "<P..x..EE",
         "<P.....E.",
-        "<P..##.E."
-      ] },
-    { "id": "locker_hall", "theme": "school", "weight": 2,
+        "<P.c##.E."
+      ]
+    },
+    {
+      "id": "locker_hall",
+      "theme": "school",
+      "weight": 2,
       "map": [
         "<P.#...E.",
         "<P.#.x.E.",
-        "<P.....EE",
-        "<P...#.E.",
+        "<Pc....EE",
+        "<P...#cE.",
         "<P.x.#.E."
-      ] },
-    { "id": "flooded_gym", "tags": ["hazard"], "theme": "school", "weight": 1,
+      ]
+    },
+    {
+      "id": "flooded_gym",
+      "tags": [
+        "hazard"
+      ],
+      "theme": "school",
+      "weight": 1,
       "map": [
-        "<P..ww.E.",
+        "<Pc.wwcE.",
         "<P..ww.E.",
         "<P.....EE",
-        "<P.hh..E.",
+        "<Pchhc.E.",
         "<P.....E."
-      ] },
-    { "id": "frozen_deli", "tags": ["hazard"], "theme": "deli", "weight": 2,
+      ]
+    },
+    {
+      "id": "frozen_deli",
+      "tags": [
+        "hazard"
+      ],
+      "theme": "deli",
+      "weight": 2,
       "map": [
         "<P..ii.E.",
-        "<P.#ww.E.",
+        "<P.#wwcE.",
         "<P..ww.EE",
-        "<P.#...E.",
+        "<Pc#..cE.",
         "<P..x..E."
-      ] },
-    { "id": "forge_floor", "tags": ["hazard"], "theme": "forge", "weight": 2,
+      ]
+    },
+    {
+      "id": "forge_floor",
+      "tags": [
+        "hazard"
+      ],
+      "theme": "forge",
+      "weight": 2,
       "map": [
         "<P..h..E.",
+        "<Pc#h#.E.",
+        "<P....cEE",
         "<P.#h#.E.",
-        "<P.....EE",
-        "<P.#h#.E.",
-        "<P..h..E."
-      ] },
-    { "id": "night_ward", "theme": "hospital", "weight": 2,
+        "<P.chc.E."
+      ]
+    },
+    {
+      "id": "night_ward",
+      "theme": "hospital",
+      "weight": 2,
       "map": [
         "<P.x..xE.",
         "<P.....E.",
         "<P..c..EE",
         "<P.....E.",
         "<P.x..xE."
-      ] },
-    { "id": "boss_stage", "theme": "boss", "weight": 0,
+      ]
+    },
+    {
+      "id": "boss_stage",
+      "theme": "boss",
+      "weight": 0,
       "map": [
         "<P.......E",
-        "<P..c...EE",
+        "<P..c.c.EE",
         "<P......E.",
         "<P..c...EE",
-        "<P.......E"
-      ] },
-    { "id": "wide_square", "theme": "town", "weight": 1,
+        "<Pc......E"
+      ]
+    },
+    {
+      "id": "wide_square",
+      "theme": "town",
+      "weight": 1,
       "map": [
-        "<P..c....E.",
+        "<Pc.c....E.",
         "<P.......E.",
         "<P..#.#..EE",
-        "<P.......E.",
+        "<Pc......E.",
         "<P..c....E.",
         "<P.......E."
-      ] },
-    { "id": "training_yard", "theme": "school", "weight": 0, "note": "Debug and screenshots only (weight 0): a hazard behind the first enemy, an ice strip in the last row.", "map": ["<P..Eh....", "<P........", "<P....E...", "<P........", "<P..Eiii.."] },
-    { "id": "big_gym", "theme": "school", "weight": 2, "note": "11x6 for swarms and ambushes.", "map": ["<P....c...E", "<P........E", "<P..h...c.E", "<P........E", "<P...c....E", "<P........E"] },
-    { "id": "crossroads", "theme": "town", "weight": 2, "note": "11x6 for swarms and ambushes.", "map": ["<P...#....E", "<P........E", "<P.c...c..E", "<P........E", "<P...#....E", "<P..w.....E"] }
+      ]
+    },
+    {
+      "id": "training_yard",
+      "theme": "school",
+      "weight": 0,
+      "note": "Debug and screenshots only (weight 0): a hazard behind the first enemy, an ice strip in the last row.",
+      "map": [
+        "<P..Eh....",
+        "<P........",
+        "<P....E...",
+        "<P........",
+        "<P..Eiii.."
+      ]
+    },
+    {
+      "id": "big_gym",
+      "theme": "school",
+      "weight": 2,
+      "note": "11x6 for swarms and ambushes.",
+      "map": [
+        "<P....c...E",
+        "<P........E",
+        "<P.ch...c.E",
+        "<P........E",
+        "<P...c....E",
+        "<P........E"
+      ]
+    },
+    {
+      "id": "crossroads",
+      "theme": "town",
+      "weight": 2,
+      "note": "11x6 for swarms and ambushes.",
+      "map": [
+        "<P.c.#....E",
+        "<P........E",
+        "<P.c...c..E",
+        "<P........E",
+        "<P...#....E",
+        "<P..w..c..E"
+      ]
+    },
+    {
+      "id": "tut_r1",
+      "name": "Tutorial",
+      "theme": "school",
+      "weight": 0,
+      "tutorial": true,
+      "map": [
+        "P.E....",
+        ".......",
+        ".......",
+        ".......",
+        "......."
+      ]
+    },
+    {
+      "id": "tut_r2",
+      "name": "Tutorial",
+      "theme": "school",
+      "weight": 0,
+      "tutorial": true,
+      "map": [
+        "P......",
+        "..E....",
+        ".......",
+        ".......",
+        "......."
+      ]
+    },
+    {
+      "id": "tut_r3",
+      "name": "Tutorial",
+      "theme": "school",
+      "weight": 0,
+      "tutorial": true,
+      "map": [
+        "P......",
+        ".......",
+        "......E",
+        ".......",
+        "......."
+      ]
+    },
+    {
+      "id": "tut_r4",
+      "name": "Tutorial",
+      "theme": "school",
+      "weight": 0,
+      "tutorial": true,
+      "map": [
+        "P...p.E",
+        "....p..",
+        "....p..",
+        "....p.E",
+        "......."
+      ]
+    },
+    {
+      "id": "tut_r5",
+      "name": "Tutorial",
+      "theme": "school",
+      "weight": 0,
+      "tutorial": true,
+      "map": [
+        "P........",
+        ".........",
+        ".......E.",
+        ".........",
+        "......E.."
+      ]
+    },
+    {
+      "id": "tut_r6",
+      "name": "Tutorial",
+      "theme": "school",
+      "weight": 0,
+      "tutorial": true,
+      "map": [
+        "P........",
+        ".........",
+        "...#.cE..",
+        "...#.....",
+        "........."
+      ]
+    },
+    {
+      "id": "tut_r7",
+      "name": "Tutorial",
+      "theme": "school",
+      "weight": 0,
+      "tutorial": true,
+      "map": [
+        "P........",
+        "...ff....",
+        "...ff..E.",
+        "...ff..E.",
+        "........."
+      ]
+    },
+    {
+      "id": "tut_r8",
+      "name": "Tutorial",
+      "theme": "school",
+      "weight": 0,
+      "tutorial": true,
+      "map": [
+        "P.......E",
+        ".........",
+        ".........",
+        ".........",
+        "........."
+      ]
+    },
+    {
+      "id": "tut_r9",
+      "name": "Tutorial",
+      "theme": "school",
+      "weight": 0,
+      "tutorial": true,
+      "map": [
+        "P......",
+        ".......",
+        ".....E.",
+        ".......",
+        "......."
+      ]
+    },
+    {
+      "id": "tut_r10",
+      "name": "Tutorial",
+      "theme": "school",
+      "weight": 0,
+      "tutorial": true,
+      "map": [
+        "P........",
+        "..c......",
+        ".......E.",
+        "....c..EE",
+        "........E"
+      ]
+    }
   ]
 }

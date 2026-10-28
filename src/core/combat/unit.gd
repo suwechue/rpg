@@ -61,11 +61,16 @@ var start_cell := Vector2i.ZERO  # where this turn began (undo move)
 var moved_steps := 0
 var undo_ok := true              # false once something happened that can't be taken back
 var intent: Dictionary = {}      # enemies: the telegraphed next action (see combat_state.plan_intent)
+var both_this_turn := false      # enemies: may move and attack on the planned turn (rolled when planning)
 var role := ""                  # encounter role (fighter, minion, front, ranged, healer, leader...)
 var links: Dictionary = {}       # status partners and amounts: "tether" / "pact" -> unit id, "regen" -> amount
 var downed := false
 var dead := false
 var turns_taken := 0
+var last_turn_round := -1
+var actions_left := 0            # PT Part 1: Actions left this turn (2 per turn)
+var held_id := ""               # PT Part 2: the card held over to the next turn
+var double_attack := false       # enemies: this turn's plan may attack twice      # the round this unit last started a turn in
 var perk_used := false
 var rally_bonus := 0.0
 var guard_active := false
@@ -149,6 +154,8 @@ static func from_enemy(rec: Dictionary, scale: float = 1.0) -> CombatUnit:
 	for a in rec.get("actions", []):
 		var copy: Dictionary = a.duplicate(true)
 		copy["power"] = float(copy.get("power", 5)) * scale
+		if copy.has("damage"):
+			copy["damage"] = float(copy["damage"]) * scale
 		u.actions.append(copy)
 	u.xp = roundi(float(rec.get("xp", 5)) * scale)
 	u.money = int(rec.get("money", 2))

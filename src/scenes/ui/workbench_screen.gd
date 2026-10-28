@@ -11,7 +11,8 @@ var place := "home"
 ## Where AP comes from: the day's AP by default; the arena passes its Arena AP.
 var ap_left: Callable = func() -> int: return int(ap_left.call())
 var spend_ap: Callable = func(n: int, kind: String) -> bool: return Calendar.spend_ap(n, kind)
-var deck_save_cost := 0   # the arena charges for swapping cards
+var deck_save_cost := -1  # AP per removed card; -1 = data/leveling.json removeCardCost (the arena sets its own)
+var _filter := ""         # deck editor filter: "" or a Vector id or "quick"
 var _vectors: Array = []
 var _form := ""
 var _magnitude := "standard"
@@ -122,7 +123,10 @@ func _play_minigame() -> void:
 			text(Strings.t("workbench.property") % [pr.get("name", prop), pr.get("text", "")])
 		if bool(card.get("stepped", false)):
 			text(Strings.t("workbench.a_perfect_craft_1_magnitude"), UiTheme.GOOD)
-		text(Strings.t("workbench.it_s_in_your_collection"), UiTheme.DIM)
+		if Crafting.add_to_deck(db, GameState.player, str(card["id"])):
+			text(Strings.t("workbench.added_to_deck"), UiTheme.DIM)
+		else:
+			text(Strings.t("workbench.it_s_in_your_collection"), UiTheme.DIM)
 		Narrator.say(Strings.t("workbench.a_new_card_the_workbench") % str(_vectors[0]))
 	add_button(Strings.t("workbench.back"), _menu)
 	focus_first()
@@ -161,7 +165,24 @@ func _deck_editor() -> void:
 			_deck = GameState.character(oid).get("deck", []).duplicate()
 			_deck_editor()))
 	var ch := GameState.character(_deck_owner)
-	text(Strings.t("workbench.s_deck_cards_to") % [ch.get("name", "?"), _deck.size(), int(db["leveling"].get("deckMin", 10)), Char.deck_max(db, ch)], UiTheme.ACCENT)
+	text(Strings.t("workbench.s_deck_cards_min") % [ch.get("name", "?"), _deck.size(), int(db["leveling"].get("deckMin", 8))], UiTheme.ACCENT)
+	var st := Crafting.deck_stats(db, GameState.run, _deck)
+	var curve: Array = []
+	for c in range(0, 8):
+		if st["curve"].has(c):
+			curve.append("%dMP x%d" % [c, int(st["curve"][c])])
+	var mix: Array = []
+	for axis in st["mix"]:
+		mix.append("%s %d" % [str(axis).capitalize(), int(st["mix"][axis])])
+	text(Strings.t("workbench.deck_stats") % [", ".join(PackedStringArray(curve)), ", ".join(PackedStringArray(mix)), int(st["quick"])], UiTheme.DIM)
+	var fr := row()
+	for f in ["", "quick"] + GameState.player.get("knownVectors", []):
+		var key := str(f)
+		var b := UiTheme.button(Strings.t("workbench.filter_all") if key == "" else key.capitalize(), func() -> void:
+			_filter = key
+			_deck_editor())
+		b.disabled = key == _filter
+		fr.add_child(b)
 	var ids: Array = []
 	for id in GameState.run.get("collection", {}):
 		ids.append(str(id))
@@ -173,10 +194,19 @@ func _deck_editor() -> void:
 		var card := CardRules.resolve(db, id, GameState.cards)
 		if card.is_empty():
 			continue
+		if _filter == "quick" and not bool(card.get("quick", false)):
+			continue
+		if _filter != "" and _filter != "quick" and not card.get("vectors", {}).has(_filter):
+			continue
 		var in_deck := _deck.count(id)
 		var r := row()
 		var l := UiTheme.label(Strings.t("workbench.mp_in_deck_owned") % [card.get("name", id), CardRules.cost(db, card), in_deck, Crafting.owned(GameState.run, ch, id)])
 		l.custom_minimum_size = Vector2(300, 0)
+		# Everything about the card on hover: full text, Form, Magnitude, Vectors, rarity, quick.
+		l.tooltip_text = Strings.t("workbench.card_detail") % [CardRules.describe(db, card), str(card.get("form", card.get("kind", ""))).capitalize(),
+			str(card.get("magnitude", "-")).capitalize(), ", ".join(PackedStringArray(card.get("vectors", {}).keys())), str(card.get("rarity", "common")).capitalize(),
+			Strings.t("workbench.quick_yes") if bool(card.get("quick", false)) else ""]
+		l.mouse_filter = Control.MOUSE_FILTER_PASS
 		r.add_child(l)
 		var cid := id
 		r.add_child(UiTheme.button("-", func() -> void:
@@ -188,11 +218,14 @@ func _deck_editor() -> void:
 	var err := Crafting.deck_error(db, GameState.run, ch, _deck)
 	if err != "":
 		text(err, UiTheme.BAD)
-	add_button(Strings.t("workbench.save_deck") + (Strings.t("workbench.ap") % deck_save_cost if deck_save_cost > 0 else ""), func() -> void:
-		if deck_save_cost > 0 and not bool(spend_ap.call(deck_save_cost, "swapCard")):
+	# Removing cards costs AP; adding is free (PT Part 2).
+	var per := deck_save_cost if deck_save_cost >= 0 else int(db["leveling"].get("removeCardCost", 1))
+	var cost := per * Crafting.removals(ch.get("deck", []), _deck)
+	add_button(Strings.t("workbench.save_deck") + (Strings.t("workbench.ap") % cost if cost > 0 else ""), func() -> void:
+		if cost > 0 and not bool(spend_ap.call(cost, "removeCard")):
 			return
 		Crafting.set_deck(DataDB.all(), GameState.run, GameState.character(_deck_owner), _deck)
-		_menu(), err != "" or int(ap_left.call()) < deck_save_cost)
+		_menu(), err != "" or int(ap_left.call()) < cost)
 	add_button(Strings.t("workbench.back_discard_changes"), _menu)
 	focus_first()
 

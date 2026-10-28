@@ -133,6 +133,7 @@ func _start_wave() -> void:
 	setup["party"] = GameState.combat_party()
 	setup["library"] = GameState.cards
 	setup["difficulty"] = GameState.combat_difficulty
+	setup["partyFirst"] = bool(DataDB.table("combat_rules").get("actions", {}).get("partyFirstInArena", true))
 	var hp := 0
 	for ch in Party.party(GameState.run):
 		hp += int(ch.get("hp", 0))
@@ -253,7 +254,7 @@ func _checkpoint() -> void:
 		if Arena.spend(db, arena, "rest"):
 			Arena.rest(db, Party.party(GameState.run))
 		_refresh(), ap < int(costs.get("rest", 2)) or bool(arena.get("noRest", false)), Strings.t("arena.no_resting_after_high_stakes") if bool(arena.get("noRest", false)) else "")
-	_button(Strings.t("arena.swap_cards_in_a_deck") % int(costs.get("swapCard", 1)), func() -> void: await _workbench(0, int(costs.get("swapCard", 1))), ap < int(costs.get("swapCard", 1)))
+	_button(Strings.t("arena.swap_cards_in_a_deck") % int(costs.get("swapCard", 1)), func() -> void: await _workbench(0, int(costs.get("removeCard", costs.get("swapCard", 1)))), ap < 0)
 	_button(Strings.t("arena.craft_a_card_ap") % int(costs.get("craftCard", 2)), func() -> void: await _workbench(int(costs.get("craftCard", 2)), 0), ap < int(costs.get("craftCard", 2)))
 	_button(Strings.t("arena.swap_a_teammate_ap") % int(costs.get("swapTeammate", 2)), _swap_teammate, ap < int(costs.get("swapTeammate", 2)) or GameState.roster.size() <= GameState.party_ids.size())
 	_button(Strings.t("arena.change_equipment_ap") % int(costs.get("changeEquipment", 1)), _equipment, ap < int(costs.get("changeEquipment", 1)) or _equipment_items().is_empty())

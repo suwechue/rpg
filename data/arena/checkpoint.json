@@ -3,6 +3,6 @@
   "every": 5,
   "apPerCheckpoint": 3,
   "restPct": 0.5,
-  "costs": { "swapCard": 1, "craftCard": 2, "swapTeammate": 2, "changeEquipment": 1, "rest": 2, "rerollMutators": 1 },
+  "costs": { "swapCard": 1, "removeCard": 1, "craftCard": 2, "swapTeammate": 2, "changeEquipment": 1, "rest": 2, "rerollMutators": 1 },
   "mutatorChoices": 3
 }

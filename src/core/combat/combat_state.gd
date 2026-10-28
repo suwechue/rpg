@@ -11,6 +11,7 @@
 class_name CombatState
 extends RefCounted
 
+const DeckScript := preload("res://src/core/deck.gd")
 const Str := preload("res://src/core/strings.gd")
 
 const VO := preload("res://src/core/vector_ops.gd")
@@ -46,7 +47,14 @@ var forms: Dictionary = {}
 var _spawn_counter := 0
 var _ai: GDScript = null           # enemy_ai.gd, loaded lazily (it preloads this script)
 var _note := ""                    # why the next hit did what it did ("Cold, resisted"), for the log
-var turn_mode := "move_or_act"     # data/combat_rules.json "turnMode" (AR); setup "turnMode" overrides
+var party_turns := 0                # party turns started this fight (enemies before the first one only move)
+var party_first := false            # arena: the party acts before every enemy in round 1 (PT Part 1)
+var fair := false                   # tutorial: no crits until the lesson that teaches them (CT Part 7)
+var hp_floor := false               # tutorial: the party can't drop below 1 HP
+var guarantee_improvise := false    # tutorial room 9: the first improvise always works
+var _undo: Array = []               # PT Part 1: snapshots of this turn, newest last
+var undo_lock := ""                 # why the turn can't be undone further (a roll, a draw, a reveal)
+var turn_mode := "two_actions"     # data/combat_rules.json "turnMode" (PT Part 1); setup "turnMode" overrides
 var difficulty := "normal"         # data/combat_rules.json "difficulty"; setup "difficulty" overrides
 var ai_overrides: Dictionary = {}  # sims: data/ai.json values to replace for this fight
 var delayed: Array = []            # telegraphed strikes that land later: [{ cells, turns, spec, caster, neutral, name }]
@@ -63,7 +71,11 @@ func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) ->
 	db = p_db
 	rng = p_rng
 	library = setup.get("library", {})
-	turn_mode = str(setup.get("turnMode", db.get("combat_rules", {}).get("turnMode", "move_or_act")))
+	turn_mode = str(setup.get("turnMode", db.get("combat_rules", {}).get("turnMode", "two_actions")))
+	party_first = bool(setup.get("partyFirst", false))
+	fair = bool(setup.get("fair", false))
+	hp_floor = bool(setup.get("hpFloor", false))
+	guarantee_improvise = bool(setup.get("guaranteeImprovise", false))
 	difficulty = str(setup.get("difficulty", db.get("combat_rules", {}).get("difficulty", "normal")))
 	ai_overrides = setup.get("ai", {})
 	mutators = setup.get("mutators", [])
@@ -100,9 +112,10 @@ func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) ->
 	for c in grid.trap_spawns:
 		glyphs.append({ "cell": c, "spec": {}, "team": "trap", "caster": null, "turns": 999 })
 	for p in grid.prop_spawns:
-		var crate := UnitScript.make_prop("crate", int(Res.combat_cfg(db).get("crateHp", 8)))
-		crate.cell = p["cell"]
-		_add_unit(crate)
+		var kind := str(p.get("prop", "crate"))
+		var piece := UnitScript.make_prop(kind, int(cover_cfg().get("pieces", {}).get(kind, {}).get("hp", 8)))
+		piece.cell = p["cell"]
+		_add_unit(piece)
 	var hype := false
 	for u in units:
 		if u.team == "party" and (u.perk == "hype" or u.perk == "encore"):
@@ -112,9 +125,20 @@ func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) ->
 			if u.team == "party":
 				u.initiative += 4
 				u.statuses["hype_draw"] = 1
-	var opening := int(Res.combat_cfg(db).get("openingHand", 5))
+	if setup.has("playerDeck") or setup.has("addCards"):
+		# Tutorial rooms: a practice deck for the player, or extra cards for the lesson.
+		for u in units:
+			if u.is_player and u.deck != null:
+				var ids: Array = setup.get("playerDeck", []) if not setup.get("playerDeck", []).is_empty() else u.deck.draw_pile.duplicate()
+				ids.append_array(setup.get("addCards", []))
+				u.deck = DeckScript.new(ids, rng, Res.combat_cfg(db))
+	if fair:
+		for u in units:
+			u.crit_pct = 0.0
+	var opening := int(Res.combat_cfg(db).get("openingHand", 3))
 	for u in units:
 		if u.deck != null:
+			u.deck.hand_limit = hand_size(u)
 			u.deck.draw(opening, rng)
 	_build_order()
 	turn_index = -1
@@ -355,7 +379,10 @@ func card_cost(u: UnitScript, card: Dictionary, target: Vector2i = Vector2i(-1, 
 
 
 func reachable_cells(u: UnitScript) -> Dictionary:
-	var r := grid.reachable(u.cell, u.move_left, occupied(u))
+	var budget := u.move_left
+	if uses_actions(u) and u.statuses.has("free_move"):
+		budget = int(u.links.get("free_move", "1"))
+	var r := grid.reachable(u.cell, budget, occupied(u))
 	r.erase(u.cell)
 	return r
 
@@ -367,7 +394,10 @@ func _build_order() -> void:
 	for u in units:
 		if u.alive() and not u.is_prop():
 			order.append(u)
+	var first := party_first and round_num == 1
 	order.sort_custom(func(a: UnitScript, b: UnitScript) -> bool:
+		if first and a.team != b.team:
+			return a.team == "party"
 		if a.initiative != b.initiative:
 			return a.initiative > b.initiative
 		if a.team != b.team:
@@ -420,8 +450,25 @@ func end_turn() -> void:
 	_check_end()
 	if result != "" or current == null:
 		return
+	_discard_hand(current)
 	_end_cleanup(current)
+	_undo.clear()
 	_advance()
+
+
+## PT Part 2: at End Turn every unplayed card goes to the discard pile, except
+## the one held card, which stays for next turn.
+func _discard_hand(u: UnitScript) -> void:
+	if u.deck == null or u.team != "party" or turn_mode != "two_actions":
+		return
+	var keep := ""
+	for id in u.deck.hand.duplicate():
+		if keep == "" and str(id) == u.held_id:
+			keep = str(id)
+			continue
+		u.deck.hand.erase(id)
+		u.deck.discard.append(id)
+	u.held_id = ""
 
 
 func _advance() -> void:
@@ -483,6 +530,10 @@ func _end_round() -> void:
 
 func _start_turn(u: UnitScript) -> void:
 	u.turns_taken += 1
+	u.last_turn_round = round_num
+	u.actions_left = 1 if u.statuses.has("encore") else actions_per_turn()
+	_undo.clear()
+	undo_lock = ""
 	u.guard_active = false
 	u.action_used = false
 	u.quick_used = false
@@ -519,11 +570,12 @@ func _start_turn(u: UnitScript) -> void:
 		if int(aura["turns"]) <= 0:
 			u.auras.erase(aura)
 	if u.deck != null:
-		var n := int(cfg.get("drawPerTurn", 2)) + int(u.mods.get("combat", {}).get("drawBonus", 0))
+		# Draw back up to the hand size (3, plus bonuses) at the start of each turn (CT Part 4).
+		u.deck.hand_limit = hand_size(u)
 		if u.statuses.has("hype_draw"):
-			n += 1
+			u.deck.hand_limit += 1
 			u.statuses.erase("hype_draw")
-		var drew := u.deck.draw(n, rng)
+		var drew := u.deck.draw(maxi(0, u.deck.hand_limit - u.deck.hand.size()), rng)
 		if int(drew["fatigue"]) > 0:
 			_emit({ "t": "log", "text": Str.t(db, "combat_state.reshuffles_and_takes_fatigue") % [u.name, int(drew["fatigue"])] })
 			_damage(u, int(drew["fatigue"]), null, "", "fatigue")
@@ -531,13 +583,24 @@ func _start_turn(u: UnitScript) -> void:
 				return
 	if u.max_mp > 0:
 		u.mp = mini(u.max_mp, u.mp + u.mp_regen + (int(mutator_rules().get("mpRegen", 0)) if u.team == "party" else 0))
-	u.move_left = u.movement + int(u.statuses.get("haste_amount", 0)) - (1 if u.statuses.has("slow") else 0)
+	u.move_left = move_budget(u) if uses_actions(u) else u.movement + int(u.statuses.get("haste_amount", 0)) - (1 if u.statuses.has("slow") else 0)
+	if u.statuses.has("move_next"):
+		# Movement saved from a card played after moving last turn.
+		u.move_left += int(u.links.get("move_next", "0"))
+		u.statuses.erase("move_next")
+		u.links.erase("move_next")
 	if u.statuses.has("root"):
 		u.move_left = 0
 	u.move_left = maxi(0, u.move_left)
 	u.start_cell = u.cell
 	if u.team == "party":
-		refresh_intents()
+		party_turns += 1
+		refresh_intents(acts_next(u))
+	elif u.intent.is_empty():
+		roll_move_and_act(u)
+		if party_turns == 0:
+			# Nobody could see it coming (it acts before the first party turn): it only moves.
+			u.action_used = true
 	if u.guest and u.alive():
 		var threatened := u.hp_ratio() < 0.6
 		for o in opponents_of(u):
@@ -549,7 +612,9 @@ func _start_turn(u: UnitScript) -> void:
 
 
 func _end_cleanup(u: UnitScript) -> void:
-	for s in ["slow", "root", "blind", "haste", "rally", "rime", "tether", "pact", "regen", "taunting", "haste_full"]:
+	u.statuses.erase("encore")
+	u.statuses.erase("free_move")
+	for s in ["slow", "root", "blind", "haste", "rally", "rime", "tether", "pact", "regen", "taunting", "haste_full", "sanctuary", "intercept"]:
 		if u.statuses.has(s):
 			u.statuses[s] = int(u.statuses[s]) - 1
 			if int(u.statuses[s]) <= 0:
@@ -581,6 +646,10 @@ func _answer_help(helper: UnitScript, target: UnitScript) -> void:
 
 ## Whether this unit may still move this turn under the turn mode.
 func can_move(u: UnitScript) -> bool:
+	if uses_actions(u):
+		if u.statuses.has("free_move"):
+			return not u.statuses.has("root")
+		return u.actions_left > 0 and u.move_left > 0
 	if u.move_left <= 0:
 		return false
 	if u.action_used and turn_mode != "move_and_act" and not _moves_and_acts(u):
@@ -590,6 +659,8 @@ func can_move(u: UnitScript) -> bool:
 
 ## Whether this unit may still take its action: under move_or_act, not after moving.
 func act_block(u: UnitScript) -> String:
+	if uses_actions(u):
+		return "" if u.actions_left > 0 else Str.t(db, "combat_state.no_actions_left")
 	if u.action_used:
 		return Str.t(db, "combat_state.no_action_left")
 	if turn_mode == "move_or_act" and u.moved_steps > 0 and not _moves_and_acts(u):
@@ -599,13 +670,35 @@ func act_block(u: UnitScript) -> String:
 
 ## Who may move and act in one turn. Enemies always telegraph during the
 ## player's turn and carry it out on their own. On Normal they either hit from
-## where they stand or move into position; on Hard they move, then attack
-## (data/combat_rules.json "difficulties", user decision Oct 24). Data
-## "moveAndAct" (fast elites) or Haste lets anyone do both.
+## where they stand or move into position, or they move, then attack: each
+## enemy turn rolls the difficulty's "enemyMoveAndActChance" when it is planned
+## (CT Part 2, user decision Oct 25). Data "moveAndAct" (fast elites) or Haste
+## lets anyone do both.
 func _moves_and_acts(u: UnitScript) -> bool:
 	if bool(u.source.get("moveAndAct", false)) or u.statuses.has("haste_full"):
 		return true
-	return u.team == "enemy" and bool(difficulty_rules().get("enemyMoveAndAct", false))
+	return u.team == "enemy" and u.both_this_turn
+
+
+## Roll whether this enemy's next turn is move-and-attack or move-or-attack.
+## The chance is one number, or one per enemy tier ({ "normal": .., "elite": .., "default": .. }).
+func move_and_act_chance(u: UnitScript, key: String = "enemyMoveAndActChance") -> float:
+	var c: Variant = difficulty_rules().get(key, 0.0)
+	if c is Dictionary:
+		var tier := "boss" if u.boss else str(u.source.get("tier", "normal"))
+		return float((c as Dictionary).get(tier, (c as Dictionary).get("default", 0.0)))
+	return float(c)
+
+
+func roll_move_and_act(u: UnitScript) -> void:
+	if turn_mode == "two_actions":
+		# PT Part 1: enemies always have 2 Actions; some turns both are attacks.
+		u.both_this_turn = true
+		var dc := move_and_act_chance(u, "enemyDoubleAttackChance")
+		u.double_attack = dc >= 1.0 or (dc > 0.0 and rng.randf() < dc)
+		return
+	var chance := move_and_act_chance(u)
+	u.both_this_turn = chance >= 1.0 or (chance > 0.0 and rng.randf() < chance)
 
 
 ## Merged effects of the active arena mutators (numbers multiply, flags OR).
@@ -638,8 +731,9 @@ func move(u: UnitScript, dest: Vector2i) -> bool:
 	if not reach.has(dest):
 		return false
 	var path := grid.path(u.cell, dest, occupied(u))
-	if path.is_empty() or path.size() > u.move_left:
+	if path.is_empty() or (path.size() > u.move_left and not (uses_actions(u) and u.statuses.has("free_move"))):
 		return false
+	_push_undo(u)
 	var walked: Array = []
 	var prev := u.cell
 	var slide_dir := Vector2i.ZERO
@@ -670,7 +764,15 @@ func move(u: UnitScript, dest: Vector2i) -> bool:
 	_face_nearest(u)
 	if u.intent.has("move"):
 		u.intent["move"] = u.cell
+	if uses_actions(u):
+		if u.statuses.has("free_move"):
+			u.statuses.erase("free_move")
+			u.links.erase("free_move")
+		else:
+			spend_action(u)
+		u.move_left = move_budget(u) if u.actions_left > 0 else 0
 	_check_end()
+	_after_step(u)
 	return true
 
 
@@ -756,11 +858,15 @@ func _slide(u: UnitScript, dir: Vector2i) -> void:
 
 ## Undo this turn's move (before acting): back to the start tile with full Movement.
 func can_undo_move(u: UnitScript) -> bool:
+	if turn_mode == "two_actions":
+		return can_undo(u)
 	return u == current and u.moved_steps > 0 and u.undo_ok and not u.action_used and not u.quick_used and u.cell != u.start_cell \
 		and (unit_at(u.start_cell) == null or unit_at(u.start_cell) == u)
 
 
 func undo_move(u: UnitScript) -> bool:
+	if turn_mode == "two_actions":
+		return undo(u)
 	if not can_undo_move(u):
 		return false
 	var from := u.cell
@@ -923,7 +1029,7 @@ func _use_slot(u: UnitScript, card: Dictionary) -> void:
 	if bool(card.get("quick", false)) and not u.quick_used:
 		u.quick_used = true
 	else:
-		u.action_used = true
+		spend_action(u)
 	u.undo_ok = false
 
 
@@ -937,6 +1043,7 @@ func play_card(u: UnitScript, hand_index: int, target: Vector2i) -> bool:
 	var cost := card_cost(u, card, target)
 	if cost > u.mp or card_block(u, card) != "":
 		return false
+	_push_undo(u)
 	_use_slot(u, card)
 	u.mp -= cost
 	if u.team == "party" and CardRules.is_spell(card):
@@ -953,6 +1060,7 @@ func play_card(u: UnitScript, hand_index: int, target: Vector2i) -> bool:
 	if card.has("effects") and result == "":
 		_effects_script().run(self, u, card, target, cells)
 	_check_end()
+	_after_step(u)
 	return true
 
 
@@ -974,23 +1082,25 @@ func effect_cells(u: UnitScript, card: Dictionary, target: Vector2i) -> Array:
 
 ## The basic Strike (adjacent, STR): always available as the turn's action.
 func strike(u: UnitScript, target: Vector2i) -> bool:
-	if result != "" or u != current or act_block(u) != "" or not u.alive():
+	if result != "" or u != current or quick_block(u) != "" or not u.alive():
 		return false
 	if not _adjacent_hostiles(u, 1).has(target):
 		return false
-	u.action_used = true
+	_push_undo(u)
+	_use_quick_builtin(u)
 	u.undo_ok = false
 	_basic(u, { "action": "strike", "stat": "str", "mult": 1.0, "name": "Strike" }, target)
 	_check_end()
+	_after_step(u)
 	return true
 
 
 ## The basic Guard (uses the action; the Guard card is a quick card instead).
 func guard(u: UnitScript) -> bool:
-	if result != "" or u != current or act_block(u) != "" or not u.alive():
+	if result != "" or u != current or quick_block(u) != "" or not u.alive():
 		return false
-	u.action_used = true
-	u.undo_ok = false
+	_push_undo(u)
+	_use_quick_builtin(u)
 	u.guard_active = true
 	_emit({ "t": "guard", "unit": u.id })
 	_guard_aura(u)
@@ -1051,7 +1161,8 @@ func improvise(u: UnitScript, vectors: Array, form: String, magnitude: String, f
 	var mp_before := u.mp
 	if u.perk == "overchannel" and not u.perk_used:
 		u.perk_used = true
-	u.action_used = true
+	_push_undo(u)
+	spend_action(u)
 	u.undo_ok = false
 	u.mp -= cost
 	u.deck.discard_from_hand(fuel_index)
@@ -1083,14 +1194,15 @@ func preview(u: UnitScript, card: Dictionary, target: Vector2i, improvised: bool
 				out["hits"].append({ "unit": t.id, "heal": _heal_value(u, spec) })
 			elif float(spec["mult"]) > 0.0 and (is_hostile(u, t) or t.is_prop()):
 				n += 1
-				out["hits"].append({ "unit": t.id, "damage": roundi(_expected_hit(u, t, _area_spec(spec, n))), "status": _preview_statuses(spec["vectors"], t) })
+				out["hits"].append({ "unit": t.id, "damage": roundi(_expected_hit(u, t, _area_spec(spec, n))), "status": _preview_statuses(spec["vectors"], t),
+					"cover": cover_mul(u.cell, t.cell, bool(spec["ranged"])) })
 		_preview_motion(u, spec, out)
 	else:
 		out["cells"] = [target]
 		out["cost"] = card_cost(u, card, target)
 		var t := unit_at(target)
 		if t != null and str(card.get("action", "")) == "strike":
-			out["hits"].append({ "unit": t.id, "damage": roundi(_expected_strike(u, t, card)) })
+			out["hits"].append({ "unit": t.id, "damage": roundi(_expected_strike(u, t, card)), "cover": cover_mul(u.cell, t.cell, false) })
 		elif t != null and str(card.get("action", "")) == "heal":
 			out["hits"].append({ "unit": t.id, "heal": Res.heal_amount(float(card.get("amount", 10)), u) })
 	return out
@@ -1124,7 +1236,7 @@ func _preview_motion(u: UnitScript, spec: Dictionary, out: Dictionary) -> void:
 		var land := {}
 		if v.has("force"):
 			var share := float(VO.normalize_sum(v).get("force", 1.0))
-			var steps := maxi(1, floori(float(spec["power"]) * share / 10.0)) + (1 if u.perk == "momentum" else 0)
+			var steps := maxi(1, floori(float(spec["power"]) * share / float(Res.combat_cfg(db).get("pushPowerPerStep", 7)))) + (1 if u.perk == "momentum" else 0)
 			land = push_landing(u, t, Forms.direction_to(u.cell, t.cell) if u.cell != t.cell else Vector2i(u.facing, 0), steps, true)
 		elif v.has("motion") and not t.is_prop() and GridScript.manhattan(t.cell, u.cell) > 1:
 			land = push_landing(u, t, Forms.direction_to(t.cell, u.cell), 1, false)
@@ -1198,6 +1310,8 @@ func _spell_spec(u: UnitScript, card: Dictionary) -> Dictionary:
 
 func _expected_hit(u: UnitScript, t: UnitScript, spec: Dictionary) -> float:
 	var area := float(spec.get("areaMul", 1.0))
+	if u.statuses.has("encore"):
+		area *= float(Res.combat_cfg(db).get("encoreMul", 0.5))
 	# Arena mutators: "Cold is stronger" and friends.
 	for axis in spec.get("vectors", {}):
 		area *= float(mutator_rules().get("vectorDamage", {}).get(str(axis), 1.0))
@@ -1254,7 +1368,50 @@ func _shared(u: UnitScript, t: UnitScript, ranged: bool) -> float:
 	for a in allies_of(u):
 		if a != u and GridScript.manhattan(a.cell, u.cell) == 1 and _bond_friendly(u, a):
 			friend = true
-	return Res.shared_mult(db, u, t, ranged, grid.get_terrain(t.cell) == GridScript.COVER, friend)
+	return Res.shared_mult(db, u, t, ranged, cover_mul(u.cell, t.cell, ranged), friend)
+
+
+# --- Cover (CT Part 3) ----------------------------------------------------------
+
+func cover_cfg() -> Dictionary:
+	return Res.combat_cfg(db).get("cover", {})
+
+
+## Whether a prop is a cover piece (crates, low walls).
+func is_cover(p: UnitScript) -> bool:
+	return p != null and p.is_prop() and not p.dead and cover_cfg().get("pieces", {}).has(_prop_kind(p))
+
+
+func _prop_kind(p: UnitScript) -> String:
+	for k in cover_cfg().get("pieces", {}):
+		if p.id == str(k) or p.id.begins_with(str(k) + "_"):
+			return str(k)
+	return p.id
+
+
+## The cover piece protecting a unit on `cell` from an attacker on `from`: one
+## next to it on the attacker's side, with the attacker mostly across it
+## (a 45 degree angle or wider counts as flanking).
+## Attacks from the side or behind (flanking) ignore it.
+func cover_piece(from: Vector2i, cell: Vector2i) -> UnitScript:
+	var v := from - cell
+	for d in GridScript.DIRS:
+		var dir: Vector2i = d
+		var along := v.x * dir.x + v.y * dir.y
+		var side := absi(v.x * dir.y - v.y * dir.x)
+		if along < 1 or along <= side:
+			continue
+		var p := unit_at(cell + dir)
+		if is_cover(p):
+			return p
+	return null
+
+
+## Damage multiplier from cover: x0.5 ranged and area, x0.75 melee, 1 without.
+func cover_mul(from: Vector2i, cell: Vector2i, ranged: bool) -> float:
+	if from == cell or cover_piece(from, cell) == null:
+		return 1.0
+	return float(cover_cfg().get("rangedMul" if ranged else "meleeMul", 0.5 if ranged else 0.75))
 
 
 ## Adjacent allies with Friend Bond or better (+5% damage). Party sources carry
@@ -1288,6 +1445,9 @@ func _cast(u: UnitScript, card: Dictionary, target: Vector2i, improvised: bool, 
 	if u.team == "party":
 		u.source["pairUses"] = uses
 	var roll := Res.roll_stability(db, u.stability + int(spec.get("stabilityBonus", 0)), cost, mp_before, improvised and u.perk != "unstable", rng)
+	if improvised and guarantee_improvise:
+		guarantee_improvise = false
+		roll["ok"] = true
 	if not bool(roll["ok"]):
 		var failure := Res.roll_failure(db, rng)
 		_emit({ "t": "instability", "unit": u.id, "result": failure, "roll": roll["roll"], "need": roll["target"],
@@ -1385,6 +1545,11 @@ func _resolve_spec(u: UnitScript, spec: Dictionary, target: Vector2i) -> void:
 func _hit_unit(u: UnitScript, t: UnitScript, spec: Dictionary, can_miss: bool) -> bool:
 	if not t.alive():
 		return false
+	var guard_ally := _interceptor(t) if u.team == "enemy" else null
+	if guard_ally != null:
+		guard_ally.statuses.erase("intercept")
+		_emit({ "t": "log", "text": Str.t(db, "combat_state.intercepts") % [guard_ally.name, t.name] })
+		t = guard_ally
 	if can_miss and u.statuses.has("blind") and rng.randf() < float(Res.combat_cfg(db).get("blindMissChance", 0.35)):
 		_emit({ "t": "miss", "unit": t.id })
 		return false
@@ -1440,8 +1605,7 @@ func _basic(u: UnitScript, card: Dictionary, target: Vector2i) -> void:
 			_emit({ "t": "guard", "unit": u.id })
 			_guard_aura(u)
 		"dash":
-			u.move_left += int(card.get("amount", 2))
-			_emit({ "t": "status", "unit": u.id, "status": "dash" })
+			grant_move(u, int(card.get("amount", 2)))
 		"rally":
 			for a in allies_of(u):
 				if GridScript.manhattan(a.cell, u.cell) <= int(card.get("range", 3)) or u.perk == "encore":
@@ -1475,8 +1639,8 @@ func hit_note(u: UnitScript, t: UnitScript, vectors: Dictionary) -> String:
 		parts.append("resisted")
 	if Res.is_behind(u, t):
 		parts.append(Str.t(db, "combat_state.from_behind"))
-	if grid.get_terrain(t.cell) == GridScript.COVER and GridScript.manhattan(u.cell, t.cell) > 1:
-		parts.append("cover")
+	if cover_piece(u.cell, t.cell) != null:
+		parts.append(Str.t(db, "combat_state.in_cover"))
 	return ", ".join(PackedStringArray(parts))
 
 
@@ -1587,7 +1751,7 @@ func _apply_vector_effects(u: UnitScript, spec: Dictionary, cells: Array, hit: A
 			_emit({ "t": "status", "unit": t.id, "status": "corroded" })
 	if v.has("force"):
 		var share := float(VO.normalize_sum(v).get("force", 1.0))
-		var steps := maxi(1, floori(power * share / 10.0)) + (1 if u.perk == "momentum" else 0)
+		var steps := maxi(1, floori(power * share / float(Res.combat_cfg(db).get("pushPowerPerStep", 7)))) + (1 if u.perk == "momentum" else 0)
 		for t in hit:
 			if t.alive():
 				_push(u, t, Forms.direction_to(u.cell, t.cell) if u.cell != t.cell else Vector2i(u.facing, 0), steps)
@@ -1660,6 +1824,18 @@ func _damage(t: UnitScript, amount: int, source: UnitScript, vector: String, cau
 		return
 	if t.downed or t.statuses.has("burrowed"):
 		return
+	if hp_floor and t.team == "party" and not t.is_prop():
+		# The tutorial's training floor: hits land for real but can't drop you.
+		amount = mini(amount, t.hp - 1)
+		if amount <= 0:
+			return
+	if is_cover(t) and cause in ["hit", "collision"]:
+		# Force breaks cover faster; Heat burns crates (CT Part 3).
+		var cc := cover_cfg()
+		var mul := float(cc.get("breakMul", {}).get(vector, 1.0))
+		if vector == "heat" and bool(cc.get("pieces", {}).get(_prop_kind(t), {}).get("burns", false)):
+			mul *= float(cc.get("burnMul", 2.0))
+		amount = roundi(float(amount) * mul)
 	if cause == "hit":
 		# Pact: an ally shares half; Tether: the linked enemy takes half too.
 		var pact := unit_by_id(str(t.links.get("pact", "")))
@@ -1808,13 +1984,22 @@ func _build_order_keep_current() -> void:
 # --- Enemy actions --------------------------------------------------------------
 
 ## An enemy (or AI) action from data: { form, vectors, power } or { kind: "strike", mult }.
+## Enemy actions carry an explicit "damage" number (before defense and
+## resistance), times the combat difficulty's enemyDamageMul. This is the only
+## place enemy damage is decided: previews, telegraphs, the threat view and the
+## hit all use it. Heals and shields use "power".
 func action_spec(u: UnitScript, action: Dictionary) -> Dictionary:
+	var dmg_mul := float(difficulty_rules().get("enemyDamageMul", 1.0)) if u.team == "enemy" else 1.0
 	if str(action.get("kind", "attack")) == "strike":
-		var base := float(u.stats.get(str(action.get("stat", "str")), 5)) * float(action.get("mult", 1.0)) + float(action.get("power", 0))
+		var base := float(action["damage"]) if action.has("damage") else \
+			float(u.stats.get(str(action.get("stat", "str")), 5)) * float(action.get("mult", 1.0)) + float(action.get("power", 0))
 		return { "name": str(action.get("name", "Strike")), "vectors": action.get("vectors", {}), "form": form_rec("touch"),
-			"power": float(action.get("power", 0)), "mult": 1.0, "heal": false, "ranged": false, "kind": "strike", "base": base }
+			"power": 0.0, "mult": 1.0, "heal": false, "ranged": false, "kind": "strike", "base": base * dmg_mul }
 	var form := Forms.at_magnitude(form_rec(str(action.get("form", "bolt"))), str(action.get("magnitude", "standard")))
 	var heal: bool = (str(form.get("id", "")) == "shield" or str(form.get("id", "")) == "aura") and (action.get("vectors", {}).has("light") or action.get("vectors", {}).has("vitality"))
+	if action.has("damage"):
+		return { "name": str(action.get("name", "Attack")), "vectors": action.get("vectors", {}), "form": form,
+			"power": float(action["damage"]) * dmg_mul, "mult": 1.0, "heal": false, "ranged": int(form.get("range", 1)) > 1, "kind": "spell" }
 	return { "name": str(action.get("name", "Attack")), "vectors": action.get("vectors", {}), "form": form,
 		"power": float(action.get("power", 5)), "mult": float(form.get("multiplier", 1.0)), "heal": heal,
 		"ranged": int(form.get("range", 1)) > 1, "kind": "spell" }
@@ -1838,7 +2023,7 @@ func perform_action(u: UnitScript, action: Dictionary, target: Vector2i) -> bool
 		return false
 	if not action_targets(u, action, u.cell).has(target):
 		return false
-	u.action_used = true
+	spend_action(u)
 	var spec := action_spec(u, action)
 	_emit({ "t": "cast", "unit": u.id, "name": spec["name"], "target": target, "improvised": false })
 	if str(spec["kind"]) == "strike":
@@ -1877,13 +2062,332 @@ func _ai_script() -> GDScript:
 	return _ai
 
 
-## Every enemy without an intent picks one now.
-func refresh_intents() -> void:
-	for u in units:
+## Enemies without an intent pick one now: the given ones, or every enemy.
+## Telegraphs are just in time (docs/COMBAT_TUNING.md Part 2): a party turn
+## reveals the plans of the enemies acting between it and the next party turn.
+func refresh_intents(only: Array = []) -> void:
+	for u in (only if not only.is_empty() else units):
 		if u.team == "enemy" and u.alive() and u.intent.is_empty():
+			roll_move_and_act(u)
 			u.intent = _ai_script().plan_intent(self, u)
 			if not u.intent.is_empty():
 				_emit({ "t": "intent", "unit": u.id, "kind": str(u.intent.get("kind", "")) })
+
+
+# --- Two Actions, Quicks, Cantrip, Hold and Undo (PT Parts 1 and 2) -------------
+
+func actions_cfg() -> Dictionary:
+	return db.get("combat_rules", {}).get("actions", {})
+
+
+func actions_per_turn() -> int:
+	return int(actions_cfg().get("actionsPerTurn", 2))
+
+
+## Party units under the two-Action turn (enemies carry out their plans instead).
+func uses_actions(u: UnitScript) -> bool:
+	return turn_mode == "two_actions" and u.team == "party"
+
+
+func spend_action(u: UnitScript) -> void:
+	if uses_actions(u):
+		u.actions_left = maxi(0, u.actions_left - 1)
+		u.action_used = u.actions_left <= 0
+	else:
+		u.action_used = true
+
+
+## Tiles one Move Action covers: Movement, plus Haste, minus Slow.
+func move_budget(u: UnitScript) -> int:
+	if u.statuses.has("root"):
+		return 0
+	var b := u.movement + int(u.statuses.get("haste_amount", 0)) - (1 if u.statuses.has("slow") else 0)
+	if u.statuses.has("haste_full"):
+		b += int(Res.combat_cfg(db).get("hasteMoveBonus", 2))
+	return maxi(0, b)
+
+
+## Why the Quick can't be used now ("" if it can).
+func quick_block(u: UnitScript) -> String:
+	if turn_mode != "two_actions" or u.team != "party":
+		return act_block(u)
+	return Str.t(db, "combat_state.quick_used") if u.quick_used else ""
+
+
+func _use_quick_builtin(u: UnitScript) -> void:
+	if turn_mode == "two_actions" and u.team == "party":
+		u.quick_used = true
+	else:
+		u.action_used = true
+
+
+func cantrip_cfg() -> Dictionary:
+	return db.get("combat_rules", {}).get("cantrip", {})
+
+
+## The built-in Cantrip: a 0 MP single-target Bolt in the first Vector known, or {}.
+func cantrip_spec(u: UnitScript) -> Dictionary:
+	if u.known_vectors.is_empty():
+		return {}
+	var axis := str(u.known_vectors[0])
+	var dmg: Dictionary = cantrip_cfg().get("damage", {})
+	var form := form_rec("bolt").duplicate()
+	form["range"] = int(cantrip_cfg().get("range", 4))
+	return { "name": Str.t(db, "combat_state.cantrip_name") % str(axis).capitalize(), "vectors": { axis: 1.0 }, "form": form,
+		"power": float(dmg.get(axis, dmg.get("default", 4))), "mult": 1.0, "heal": false, "ranged": true, "kind": "spell", "cantrip": true }
+
+
+func cantrip_targets(u: UnitScript) -> Array:
+	var spec := cantrip_spec(u)
+	if spec.is_empty():
+		return []
+	return _spell_targets(u, spec["form"], false).filter(func(c: Vector2i) -> bool:
+		var t := unit_at(c)
+		return t != null and t.alive() and is_hostile(u, t))
+
+
+func cast_cantrip(u: UnitScript, target: Vector2i) -> bool:
+	if result != "" or u != current or not u.alive() or act_block(u) != "" or not cantrip_targets(u).has(target):
+		return false
+	_push_undo(u)
+	spend_action(u)
+	var spec := cantrip_spec(u)
+	var t := unit_at(target)
+	_face_toward(u, target)
+	_emit({ "t": "cast", "unit": u.id, "name": spec["name"], "target": target, "improvised": false })
+	_emit({ "t": "area", "cells": [target], "vectors": spec["vectors"] })
+	_hit_unit(u, t, spec, true)
+	_check_end()
+	_after_step(u)
+	return true
+
+
+## Spend an Action to keep one card for next turn (PT Part 2).
+func hold_block(u: UnitScript) -> String:
+	if u.deck == null or u.deck.hand.is_empty():
+		return Str.t(db, "combat_state.no_card")
+	if u.held_id != "":
+		return Str.t(db, "combat_state.already_holding")
+	return act_block(u)
+
+
+func hold_card(u: UnitScript, hand_index: int) -> bool:
+	if u != current or result != "" or hold_block(u) != "" or hand_index < 0 or hand_index >= u.deck.hand.size():
+		return false
+	_push_undo(u)
+	spend_action(u)
+	u.held_id = str(u.deck.hand[hand_index])
+	_emit({ "t": "log", "text": Str.t(db, "combat_state.holds") % [u.name, str(CardRules.resolve(db, u.held_id, library).get("name", u.held_id))] })
+	return true
+
+
+## Sanctuary: telegraphed hits on a protected unit deal half.
+func _sanctuary_spec(spec: Dictionary, t: UnitScript) -> Dictionary:
+	if not t.statuses.has("sanctuary"):
+		return spec
+	var s := spec.duplicate()
+	s["areaMul"] = float(s.get("areaMul", 1.0)) * float(Res.combat_cfg(db).get("sanctuaryMul", 0.5))
+	return s
+
+
+## A move that doesn't cost an Action (Hit and Run, Smoke Bomb).
+func grant_free_move(u: UnitScript, tiles: int) -> void:
+	u.statuses["free_move"] = 1
+	u.links["free_move"] = str(tiles)
+	_emit({ "t": "status", "unit": u.id, "status": "dash" })
+
+
+## Encore (CT Part 5): the ally takes another turn right after this one, with
+## 1 Action and half effect.
+func give_encore(t: UnitScript) -> void:
+	var i := order.find(t)
+	if i >= 0:
+		order.remove_at(i)
+		if i <= turn_index:
+			turn_index -= 1
+	order.insert(turn_index + 1, t)
+	t.statuses["encore"] = 1
+	_emit({ "t": "status", "unit": t.id, "status": "encore" })
+
+
+## Intercept: an adjacent ally with Intercept up takes the hit instead.
+func _interceptor(t: UnitScript) -> UnitScript:
+	if t.team != "party":
+		return null
+	for a in allies_of(t):
+		if a != t and a.alive() and a.statuses.has("intercept") and GridScript.manhattan(a.cell, t.cell) == 1:
+			return a
+	return null
+
+
+## Blocking an enemy's planned tile: a free Strike when it's stopped next to you.
+func _opportunity_strike(blocker: UnitScript, e: UnitScript) -> void:
+	if blocker == null or not blocker.alive() or blocker.team != "party" or not e.alive():
+		return
+	if GridScript.manhattan(blocker.cell, e.cell) != 1:
+		return
+	_emit({ "t": "log", "text": Str.t(db, "combat_state.opportunity_strike") % [blocker.name, e.name] })
+	_basic(blocker, { "action": "strike", "stat": "str", "mult": float(db.get("combat_rules", {}).get("opportunityStrike", {}).get("mult", 1.0)), "name": "Opportunity Strike" }, e.cell)
+
+
+## Enemies whose planned move ends on this unit's tile (for the hover line).
+func blocking(u: UnitScript) -> Array:
+	var out: Array = []
+	for e in units:
+		if e.team == "enemy" and e.alive() and not e.intent.is_empty() and e.intent.get("move", e.cell) == u.cell and e.cell != u.cell:
+			out.append(e)
+	return out
+
+
+# Undo (PT Part 1): every party step pushes a snapshot of the whole fight. A
+# step that rolled dice, drew a card or revealed something clears the stack.
+
+const _NO_SNAP := ["db", "rng", "forms", "events", "_ai", "_fx", "_undo", "undo_lock", "ai_overrides", "library"]
+
+
+func _snap_obj(o: Object, skip: Array = []) -> Dictionary:
+	var out := {}
+	for p in o.get_property_list():
+		if not (int(p["usage"]) & PROPERTY_USAGE_SCRIPT_VARIABLE):
+			continue
+		var n := str(p["name"])
+		if skip.has(n):
+			continue
+		var v: Variant = o.get(n)
+		out[n] = v.duplicate(true) if (v is Dictionary or v is Array) else v
+	return out
+
+
+func _restore_obj(o: Object, data: Dictionary) -> void:
+	for n in data:
+		var v: Variant = data[n]
+		o.set(n, v.duplicate(true) if (v is Dictionary or v is Array) else v)
+
+
+func _push_undo(u: UnitScript) -> void:
+	if u.team != "party" or u.ai_controlled or turn_mode != "two_actions":
+		return
+	var snap := { "state": _snap_obj(self, _NO_SNAP), "grid": _snap_obj(grid), "units": {}, "decks": {}, "rng": rng.state,
+		"intents": _intent_count() }
+	for x in units:
+		snap["units"][x] = _snap_obj(x, ["deck"])
+		if x.deck != null:
+			snap["decks"][x] = _snap_obj(x.deck)
+	_undo.append(snap)
+
+
+func _intent_count() -> int:
+	var n := 0
+	for x in units:
+		if not x.intent.is_empty():
+			n += 1
+	return n
+
+
+## After a step: a roll, a draw or a reveal locks everything before it.
+func _after_step(u: UnitScript) -> void:
+	if _undo.is_empty() or u.team != "party":
+		return
+	var last: Dictionary = _undo[-1]
+	var reason := ""
+	if rng.state != int(last["rng"]):
+		reason = Str.t(db, "combat_state.undo_locked_roll")
+	elif _intent_count() > int(last["intents"]):
+		reason = Str.t(db, "combat_state.undo_locked_reveal")
+	elif u.deck != null and last["decks"].has(u) and u.deck.draw_pile.size() < (last["decks"][u]["draw_pile"] as Array).size():
+		reason = Str.t(db, "combat_state.undo_locked_draw")
+	if reason != "":
+		_undo.clear()
+		undo_lock = reason
+
+
+func can_undo(u: UnitScript) -> bool:
+	return u == current and result == "" and not _undo.is_empty()
+
+
+func undo_reason(u: UnitScript) -> String:
+	if can_undo(u):
+		return ""
+	return undo_lock if undo_lock != "" else Str.t(db, "combat_state.nothing_to_undo")
+
+
+func undo(u: UnitScript) -> bool:
+	if not can_undo(u):
+		return false
+	var snap: Dictionary = _undo.pop_back()
+	var keep_undo := _undo
+	_restore_obj(self, snap["state"])
+	_undo = keep_undo
+	_restore_obj(grid, snap["grid"])
+	for x in snap["units"]:
+		_restore_obj(x, snap["units"][x])
+	for x in snap["decks"]:
+		if x.deck != null:
+			_restore_obj(x.deck, snap["decks"][x])
+	rng.state = int(snap["rng"])
+	_emit({ "t": "undo", "unit": u.id, "from": u.cell, "to": u.cell, "full": true })
+	return true
+
+
+## Cards in hand at the start of a turn: data "drawUpTo" plus draw bonuses.
+func hand_size(u: UnitScript) -> int:
+	return int(Res.combat_cfg(db).get("drawUpTo", 3)) + int(u.mods.get("combat", {}).get("drawBonus", 0))
+
+
+## Movement cards (CT Part 4): before moving or acting this turn the tiles
+## apply now; after that they carry over to the next turn (never wasted).
+func grant_move(u: UnitScript, tiles: int) -> void:
+	if uses_actions(u) and u.actions_left > 0:
+		# Two Actions: the next Move this turn goes further.
+		u.move_left += tiles
+		_emit({ "t": "status", "unit": u.id, "status": "dash" })
+	elif not uses_actions(u) and u.moved_steps == 0 and not u.action_used:
+		u.move_left += tiles
+		_emit({ "t": "status", "unit": u.id, "status": "dash" })
+	else:
+		u.statuses["move_next"] = 1
+		u.links["move_next"] = str(int(u.links.get("move_next", "0")) + tiles)
+		_emit({ "t": "status", "unit": u.id, "status": "move_next" })
+		_emit({ "t": "log", "text": Str.t(db, "combat_state.move_next_turn") % [u.name, tiles] })
+
+
+## Whether a movement card would apply now (true) or next turn (false).
+func move_applies_now(u: UnitScript) -> bool:
+	return u.moved_steps == 0 and not u.action_used
+
+
+## Whether this unit already took its turn this round (not counting the current one).
+func acted_this_round(u: UnitScript) -> bool:
+	return u != current and u.last_turn_round == round_num
+
+
+## The enemies that act after this party unit's turn and before the next
+## party turn (wrapping into the next round): this turn is their last chance.
+func acts_next(u: UnitScript) -> Array:
+	var out: Array = []
+	var i := order.find(u)
+	if i < 0:
+		return out
+	for step in range(1, order.size()):
+		var o: UnitScript = order[(i + step) % order.size()]
+		if not o.alive() or o.is_prop():
+			continue
+		if o.team == "party":
+			break
+		out.append(o)
+	return out
+
+
+## The party unit whose turn is the last chance before this enemy acts, or null.
+func last_chance_for(e: UnitScript) -> UnitScript:
+	var i := order.find(e)
+	if i < 0:
+		return null
+	for step in range(1, order.size()):
+		var o: UnitScript = order[(i - step + order.size()) % order.size()]
+		if o.alive() and o.team == "party" and not o.is_prop():
+			return o
+	return null
 
 
 ## Tiles an intent threatens right now (tracking intents follow their target).
@@ -1909,12 +2413,7 @@ func support_cells() -> Array:
 ## The resolution spec of an intent's action. Telegraphed attacks can be
 ## dodged, so they hit harder (data/stats.json combat "telegraphDamageMul").
 func intent_spec(u: UnitScript, action: Dictionary = {}) -> Dictionary:
-	var spec := action_spec(u, action if not action.is_empty() else u.intent.get("action", {}))
-	var mul := float(Res.combat_cfg(db).get("telegraphDamageMul", 1.0)) * float(difficulty_rules().get("enemyDamageMul", 1.0))
-	spec["power"] = float(spec["power"]) * mul
-	if spec.has("base"):
-		spec["base"] = float(spec["base"]) * mul
-	return spec
+	return action_spec(u, action if not action.is_empty() else u.intent.get("action", {}))
 
 
 ## Expected damage an intent deals on a tile: to whoever stands there, or to
@@ -1930,7 +2429,16 @@ func intent_damage(u: UnitScript, cell: Vector2i) -> int:
 				t = p
 	if t == null or t == u:
 		return 0
-	return roundi(_expected_hit(u, t, spec))
+	# Estimated from where the enemy will stand, against whoever is on that tile,
+	# so cover and flanking show in the telegraph (CT Part 3).
+	var saved_u := u.cell
+	var saved_t := t.cell
+	u.cell = u.intent.get("move", u.cell) if str(u.intent.get("mode", "locked")) != "tracking" else u.cell
+	t.cell = cell
+	var dmg := roundi(_expected_hit(u, t, spec))
+	u.cell = saved_u
+	t.cell = saved_t
+	return dmg
 
 
 ## cell -> [{ "unit": enemy id, "damage": n, "charge": n }] for every telegraph.
@@ -1942,7 +2450,7 @@ func threats() -> Dictionary:
 		for c in intent_cells(u):
 			if not out.has(c):
 				out[c] = []
-			out[c].append({ "unit": u.id, "damage": intent_damage(u, c), "charge": int(u.intent.get("charge", 0)) })
+			out[c].append({ "unit": u.id, "damage": intent_damage(u, c) * int(u.intent.get("repeat", 1)), "charge": int(u.intent.get("charge", 0)) })
 	for d in delayed:
 		var caster: UnitScript = d["caster"]
 		for c in d["cells"]:
@@ -1952,6 +2460,22 @@ func threats() -> Dictionary:
 			var dmg := roundi(_expected_hit(caster, victim, d["spec"])) if victim != null and victim != caster else roundi(float(d["spec"]["power"]))
 			out[c].append({ "unit": caster.id, "damage": dmg, "charge": int(d["turns"]), "neutral": bool(d["neutral"]), "delayed": true })
 	return out
+
+
+## Damage from tracking attacks aimed at this unit that would still reach it
+## if it stood on `cell` (the attacker's Movement plus the action's range).
+func tracking_threat(u: UnitScript, cell: Vector2i) -> int:
+	var total := 0
+	for e in units:
+		if e.team == u.team or not e.alive() or str(e.intent.get("mode", "")) != "tracking" or str(e.intent.get("unit", "")) != u.id:
+			continue
+		if not str(e.intent.get("kind", "")) in ["attack", "special"]:
+			continue
+		var spec := intent_spec(e)
+		var reach: int = e.movement + (1 if str(spec.get("kind", "")) == "strike" else int(spec["form"].get("range", 1)))
+		if GridScript.manhattan(e.cell, cell) <= reach:
+			total += intent_damage(e, u.cell)
+	return total
 
 
 ## Expected damage waiting on a tile for a unit of `team` (for the AI and the hover info).
@@ -2079,9 +2603,28 @@ func execute_intent(u: UnitScript) -> bool:
 		_emit({ "t": "log", "text": Str.t(db, "combat_state.can_t_reach") % [u.name, t.name] })
 		return true
 	var dest: Vector2i = it.get("move", u.cell)
-	if dest != u.cell and u.move_left > 0 and reachable_cells(u).has(dest):
-		move(u, dest)
+	if bool(it.get("double_move", false)):
+		u.move_left = maxi(u.move_left, u.movement * 2)
+	if dest != u.cell and can_move(u):
+		var reach := reachable_cells(u)
+		if reach.has(dest):
+			move(u, dest)
+		else:
+			# Blocked: get as close as it can, then re-aim at the same target.
+			var blocker := unit_at(dest)
+			var best := u.cell
+			for c in reach:
+				var cell: Vector2i = c
+				if unit_at(cell) == null and GridScript.manhattan(cell, dest) < GridScript.manhattan(best, dest):
+					best = cell
+			if best != u.cell:
+				move(u, best)
+			_opportunity_strike(blocker, u)
 	if result != "" or not u.alive():
+		return true
+	if u.cell != dest and kind in ["attack", "special"] and not _reaim(u, it):
+		_emit({ "t": "log", "text": Str.t(db, "combat_state.blocked_loses_attack") % u.name })
+		u.action_used = true
 		return true
 	match kind:
 		"move":
@@ -2094,6 +2637,23 @@ func execute_intent(u: UnitScript) -> bool:
 				return false
 		"attack", "special":
 			_resolve_locked(u, it)
+			if int(it.get("repeat", 1)) > 1 and result == "" and u.alive():
+				_emit({ "t": "log", "text": Str.t(db, "combat_state.attacks_twice") % u.name })
+				_resolve_locked(u, it)
+	return true
+
+
+## After being blocked or moved off its plan: aim the same attack at the same
+## target tile from where it stands. False if the target is out of reach.
+func _reaim(u: UnitScript, it: Dictionary) -> bool:
+	var act: Dictionary = it.get("action", {})
+	if bool(act.get("summon", false)) or bool(act.get("burrow", false)) or bool(act.get("resurface", false)):
+		return true
+	var target: Vector2i = it.get("target", u.cell)
+	if not action_targets(u, act, u.cell).has(target):
+		return false
+	it["cells"] = _ai_script().attack_cells(self, u, act, u.cell, target)
+	it["move"] = u.cell
 	return true
 
 
@@ -2140,7 +2700,7 @@ func _resolve_locked(u: UnitScript, it: Dictionary) -> void:
 				_heal(u, t, _heal_value(u, spec))
 		elif str(spec.get("kind", "")) == "strike" and parried(u, t):
 			continue
-		elif _hit_unit(u, t, spec, true):
+		elif _hit_unit(u, t, _sanctuary_spec(spec, t), true):
 			hit.append(t)
 	if not bool(spec["heal"]):
 		_apply_vector_effects(u, spec, cells, hit)
