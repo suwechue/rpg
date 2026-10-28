@@ -355,6 +355,8 @@ Change these in `data/school_classes.json`, `data/events/class_events.json`, `da
 
 ## C3. Stats and leveling
 
+
+**Point buy at run start (PT Part 9):** every stat starts at **3**; spend **20 points** (1 per point up to 8, 2 per point for 9 and 10; nothing above 10). The class adds a small bonus on top (Mage +1 INT +1 WIL, Fighter +1 STR +1 CON, Rogue +1 DEX +1 PER, Healer +1 WIL +1 CON, Bard +1 CHA +1 DEX). The screen shows each stat's job and the derived values live, with **Recommended** and **Random** buttons. Story runs get it after picking a class; arena runs offer "Use recommended for all" or point buy for each member. NPCs keep their class starting stats. Change it in `data/point_buy.json`.
 - **Stats:** STR, DEX, CON, INT, PER, WIL, CHA (1 to 20).
 - **Derived values:**
 
@@ -497,4 +499,3 @@ Change these in `data/story/*.json`, `data/journal.json` and `data/endings.json`
 CT is done, with PT Parts 1 and 2 (2 Actions, Quicks, Cantrip, Hold, undo, deck rules) adopted inside it. Next, from `docs/PATCH_1.md`:
 
 - Part 8: the Vector expansion, fusion synergy and antagonism, Instability by Magnitude, Techniques.
-- Part 9: point-buy stats.

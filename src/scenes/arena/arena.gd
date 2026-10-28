@@ -45,6 +45,8 @@ func _ready() -> void:
 	if bool(arena.get("inFight", false)) and GameState.combat_context == "arena":
 		_after_wave()
 	_refresh()
+	if bool(GameState.run.get("pendingPointBuy", false)):
+		_point_buy.call_deferred()
 	if GameState.dev_autoplay:
 		_autoplay.call_deferred()
 
@@ -311,6 +313,28 @@ func _checkpoint() -> void:
 	if story:
 		_button(Strings.t("arena.bank_and_leave_the_rift"), _leave)
 	_center()
+
+
+## PT Part 9: point buy for each party member, from their recommended picks.
+func _point_buy() -> void:
+	GameState.run.erase("pendingPointBuy")
+	const PB := preload("res://src/core/progression/point_buy.gd")
+	for ch in Party.party(GameState.run):
+		var start := PB.recommended(DataDB.all(), str(ch.get("class", "mage")))
+		var pb := preload("res://src/scenes/ui/point_buy_screen.gd").new()
+		pb.class_id = str(ch.get("class", "mage"))
+		pb.who = str(ch.get("name", ""))
+		pb.stats = start
+		var got: Variant = await Flow.show_modal(pb)
+		if got != null:
+			# Undo the recommended picks, then apply the chosen ones.
+			var diff := {}
+			for s in got:
+				diff[s] = int(got[s]) - int(start.get(s, 3))
+			for s in diff:
+				ch["stats"][s] = maxi(1, int(ch["stats"].get(s, 3)) + int(diff[s]))
+			preload("res://src/core/character.gd").full_restore(DataDB.all(), ch)
+	_refresh()
 
 
 ## PT Part 6: pick 1 of 3 cards after a wave, or skip for Scraps.

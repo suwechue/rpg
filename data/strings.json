@@ -672,6 +672,18 @@
     "arena.score_picks": "Perks taken: %s",
     "arena.score_highest_hit": "Highest hit: %d",
     "card.sets_up": "Sets up: %s.",
-    "card.pays_off": "Pays off: %s."
+    "card.pays_off": "Pays off: %s.",
+    "point_buy.title": "Stats: %s",
+    "point_buy.you": "you",
+    "point_buy.points_left": "Points left: %d of %d (1 per point up to 8, 2 per point for 9 and 10)",
+    "point_buy.derived": "HP %d  MP %d  Move %d  Init %d  Def %d  MRes %d  Stab %d  Crit %.1f%%  High crit %.1f%%",
+    "point_buy.recommended": "Recommended",
+    "point_buy.random": "Random",
+    "point_buy.confirm": "Confirm",
+    "point_buy.out_of_range": "%s must be between 3 and 10.",
+    "point_buy.over_budget": "That's more points than you have.",
+    "point_buy.arena_title": "Party stats",
+    "point_buy.use_recommended": "Use recommended for all",
+    "point_buy.each_member": "Point buy for each member"
   }
 }

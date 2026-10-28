@@ -14,8 +14,11 @@ const VERSION := 3
 
 ## A fresh run. opts: name, traits.
 static func new_run(db: Dictionary, seed_value: int, class_id: String, rng: RandomNumberGenerator, opts: Dictionary = {}) -> Dictionary:
-	var player := Char.create(db, class_id, rng, {
-		"id": "player", "name": str(opts.get("name", Str.t(db, "run_model.new_kid"))), "isPlayer": true, "traits": opts.get("traits", []) })
+	var copts := { "id": "player", "name": str(opts.get("name", Str.t(db, "run_model.new_kid"))), "isPlayer": true, "traits": opts.get("traits", []) }
+	if opts.has("stats"):
+		# Point buy (PT Part 9): the final starting stats, class bonus included.
+		copts["stats"] = opts["stats"]
+	var player := Char.create(db, class_id, rng, copts)
 	player["sprite"] = str(opts.get("sprite", db.get("assets/roles", {}).get("player", "")))
 	var collection := {}
 	for id in player["deck"]:

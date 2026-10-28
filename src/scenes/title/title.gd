@@ -2,6 +2,7 @@
 ## The Narrator's Journal and other meta options hook in via `extra_buttons`.
 extends Control
 
+const PointBuy := preload("res://src/core/progression/point_buy.gd")
 const Modal := preload("res://src/scenes/ui/modal.gd")
 const Char := preload("res://src/core/character.gd")
 const TOWN_SCENE := "res://src/scenes/town/town.tscn"
@@ -145,9 +146,16 @@ func _new_run() -> void:
 	if r == null:
 		return
 	var pick: Dictionary = r
+	# PT Part 9: point-buy stats before the run starts.
+	var pb := preload("res://src/scenes/ui/point_buy_screen.gd").new()
+	pb.class_id = str(pick["class"])
+	var alloc: Variant = await Flow.show_modal(pb)
+	if alloc == null:
+		return
 	SaveSystem.delete_save()
 	var traits: Array = [] if str(trait_pick["id"]) == "" else [str(trait_pick["id"])]
-	GameState.new_run(int(pick["seed"]), str(pick["class"]), Strings.t("title.new_kid"), { "traits": traits })
+	GameState.new_run(int(pick["seed"]), str(pick["class"]), Strings.t("title.new_kid"), { "traits": traits,
+		"stats": PointBuy.final_stats(DataDB.all(), str(pick["class"]), alloc) })
 	GameState.combat_difficulty = str(diff["id"])
 	Narrator.say(Strings.t("title.new_kid_in_a_small"))
 	SceneRouter.goto(TOWN_SCENE)
@@ -187,6 +195,13 @@ func _arena() -> void:
 	if r == null:
 		return
 	var pick: Dictionary = r
+	if not bool(pick.get("import", false)):
+		# PT Part 9: point buy for every member (in the arena), or the recommended picks for all.
+		var q := Modal.new()
+		q.build(Strings.t("point_buy.arena_title"), 320)
+		q.add_button(Strings.t("point_buy.use_recommended"), func() -> void: q.finish(false))
+		q.add_button(Strings.t("point_buy.each_member"), func() -> void: q.finish(true))
+		pick["pointBuyEach"] = bool(await Flow.show_modal(q))
 	start_arena(pick, int(size["n"]), Rng.stream("creation").randi_range(1, 999999), 3)
 
 
@@ -203,6 +218,11 @@ static func start_arena(pick: Dictionary, size: int, seed_value: int, level: int
 		GameState.new_run(seed_value, str(pick.get("class", "mage")))
 		GameState.run = ArenaParty.preset_run(DataDB.all(), seed_value, str(pick.get("class", "mage")), size, level, rng)
 	GameState.run.erase("rift")
+	if not bool(pick.get("import", false)):
+		for ch in [GameState.run["player"]] + GameState.run.get("roster", []):
+			PointBuy.apply_to(DataDB.all(), ch, PointBuy.recommended(DataDB.all(), str(ch.get("class", "mage"))))
+		if bool(pick.get("pointBuyEach", false)):
+			GameState.run["pendingPointBuy"] = true
 	GameState.run["arena"] = ArenaRules.new_arena(seed_value, false)
 	GameState.run["devArenaWaves"] = waves_cap
 	SceneRouter.goto("res://src/scenes/arena/arena.tscn")
