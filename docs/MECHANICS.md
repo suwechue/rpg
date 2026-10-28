@@ -532,8 +532,18 @@ Change these in `data/story/*.json`, `data/journal.json` and `data/endings.json`
 
 ---
 
+## B13. Vector combos and your spark
+
+- **Combos:** every pair of Heat, Cold, Force, Motion, Binding and Light is a named combo (15), plus three-Vector combos (Shatterstorm, Starfall Lance, Crystal Prison). A party spell whose top Vectors match (each at least 20% of the strongest) runs the combo's effects after its damage. This covers crafted hybrids and improvised casts. Cards with their own authored effects keep those. Three-Vector spells already cost more through the fusion surcharge.
+- **Discovery:** the first cast or craft of a combo shows its name, effect and a narrator line. The run and the Narrator's Journal remember it, and the **Vector Compendium** (Party panel or workbench) shows found combos, with "???" and a hint for the rest.
+- **Your spark:** at the start of a story run, the narrator asks 6 questions. Answers add Vector weights, and the strongest is your spark. It adds +3 to that Vector's affinity, makes it known, adds a Standard Bolt of it to your deck and gives a trait: Runs Warm (+1 damage on Heat cards), Cool Head (+1 WIL), Heavy Hands (+1 damage on Force cards), Restless (+1 Initiative), Keeps Promises (+1 CON) or Bright Idea (+1 PER). After the first quiz, later runs can pick a spark directly.
+- **Crafting:** the workbench builder shows a live card preview, its footprint and its combo ("???" until discovered). After the minigame you get a grade (S 95%+, A 80%+, B 60%+, C 40%+, else D) and the card flips in. The deck editor sorts by Vector, then cost, and badges combos.
+
+Change these in `data/combos.json`, `data/sparks.json`, `data/intro/spark_quiz.json` and `data/traits.json`.
+
+---
+
 # Part D: Changing next
 
-PT (`docs/PATCH_1.md`) and P2 Parts 1 to 3 (`docs/PATCH_2.md`, with cutscenes M14 and the intro M15) are in. Next:
-- VD (`docs/VECTORS_DEMO.md`) Parts 1 to 4: audio and asset polish, combos and the Compendium, the spark quiz, the visual card builder.
+PT (`docs/PATCH_1.md`), P2 Parts 1 to 3 (`docs/PATCH_2.md`, with cutscenes M14 and the intro M15) and VD Parts 1 to 4 (combos, the spark, the card builder) are in. Next:
 - VD Parts 5 and 6: the demo build and feedback tools.

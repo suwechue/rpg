@@ -36,9 +36,9 @@ func test_card_summary_is_short() -> void:
 func test_card_art_ids() -> void:
 	var spell := CardRules.make_spell(db(), { "cold": 1.0, "heat": 0.5 }, "burst", "minor")
 	var ids := CardRules.art_ids(db(), spell)
-	check(ids.has("card_art_heat") and ids[-1] == "card_art_spell", "spell art falls back to its first Vector, then its kind: %s" % str(ids))
+	check(ids.has("card_art_heat") and ids[-2] == "card_art_spell" and ids[-1] == "card_art_default", "spell art falls back to its first Vector, its kind, then the default: %s" % str(ids))
 	var strike := { "id": "card_strike", "kind": "basic" }
-	check(CardRules.art_ids(db(), strike) == ["card_art_card_strike", "card_art_basic"], "basic cards try their own art then the basic art")
+	check(CardRules.art_ids(db(), strike) == ["card_art_card_strike", "card_art_basic", "card_art_default"], "basic cards try their own art, the basic art, then the default")
 
 
 func test_status_list_order() -> void:

@@ -739,6 +739,27 @@
     "cutscene.skip": "Skip",
     "title.your_name": "Name:",
     "title.skip_tutorial_day": "Skip the tutorial day (and the floor's lessons)",
-    "arena.theme_banner": "Next five waves: %s. %s"
+    "arena.theme_banner": "Next five waves: %s. %s",
+    "card.combo": "Combo, %s: %s",
+    "combo.discovered": "Combo discovered: %s",
+    "combo.compendium": "Vector Compendium",
+    "combo.count": "Combos found: %d of %d (pairs %d of %d)",
+    "combo.unknown": "???",
+    "combo.triples": "Three-Vector combos",
+    "combo.close": "Close",
+    "spark.title": "Your spark",
+    "spark.question": "Question %d of %d",
+    "spark.reveal": "%s\n\n%s\n\nYou know %s now, and you have a new card: %s.\nTrait: %s (%s)",
+    "spark.choose": "Choose your spark",
+    "spark.choose_text": "The Journal remembers: you can take the quiz again or pick a spark directly.",
+    "spark.take_quiz": "Take the quiz",
+    "spark.continue": "Continue",
+    "workbench.compendium": "Vector Compendium",
+    "workbench.combo_known": "Combo: %s. %s",
+    "workbench.combo_unknown": "Combo: ??? (%s)",
+    "workbench.combo_found": "Combo discovered: %s!",
+    "workbench.grade": "Grade %s",
+    "workbench.combo_badge": "[%s]",
+    "party_panel.tab_compendium": "Compendium"
   }
 }

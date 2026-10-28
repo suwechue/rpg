@@ -43,6 +43,7 @@ func _ready() -> void:
 	_menu.add_child(UiTheme.button(Strings.t("title.quit"), func() -> void: get_tree().quit()))
 	(_menu.get_child(1 if not cont.disabled else 0) as Button).grab_focus()
 	Audio.play_music("title")
+	Audio.play_ambience("")
 
 
 func _process(delta: float) -> void:
@@ -177,6 +178,15 @@ func _new_run() -> void:
 		if bool(await Flow.show_modal(q)):
 			GameState.set_flag("tut_skip_day")
 			GameState.set_flag("tut_skip_lessons")
+	# VD Part 3: the narrator's spark quiz (or a direct pick once the Journal unlocks it).
+	var sq := preload("res://src/scenes/ui/spark_quiz_screen.gd").new()
+	sq.allow_choose = bool(Journal.data.get("spark_unlocked", false))
+	var spark: Variant = await Flow.show_modal(sq)
+	if spark != null and str(spark) != "":
+		preload("res://src/core/progression/spark.gd").apply(DataDB.all(), GameState.run, GameState.player, str(spark))
+		preload("res://src/core/character.gd").full_restore(DataDB.all(), GameState.player)
+		Journal.data["spark_unlocked"] = true
+		Journal.save_journal()
 	await Cutscenes.play("intro_night", self)
 	SceneRouter.goto(TOWN_SCENE)
 

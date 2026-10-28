@@ -18,7 +18,7 @@ Sizes: tiles 32x32, characters 32x32 (up to 32x48 for tall ones), portraits 64x6
 
 Pack art is a placeholder: the 16x16 packs are scaled up 2x (nearest neighbour) to fit the 32x32 grid until you replace them.
 
-Replaced so far: Characters (walk sheets) 0/39, Portraits 0/35, Enemies and bosses 0/76, Tilesets 0/4, Single tiles 0/120, UI 0/19, Icons 0/42, Card art 0/23, VFX 0/0, Music 0/30, Sound effects 0/38, Ambience 0/9, Voice blips 0/10.
+Replaced so far: Characters (walk sheets) 0/39, Portraits 0/35, Enemies and bosses 0/76, Tilesets 0/4, Single tiles 0/120, UI 0/19, Icons 0/42, Card art 0/24, VFX 0/38, Music 0/30, Sound effects 0/39, Ambience 0/9, Voice blips 0/10.
 
 ## Characters (walk sheets) (39)
 
@@ -404,7 +404,7 @@ Single tiles inside a tileset. Replacing one changes it everywhere it's used. Dr
 | [ ] | `icon_intent_move` | 16x16 | 16x16 white shape with dark outline; drawn over an enemy's head | center | skin placeholder |  |
 | [ ] | `icon_intent_tracking` | 16x16 | 16x16 white shape with dark outline; drawn over an enemy's head | center | skin placeholder |  |
 
-## Card art (23)
+## Card art (24)
 
 
 
@@ -433,10 +433,52 @@ Single tiles inside a tileset. Replacing one changes it everywhere it's used. Dr
 | [ ] | `card_art_corrosion` | 48x48 | 48x48 card illustration | top left | skin placeholder | Default art for corrosion cards. Give one card its own art with assets/custom/cards/card_art_<card id>.png. |
 | [ ] | `card_art_basic` | 48x48 | 48x48 card illustration | top left | skin placeholder | Default art for basic cards. Give one card its own art with assets/custom/cards/card_art_<card id>.png. |
 | [ ] | `card_art_item` | 48x48 | 48x48 card illustration | top left | skin placeholder | Default art for item cards. Give one card its own art with assets/custom/cards/card_art_<card id>.png. |
+| [ ] | `card_art_default` | 48x48 | 48x48 card illustration | top left | skin placeholder | The last fallback for any card with no other art (VD Part 1). |
 
-## VFX (0)
+## VFX (38)
 
-None yet.
+
+
+| Done | Id | Target size | Layout | Anchor | Source | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| [ ] | `vfx_heat` | 0x0 | one row of 5 frames, left to right | center (on the target tile) | pack: ninja_adventure | Effect for heat spells. Specific ones: vfx_heat_<form> (vfx_heat_bolt). |
+| [ ] | `vfx_cold` | 0x0 | one row of 10 frames, left to right | center (on the target tile) | pack: ninja_adventure | Effect for cold spells. Specific ones: vfx_cold_<form> (vfx_cold_bolt). |
+| [ ] | `vfx_force` | 0x0 | one row of 14 frames, left to right | center (on the target tile) | pack: ninja_adventure | Effect for force spells. Specific ones: vfx_force_<form> (vfx_force_bolt). |
+| [ ] | `vfx_motion` | 0x0 | one row of 5 frames, left to right | center (on the target tile) | pack: ninja_adventure | Effect for motion spells. Specific ones: vfx_motion_<form> (vfx_motion_bolt). |
+| [ ] | `vfx_binding` | 0x0 | one row of 8 frames, left to right | center (on the target tile) | pack: ninja_adventure | Effect for binding spells. Specific ones: vfx_binding_<form> (vfx_binding_bolt). |
+| [ ] | `vfx_light` | 0x0 | one row of 9 frames, left to right | center (on the target tile) | pack: ninja_adventure | Effect for light spells. Specific ones: vfx_light_<form> (vfx_light_bolt). |
+| [ ] | `vfx_transmutation` | 0x0 | one row of 4 frames, left to right | center (on the target tile) | pack: ninja_adventure | Effect for transmutation spells. Specific ones: vfx_transmutation_<form> (vfx_transmutation_bolt). |
+| [ ] | `vfx_vitality` | 0x0 | one row of 5 frames, left to right | center (on the target tile) | pack: ninja_adventure | Effect for vitality spells. Specific ones: vfx_vitality_<form> (vfx_vitality_bolt). |
+| [ ] | `vfx_corrosion` | 0x0 | one row of 11 frames, left to right | center (on the target tile) | pack: ninja_adventure | Effect for corrosion spells. Specific ones: vfx_corrosion_<form> (vfx_corrosion_bolt). |
+| [ ] | `vfx_gravity` | 0x0 | one row of 14 frames, left to right | center (on the target tile) | pack: ninja_adventure | Effect for gravity spells. Specific ones: vfx_gravity_<form> (vfx_gravity_bolt). |
+| [ ] | `vfx_lightning` | 0x0 | one row of 5 frames, left to right | center (on the target tile) | pack: ninja_adventure | Effect for lightning spells. Specific ones: vfx_lightning_<form> (vfx_lightning_bolt). |
+| [ ] | `vfx_sound` | 0x0 | one row of 4 frames, left to right | center (on the target tile) | pack: ninja_adventure | Effect for sound spells. Specific ones: vfx_sound_<form> (vfx_sound_bolt). |
+| [ ] | `vfx_shadow` | 0x0 | one row of 5 frames, left to right | center (on the target tile) | pack: ninja_adventure | Effect for shadow spells. Specific ones: vfx_shadow_<form> (vfx_shadow_bolt). |
+| [ ] | `vfx_warding` | 0x0 | one row of 6 frames, left to right | center (on the target tile) | pack: ninja_adventure | Effect for warding spells. Specific ones: vfx_warding_<form> (vfx_warding_bolt). |
+| [ ] | `vfx_poison` | 0x0 | one row of 8 frames, left to right | center (on the target tile) | pack: ninja_adventure | Effect for poison spells. Specific ones: vfx_poison_<form> (vfx_poison_bolt). |
+| [ ] | `vfx_psychic` | 0x0 | one row of 9 frames, left to right | center (on the target tile) | pack: ninja_adventure | Effect for psychic spells. Specific ones: vfx_psychic_<form> (vfx_psychic_bolt). |
+| [ ] | `vfx_cognition` | 0x0 | one row of 4 frames, left to right | center (on the target tile) | pack: ninja_adventure | Effect for cognition spells. Specific ones: vfx_cognition_<form> (vfx_cognition_bolt). |
+| [ ] | `vfx_entropy` | 0x0 | one row of 9 frames, left to right | center (on the target tile) | pack: ninja_adventure | Effect for entropy spells. Specific ones: vfx_entropy_<form> (vfx_entropy_bolt). |
+| [ ] | `vfx_void` | 0x0 | one row of 4 frames, left to right | center (on the target tile) | pack: ninja_adventure | Effect for void spells. Specific ones: vfx_void_<form> (vfx_void_bolt). |
+| [ ] | `vfx_time` | 0x0 | one row of 4 frames, left to right | center (on the target tile) | pack: ninja_adventure | Effect for time spells. Specific ones: vfx_time_<form> (vfx_time_bolt). |
+| [ ] | `vfx_probability` | 0x0 | one row of 9 frames, left to right | center (on the target tile) | pack: ninja_adventure | Effect for probability spells. Specific ones: vfx_probability_<form> (vfx_probability_bolt). |
+| [ ] | `vfx_form_bolt` | 0x0 | one row of 4 frames, left to right | center (on the target tile) | pack: ninja_adventure | Shape effect for bolt spells, used when a Vector has no effect of its own. |
+| [ ] | `vfx_form_burst` | 0x0 | one row of 9 frames, left to right | center (on the target tile) | pack: ninja_adventure | Shape effect for burst spells, used when a Vector has no effect of its own. |
+| [ ] | `vfx_form_shield` | 0x0 | one row of 6 frames, left to right | center (on the target tile) | pack: ninja_adventure | Shape effect for shield spells, used when a Vector has no effect of its own. |
+| [ ] | `vfx_form_weapon_infusion` | 0x0 | one row of 4 frames, left to right | center (on the target tile) | pack: ninja_adventure | Shape effect for weapon_infusion spells, used when a Vector has no effect of its own. |
+| [ ] | `vfx_form_line` | 0x0 | one row of 4 frames, left to right | center (on the target tile) | pack: ninja_adventure | Shape effect for line spells, used when a Vector has no effect of its own. |
+| [ ] | `vfx_form_sphere` | 0x0 | one row of 9 frames, left to right | center (on the target tile) | pack: ninja_adventure | Shape effect for sphere spells, used when a Vector has no effect of its own. |
+| [ ] | `vfx_form_projectile` | 0x0 | one row of 4 frames, left to right | center (on the target tile) | pack: ninja_adventure | Shape effect for projectile spells, used when a Vector has no effect of its own. |
+| [ ] | `vfx_form_touch` | 0x0 | one row of 4 frames, left to right | center (on the target tile) | pack: ninja_adventure | Shape effect for touch spells, used when a Vector has no effect of its own. |
+| [ ] | `vfx_form_aura` | 0x0 | one row of 5 frames, left to right | center (on the target tile) | pack: ninja_adventure | Shape effect for aura spells, used when a Vector has no effect of its own. |
+| [ ] | `vfx_form_construct` | 0x0 | one row of 6 frames, left to right | center (on the target tile) | pack: ninja_adventure | Shape effect for construct spells, used when a Vector has no effect of its own. |
+| [ ] | `vfx_form_glyph` | 0x0 | one row of 4 frames, left to right | center (on the target tile) | pack: ninja_adventure | Shape effect for glyph spells, used when a Vector has no effect of its own. |
+| [ ] | `vfx_form_cone` | 0x0 | one row of 4 frames, left to right | center (on the target tile) | pack: ninja_adventure | Shape effect for cone spells, used when a Vector has no effect of its own. |
+| [ ] | `vfx_hit` | 0x0 | one row of 4 frames, left to right | center (on the target tile) | pack: ninja_adventure | Hit spark on any damage |
+| [ ] | `vfx_heal` | 0x0 | one row of 5 frames, left to right | center (on the target tile) | pack: ninja_adventure | Heal glow |
+| [ ] | `vfx_telegraph` | 0x0 | one row of 4 frames, left to right | center (on the target tile) | pack: ninja_adventure | Telegraph marker flash (an enemy's coming attack) |
+| [ ] | `vfx_status` | 0x0 | one row of 9 frames, left to right | center (on the target tile) | pack: ninja_adventure | A status landing (root, burning, frozen...) |
+| [ ] | `vfx_combo` | 0x0 | one row of 8 frames, left to right | center (on the target tile) | pack: ninja_adventure | Any combo (VD Part 2); give one combo its own with assets/custom/vfx/vfx_combo_<id>.png |
 
 ## Music (30)
 
@@ -475,7 +517,7 @@ Background music by situation (data/audio.json). Tracks loop; jingles play once.
 | [ ] | `music_cutscene_funny` | - | - | - | pack: ninja_adventure | Looping track (.ogg). |
 | [ ] | `music_arena` | - | - | - | pack: ninja_adventure | Looping track (.ogg). |
 
-## Sound effects (38)
+## Sound effects (39)
 
 Short sound effects.
 
@@ -519,6 +561,7 @@ Short sound effects.
 | [ ] | `sfx_explosion` | - | - | - | pack: ninja_adventure | Short one-shot (.wav or .ogg). |
 | [ ] | `sfx_charge` | - | - | - | pack: ninja_adventure | Short one-shot (.wav or .ogg). |
 | [ ] | `sfx_combo_discovered` | - | - | - | pack: ninja_adventure | Short one-shot (.wav or .ogg). |
+| [ ] | `sfx_combo_cast` | - | - | - | pack: ninja_adventure | A combo spell goes off (VD Part 2). Short one-shot (.wav or .ogg). |
 
 ## Ambience (9)
 

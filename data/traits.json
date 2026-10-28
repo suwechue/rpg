@@ -55,6 +55,12 @@
     { "id": "improvised_tank", "name": "Improvised tank", "fixed": true, "text": "+10 Max HP.", "mods": { "derived": { "maxHp": 10 } } },
     { "id": "underestimated", "name": "Underestimated", "fixed": true, "text": "+3 Initiative.", "mods": { "derived": { "initiative": 3 } } },
     { "id": "two_worlds", "name": "Caught between two worlds", "fixed": true, "text": "Flavor.", "mods": {} },
-    { "id": "fast_learner", "name": "Fast learner", "fixed": true, "text": "Training gives a little more.", "mods": {} }
+    { "id": "fast_learner", "name": "Fast learner", "fixed": true, "text": "Training gives a little more.", "mods": {} },
+    {"id": "spark_runs_warm", "name": "Runs Warm", "spark": true, "text": "+1 damage on Heat cards.", "mods": {"combat": {"axisPower": {"heat": 1}}}},
+    {"id": "spark_cool_head", "name": "Cool Head", "spark": true, "text": "+1 WIL.", "mods": {"stats": {"wil": 1}}},
+    {"id": "spark_heavy_hands", "name": "Heavy Hands", "spark": true, "text": "+1 damage on Force cards.", "mods": {"combat": {"axisPower": {"force": 1}}}},
+    {"id": "spark_restless", "name": "Restless", "spark": true, "text": "+1 Initiative.", "mods": {"derived": {"initiative": 1}}},
+    {"id": "spark_keeps_promises", "name": "Keeps Promises", "spark": true, "text": "+1 CON.", "mods": {"stats": {"con": 1}}},
+    {"id": "spark_bright_idea", "name": "Bright Idea", "spark": true, "text": "+1 PER.", "mods": {"stats": {"per": 1}}}
   ]
 }

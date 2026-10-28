@@ -92,7 +92,7 @@ func give_xp(id: String, amount: int) -> Array:
 	if not ch.get("isPlayer", false):
 		Lv.auto_perks(DataDB.all(), ch)
 	if not reports.is_empty():
-		Audio.play_sfx("levelup")
+		Audio.event("level_up")
 	EventBus.stats_changed.emit(id)
 	return reports
 

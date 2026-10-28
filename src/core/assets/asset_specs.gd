@@ -43,6 +43,23 @@ static func exts_for(sp: Dictionary) -> Array:
 	return IMAGE_EXTS
 
 
+## VFX ids to try, most specific first (VD Part 1): "vfx_heat_bolt" tries
+## itself, then vfx_heat, vfx_form_bolt and vfx_hit; "vfx_combo_<id>" tries
+## itself, then vfx_combo. Only the general ids need a manifest entry.
+static func vfx_chain(id: String) -> Array:
+	var out: Array = [id]
+	var rest := id.trim_prefix("vfx_")
+	if rest.begins_with("combo_"):
+		out.append("vfx_combo")
+	else:
+		var parts := rest.split("_", false, 1)
+		if parts.size() == 2:
+			out.append("vfx_" + parts[0])
+			out.append("vfx_form_" + parts[1])
+	out.append("vfx_hit")
+	return out
+
+
 ## Where a replacement for `id` may be dropped, in the order they are tried:
 ## <root>/<type>/<id>.<ext>, then <root>/<id>.<ext>.
 static func custom_candidates(root: String, sp: Dictionary, id: String) -> Array:

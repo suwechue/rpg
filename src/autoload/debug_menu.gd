@@ -88,6 +88,9 @@ func _dev_args() -> void:
 		GameState.pending_combat = GameState.combat_setup(str(args["fight"]).split(","), str(args.get("layout", "boss_stage")), { "boss": true })
 	if args.has("scene"):
 		SceneRouter.goto(str(args["scene"]))
+	if args.has("modal"):
+		# --modal=res://src/scenes/ui/<screen>.gd: open a screen (with --town for a run).
+		_show_modal_arg.call_deferred(str(args["modal"]))
 	if args.has("arena"):
 		# --arena [--seed=N --class=mage --size=4 --level=3 --arenawave=N --waves=N]: straight into the Endless Arena.
 		preload("res://src/scenes/title/title.gd").start_arena({ "class": str(args.get("class", "mage")) }, int(args.get("size", "4")),
@@ -481,6 +484,8 @@ func _show_art(box: VBoxContainer) -> void:
 		Assets.reload()
 		_rebuild_scene()
 		_open(_show_art)))
+	row.add_child(UiTheme.button("Reload audio", func() -> void:
+		Audio.reload()))
 	row.add_child(UiTheme.button("Colorblind palette: %s" % ("on" if UiTheme.colorblind else "off"), func() -> void:
 		UiTheme.set_colorblind(not UiTheme.colorblind)
 		_rebuild_scene()
@@ -572,6 +577,14 @@ func _rebuild_scene() -> void:
 	var cur := get_tree().current_scene
 	if cur != null and cur.scene_file_path != "":
 		SceneRouter.goto(cur.scene_file_path)
+
+
+func _show_modal_arg(path: String) -> void:
+	for i in 20:
+		await get_tree().process_frame
+	var script: Variant = load(path)
+	if script is GDScript:
+		Flow.show_modal((script as GDScript).new())
 
 
 func _play_cutscene_arg(id: String) -> void:

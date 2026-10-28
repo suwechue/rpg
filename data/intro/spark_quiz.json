@@ -1,0 +1,188 @@
+{
+  "comment": "VD Part 3: the narrator's odd questions during the intro. Each answer adds weights to Vectors; the strongest total is the spark (ties by the axis order in spaces.json).",
+  "intro": "Before you sleep, the narrator has a few questions. Answer honestly. Or don't. It can tell.",
+  "questions": [
+    {
+      "text": "The moving truck is on fire. You...",
+      "answers": [
+        {
+          "label": "Grab the box marked FRAGILE",
+          "weights": {
+            "binding": 2
+          }
+        },
+        {
+          "label": "Kick the back door open",
+          "weights": {
+            "force": 2
+          }
+        },
+        {
+          "label": "Film it",
+          "weights": {
+            "light": 2
+          }
+        },
+        {
+          "label": "Run for the hose",
+          "weights": {
+            "motion": 1,
+            "cold": 1
+          }
+        }
+      ]
+    },
+    {
+      "text": "A stranger waves at you from across the street. You...",
+      "answers": [
+        {
+          "label": "Wave back, big",
+          "weights": {
+            "heat": 2
+          }
+        },
+        {
+          "label": "Nod, once",
+          "weights": {
+            "cold": 2
+          }
+        },
+        {
+          "label": "Cross over and say hi",
+          "weights": {
+            "motion": 2
+          }
+        },
+        {
+          "label": "Wonder how they know you",
+          "weights": {
+            "light": 1,
+            "binding": 1
+          }
+        }
+      ]
+    },
+    {
+      "text": "Your new room has a locked closet. You...",
+      "answers": [
+        {
+          "label": "Force it",
+          "weights": {
+            "force": 2
+          }
+        },
+        {
+          "label": "Find the key, eventually",
+          "weights": {
+            "binding": 1,
+            "cold": 1
+          }
+        },
+        {
+          "label": "Peek through the keyhole",
+          "weights": {
+            "light": 2
+          }
+        },
+        {
+          "label": "Forget it. New room!",
+          "weights": {
+            "heat": 1,
+            "motion": 1
+          }
+        }
+      ]
+    },
+    {
+      "text": "Pick a weather.",
+      "answers": [
+        {
+          "label": "A heatwave",
+          "weights": {
+            "heat": 2
+          }
+        },
+        {
+          "label": "First snow",
+          "weights": {
+            "cold": 2
+          }
+        },
+        {
+          "label": "A thunderstorm",
+          "weights": {
+            "force": 1,
+            "light": 1
+          }
+        },
+        {
+          "label": "Wind, lots of it",
+          "weights": {
+            "motion": 2
+          }
+        }
+      ]
+    },
+    {
+      "text": "Someone breaks a promise to you. You...",
+      "answers": [
+        {
+          "label": "Never forget it",
+          "weights": {
+            "binding": 2
+          }
+        },
+        {
+          "label": "Say something. Loudly",
+          "weights": {
+            "heat": 1,
+            "force": 1
+          }
+        },
+        {
+          "label": "Let it go. Coldly",
+          "weights": {
+            "cold": 2
+          }
+        },
+        {
+          "label": "Find out why",
+          "weights": {
+            "light": 2
+          }
+        }
+      ]
+    },
+    {
+      "text": "Last question. What are you most afraid of?",
+      "answers": [
+        {
+          "label": "Standing still",
+          "weights": {
+            "motion": 2
+          }
+        },
+        {
+          "label": "Being forgotten",
+          "weights": {
+            "binding": 1,
+            "light": 1
+          }
+        },
+        {
+          "label": "Losing your temper",
+          "weights": {
+            "heat": 1,
+            "cold": 1
+          }
+        },
+        {
+          "label": "Being pushed around",
+          "weights": {
+            "force": 2
+          }
+        }
+      ]
+    }
+  ]
+}

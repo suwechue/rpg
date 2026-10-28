@@ -17,6 +17,17 @@ func _ready() -> void:
 		note_week(w))
 
 
+## VD Part 2: note a combo discovery in the run and the Journal. True the
+## first time this run (the caller shows the reveal).
+func discover_combo(id: String) -> bool:
+	if not GameState.has_run():
+		return false
+	var fresh := preload("res://src/core/combos.gd").discover(GameState.run, data, id)
+	if fresh:
+		save_journal()
+	return fresh
+
+
 func load_journal() -> void:
 	data = { "runs": 0, "lore": {}, "enemies": {}, "endings": {}, "unlocks": [], "bestWeek": 0 }
 	if FileAccess.file_exists(PATH):

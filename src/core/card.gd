@@ -5,6 +5,7 @@
 class_name Card
 extends RefCounted
 
+const Combos := preload("res://src/core/combos.gd")
 const Str := preload("res://src/core/strings.gd")
 
 const VO := preload("res://src/core/vector_ops.gd")
@@ -259,6 +260,9 @@ static func _describe(db: Dictionary, card: Dictionary) -> String:
 		text += str(effects.get(axis, "")).split(";")[0] + ". "
 	if not card.get("properties", []).is_empty():
 		text += Str.t(db, "card.properties") % ", ".join(PackedStringArray(card["properties"]))
+	var combo := Combos.for_vectors(db, card.get("vectors", {}))
+	if not combo.is_empty() and not card.has("effects"):
+		text += " " + Str.t(db, "card.combo") % [str(combo.get("name", "")), str(combo.get("description", ""))]
 	return text.strip_edges()
 
 
@@ -300,8 +304,9 @@ static func summary(db: Dictionary, card: Dictionary) -> String:
 	return "%s %d" % [form_rec.get("name", "?"), roundi(power(db, card))]
 
 
-## Card art ids to try, most specific first: the card's own art, its first
-## Vector's art (spells), then its kind's art.
+## Card art ids to try, most specific first (VD Part 1): the card's own art,
+## its combo's art, its two Vectors, its Vector and Form, its Vector, its kind,
+## then card_art_default. One image per Vector covers every spell.
 static func art_ids(db: Dictionary, card: Dictionary) -> Array:
 	var out: Array = []
 	if card.has("art"):
@@ -309,8 +314,15 @@ static func art_ids(db: Dictionary, card: Dictionary) -> Array:
 	if card.has("id") and not str(card["id"]).begins_with("sp:"):
 		out.append("card_art_%s" % card["id"])
 	if is_spell(card):
+		var combo := Combos.for_vectors(db, card.get("vectors", {}))
+		if not combo.is_empty():
+			out.append(str(combo.get("art", "card_art_" + str(combo.get("id", "")))))
 		var axes := ordered_vectors(db, card.get("vectors", {}))
+		if axes.size() >= 2:
+			out.append("card_art_%s_%s" % [axes[0], axes[1]])
 		if not axes.is_empty():
+			out.append("card_art_%s_%s" % [axes[0], str(card.get("form", ""))])
 			out.append("card_art_%s" % axes[0])
 	out.append("card_art_%s" % str(card.get("kind", "basic")))
+	out.append("card_art_default")
 	return out

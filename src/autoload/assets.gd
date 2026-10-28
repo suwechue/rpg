@@ -32,6 +32,11 @@ func _index() -> void:
 
 
 ## Forget everything loaded so the next request picks up new custom files.
+## Drop cached sounds so new files in assets/custom/ are picked up (F1).
+func reload_audio() -> void:
+	_audio.clear()
+
+
 func reload() -> void:
 	_tex.clear()
 	_audio.clear()
@@ -73,10 +78,14 @@ func custom_file(id: String) -> String:
 	var rid := resolve(id)
 	var sp := Spec.spec(DataDB.all(), rid)
 	if sp.is_empty():
-		# Per-card art needs no manifest entry: assets/custom/cards/card_art_<card id>.png.
-		if not rid.begins_with("card_art_"):
+		# Per-card art and per-spell VFX need no manifest entry:
+		# assets/custom/cards/card_art_<id>.png, assets/custom/vfx/vfx_<id>.png.
+		if rid.begins_with("card_art_"):
+			sp = { "type": "cards", "kind": "image" }
+		elif rid.begins_with("vfx_"):
+			sp = { "type": "vfx", "kind": "sheet" }
+		else:
 			return ""
-		sp = { "type": "cards", "kind": "image" }
 	for p in Spec.custom_candidates(custom_root, sp, rid):
 		if FileAccess.file_exists(str(p)):
 			return str(p)
@@ -166,6 +175,17 @@ func stream(id: String) -> AudioStream:
 			s = load(src)
 	_audio[rid] = s
 	return s
+
+
+## The VFX id to draw for a requested one (the first in its fallback chain
+## with custom art or a manifest entry), and its frame count and speed.
+func vfx(id: String) -> Dictionary:
+	for v in Spec.vfx_chain(id):
+		var vid := str(v)
+		if custom_file(vid) != "" or has(vid):
+			var sp := spec(vid)
+			return { "id": vid, "frames": int(sp.get("frames", 1)), "fps": float(sp.get("fps", 12)) }
+	return {}
 
 
 func font(id: String) -> Font:

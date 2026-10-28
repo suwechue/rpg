@@ -167,6 +167,12 @@ static func merge_mods(sources: Array) -> Dictionary:
 				var k := str(key)
 				if typeof(v) == TYPE_BOOL:
 					out[group][k] = bool(out[group].get(k, false)) or v
+				elif typeof(v) == TYPE_DICTIONARY:
+					# Per-Vector numbers (axisPower: { "heat": 1 }) add up per key.
+					var sub: Dictionary = out[group].get(k, {})
+					for sk in v:
+						sub[str(sk)] = float(sub.get(str(sk), 0.0)) + float(v[sk])
+					out[group][k] = sub
 				elif k.ends_with("Mul"):
 					out[group][k] = float(out[group].get(k, 1.0)) * float(v)
 				else:

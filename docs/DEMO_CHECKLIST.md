@@ -11,9 +11,9 @@ The demo (VD Part 5): the intro through the week 1 boss, the Endless Arena from 
 | Point buy, Party panel, pause menu, options | Have | Check that options open from the title screen (VD Part 5) |
 | Art, audio and UI by asset id | Mostly | VD Part 1: audio situation map, voice blips, `docs/CUSTOMIZE.md`, audit test |
 | Advanced Vectors and Techniques | Have | PT Part 8: 14 Techniques active, 10 planned (potions, acting constructs) |
-| Multi-Vector combos and the Compendium | Missing | VD Part 2 |
-| Spark quiz | Missing | VD Part 3 (standalone screen until M15) |
-| Visual card builder and crafting juice | Missing | VD Part 4 |
+| Multi-Vector combos and the Compendium | Have | VD Part 2: 15 pairs, 3 three-Vector combos, discovery, Compendium. Party combos at Close Bond are not built |
+| Spark quiz | Have | VD Part 3: during the intro, before the first night; direct pick on later runs |
+| Visual card builder and crafting juice | Have | VD Part 4: live preview card, footprint, combo ???, grade, card flip; minigame particles are not built |
 | Cutscene system | Have | P2 Part 3 (M14); docs/CUTSCENE_GUIDE.md |
 | Intro and tutorial day | Have | P2 Part 3 (M15): moving day, name, intro night, a beat per Monday day part; illustrations are placeholders until art lands |
 | A friendship scene in week 1 | Missing | One scripted scene with the cutscene system (Dex or Theo at lunch); the full system is M18 |

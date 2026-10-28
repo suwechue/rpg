@@ -64,7 +64,8 @@ func _ready() -> void:
 	_prompt = UiTheme.world_label("", UiTheme.ACCENT)
 	_prompt.position = Vector2(4, Display.base.y - 18)
 	ui.add_child(_prompt)
-	Audio.play_music("dungeon_boss_floor" if bool(floor_data.get("boss", false)) else "dungeon")
+	Audio.play_music_first(["dungeon_boss_floor"] if bool(floor_data.get("boss", false)) else ["upside_down_week%d" % Calendar.week(), "dungeon"])
+	Audio.play_ambience("upside_down_week%d" % Calendar.week())
 	if GameState.run.has("floor_fight"):
 		await _after_fight(int(GameState.run["floor_fight"]))
 	elif not GameState.run.has("floor_pos"):

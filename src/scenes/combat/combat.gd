@@ -118,7 +118,14 @@ func _ready() -> void:
 	_play_events()
 	if setup.has("intro"):
 		_say_banner(str(setup["intro"]))
-	Audio.play_music("battle_boss" if state.boss_fight else "battle")
+	var tracks: Array = ["battle"]
+	for u in state.units:
+		if u.team == "enemy" and str(u.source.get("tier", "")) == "boss":
+			tracks = ["boss_" + str(u.source.get("id", "")), "battle_boss"]
+			break
+		if u.team == "enemy" and str(u.source.get("tier", "")) == "elite":
+			tracks = ["elite", "battle"]
+	Audio.play_music_first(tracks)
 
 
 # --- Views ----------------------------------------------------------------------------
@@ -708,6 +715,7 @@ func _portrait(u: UnitScript, size: int) -> TextureRect:
 func _hover_card_changed(i: int) -> void:
 	_hover_card = i
 	if i >= 0:
+		Audio.event("card_hover")
 		_lesson_event("hovered_card")
 	if i >= 0:
 		_show_card_info(i)
@@ -1414,11 +1422,28 @@ func _play_event(e: Dictionary) -> void:
 				var tw := create_tween()
 				v.modulate = Color(2.2, 2.2, 2.2)
 				tw.tween_property(v, "modulate", Color.WHITE, _dur(0.3))
-				Audio.play_sfx("cast")
+				Audio.event("enemy_windup")
 				await _wait(0.45)
 			else:
-				Audio.play_sfx("cast")
+				# VD Part 1: each Vector has its own cast sound event.
+				Audio.event("card_play_" + str(e["axis"]) if str(e.get("axis", "")) != "" else "card_play_basic")
+				if e.has("vfx") and e.get("target", null) is Vector2i:
+					_vfx(str(e["vfx"]), e["target"])
 				await _wait(0.25)
+		"combo":
+			# VD Part 2: the combo's name, and a reveal the first time this run.
+			_say_banner(str(e["name"]))
+			_note("%s: %s" % [e["name"], e["text"]])
+			Audio.event("combo_cast")
+			var cu := state.unit_by_id(str(e["unit"]))
+			if cu != null:
+				_vfx("vfx_combo_" + str(e["id"]), cu.cell)
+			if Journal.discover_combo(str(e["id"])):
+				var c := preload("res://src/core/combos.gd").find(DataDB.all(), str(e["id"]))
+				Audio.event("combo_discovered")
+				Narrator.say(str(c.get("narrator", "")))
+				_say_banner(Strings.t("combo.discovered") % str(e["name"]))
+				await _wait(0.6)
 		"charge":
 			var u := state.unit_by_id(str(e["unit"]))
 			var line := Strings.t("combat.is_charging") % [u.name if u != null else "?", e.get("name", Strings.t("combat.something_big"))]
@@ -1548,6 +1573,7 @@ func _play_event(e: Dictionary) -> void:
 				tw.tween_property(v, "modulate", Color.WHITE, _dur(0.2))
 				await tw.finished
 		"telegraph":
+			Audio.event("telegraph_warning")
 			_say_banner(Strings.t("combat.is_coming") % str(e.get("name", "Something")))
 			_note(Strings.t("combat.will_land_on_the_marked") % str(e.get("name", "Something")))
 			_sync_views()
@@ -1616,6 +1642,22 @@ func _float_text(v: Node2D, text: String, color: Color) -> void:
 	# Bound ids, not captured nodes: the unit's view can be freed first (P2 1.4).
 	tw.tween_callback(l.queue_free)
 	tw.tween_callback(_release_float_slot.bind(v.get_instance_id()))
+
+
+## VD Part 1: a one-shot effect sheet by id (through its fallback chain) on a tile.
+func _vfx(id: String, cell: Vector2i) -> void:
+	var info := Assets.vfx(id)
+	if info.is_empty():
+		return
+	var s := Sprite2D.new()
+	s.texture = Assets.texture(str(info["id"]))
+	s.hframes = maxi(1, int(info["frames"]))
+	s.position = proj.cell_center(cell)
+	s.z_index = 50
+	_fx.add_child(s)
+	var tw := create_tween()
+	tw.tween_property(s, "frame", s.hframes - 1, _dur(float(s.hframes) / maxf(1.0, float(info["fps"]))))
+	tw.tween_callback(s.queue_free)
 
 
 func _release_float_slot(view_id: int) -> void:
@@ -1774,4 +1816,4 @@ func _finish() -> void:
 			get_tree().create_timer(0.5).timeout.connect(func() -> void:
 				if is_inside_tree():
 					GameState.leave_combat())
-	Audio.play_sfx("win" if result == "win" else "lose")
+	Audio.event("victory" if result == "win" else "defeat")

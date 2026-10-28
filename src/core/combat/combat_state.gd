@@ -22,6 +22,7 @@ const Forms := preload("res://src/core/combat/forms.gd")
 const UnitScript := preload("res://src/core/combat/unit.gd")
 const Res := preload("res://src/core/combat/resolver.gd")
 const EnemyMods := preload("res://src/core/combat/enemy_mods.gd")
+const Combos := preload("res://src/core/combos.gd")
 
 var db: Dictionary = {}
 var rng: RandomNumberGenerator
@@ -41,6 +42,7 @@ var kills: Array = []
 var xp_total := 0
 var money_total := 0
 var wild_surges := 0
+var combos_cast: Array = []         # combo ids the party cast this fight (VD Part 2)
 var support_log: Dictionary = {}
 var help_calls: Array = []
 var forms: Dictionary = {}
@@ -1605,6 +1607,8 @@ func _spell_spec(u: UnitScript, card: Dictionary) -> Dictionary:
 	var power := CardRules.power(db, card) if card.has("magnitude") else float(card.get("power", 5))
 	for axis in card.get("vectors", {}):
 		power *= float(u.statuses.get("empower_" + str(axis), 1.0))
+		# VD Part 3: spark traits add flat power to their Vector's cards.
+		power += float(u.mods.get("combat", {}).get("axisPower", {}).get(str(axis), 0.0))
 	return {
 		"bonusVs": card.get("bonusVs", {}),
 		"name": str(card.get("name", "Spell")),
@@ -1774,7 +1778,9 @@ func _cast(u: UnitScript, card: Dictionary, target: Vector2i, improvised: bool, 
 		u.statuses.erase("empower_" + str(axis))
 	if u.team == "party" and card.get("vectors", {}).size() >= 2:
 		multi_vector_casts += 1
-	_emit({ "t": "cast", "unit": u.id, "name": spec["name"], "target": target, "improvised": improvised })
+	var cast_axes := CardRules.ordered_vectors(db, spec["vectors"])
+	_emit({ "t": "cast", "unit": u.id, "name": spec["name"], "target": target, "improvised": improvised, "axis": str(cast_axes[0]) if not cast_axes.is_empty() else "",
+		"vfx": str(card.get("vfx", "vfx_%s_%s" % [str(cast_axes[0]) if not cast_axes.is_empty() else "basic", str(spec["form"].get("id", ""))])) })
 	var key := "%s:%s" % ["+".join(PackedStringArray(CardRules.ordered_vectors(db, spec["vectors"]))), str(spec["form"].get("id", ""))]
 	var uses: Dictionary = u.source.get("pairUses", {})
 	uses[key] = int(uses.get(key, 0)) + 1
@@ -1815,6 +1821,23 @@ func _cast(u: UnitScript, card: Dictionary, target: Vector2i, improvised: bool, 
 					u.source["wildSurges"] = int(u.source.get("wildSurges", 0)) + 1
 				_emit({ "t": "log", "text": Str.t(db, "combat_state.wild_surge_the_spell_comes") % str(axis).capitalize() })
 	_resolve_spec(u, spec, target)
+	_combo(u, card, spec, target)
+
+
+## VD Part 2: a party spell whose top Vectors make a combo runs the combo's
+## effects after its damage (cards with their own authored effects keep those).
+func _combo(u: UnitScript, card: Dictionary, spec: Dictionary, target: Vector2i) -> void:
+	if u.team != "party" or result != "" or not u.alive() or card.has("effects"):
+		return
+	var c := Combos.for_vectors(db, spec["vectors"])
+	if c.is_empty():
+		return
+	var id := str(c.get("id", ""))
+	if not combos_cast.has(id):
+		combos_cast.append(id)
+	_emit({ "t": "combo", "unit": u.id, "id": id, "name": str(c.get("name", "")), "text": str(c.get("description", "")) })
+	var fx_card := { "name": str(c.get("name", "")), "vectors": spec["vectors"], "effects": c.get("effects", []) }
+	_effects_script().run(self, u, fx_card, target, effect_cells(u, card, target))
 
 
 ## Apply a spell spec at a target (cards, improvised casts and enemy actions).
@@ -3450,7 +3473,7 @@ func finish() -> Dictionary:
 	return {
 		"result": result, "xp": xp_total, "money": money_total, "party": party, "kills": kills,
 		"remaining": remaining, "wildSurges": wild_surges, "support": support_log,
-		"helpAnswered": answered, "helpIgnored": ignored, "rounds": round_num, "multiVector": multi_vector_casts, "highestHit": highest_hit,
+		"helpAnswered": answered, "helpIgnored": ignored, "rounds": round_num, "multiVector": multi_vector_casts, "combos": combos_cast, "highestHit": highest_hit,
 	}
 
 

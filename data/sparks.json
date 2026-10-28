@@ -1,0 +1,60 @@
+{
+  "comment": "VD Part 3: the spark is the player's strongest Vector, found by the quiz in data/intro/spark_quiz.json (or chosen directly once the Journal unlocks it). It raises that Vector's affinity (affinityBoost, added with a Vector blend), grants it as a known Vector, adds its first card to the deck and gives a small trait (data/traits.json, \"spark\": true). Icons and reveal art go by asset id.",
+  "affinityBoost": 3,
+  "sparks": [
+    {
+      "id": "heat",
+      "name": "A spark of Heat",
+      "trait": "spark_runs_warm",
+      "card": "sp:heat:bolt:standard",
+      "icon": "icon_spark_heat",
+      "art": "art_spark_reveal_heat",
+      "reveal": "Heat. Of course it's Heat. You've been running warm since the truck pulled in."
+    },
+    {
+      "id": "cold",
+      "name": "A spark of Cold",
+      "trait": "spark_cool_head",
+      "card": "sp:cold:bolt:standard",
+      "icon": "icon_spark_cold",
+      "art": "art_spark_reveal_cold",
+      "reveal": "Cold. Calm, slow, patient. The town's going to hate how calm you are."
+    },
+    {
+      "id": "force",
+      "name": "A spark of Force",
+      "trait": "spark_heavy_hands",
+      "card": "sp:force:bolt:standard",
+      "icon": "icon_spark_force",
+      "art": "art_spark_reveal_force",
+      "reveal": "Force. You push. Doors, people, your luck. Mostly doors."
+    },
+    {
+      "id": "motion",
+      "name": "A spark of Motion",
+      "trait": "spark_restless",
+      "card": "sp:motion:bolt:standard",
+      "icon": "icon_spark_motion",
+      "art": "art_spark_reveal_motion",
+      "reveal": "Motion. You were halfway out the door before the question ended."
+    },
+    {
+      "id": "binding",
+      "name": "A spark of Binding",
+      "trait": "spark_keeps_promises",
+      "card": "sp:binding:bolt:standard",
+      "icon": "icon_spark_binding",
+      "art": "art_spark_reveal_binding",
+      "reveal": "Binding. You hold on. To boxes, to people, to grudges."
+    },
+    {
+      "id": "light",
+      "name": "A spark of Light",
+      "trait": "spark_bright_idea",
+      "card": "sp:light:bolt:standard",
+      "icon": "icon_spark_light",
+      "art": "art_spark_reveal_light",
+      "reveal": "Light. You notice things. That'll be useful here. And dangerous."
+    }
+  ]
+}

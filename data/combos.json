@@ -1,0 +1,454 @@
+{
+  "comment": "VD Part 2: named combos for Vector pairs, plus three-Vector combos (Tier 3 knowledge, +2 MP). A spell whose top Vectors (each at least minShare of the strongest) match a combo runs its effects on top of its damage. Effects use the card effect ops in src/core/combat/card_effects.gd. Tier 3 Vectors can join later: add records with their ids.",
+  "axes": [
+    "heat",
+    "cold",
+    "force",
+    "motion",
+    "binding",
+    "light"
+  ],
+  "minShare": 0.2,
+  "combos": [
+    {
+      "id": "thermal_shock",
+      "name": "Thermal Shock",
+      "vectors": [
+        "heat",
+        "cold"
+      ],
+      "description": "Shreds resistances and fills the area with steam that blocks sight.",
+      "hint": "Something hot, something cold.",
+      "effects": [
+        {
+          "op": "shred",
+          "defense": 0,
+          "resist": 4,
+          "turns": 2
+        },
+        {
+          "op": "steam",
+          "turns": 2
+        }
+      ],
+      "vfx": "vfx_combo_thermal_shock",
+      "sound": "combo_cast",
+      "art": "card_art_thermal_shock",
+      "narrator": "Hot met cold. Neither won. Everything else lost."
+    },
+    {
+      "id": "magma_ram",
+      "name": "Magma Ram",
+      "vectors": [
+        "heat",
+        "force"
+      ],
+      "description": "Burns the ground and pushes the target 2 tiles.",
+      "hint": "Something hot, something heavy.",
+      "effects": [
+        {
+          "op": "burn_tiles",
+          "turns": 2
+        },
+        {
+          "op": "push",
+          "steps": 2
+        }
+      ],
+      "vfx": "vfx_combo_magma_ram",
+      "sound": "combo_cast",
+      "art": "card_art_magma_ram",
+      "narrator": "You shoved a furnace at someone. It worked."
+    },
+    {
+      "id": "comet_dash",
+      "name": "Comet Dash",
+      "vectors": [
+        "heat",
+        "motion"
+      ],
+      "description": "Dash in a line, hitting what you pass, and burn the tiles.",
+      "hint": "Something hot, something fast.",
+      "effects": [
+        {
+          "op": "dash_line",
+          "tiles": 3,
+          "mult": 0.8
+        },
+        {
+          "op": "burn_tiles",
+          "turns": 2
+        }
+      ],
+      "vfx": "vfx_combo_comet_dash",
+      "sound": "combo_cast",
+      "art": "card_art_comet_dash",
+      "narrator": "You became the projectile. Bold."
+    },
+    {
+      "id": "branding_chains",
+      "name": "Branding Chains",
+      "vectors": [
+        "heat",
+        "binding"
+      ],
+      "description": "Roots the target for 2 turns and sets it burning.",
+      "hint": "Something hot, something that holds.",
+      "effects": [
+        {
+          "op": "status_target",
+          "status": "root",
+          "turns": 2
+        },
+        {
+          "op": "status_target",
+          "status": "burning",
+          "turns": 2
+        }
+      ],
+      "vfx": "vfx_combo_branding_chains",
+      "sound": "combo_cast",
+      "art": "card_art_branding_chains",
+      "narrator": "Chains, but warm. Uncomfortably warm."
+    },
+    {
+      "id": "solar_flare",
+      "name": "Solar Flare",
+      "vectors": [
+        "heat",
+        "light"
+      ],
+      "description": "Blinds everything in the area and sets it burning.",
+      "hint": "Something hot, something bright.",
+      "effects": [
+        {
+          "op": "status_area",
+          "status": "blind",
+          "turns": 1
+        },
+        {
+          "op": "status_area",
+          "status": "burning",
+          "turns": 2
+        }
+      ],
+      "vfx": "vfx_combo_solar_flare",
+      "sound": "combo_cast",
+      "art": "card_art_solar_flare",
+      "narrator": "A small sun, briefly. Don't look at it."
+    },
+    {
+      "id": "glacier_slam",
+      "name": "Glacier Slam",
+      "vectors": [
+        "cold",
+        "force"
+      ],
+      "description": "Pushes the target, then freezes it in place.",
+      "hint": "Something cold, something heavy.",
+      "effects": [
+        {
+          "op": "push",
+          "steps": 1
+        },
+        {
+          "op": "status_target",
+          "status": "frozen",
+          "turns": 1
+        }
+      ],
+      "vfx": "vfx_combo_glacier_slam",
+      "sound": "combo_cast",
+      "art": "card_art_glacier_slam",
+      "narrator": "Ice, but thrown. Hard."
+    },
+    {
+      "id": "glacier_slide",
+      "name": "Glacier Slide",
+      "vectors": [
+        "cold",
+        "motion"
+      ],
+      "description": "Lays ice under the area and slides the target 2 tiles.",
+      "hint": "Something cold, something fast.",
+      "effects": [
+        {
+          "op": "ice_tiles",
+          "turns": 2
+        },
+        {
+          "op": "push",
+          "steps": 2
+        }
+      ],
+      "vfx": "vfx_combo_glacier_slide",
+      "sound": "combo_cast",
+      "art": "card_art_glacier_slide",
+      "narrator": "Everyone loves a slide. Almost everyone."
+    },
+    {
+      "id": "frost_shackles",
+      "name": "Frost Shackles",
+      "vectors": [
+        "cold",
+        "binding"
+      ],
+      "description": "Roots for 2 turns, then slows.",
+      "hint": "Something cold, something that holds.",
+      "effects": [
+        {
+          "op": "status_target",
+          "status": "root",
+          "turns": 2
+        },
+        {
+          "op": "status_target",
+          "status": "slow",
+          "turns": 3
+        }
+      ],
+      "vfx": "vfx_combo_frost_shackles",
+      "sound": "combo_cast",
+      "art": "card_art_frost_shackles",
+      "narrator": "Cold iron. It doesn't let go easily."
+    },
+    {
+      "id": "prism_frost",
+      "name": "Prism Frost",
+      "vectors": [
+        "cold",
+        "light"
+      ],
+      "description": "Splits through the area, slowing every foe it touches.",
+      "hint": "Something cold, something bright.",
+      "effects": [
+        {
+          "op": "status_area",
+          "status": "slow",
+          "turns": 2
+        }
+      ],
+      "vfx": "vfx_combo_prism_frost",
+      "sound": "combo_cast",
+      "art": "card_art_prism_frost",
+      "narrator": "Light bent through ice. Pretty. Painful."
+    },
+    {
+      "id": "slingshot",
+      "name": "Slingshot",
+      "vectors": [
+        "force",
+        "motion"
+      ],
+      "description": "Launches the target 3 tiles; collisions hurt.",
+      "hint": "Something heavy, something fast.",
+      "effects": [
+        {
+          "op": "push",
+          "steps": 3
+        }
+      ],
+      "vfx": "vfx_combo_slingshot",
+      "sound": "combo_cast",
+      "art": "card_art_slingshot",
+      "narrator": "Physics, used as a weapon. As intended."
+    },
+    {
+      "id": "tether_slam",
+      "name": "Tether Slam",
+      "vectors": [
+        "force",
+        "binding"
+      ],
+      "description": "Chains the target to its nearest ally and drags them together.",
+      "hint": "Something heavy, something that holds.",
+      "effects": [
+        {
+          "op": "tether",
+          "turns": 2,
+          "pull": true
+        }
+      ],
+      "vfx": "vfx_combo_tether_slam",
+      "sound": "combo_cast",
+      "art": "card_art_tether_slam",
+      "narrator": "Two problems, one chain."
+    },
+    {
+      "id": "radiant_shockwave",
+      "name": "Radiant Shockwave",
+      "vectors": [
+        "force",
+        "light"
+      ],
+      "description": "A ring around you hits foes and heals allies.",
+      "hint": "Something heavy, something bright.",
+      "effects": [
+        {
+          "op": "radiance",
+          "power": 6,
+          "heal": 5,
+          "ring": 1
+        }
+      ],
+      "vfx": "vfx_combo_radiant_shockwave",
+      "sound": "combo_cast",
+      "art": "card_art_radiant_shockwave",
+      "narrator": "Light, pushed outward like a held breath."
+    },
+    {
+      "id": "anchor_swap",
+      "name": "Anchor Swap",
+      "vectors": [
+        "motion",
+        "binding"
+      ],
+      "description": "Swap places with the target; foes in the area are rooted.",
+      "hint": "Something fast, something that holds.",
+      "effects": [
+        {
+          "op": "swap"
+        },
+        {
+          "op": "root_area",
+          "turns": 1
+        }
+      ],
+      "vfx": "vfx_combo_anchor_swap",
+      "sound": "combo_cast",
+      "art": "card_art_anchor_swap",
+      "narrator": "Where you were, they are. Where they were, they stay."
+    },
+    {
+      "id": "flash_step",
+      "name": "Flash Step",
+      "vectors": [
+        "motion",
+        "light"
+      ],
+      "description": "Blink to an empty target tile and blind foes next to you.",
+      "hint": "Something fast, something bright.",
+      "effects": [
+        {
+          "op": "blink"
+        },
+        {
+          "op": "blind_adjacent",
+          "turns": 1
+        }
+      ],
+      "vfx": "vfx_combo_flash_step",
+      "sound": "combo_cast",
+      "art": "card_art_flash_step",
+      "narrator": "Gone in a flash. Literally."
+    },
+    {
+      "id": "halo_chains",
+      "name": "Halo Chains",
+      "vectors": [
+        "binding",
+        "light"
+      ],
+      "description": "Roots the target and shields allies next to you.",
+      "hint": "Something that holds, something bright.",
+      "effects": [
+        {
+          "op": "status_target",
+          "status": "root",
+          "turns": 2
+        },
+        {
+          "op": "halo",
+          "amount": 5
+        }
+      ],
+      "vfx": "vfx_combo_halo_chains",
+      "sound": "combo_cast",
+      "art": "card_art_halo_chains",
+      "narrator": "A halo, but it's a cage. Holy, technically."
+    },
+    {
+      "id": "shatterstorm",
+      "name": "Shatterstorm",
+      "vectors": [
+        "heat",
+        "cold",
+        "force"
+      ],
+      "description": "Shreds armor and resistances, fills the area with steam and hurls the target.",
+      "hint": "Hot, cold and heavy, all at once.",
+      "effects": [
+        {
+          "op": "shred",
+          "defense": 2,
+          "resist": 4,
+          "turns": 2
+        },
+        {
+          "op": "steam",
+          "turns": 2
+        },
+        {
+          "op": "push",
+          "steps": 2
+        }
+      ],
+      "vfx": "vfx_combo_shatterstorm",
+      "sound": "combo_cast",
+      "art": "card_art_shatterstorm",
+      "narrator": "Three things that shouldn't touch. They touched."
+    },
+    {
+      "id": "starfall_lance",
+      "name": "Starfall Lance",
+      "vectors": [
+        "force",
+        "motion",
+        "light"
+      ],
+      "description": "Dash in a line, then flash: foes next to you are blinded.",
+      "hint": "Heavy, fast and bright.",
+      "effects": [
+        {
+          "op": "dash_line",
+          "tiles": 4,
+          "mult": 1.0
+        },
+        {
+          "op": "blind_adjacent",
+          "turns": 1
+        }
+      ],
+      "vfx": "vfx_combo_starfall_lance",
+      "sound": "combo_cast",
+      "art": "card_art_starfall_lance",
+      "narrator": "You fell like a star. On purpose."
+    },
+    {
+      "id": "crystal_prison",
+      "name": "Crystal Prison",
+      "vectors": [
+        "cold",
+        "binding",
+        "light"
+      ],
+      "description": "Freezes every foe in the area and shields allies next to you.",
+      "hint": "Cold, holding and bright.",
+      "effects": [
+        {
+          "op": "status_area",
+          "status": "frozen",
+          "turns": 1
+        },
+        {
+          "op": "halo",
+          "amount": 6
+        }
+      ],
+      "vfx": "vfx_combo_crystal_prison",
+      "sound": "combo_cast",
+      "art": "card_art_crystal_prison",
+      "narrator": "A beautiful cell. Nobody asked to stay."
+    }
+  ]
+}

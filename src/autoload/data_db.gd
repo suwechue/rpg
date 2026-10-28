@@ -102,6 +102,10 @@ func _validate() -> void:
 				errors.append("class %s: unknown starter card '%s'" % [id, entry["basic"]])
 	_validate_combat(arcane)
 	_validate_forge()
+	for msg in preload("res://src/core/progression/spark.gd").problems(_tables):
+		errors.append(msg)
+	for msg in preload("res://src/core/combos.gd").problems(_tables, preload("res://src/core/combat/card_effects.gd").OPS):
+		errors.append(msg)
 	for c in records_under("cutscenes/", "cutscenes"):
 		for msg in preload("res://src/core/story/cutscenes.gd").problems(_tables, c):
 			errors.append(msg)

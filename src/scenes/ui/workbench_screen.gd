@@ -5,6 +5,8 @@ extends "res://src/scenes/ui/modal.gd"
 const Crafting := preload("res://src/core/progression/crafting.gd")
 const CardRules := preload("res://src/core/card.gd")
 const Char := preload("res://src/core/character.gd")
+const Combos := preload("res://src/core/combos.gd")
+const CardView := preload("res://src/scenes/combat/card_view.gd")
 
 var craft_ap := 1
 var place := "home"
@@ -49,6 +51,10 @@ func _menu() -> void:
 		await Flow.show_modal(fs)
 		visible = true
 		_menu())
+	add_button(Strings.t("workbench.compendium"), func() -> void:
+		visible = false
+		await Flow.show_modal(preload("res://src/scenes/ui/compendium_screen.gd").new())
+		visible = true)
 	add_button(Strings.t("workbench.edit_decks_free"), func() -> void:
 		_deck_owner = "player"
 		_deck = GameState.player.get("deck", []).duplicate()
@@ -71,7 +77,7 @@ func _design() -> void:
 	vr.add_child(UiTheme.label(Strings.t("workbench.vectors")))
 	for v in p["knownVectors"]:
 		var a := str(v)
-		vr.add_child(UiTheme.button(("[%s]" if _vectors.has(a) else "%s") % a.capitalize(), func() -> void:
+		var vb := UiTheme.button(("[%s]" if _vectors.has(a) else "%s") % a.capitalize(), func() -> void:
 			if _vectors.has(a):
 				if _vectors.size() > 1:
 					_vectors.erase(a)
@@ -79,7 +85,9 @@ func _design() -> void:
 				_vectors.append(a)
 			else:
 				_vectors = [_vectors[1], a]
-			_design()))
+			_design())
+		vb.add_theme_color_override("font_color", UiTheme.vector_color(a))
+		vr.add_child(vb)
 	var fr := HFlowContainer.new()
 	body.add_child(fr)
 	fr.add_child(UiTheme.label(Strings.t("workbench.form")))
@@ -107,7 +115,23 @@ func _design() -> void:
 			dir[v] = 1.0
 		var card := CardRules.make_spell(db, dir, _form, _magnitude)
 		var arch := Crafting.archetype(db, Crafting.input_vector(db, _vectors, _magnitude))
-		text(Strings.t("workbench.mp") % [card["name"], int(card["cost"]), CardRules.describe(db, card)])
+		var pr := row()
+		var cv := CardView.new()
+		cv.setup(card, int(card["cost"]))
+		cv.focus_mode = Control.FOCUS_NONE
+		pr.add_child(cv)
+		var dg := preload("res://src/scenes/ui/shape_diagram.gd").new()
+		dg.setup(DataDB.record("forms", _form), _magnitude, UiTheme.vector_color(str(_vectors[0])), 5)
+		pr.add_child(dg)
+		var combo := Combos.for_vectors(db, dir)
+		var desc := CardRules.describe(db, card)
+		if not combo.is_empty() and not Combos.discovered(GameState.run, Journal.data, str(combo["id"])):
+			# Undiscovered combos stay a mystery until crafted (VD Part 4).
+			desc = desc.replace(Strings.t("card.combo") % [str(combo.get("name", "")), str(combo.get("description", ""))], Strings.t("workbench.combo_unknown") % str(combo.get("hint", "")))
+		var dl := UiTheme.label(Strings.t("workbench.mp") % [card["name"] if combo.is_empty() or Combos.discovered(GameState.run, Journal.data, str(combo["id"])) else Strings.t("combo.unknown"), int(card["cost"]), desc])
+		dl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		dl.custom_minimum_size = Vector2(240, 0)
+		pr.add_child(dl)
 		text(Strings.t("workbench.minigame_better_performance_rolls_properties") % arch.capitalize(), UiTheme.DIM)
 	else:
 		text(err, UiTheme.BAD)
@@ -132,11 +156,19 @@ func _play_minigame() -> void:
 	visible = true
 	var card := Crafting.craft(db, GameState.run, GameState.player, _vectors, _form, _magnitude, perf, Rng.stream("crafting"))
 	clear_body()
-	text(Strings.t("workbench.performance") % roundi(perf * 100.0), UiTheme.ACCENT)
+	text(Strings.t("workbench.performance") % roundi(perf * 100.0) + "  " + Strings.t("workbench.grade") % _grade(perf), UiTheme.ACCENT)
+	Audio.event("level_up" if perf >= 0.75 else ("click" if perf >= 0.4 else "fail"))
 	if card.has("error"):
 		text(str(card["error"]), UiTheme.BAD)
 	else:
+		_reveal(card)
 		text(Strings.t("workbench.you_made_mp") % [card["name"], int(card["cost"])], UiTheme.GOOD)
+		var combo := Combos.for_vectors(db, card.get("vectors", {}))
+		if not combo.is_empty() and Journal.discover_combo(str(combo["id"])):
+			Audio.event("combo_discovered")
+			text(Strings.t("workbench.combo_found") % str(combo.get("name", "")), UiTheme.vector_color(str(combo["vectors"][0])))
+			text(str(combo.get("description", "")))
+			Narrator.say(str(combo.get("narrator", "")))
 		for prop in card.get("properties", []):
 			var pr := DataDB.record("properties", str(prop))
 			text(Strings.t("workbench.property") % [pr.get("name", prop), pr.get("text", "")])
@@ -149,6 +181,33 @@ func _play_minigame() -> void:
 		Narrator.say(Strings.t("workbench.a_new_card_the_workbench") % str(_vectors[0]))
 	add_button(Strings.t("workbench.back"), _menu)
 	focus_first()
+
+
+## A letter grade for minigame performance (VD Part 4).
+func _grade(perf: float) -> String:
+	for g in [[0.95, "S"], [0.8, "A"], [0.6, "B"], [0.4, "C"]]:
+		if perf >= float(g[0]):
+			return str(g[1])
+	return "D"
+
+
+## The finished card flips in, glowing in its Vector's color.
+func _reveal(card: Dictionary) -> void:
+	var holder := CenterContainer.new()
+	body.add_child(holder)
+	var cv := CardView.new()
+	cv.setup(card, int(card.get("cost", 0)))
+	cv.focus_mode = Control.FOCUS_NONE
+	holder.add_child(cv)
+	var axes := CardRules.ordered_vectors(DataDB.all(), card.get("vectors", {}))
+	var glow := UiTheme.vector_color(str(axes[0])) if not axes.is_empty() else UiTheme.ACCENT
+	Audio.event("card_play_" + str(axes[0]) if not axes.is_empty() else "card_play_basic")
+	cv.pivot_offset = cv.custom_minimum_size / 2.0
+	cv.scale = Vector2(0.0, 1.0)
+	cv.modulate = glow.lightened(0.5)
+	var tw := cv.create_tween()
+	tw.tween_property(cv, "scale", Vector2.ONE, 0.25)
+	tw.tween_property(cv, "modulate", Color.WHITE, 0.4)
 
 
 func _copy_menu() -> void:
@@ -208,6 +267,19 @@ func _deck_editor() -> void:
 	for id in _deck:
 		if not ids.has(str(id)):
 			ids.append(str(id))
+	var axis_order: Array = db.get("spaces", {}).get("arcane", {}).get("axes", [])
+	ids.sort_custom(func(x: String, y: String) -> bool:
+		var cx := CardRules.resolve(db, x, GameState.cards)
+		var cy := CardRules.resolve(db, y, GameState.cards)
+		var ax := CardRules.ordered_vectors(db, cx.get("vectors", {}))
+		var ay := CardRules.ordered_vectors(db, cy.get("vectors", {}))
+		var ix := axis_order.find(ax[0]) if not ax.is_empty() else 999
+		var iy := axis_order.find(ay[0]) if not ay.is_empty() else 999
+		if ix != iy:
+			return ix < iy
+		var kx := CardRules.cost(db, cx) if not cx.is_empty() else 0
+		var ky := CardRules.cost(db, cy) if not cy.is_empty() else 0
+		return kx < ky if kx != ky else x < y)
 	for any_id in ids:
 		var id := str(any_id)
 		var card := CardRules.resolve(db, id, GameState.cards)
@@ -221,6 +293,9 @@ func _deck_editor() -> void:
 		var in_deck := _deck.count(id)
 		var r := row()
 		var l := UiTheme.label(Strings.t("workbench.mp_in_deck_owned") % [card.get("name", id), CardRules.cost(db, card), in_deck, Crafting.owned(GameState.run, ch, id)])
+		var badge := Combos.for_vectors(db, card.get("vectors", {})) if CardRules.is_spell(card) else {}
+		if not badge.is_empty():
+			l.text += " " + Strings.t("workbench.combo_badge") % str(badge.get("name", ""))
 		l.custom_minimum_size = Vector2(300, 0)
 		# Everything about the card on hover: full text, Form, Magnitude, Vectors, rarity, quick.
 		l.tooltip_text = Strings.t("workbench.card_detail") % [CardRules.describe(db, card), str(card.get("form", card.get("kind", ""))).capitalize(),

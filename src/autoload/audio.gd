@@ -91,6 +91,32 @@ func play_music(situation: String) -> void:
 		old.stop()
 
 
+## The first situation that data/audio.json maps ("boss_cold_cut", then
+## "battle_boss"), so specific tracks are optional (VD Part 1).
+func play_music_first(situations: Array) -> void:
+	for s in situations:
+		if _cfg().get("music", {}).has(str(s)):
+			play_music(str(s))
+			return
+	if not situations.is_empty():
+		play_music(str(situations[-1]))
+
+
+## Hot reload (F1, VD Part 1): reread sounds and restart the current music
+## and ambience, so replaced files play at once.
+func reload() -> void:
+	Assets.reload_audio()
+	_warned.clear()
+	var m := _music_id
+	var a := _amb_id
+	_music_id = ""
+	_amb_id = ""
+	if m != "":
+		play_music(m)
+	if a != "":
+		play_ambience(a)
+
+
 func stop_music() -> void:
 	for m in _music:
 		(m as AudioStreamPlayer).stop()

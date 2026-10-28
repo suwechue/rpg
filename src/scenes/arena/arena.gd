@@ -46,6 +46,7 @@ func _ready() -> void:
 	_strip.position = Vector2(2, 40)
 	_ui.add_child(_strip)
 	Audio.play_music(str(Arena.waves(DataDB.all()).get("music", {}).get("hub", "dungeon")))
+	Audio.play_ambience("arena")
 	if bool(arena.get("inFight", false)) and GameState.combat_context == "arena":
 		_after_wave()
 	_refresh()

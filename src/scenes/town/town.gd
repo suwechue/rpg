@@ -105,8 +105,12 @@ func _load_map(id: String, is_int: bool, loc: String, at: Vector2i) -> void:
 	_camera.make_current()
 	_refresh_people()
 	_save_pos()
+	var late := Calendar.part_id() in ["evening", "night"]
 	if not interior:
-		Audio.play_music("weekend" if Calendar.is_weekend() else str(DataDB.table("town/zones/" + id).get("music", "town")))
+		var zone_music := str(DataDB.table("town/zones/" + id).get("music", "town"))
+		Audio.play_music_first(["weekend"] if Calendar.is_weekend() else (["town_night", zone_music] if late else ["town_" + Calendar.part_id(), zone_music]))
+	# VD Part 1: ambience by place and time.
+	Audio.play_ambience("school" if id == "school" else ("town_night" if late else "town_day"))
 
 
 func _cell_pos(c: Vector2i) -> Vector2:
@@ -158,7 +162,7 @@ func _enter_interior(loc: String, zone: String, back_cell: Vector2i) -> void:
 	var sz: Array = t.get("size", [12, 10])
 	facing = Vector2i.UP
 	_load_map(tmpl, true, loc, Vector2i(int(sz[0]) / 2, int(sz[1]) - 2))
-	Audio.play_sfx("door")
+	Audio.event("door_open")
 	Narrator.say(_enter_line(loc))
 
 
@@ -186,7 +190,7 @@ func _leave_interior() -> void:
 		return
 	facing = Vector2i.DOWN
 	_load_map(return_zone if return_zone != "" else "residential", false, "", return_cell)
-	Audio.play_sfx("door")
+	Audio.event("door_open")
 
 
 # --- People ------------------------------------------------------------------------------
@@ -314,6 +318,7 @@ func step(dir: Vector2i) -> void:
 		return
 	_moving = true
 	cell = next
+	Audio.event("step_floor" if interior else "step_grass")
 	var tw := create_tween()
 	tw.tween_property(player, "position", _cell_pos(cell), STEP_TIME)
 	player.play_walk(STEP_TIME)
