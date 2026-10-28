@@ -1,0 +1,142 @@
+{
+  "comment": "M15 tutorial day (pulled forward by P2 Part 3): one short cutscene per day part on week 1 Monday. Skipped on later runs if the player chooses.",
+  "cutscenes": [
+    {
+      "id": "day1_before_school",
+      "steps": [
+        {
+          "type": "narrator",
+          "text": "Monday. You overslept. Of course you overslept."
+        },
+        {
+          "type": "say",
+          "speaker": "parent",
+          "text": "You're LATE! Lunch is on the counter. Go, go, go!"
+        },
+        {
+          "type": "give",
+          "effects": {
+            "item": "good_coffee"
+          }
+        },
+        {
+          "type": "narrator",
+          "text": "Walk with the arrow keys or WASD. E talks and opens doors. The bar up top is your day: parts, Action Points, money. Go."
+        },
+        {
+          "type": "set_flag",
+          "flag": "tut_day_before_school"
+        }
+      ]
+    },
+    {
+      "id": "day1_period1",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Period 1",
+          "seconds": 1.6
+        },
+        {
+          "type": "narrator",
+          "text": "First class. Pick a seat, meet the teacher, try not to be memorable."
+        },
+        {
+          "type": "narrator",
+          "text": "Going to class raises stats. Skipping does the opposite, slowly."
+        },
+        {
+          "type": "set_flag",
+          "flag": "tut_day_period1"
+        }
+      ]
+    },
+    {
+      "id": "day1_period2",
+      "steps": [
+        {
+          "type": "narrator",
+          "text": "This is your schedule. Pick the week's classes; each one trains different stats. You can change it every Sunday."
+        },
+        {
+          "type": "set_flag",
+          "flag": "tut_day_period2"
+        }
+      ]
+    },
+    {
+      "id": "day1_lunch",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Lunch",
+          "seconds": 1.6
+        },
+        {
+          "type": "narrator",
+          "text": "The cafeteria. Kelly's table. Dex mid-bit. Theo alone with a book he isn't reading."
+        },
+        {
+          "type": "narrator",
+          "text": "Talking costs AP. Some lines need Charisma, and some get misheard. Bonds grow from both."
+        },
+        {
+          "type": "set_flag",
+          "flag": "tut_day_lunch"
+        }
+      ]
+    },
+    {
+      "id": "day1_period3",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Period 3",
+          "seconds": 1.6
+        },
+        {
+          "type": "narrator",
+          "text": "A class event. Choices here change things later. Choose like you mean it."
+        },
+        {
+          "type": "set_flag",
+          "flag": "tut_day_period3"
+        }
+      ]
+    },
+    {
+      "id": "day1_after_school",
+      "steps": [
+        {
+          "type": "narrator",
+          "text": "After school, the town is yours. Places open and close by time of day. Gary's Deli is downtown; the forge is past the tracks."
+        },
+        {
+          "type": "narrator",
+          "text": "Every action costs AP. Walking is free. When you're done, end the part."
+        },
+        {
+          "type": "set_flag",
+          "flag": "tut_day_after_school"
+        }
+      ]
+    },
+    {
+      "id": "day1_night",
+      "steps": [
+        {
+          "type": "narrator",
+          "text": "Home. Your room has a workbench, which is a weird thing for a bedroom to have. Use it: craft your first card."
+        },
+        {
+          "type": "narrator",
+          "text": "Cards you craft go straight into your deck."
+        },
+        {
+          "type": "set_flag",
+          "flag": "tut_day_night"
+        }
+      ]
+    }
+  ]
+}

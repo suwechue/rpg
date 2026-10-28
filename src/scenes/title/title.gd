@@ -87,9 +87,17 @@ func _continue() -> void:
 
 
 func _new_run() -> void:
+	# M15 intro (P2 Part 3): moving day first, then creation framed as unpacking.
+	await Cutscenes.play("intro_moving_day", self)
 	var m := Modal.new()
 	m.build(Strings.t("title.who_are_you_new_kid"), 420)
 	var db: Dictionary = DataDB.all()
+	var name_row := m.row()
+	name_row.add_child(UiTheme.label(Strings.t("title.your_name")))
+	var name_edit := LineEdit.new()
+	name_edit.text = Strings.t("title.new_kid")
+	name_edit.custom_minimum_size = Vector2(140, 0)
+	name_row.add_child(name_edit)
 	m.text(Strings.t("title.pick_a_starting_class_you"), UiTheme.DIM)
 	var seed_row := m.row()
 	seed_row.add_child(UiTheme.label(Strings.t("title.seed_blank_random")))
@@ -155,10 +163,21 @@ func _new_run() -> void:
 		return
 	SaveSystem.delete_save()
 	var traits: Array = [] if str(trait_pick["id"]) == "" else [str(trait_pick["id"])]
-	GameState.new_run(int(pick["seed"]), str(pick["class"]), Strings.t("title.new_kid"), { "traits": traits,
+	var chosen_name := name_edit.text.strip_edges() if name_edit.text.strip_edges() != "" else Strings.t("title.new_kid")
+	GameState.new_run(int(pick["seed"]), str(pick["class"]), chosen_name, { "traits": traits,
 		"stats": PointBuy.final_stats(DataDB.all(), str(pick["class"]), alloc) })
 	GameState.combat_difficulty = str(diff["id"])
 	Narrator.say(Strings.t("title.new_kid_in_a_small"))
+	# Later runs may skip the tutorial day (unlocked in the Narrator's Journal).
+	if bool(Journal.data.get("tutorial_cleared", false)):
+		var q := Modal.new()
+		q.build(Strings.t("tut_skip_title"), 320)
+		q.add_button(Strings.t("title.skip_tutorial_day"), func() -> void: q.finish(true))
+		q.add_button(Strings.t("tut_skip_no"), func() -> void: q.finish(false))
+		if bool(await Flow.show_modal(q)):
+			GameState.set_flag("tut_skip_day")
+			GameState.set_flag("tut_skip_lessons")
+	await Cutscenes.play("intro_night", self)
 	SceneRouter.goto(TOWN_SCENE)
 
 

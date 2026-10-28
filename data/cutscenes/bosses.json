@@ -1,0 +1,45 @@
+{
+  "comment": "Boss cutscenes, played inside combat (encounter data 'cutscenes': { 'start', 'phase2' }).",
+  "cutscenes": [
+    {
+      "id": "mascot_intro",
+      "steps": [
+        {
+          "type": "music",
+          "situation": "boss_hollow_mascot"
+        },
+        {
+          "type": "title_card",
+          "text": "The Hollow Mascot",
+          "seconds": 1.6
+        },
+        {
+          "type": "narrator",
+          "text": "The bleachers groan. Center stage, under a single flickering light, the school mascot stands up. There's nobody inside it."
+        },
+        {
+          "type": "narrator",
+          "text": "It waves. Nobody waves back."
+        }
+      ]
+    },
+    {
+      "id": "mascot_phase2",
+      "steps": [
+        {
+          "type": "camera_shake",
+          "amount": 5
+        },
+        {
+          "type": "narrator",
+          "text": "The head comes off. Something else is wearing the body now."
+        },
+        {
+          "type": "title_card",
+          "text": "Phase 2",
+          "seconds": 1.0
+        }
+      ]
+    }
+  ]
+}

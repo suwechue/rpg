@@ -82,6 +82,8 @@ func _run(from: int) -> void:
 			"tutorialRest":
 				var lines := Night.rest(DataDB.all(), GameState.run, {})
 				await Flow.show_event({ "title": "", "text": Strings.t(str(step.get("textKey", "tut_rest_a"))) + "\n" + " ".join(PackedStringArray(lines)) })
+			"cutscene":
+				await Cutscenes.play(str(step["id"]), self)
 			"event":
 				await Flow.show_event(step["event"])
 			"narrate":

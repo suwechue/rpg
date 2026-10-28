@@ -735,6 +735,10 @@
     "technique.swap_out": "Swap out %s for:",
     "technique.planned": "(coming later)",
     "arena.technique_pick": "Pick a Technique for someone (once per checkpoint)",
-    "arena.next_theme": "Next 5 waves: %s. %s"
+    "arena.next_theme": "Next 5 waves: %s. %s",
+    "cutscene.skip": "Skip",
+    "title.your_name": "Name:",
+    "title.skip_tutorial_day": "Skip the tutorial day (and the floor's lessons)",
+    "arena.theme_banner": "Next five waves: %s. %s"
   }
 }

@@ -102,6 +102,9 @@ func _validate() -> void:
 				errors.append("class %s: unknown starter card '%s'" % [id, entry["basic"]])
 	_validate_combat(arcane)
 	_validate_forge()
+	for c in records_under("cutscenes/", "cutscenes"):
+		for msg in preload("res://src/core/story/cutscenes.gd").problems(_tables, c):
+			errors.append(msg)
 	_validate_events()
 	_validate_town()
 	for t in records_under("traits", "traits"):

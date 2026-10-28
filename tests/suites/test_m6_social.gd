@@ -214,7 +214,7 @@ func test_kelly_guest_fight_tracks_help() -> void:
 
 func test_story_triggers() -> void:
 	var run := fresh()
-	check(StoryRules.due(db(), run, { "week": 1, "day": "mon", "part": "lunch" }, true) == ["w1_lunch"], "lunch scene is due Monday lunch")
+	check(StoryRules.due(db(), run, { "week": 1, "day": "mon", "part": "lunch" }, true).has("w1_lunch"), "lunch scene is due Monday lunch")
 	check(StoryRules.due(db(), run, { "week": 1, "day": "mon", "part": "evening" }, false) == ["w1_evening"], "the evening floor is due")
 	RM.set_flag(run, "story_done_w1_evening")
 	check(StoryRules.due(db(), run, { "week": 1, "day": "mon", "part": "evening" }, false).is_empty(), "once only")

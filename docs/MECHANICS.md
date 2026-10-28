@@ -527,11 +527,13 @@ Change these in `data/dungeon.json`, `data/weeks.json` and `data/encounters.json
 
 Change these in `data/story/*.json`, `data/journal.json` and `data/endings.json`.
 
+- **Cutscenes:** `data/cutscenes/*.json` (see docs/CUTSCENE_GUIDE.md). A new run opens on moving day, then creation (with a name), then the first night. Week 1 Monday plays a short beat each day part; the Kelly floor opens and closes with cutscenes; the Hollow Mascot has intro and phase 2 scenes. Later runs can skip the tutorial day. Skip with Esc (choices take their first option; effects still apply), hold E to fast-forward. Each cutscene sets the flag `cutscene_seen_<id>`.
+- **Arena cutscenes:** the first visit, the first boss wave, a new best score; each 5-wave theme gets a Narrator banner.
+
 ---
 
 # Part D: Changing next
 
-PT (`docs/PATCH_1.md`) and P2 Parts 1 and 2 (`docs/PATCH_2.md`) are in. Next:
+PT (`docs/PATCH_1.md`) and P2 Parts 1 to 3 (`docs/PATCH_2.md`, with cutscenes M14 and the intro M15) are in. Next:
 - VD (`docs/VECTORS_DEMO.md`) Parts 1 to 4: audio and asset polish, combos and the Compendium, the spark quiz, the visual card builder.
-- P2 Part 3: the cutscene system (M14) and the intro and tutorial day (M15).
 - VD Parts 5 and 6: the demo build and feedback tools.

@@ -1,5 +1,5 @@
 {
-  "comment": "Week 1 Monday (DESIGN.md Section 13, 'Kelly and the first-night betrayal'). Kelly Risk sources: mock her at lunch +2 (a misheard joke counts), side with the laughers in the class disruption +1 (class_events story_w1_disruption), ignore her call for help in the first fight +2, take the shortcut she begs you not to +1, refuse to let her carry the lantern +1, defend her -2 (disruption), shield or heal her in combat -2, kind reassurance when she panics -1. At the panic moment, Risk 4+ kills you. The narrator foreshadows twice before it. CT Part 7: the evening is now the 10-room tutorial floor (data/story/tutorial_floor.json); the Kelly Risk choices (lantern, shortcut, help call in room 8, panic) are unchanged.",
+  "comment": "Week 1 Monday (DESIGN.md Section 13, 'Kelly and the first-night betrayal'). Kelly Risk sources: mock her at lunch +2 (a misheard joke counts), side with the laughers in the class disruption +1 (class_events story_w1_disruption), ignore her call for help in the first fight +2, take the shortcut she begs you not to +1, refuse to let her carry the lantern +1, defend her -2 (disruption), shield or heal her in combat -2, kind reassurance when she panics -1. At the panic moment, Risk 4+ kills you. The narrator foreshadows twice before it. CT Part 7: the evening is now the 10-room tutorial floor (data/story/tutorial_floor.json); the Kelly Risk choices (lantern, shortcut, help call in room 8, panic) are unchanged. P2 Part 3 (M15): the tutorial day is a short cutscene per Monday day part (stories w1_day_*), skipped when the flag tut_skip_day is set.",
   "kellyRiskDeath": 4,
   "stories": [
     {
@@ -94,6 +94,10 @@
         {
           "type": "guest",
           "add": "kelly"
+        },
+        {
+          "type": "cutscene",
+          "id": "kelly_floor_intro"
         },
         {
           "type": "tutorialSkip"
@@ -295,6 +299,10 @@
         },
         {
           "type": "kellyCheck"
+        },
+        {
+          "type": "cutscene",
+          "id": "kelly_floor_end"
         }
       ],
       "survive": {
@@ -307,6 +315,132 @@
         "cause": "kelly",
         "narrate": "Kelly's scream is the last thing you hear. The lantern hits the floor. The panic pours out of her like a wave, hits the ceiling, and the ceiling comes down. She didn't mean to. That's the worst part. She looks for you in the dust, and you're not there anymore. Some people panic under pressure. You were the pressure."
       }
+    },
+    {
+      "id": "w1_day_before_school",
+      "trigger": {
+        "week": 1,
+        "day": "mon",
+        "part": "before_school"
+      },
+      "inline": true,
+      "cond": {
+        "notFlag": "tut_skip_day"
+      },
+      "steps": [
+        {
+          "type": "cutscene",
+          "id": "day1_before_school"
+        }
+      ]
+    },
+    {
+      "id": "w1_day_period_1",
+      "trigger": {
+        "week": 1,
+        "day": "mon",
+        "part": "period_1"
+      },
+      "inline": true,
+      "cond": {
+        "notFlag": "tut_skip_day"
+      },
+      "steps": [
+        {
+          "type": "cutscene",
+          "id": "day1_period1"
+        }
+      ]
+    },
+    {
+      "id": "w1_day_period_2",
+      "trigger": {
+        "week": 1,
+        "day": "mon",
+        "part": "period_2"
+      },
+      "inline": true,
+      "cond": {
+        "notFlag": "tut_skip_day"
+      },
+      "steps": [
+        {
+          "type": "cutscene",
+          "id": "day1_period2"
+        }
+      ]
+    },
+    {
+      "id": "w1_day_lunch",
+      "trigger": {
+        "week": 1,
+        "day": "mon",
+        "part": "lunch"
+      },
+      "inline": true,
+      "cond": {
+        "notFlag": "tut_skip_day"
+      },
+      "steps": [
+        {
+          "type": "cutscene",
+          "id": "day1_lunch"
+        }
+      ]
+    },
+    {
+      "id": "w1_day_period_3",
+      "trigger": {
+        "week": 1,
+        "day": "mon",
+        "part": "period_3"
+      },
+      "inline": true,
+      "cond": {
+        "notFlag": "tut_skip_day"
+      },
+      "steps": [
+        {
+          "type": "cutscene",
+          "id": "day1_period3"
+        }
+      ]
+    },
+    {
+      "id": "w1_day_after_school",
+      "trigger": {
+        "week": 1,
+        "day": "mon",
+        "part": "after_school"
+      },
+      "inline": true,
+      "cond": {
+        "notFlag": "tut_skip_day"
+      },
+      "steps": [
+        {
+          "type": "cutscene",
+          "id": "day1_after_school"
+        }
+      ]
+    },
+    {
+      "id": "w1_day_night",
+      "trigger": {
+        "week": 1,
+        "day": "mon",
+        "part": "night"
+      },
+      "inline": true,
+      "cond": {
+        "notFlag": "tut_skip_day"
+      },
+      "steps": [
+        {
+          "type": "cutscene",
+          "id": "day1_night"
+        }
+      ]
     }
   ]
 }

@@ -36,6 +36,7 @@ func _ready() -> void:
 	add_section("Character", _show_character, left)
 	add_section("Leveling", _show_leveling, left)
 	add_section("Fights", _show_fights, left)
+	add_section("Cutscenes", _show_cutscenes, left)
 	add_section("Time", _show_time, left)
 	add_section("Stats/Flags", _show_stats, left)
 	add_section("Town", _show_town, left)
@@ -50,6 +51,7 @@ func _ready() -> void:
 ##   --jump=week,day_index,part_index  --town=zone:x,y (start position in the town)
 ##   --section=Art (with --debug)  --custom=C:/folder (use another custom art folder)
 ##   --hand=ids --hovercard=N --card=N --hover=x,y (combat previews, see _combat_dev_args)
+##   --cutscene=id (play a cutscene over the current scene)
 ##   --tutorial=N (tutorial floor room N with its lesson; use with --scene=res://src/scenes/combat/combat.tscn)
 ##   --arena --size=4 --level=3 --arenawave=N --waves=N (Endless Arena; --autoplay plays it)
 ## --debug opens this menu; --shot saves the viewport after N frames and quits.
@@ -80,6 +82,8 @@ func _dev_args() -> void:
 		var opts := preload("res://src/core/story/tutorial.gd").setup_opts(DataDB.all(), int(args["tutorial"]), GameState.player, GameState.run.get("flags", {}))
 		opts["intro"] = Strings.t(str(opts["intro"]))
 		GameState.pending_combat = GameState.combat_setup(opts["enemies"], str(opts["layout"]), opts)
+	if args.has("cutscene"):
+		_play_cutscene_arg.call_deferred(str(args["cutscene"]))
 	if args.has("fight"):
 		GameState.pending_combat = GameState.combat_setup(str(args["fight"]).split(","), str(args.get("layout", "boss_stage")), { "boss": true })
 	if args.has("scene"):
@@ -226,6 +230,15 @@ func _level_text(reports: Array) -> String:
 			text += ", learned " + ", ".join(PackedStringArray(r["learned"]))
 		parts.append(text)
 	return ". ".join(PackedStringArray(parts))
+
+
+## Play any cutscene (M14).
+func _show_cutscenes(box: VBoxContainer) -> void:
+	for c in preload("res://src/core/story/cutscenes.gd").all(DataDB.all()):
+		var cid := str(c["id"])
+		box.add_child(UiTheme.button(cid, func() -> void:
+			toggle()
+			Cutscenes.play(cid, get_tree().current_scene)))
 
 
 func _show_fights(box: VBoxContainer) -> void:
@@ -559,3 +572,9 @@ func _rebuild_scene() -> void:
 	var cur := get_tree().current_scene
 	if cur != null and cur.scene_file_path != "":
 		SceneRouter.goto(cur.scene_file_path)
+
+
+func _play_cutscene_arg(id: String) -> void:
+	for i in 20:
+		await get_tree().process_frame
+	Cutscenes.play(id, get_tree().current_scene)

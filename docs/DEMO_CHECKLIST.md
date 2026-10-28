@@ -14,8 +14,8 @@ The demo (VD Part 5): the intro through the week 1 boss, the Endless Arena from 
 | Multi-Vector combos and the Compendium | Missing | VD Part 2 |
 | Spark quiz | Missing | VD Part 3 (standalone screen until M15) |
 | Visual card builder and crafting juice | Missing | VD Part 4 |
-| Cutscene system | Missing | P2 Part 3 (M14) |
-| Intro and tutorial day | Missing | P2 Part 3 (M15). Today a new run starts directly in the game |
+| Cutscene system | Have | P2 Part 3 (M14); docs/CUTSCENE_GUIDE.md |
+| Intro and tutorial day | Have | P2 Part 3 (M15): moving day, name, intro night, a beat per Monday day part; illustrations are placeholders until art lands |
 | A friendship scene in week 1 | Missing | One scripted scene with the cutscene system (Dex or Theo at lunch); the full system is M18 |
 | Title logo slot and animated title background | Missing | `art_logo` asset id with a placeholder (VD Part 5) |
 | Demo mode, thanks screen, export preset | Missing | `data/demo.json`, `export_presets.cfg` "Demo" (VD Part 5) |

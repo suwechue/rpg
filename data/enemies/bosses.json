@@ -162,7 +162,11 @@
       ],
       "xp": 60,
       "money": 30,
-      "sprite": "enemy_hollow_mascot"
+      "sprite": "enemy_hollow_mascot",
+      "cutscenes": {
+        "start": "mascot_intro",
+        "phase2": "mascot_phase2"
+      }
     },
     {
       "id": "cold_cut",

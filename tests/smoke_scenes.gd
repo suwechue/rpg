@@ -276,6 +276,7 @@ func smoke_kelly_monday() -> void:
 		var ended := await _drive(func() -> bool:
 			return gs.call("flag", "story_done_w1_evening") or (current_scene != null and current_scene.name == "Title"), needles, 900.0)
 		check(ended, "the evening tutorial floor plays to the end (%s, Risk %d)" % [outcome, int(gs.get("run").get("kelly_risk", 0))])
+		check(gs.call("flag", "cutscene_seen_kelly_floor_intro"), "M14: the Kelly floor intro cutscene played (playing: %s)" % str(_root_node("Cutscenes").get("playing")))
 		if outcome == "survive":
 			check(not gs.call("flag", "w1_shortcut"), "the long way: room 7 (Hot Floor) is played")
 			check(gs.call("flag", "survived_w1_monday"), "kind night: you survive")

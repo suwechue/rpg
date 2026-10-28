@@ -1,0 +1,62 @@
+{
+  "comment": "The Kelly tutorial floor's cutscenes (P2 Part 3).",
+  "cutscenes": [
+    {
+      "id": "kelly_floor_intro",
+      "steps": [
+        {
+          "type": "music",
+          "situation": "cutscene_tense"
+        },
+        {
+          "type": "title_card",
+          "text": "The Upside-Down",
+          "seconds": 1.6
+        },
+        {
+          "type": "narrator",
+          "text": "The school, but wrong. The trophy case is full of teeth. The hallway goes on further than the building does."
+        },
+        {
+          "type": "say",
+          "speaker": "kelly",
+          "text": "What did you DO?",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "kelly",
+          "text": "Okay. Okay. We walk. We do NOT run. Running is how they get you in movies.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "kelly_floor_end",
+      "steps": [
+        {
+          "type": "if_flag",
+          "flag": "survived_w1_monday",
+          "then": [
+            {
+              "type": "say",
+              "speaker": "kelly",
+              "text": "...Thanks. Don't make it weird.",
+              "side": "right"
+            },
+            {
+              "type": "narrator",
+              "text": "She doesn't say anything else on the walk home. She doesn't have to."
+            }
+          ],
+          "else": [
+            {
+              "type": "narrator",
+              "text": "Some people panic under pressure. You were the pressure."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

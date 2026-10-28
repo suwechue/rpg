@@ -114,6 +114,7 @@ func _ready() -> void:
 	_build_ui()
 	_start_lesson(setup)
 	_sync_views()
+	await _boss_cutscene("start")
 	_play_events()
 	if setup.has("intro"):
 		_say_banner(str(setup["intro"]))
@@ -654,6 +655,23 @@ func _perk_suffix(u: UnitScript) -> String:
 func _member_perks(u: UnitScript) -> Array:
 	return preload("res://src/core/effects.gd").member_effects(DataDB.all(), GameState.run).filter(func(e: Dictionary) -> bool:
 		return str(e["member"]) == u.id or (u.is_player and str(e["member"]) == "player"))
+
+
+## Boss cutscenes from encounter data ("cutscenes": { "start", "phase2" }), played over the board.
+func _boss_cutscene(key: String) -> void:
+	for u in state.units:
+		if u.team == "enemy" and u.source.has("cutscenes"):
+			var id := str(u.source["cutscenes"].get(key, ""))
+			if id != "":
+				await Cutscenes.play(id, self)
+			return
+
+
+func cutscene_actor(id: String) -> Node2D:
+	for u in state.units:
+		if u.id == id or str(u.source.get("id", "")) == id:
+			return _view_for(u)
+	return null
 
 
 ## Each party member's color (data/ui.json "partyColors", by party order).
@@ -1511,6 +1529,7 @@ func _play_event(e: Dictionary) -> void:
 			Audio.play_sfx("fail")
 			await _shake(2.0)
 		"phase":
+			await _boss_cutscene("phase%d" % (int(e.get("index", 1)) + 1))
 			_say_banner(str(e["text"]))
 			_note(str(e["text"]))
 			await _shake(4.0)

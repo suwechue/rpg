@@ -1,0 +1,88 @@
+{
+  "comment": "M15 intro (pulled forward by P2 Part 3). Edit the lines freely.",
+  "cutscenes": [
+    {
+      "id": "intro_moving_day",
+      "steps": [
+        {
+          "type": "music",
+          "situation": "cutscene_funny"
+        },
+        {
+          "type": "image",
+          "id": "art_cutscene_moving_day"
+        },
+        {
+          "type": "fade",
+          "to": "clear",
+          "seconds": 0.6
+        },
+        {
+          "type": "title_card",
+          "text": "Moving Day",
+          "seconds": 2.0
+        },
+        {
+          "type": "narrator",
+          "text": "Every town has a story. This one has a hole in it."
+        },
+        {
+          "type": "narrator",
+          "text": "The truck pulls in at dusk. Past the fountain that hasn't worked in years. Past the train station where nothing stops. Past the school, which is bigger than it needs to be."
+        },
+        {
+          "type": "narrator",
+          "text": "That's you in the passenger seat, by the way. New kid. Clean slate. Terrible timing."
+        },
+        {
+          "type": "narrator",
+          "text": "Let's get you unpacked."
+        },
+        {
+          "type": "fade",
+          "to": "black",
+          "seconds": 0.5
+        },
+        {
+          "type": "image",
+          "id": ""
+        }
+      ]
+    },
+    {
+      "id": "intro_night",
+      "steps": [
+        {
+          "type": "music",
+          "situation": "cutscene_tense"
+        },
+        {
+          "type": "image",
+          "id": "art_cutscene_first_night"
+        },
+        {
+          "type": "fade",
+          "to": "clear",
+          "seconds": 0.5
+        },
+        {
+          "type": "narrator",
+          "text": "Night falls. The boxes stay mostly packed. Out past the yard, the woods are doing something woods shouldn't do."
+        },
+        {
+          "type": "narrator",
+          "text": "Don't look. Go to sleep. Monday is a big day."
+        },
+        {
+          "type": "title_card",
+          "text": "Week 1",
+          "seconds": 1.6
+        },
+        {
+          "type": "image",
+          "id": ""
+        }
+      ]
+    }
+  ]
+}

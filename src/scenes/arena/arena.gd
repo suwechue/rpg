@@ -49,8 +49,7 @@ func _ready() -> void:
 	if bool(arena.get("inFight", false)) and GameState.combat_context == "arena":
 		_after_wave()
 	_refresh()
-	if bool(GameState.run.get("pendingPointBuy", false)):
-		_point_buy.call_deferred()
+	_intro.call_deferred()
 	if GameState.dev_autoplay:
 		_autoplay.call_deferred()
 
@@ -149,6 +148,14 @@ func _start_wave() -> void:
 	var wave := int(arena["wave"]) + 1
 	arena["wave"] = wave
 	arena.erase("lastPick")
+	if Arena.is_boss(DataDB.all(), wave) and not bool(Journal.data.get("arena_boss_seen", false)):
+		Journal.data["arena_boss_seen"] = true
+		Journal.save_journal()
+		await Cutscenes.play("arena_boss_first", self)
+	elif (wave - 1) % int(Arena.waves(DataDB.all()).get("themes", {}).get("blockSize", 5)) == 0:
+		var th := Arena.theme_for(DataDB.all(), arena, wave)
+		if not th.is_empty() and not GameState.dev_autoplay:
+			Narrator.say(Strings.t("arena.theme_banner") % [str(th.get("name", "")), str(th.get("text", ""))])
 	var setup := Arena.setup_for_wave(db, arena, wave)
 	setup["party"] = GameState.combat_party()
 	setup["library"] = GameState.cards
@@ -225,6 +232,8 @@ func _lost() -> void:
 	Journal.data["arena"] = scores
 	Journal.save_journal()
 	arena["newBest"] = best
+	if best:
+		_arena_cutscenes.call_deferred()
 
 
 func _over() -> void:
@@ -328,6 +337,26 @@ func _checkpoint() -> void:
 	if story:
 		_button(Strings.t("arena.bank_and_leave_the_rift"), _leave)
 	_center()
+
+
+## The first-visit cutscene, then point buy, one after the other.
+func _intro() -> void:
+	await _arena_cutscenes()
+	if bool(GameState.run.get("pendingPointBuy", false)):
+		await _point_buy()
+	_refresh()
+
+
+## Arena cutscenes (P2 Part 3): the first visit, the first wave 10 boss, a new
+## best score, and each new 5-wave theme. Seen-flags live in the Journal.
+func _arena_cutscenes() -> void:
+	if not bool(Journal.data.get("arena_first_seen", false)):
+		Journal.data["arena_first_seen"] = true
+		Journal.save_journal()
+		await Cutscenes.play("arena_first", self)
+	if bool(arena.get("newBest", false)) and str(arena.get("phase", "")) == "over" and not bool(arena.get("bestShown", false)):
+		arena["bestShown"] = true
+		await Cutscenes.play("arena_new_best", self)
 
 
 ## PT Part 9: point buy for each party member, from their recommended picks.

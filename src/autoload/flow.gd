@@ -261,6 +261,8 @@ func play_inline_story(id: String) -> void:
 				await show_event(step["event"])
 			"narrate":
 				await show_event({ "title": "", "text": str(step["text"]) })
+			"cutscene":
+				await Cutscenes.play(str(step["id"]), get_tree().current_scene)
 			"foreshadow":
 				var l := Narrator.line("foreshadow")
 				Narrator.say(l)

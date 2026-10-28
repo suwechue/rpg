@@ -1,0 +1,72 @@
+{
+  "comment": "Endless Arena cutscenes (P2 Part 3, the basic arena cutscene set the user asked for): the first visit, the first wave 10 boss, a new best score, and each new 5-wave theme.",
+  "cutscenes": [
+    {
+      "id": "arena_first",
+      "steps": [
+        {
+          "type": "music",
+          "situation": "arena"
+        },
+        {
+          "type": "title_card",
+          "text": "The Endless Arena",
+          "seconds": 2.0
+        },
+        {
+          "type": "narrator",
+          "text": "A place between the Upside-Down's rooms where it practices on people. You're people."
+        },
+        {
+          "type": "narrator",
+          "text": "Waves come in fives. Each five has a theme. Every fifth wave, you get to rest, rethink, and regret."
+        },
+        {
+          "type": "narrator",
+          "text": "It doesn't end. That's the point. See how far you get."
+        }
+      ]
+    },
+    {
+      "id": "arena_boss_first",
+      "steps": [
+        {
+          "type": "camera_shake",
+          "amount": 4
+        },
+        {
+          "type": "title_card",
+          "text": "Wave 10",
+          "seconds": 1.2
+        },
+        {
+          "type": "narrator",
+          "text": "Something remembers you from the story. It got bigger in here."
+        }
+      ]
+    },
+    {
+      "id": "arena_new_best",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "New best!",
+          "seconds": 1.4
+        },
+        {
+          "type": "narrator",
+          "text": "Further than ever. The Arena takes notes. So do I."
+        }
+      ]
+    },
+    {
+      "id": "arena_theme",
+      "steps": [
+        {
+          "type": "narrator",
+          "text": "The Arena rearranges itself for the next five waves."
+        }
+      ]
+    }
+  ]
+}
