@@ -11,6 +11,8 @@ const Workbench := preload("res://src/scenes/ui/workbench_screen.gd")
 const ShopScreen := preload("res://src/scenes/town/shop_screen.gd")
 const Locs := preload("res://src/core/town/locations.gd")
 const Sched := preload("res://src/core/town/schedule.gd")
+var _light: CanvasModulate
+var _particles: CPUParticles2D
 var TILE: int:
 	get: return Display.tile
 const STEP_TIME := 0.11
@@ -110,6 +112,7 @@ func _load_map(id: String, is_int: bool, loc: String, at: Vector2i) -> void:
 		_camera.limit_top = cb.position.y * TILE - TILE
 		_camera.limit_bottom = cb.end.y * TILE + TILE
 	_camera.make_current()
+	_apply_light()
 	_refresh_people()
 	_save_pos()
 	var late := Calendar.part_id() in ["evening", "night"]
@@ -118,6 +121,47 @@ func _load_map(id: String, is_int: bool, loc: String, at: Vector2i) -> void:
 		Audio.play_music_first(["weekend"] if Calendar.is_weekend() else (["town_night", zone_music] if late else ["town_" + Calendar.part_id(), zone_music]))
 	# VD Part 1: ambience by place and time.
 	Audio.play_ambience("school" if id == "school" else ("town_night" if late else "town_day"))
+
+
+## M12b: the day part's light over the map, and leaves or fireflies outdoors.
+func _apply_light() -> void:
+	var tints: Dictionary = DataDB.table("display").get("dayTint", {})
+	if _light == null:
+		_light = CanvasModulate.new()
+		add_child(_light)
+	_light.color = Color(str(tints.get("interior" if interior else Calendar.part_id(), "#ffffff")))
+	if _particles != null:
+		_particles.queue_free()
+		_particles = null
+	if interior:
+		return
+	var late := Calendar.part_id() in ["evening", "night"]
+	for key in ["leaves", "fireflies"]:
+		var a: Dictionary = DataDB.table("display").get("ambient", {}).get(key, {})
+		if a.is_empty() or not a.get("zones", []).has(map.map_id) or bool(a.get("day", true)) == late:
+			continue
+		var p := CPUParticles2D.new()
+		p.amount = int(a.get("amount", 12))
+		p.lifetime = 6.0
+		p.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+		p.emission_rect_extents = Vector2(Display.base) / 2.0
+		p.color = Color(str(a.get("color", "#ffffff")))
+		p.scale_amount_min = Display.detail
+		p.scale_amount_max = Display.detail * 1.5
+		if key == "leaves":
+			p.gravity = Vector2(6, 10)
+			p.direction = Vector2(1, 0.4)
+			p.initial_velocity_min = 4.0
+			p.initial_velocity_max = 10.0
+		else:
+			p.gravity = Vector2.ZERO
+			p.initial_velocity_min = 1.0
+			p.initial_velocity_max = 5.0
+			p.spread = 180.0
+		p.z_index = 20
+		_camera.add_child(p)
+		_particles = p
+		break
 
 
 func _cell_pos(c: Vector2i) -> Vector2:
@@ -148,6 +192,8 @@ func _save_pos() -> void:
 
 ## Each part may start somewhere specific (calendar.json "start": home or school).
 func _on_part_started() -> void:
+	if map != null and _camera != null and _camera.is_inside_tree():
+		_apply_light()
 	var part: Dictionary = Calendar.current_part()
 	var start := str(part.get("start", ""))
 	if bool(part.get("wholePart", false)):

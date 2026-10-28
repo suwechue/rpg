@@ -9,6 +9,7 @@ extends Node2D
 const SRC := { "town": 0, "city": 1, "floor": 2 }
 const Locs := preload("res://src/core/town/locations.gd")
 const ZoneReader := preload("res://src/world/zone_reader.gd")
+const TileTints := preload("res://src/world/tile_tints.gd")
 const ZONE_DIR := "res://src/world/zones/"
 
 var TILE: int:
@@ -32,7 +33,9 @@ var buildings: Array = []
 var camera_rect := Rect2i()          # M12 CameraBounds marker (empty = the whole zone)
 
 var _ground: TileMapLayer
+var _decor: TileMapLayer             # M12b decorations (never block)
 var _objects: TileMapLayer
+var _alts: Dictionary = {}           # roof tint name -> alternative tile id
 var _overlay: Node2D
 var _water: Array = []
 var _labels: Array = []            # [{ "pos", "text", "color" }]
@@ -50,6 +53,9 @@ func build(db: Dictionary, id: String, interior: bool) -> void:
 	_ground = TileMapLayer.new()
 	_ground.tile_set = ts
 	add_child(_ground)
+	_decor = TileMapLayer.new()
+	_decor.tile_set = ts
+	add_child(_decor)
 	_objects = TileMapLayer.new()
 	_objects.tile_set = ts
 	add_child(_objects)
@@ -82,6 +88,9 @@ func build_custom(db: Dictionary, zone: Dictionary) -> void:
 	_ground = TileMapLayer.new()
 	_ground.tile_set = ts
 	add_child(_ground)
+	_decor = TileMapLayer.new()
+	_decor.tile_set = ts
+	add_child(_decor)
 	_objects = TileMapLayer.new()
 	_objects.tile_set = ts
 	add_child(_objects)
@@ -91,7 +100,7 @@ func build_custom(db: Dictionary, zone: Dictionary) -> void:
 
 ## The stamped layers and data, for the migration tool.
 func layers() -> Dictionary:
-	return { "ground": _ground, "objects": _objects, "water": _water.duplicate(), "labels": _labels.duplicate() }
+	return { "ground": _ground, "objects": _objects, "decor": _decor, "water": _water.duplicate(), "labels": _labels.duplicate() }
 
 
 # --- Zone scenes (M12) ---------------------------------------------------------------
@@ -101,10 +110,10 @@ func layers() -> Dictionary:
 ## spots, signs and exits.
 func _build_from_scene(z: Dictionary) -> void:
 	size = z["tiles"]
-	for key in ["Ground", "Objects"]:
-		var layer := _ground if key == "Ground" else _objects
+	for key in ["Ground", "Decor", "Objects"]:
+		var layer := _ground if key == "Ground" else (_decor if key == "Decor" else _objects)
 		for t in z[key]:
-			layer.set_cell(t["cell"], int(t["source"]), t["atlas"])
+			layer.set_cell(t["cell"], int(t["source"]), t["atlas"], int(t.get("alt", 0)))
 			if key == "Objects":
 				_block(t["cell"])
 	for t in z["Collision"]:
@@ -159,12 +168,13 @@ func _tileset() -> TileSet:
 			for c in cols:
 				src.create_tile(Vector2i(c, r))
 		ts.add_source(src, int(SRC[key]))
+	_alts = TileTints.add(ts, _styles.get("roofTints", {}))
 	return ts
 
 
-func _put(layer: TileMapLayer, cell: Vector2i, pack: String, index: int) -> void:
+func _put(layer: TileMapLayer, cell: Vector2i, pack: String, index: int, alt: int = 0) -> void:
 	var cols := int(_cols.get(pack, 1))
-	layer.set_cell(cell, int(SRC[pack]), Vector2i(index % cols, index / cols))
+	layer.set_cell(cell, int(SRC[pack]), Vector2i(index % cols, index / cols), alt)
 
 
 func _block(cell: Vector2i) -> void:
@@ -232,6 +242,7 @@ func _stamp_building(b: Dictionary) -> void:
 	var wall_rows := 1 if r.size.y >= 5 else 0
 	var roof_rows := maxi(1, r.size.y - 1 - wall_rows)
 	var roof: Dictionary = style.get("roof", {})
+	var tint := int(_alts.get(str(style.get("roofTint", "")), 0))
 	for ry in roof_rows:
 		var set_key := "top"
 		if ry == roof_rows - 1 and roof_rows > 1:
@@ -247,7 +258,7 @@ func _stamp_building(b: Dictionary) -> void:
 				t = int(row[2])
 			if set_key == "bottom" and dx == door_dx and roof.has("gable"):
 				t = int(roof["gable"])
-			_put(_objects, r.position + Vector2i(dx, ry), pack, t)
+			_put(_objects, r.position + Vector2i(dx, ry), pack, t, tint)
 	var wall: Array = style.get("wall", [0, 0, 0])
 	for wy in wall_rows:
 		for dx in r.size.x:

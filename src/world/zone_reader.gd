@@ -4,12 +4,12 @@
 ## size is passed in.
 extends RefCounted
 
-const LAYERS := ["Ground", "Objects", "Collision", "Water"]
+const LAYERS := ["Ground", "Decor", "Objects", "Collision", "Water"]
 
 
 static func read(root: Node, tile: int) -> Dictionary:
 	var out := { "zone": str(root.get("zone_id")) if root.get("zone_id") != null else "", "tiles": root.get("tiles") if root.get("tiles") != null else Vector2i.ZERO,
-		"Ground": [], "Objects": [], "Collision": [], "Water": [],
+		"Ground": [], "Decor": [], "Objects": [], "Collision": [], "Water": [],
 		"doors": [], "spots": [], "signs": [], "exits": [], "spawns": [], "bounds": [] }
 	_walk(root, Vector2.ZERO, tile, out, true)
 	return out
@@ -30,7 +30,7 @@ static func _walk(n: Node, offset: Vector2, tile: int, out: Dictionary, is_root:
 		var base := _cell(here, tile)
 		var list: Array = out[str(n.name)]
 		for c in layer.get_used_cells():
-			list.append({ "cell": base + c, "source": layer.get_cell_source_id(c), "atlas": layer.get_cell_atlas_coords(c) })
+			list.append({ "cell": base + c, "source": layer.get_cell_source_id(c), "atlas": layer.get_cell_atlas_coords(c), "alt": layer.get_cell_alternative_tile(c) })
 	var s: Script = n.get_script()
 	var path := s.resource_path if s != null else ""
 	var cell := _cell(here, tile)

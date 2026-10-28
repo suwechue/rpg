@@ -12,3 +12,6 @@ tools/apply_town_update.py
 
 # screenshots from the --shot dev flag
 tools/screenshots/
+
+# generated contact sheets (tools/art_inventory.gd)
+tools/inventory/

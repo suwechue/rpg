@@ -67,6 +67,7 @@ func _tileset() -> TileSet:
 			for c in tex.get_width() / tile:
 				src.create_tile(Vector2i(c, r))
 		t.add_source(src, int(SRC[key]))
+	(load("res://src/world/tile_tints.gd") as GDScript).call("add", t, db.get("town/styles", {}).get("roofTints", {}))
 	return t
 
 
@@ -116,7 +117,7 @@ func _stamp(zone: Dictionary) -> Dictionary:
 func _copy(src: TileMapLayer, name: String) -> TileMapLayer:
 	var l := _layer(name)
 	for c in src.get_used_cells():
-		l.set_cell(c, src.get_cell_source_id(c), src.get_cell_atlas_coords(c))
+		l.set_cell(c, src.get_cell_source_id(c), src.get_cell_atlas_coords(c), src.get_cell_alternative_tile(c))
 	return l
 
 
@@ -132,6 +133,7 @@ func _zone_scene(id: String) -> Node2D:
 	var ground: TileMapLayer = s["ground"]
 	var objects: TileMapLayer = s["objects"]
 	root_node.add_child(ground)
+	root_node.add_child(_decor(z, s))
 	root_node.add_child(objects)
 	# Collision: blocked tiles that have no object tile and aren't water.
 	var col := _layer("Collision")
@@ -185,6 +187,47 @@ func _zone_scene(id: String) -> Node2D:
 		if at.x >= 0:
 			markers.add_child(_marker("spawn_point.gd", "Spawn_" + str(k), at, { "spawn_id": str(k) }))
 	return root_node
+
+
+## M12b: the seeded decorator over this zone's ground (data/world/decor_rules.json).
+func _decor(z: Dictionary, s: Dictionary) -> TileMapLayer:
+	var l := _layer("Decor")
+	var rules: Dictionary = db.get("world/decor_rules", {})
+	var grounds := {}
+	var sz: Array = z.get("size", [60, 34])
+	for y in int(sz[1]):
+		for x in int(sz[0]):
+			grounds[Vector2i(x, y)] = str(z.get("ground", "grass"))
+	for f in z.get("fills", []):
+		var r: Array = f["rect"]
+		for y in range(int(r[1]), int(r[1]) + int(r[3])):
+			for x in range(int(r[0]), int(r[0]) + int(r[2])):
+				grounds[Vector2i(x, y)] = str(f["ground"])
+	for rd in z.get("roads", []):
+		for i in int(rd["len"]):
+			var c := Vector2i(int(rd["x"]) + (i if str(rd["dir"]) == "h" else 0), int(rd["y"]) + (i if str(rd["dir"]) == "v" else 0))
+			grounds[c] = "road"
+			grounds[c + (Vector2i(0, 1) if str(rd["dir"]) == "h" else Vector2i(1, 0))] = "road"
+	var clear := {}
+	for b in s["buildings"]:
+		clear[Vector2i(b["door"]) + Vector2i(0, 1)] = true
+	for k in s["spots"]:
+		clear[s["spots"][k]] = true
+	for e in s["exits"]:
+		var r: Rect2i = e["rect"]
+		for y in range(r.position.y, r.end.y):
+			for x in range(r.position.x, r.end.x):
+				clear[Vector2i(x, y)] = true
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash("%s:%d" % [str(z.get("id", "")), int(rules.get("seed", 1))])
+	var cols := {}
+	for key in KEYS:
+		var src := ts.get_source(int(SRC[key])) as TileSetAtlasSource
+		cols[key] = maxi(1, src.texture.get_width() / tile)
+	for d in (load("res://src/core/world/decor.gd") as GDScript).call("scatter", rules, grounds, s["blocked"], clear, rng):
+		var n := int(cols.get(str(d["pack"]), 1))
+		l.set_cell(d["cell"], int(SRC[str(d["pack"])]), Vector2i(int(d["tile"]) % n, int(d["tile"]) / n))
+	return l
 
 
 ## The block library: one lot per building style, road pieces, a park, a

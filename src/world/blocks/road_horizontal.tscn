@@ -2,11 +2,11 @@
 
 [ext_resource type="TileSet" path="res://src/world/world_tileset.tres" id="1_nkli5"]
 
-[node name="RoadHorizontal" type="Node2D" unique_id=3515775]
+[node name="RoadHorizontal" type="Node2D" unique_id=230606180]
 
-[node name="Ground" type="TileMapLayer" parent="." unique_id=1233149688]
+[node name="Ground" type="TileMapLayer" parent="." unique_id=1458230589]
 tile_map_data = PackedByteArray("AAAAAAAAAQADAAUAAAABAAAAAQADAAUAAAACAAAAAQADAAUAAAADAAAAAQADAAUAAAAEAAAAAQADAAUAAAAFAAAAAQADAAUAAAAGAAAAAQADAAUAAAAHAAAAAQADAAUAAAAAAAEAAQADAAYAAAABAAEAAQADAAYAAAACAAEAAQADAAYAAAADAAEAAQADAAYAAAAEAAEAAQADAAYAAAAFAAEAAQADAAYAAAAGAAEAAQADAAYAAAAHAAEAAQADAAYAAAA=")
 tile_set = ExtResource("1_nkli5")
 
-[node name="Objects" type="TileMapLayer" parent="." unique_id=1954498208]
+[node name="Objects" type="TileMapLayer" parent="." unique_id=1745932465]
 tile_set = ExtResource("1_nkli5")

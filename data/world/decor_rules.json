@@ -1,0 +1,38 @@
+{
+  "comment": "M12b: decorations scattered on ground tiles by tools/build_world.gd (baked into each zone's Decor layer; decorations never block walking). Per ground type, a list of { pack, tile, chance }: the first that rolls under its chance is placed. keepClear keeps this many tiles around doors, spots and exits empty.",
+  "seed": 12,
+  "keepClear": 1,
+  "rules": {
+    "grass": [
+      {
+        "pack": "town",
+        "tile": 7,
+        "chance": 0.025
+      },
+      {
+        "pack": "town",
+        "tile": 10,
+        "chance": 0.015
+      },
+      {
+        "pack": "town",
+        "tile": 1,
+        "chance": 0.03
+      }
+    ],
+    "field": [
+      {
+        "pack": "town",
+        "tile": 10,
+        "chance": 0.04
+      }
+    ],
+    "dirt": [
+      {
+        "pack": "town",
+        "tile": 7,
+        "chance": 0.01
+      }
+    ]
+  }
+}

@@ -6,45 +6,596 @@
     "floor": "tileset_interior"
   },
   "ground": {
-    "grass": {"pack": "town", "tiles": [0, 0, 0, 1, 0, 2]},
-    "concrete": {"pack": "city", "tiles": [88, 88, 88, 100]},
-    "dirt": {"pack": "town", "tiles": [25]},
-    "path": {"pack": "town", "tiles": [43]},
-    "water": {"pack": "city", "tiles": [34], "blocked": true, "tint": "#5b8fd6"},
-    "field": {"pack": "town", "tiles": [25, 25, 25, 42]},
-    "plaza": {"pack": "city", "tiles": [100]}
+    "grass": {
+      "pack": "town",
+      "tiles": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        2
+      ]
+    },
+    "concrete": {
+      "pack": "city",
+      "tiles": [
+        88,
+        88,
+        88,
+        100
+      ]
+    },
+    "dirt": {
+      "pack": "town",
+      "tiles": [
+        25
+      ]
+    },
+    "path": {
+      "pack": "town",
+      "tiles": [
+        43
+      ]
+    },
+    "water": {
+      "pack": "city",
+      "tiles": [
+        34
+      ],
+      "blocked": true,
+      "tint": "#5b8fd6"
+    },
+    "field": {
+      "pack": "town",
+      "tiles": [
+        25,
+        25,
+        25,
+        42
+      ]
+    },
+    "plaza": {
+      "pack": "city",
+      "tiles": [
+        100
+      ]
+    }
   },
-  "road": {"pack": "city", "h": [63, 75], "v": [61, 62], "cross": 63},
+  "road": {
+    "pack": "city",
+    "h": [
+      63,
+      75
+    ],
+    "v": [
+      61,
+      62
+    ],
+    "cross": 63
+  },
   "styles": {
-    "house_red": {"pack": "town", "roof": {"top": [52, 53, 54], "bottom": [64, 65, 66], "gable": 67}, "wall": [72, 73, 75], "base": {"left": 84, "mid": 84, "right": 84, "door": 85}},
-    "house_gray": {"pack": "town", "roof": {"top": [48, 49, 50], "bottom": [60, 61, 62], "gable": 63}, "wall": [72, 73, 75], "base": {"left": 84, "mid": 84, "right": 84, "door": 85}},
-    "stone_red": {"pack": "town", "roof": {"top": [52, 53, 54], "bottom": [64, 65, 66], "gable": 67}, "wall": [76, 77, 79], "base": {"left": 88, "mid": 88, "right": 88, "door": 89}},
-    "stone_gray": {"pack": "town", "roof": {"top": [48, 49, 50], "bottom": [60, 61, 62], "gable": 63}, "wall": [76, 77, 79], "base": {"left": 88, "mid": 88, "right": 88, "door": 89}},
-    "shop_brick": {"pack": "city", "roof": {"top": [0, 1, 2], "mid": [12, 13, 14], "bottom": [24, 25, 26]}, "wall": [36, 37, 41], "wallWindow": 40, "base": {"left": 48, "mid": 49, "right": 53, "door": 52}},
-    "shop_brown": {"pack": "city", "roof": {"top": [6, 7, 8], "mid": [18, 19, 20], "bottom": [30, 31, 32]}, "wall": [42, 43, 47], "wallWindow": 46, "base": {"left": 54, "mid": 55, "right": 59, "door": 58, "window": [56, 57]}},
-    "civic": {"pack": "city", "roof": {"top": [6, 7, 8], "mid": [18, 19, 20], "bottom": [30, 31, 32]}, "wall": [36, 37, 41], "wallWindow": 40, "base": {"left": 48, "mid": 49, "right": 53, "door": 50, "doubleDoor": [50, 51]}},
-    "school": {"pack": "city", "roof": {"top": [0, 1, 2], "mid": [12, 13, 14], "bottom": [24, 25, 26]}, "wall": [36, 37, 41], "wallWindow": 40, "base": {"left": 48, "mid": 49, "right": 53, "door": 50, "doubleDoor": [50, 51]}},
-    "hospital": {"pack": "city", "roof": {"top": [6, 7, 8], "mid": [18, 19, 20], "bottom": [30, 31, 32]}, "wall": [42, 43, 47], "wallWindow": 46, "base": {"left": 54, "mid": 55, "right": 59, "door": 58}}
+    "house_red": {
+      "pack": "town",
+      "roof": {
+        "top": [
+          52,
+          53,
+          54
+        ],
+        "bottom": [
+          64,
+          65,
+          66
+        ],
+        "gable": 67
+      },
+      "wall": [
+        72,
+        73,
+        75
+      ],
+      "base": {
+        "left": 84,
+        "mid": 84,
+        "right": 84,
+        "door": 85
+      }
+    },
+    "house_gray": {
+      "pack": "town",
+      "roof": {
+        "top": [
+          48,
+          49,
+          50
+        ],
+        "bottom": [
+          60,
+          61,
+          62
+        ],
+        "gable": 63
+      },
+      "wall": [
+        72,
+        73,
+        75
+      ],
+      "base": {
+        "left": 84,
+        "mid": 84,
+        "right": 84,
+        "door": 85
+      }
+    },
+    "stone_red": {
+      "pack": "town",
+      "roof": {
+        "top": [
+          52,
+          53,
+          54
+        ],
+        "bottom": [
+          64,
+          65,
+          66
+        ],
+        "gable": 67
+      },
+      "wall": [
+        76,
+        77,
+        79
+      ],
+      "base": {
+        "left": 88,
+        "mid": 88,
+        "right": 88,
+        "door": 89
+      }
+    },
+    "stone_gray": {
+      "pack": "town",
+      "roof": {
+        "top": [
+          48,
+          49,
+          50
+        ],
+        "bottom": [
+          60,
+          61,
+          62
+        ],
+        "gable": 63
+      },
+      "wall": [
+        76,
+        77,
+        79
+      ],
+      "base": {
+        "left": 88,
+        "mid": 88,
+        "right": 88,
+        "door": 89
+      }
+    },
+    "shop_brick": {
+      "pack": "city",
+      "roof": {
+        "top": [
+          0,
+          1,
+          2
+        ],
+        "mid": [
+          12,
+          13,
+          14
+        ],
+        "bottom": [
+          24,
+          25,
+          26
+        ]
+      },
+      "wall": [
+        36,
+        37,
+        41
+      ],
+      "wallWindow": 40,
+      "base": {
+        "left": 48,
+        "mid": 49,
+        "right": 53,
+        "door": 52
+      }
+    },
+    "shop_brown": {
+      "pack": "city",
+      "roof": {
+        "top": [
+          6,
+          7,
+          8
+        ],
+        "mid": [
+          18,
+          19,
+          20
+        ],
+        "bottom": [
+          30,
+          31,
+          32
+        ]
+      },
+      "wall": [
+        42,
+        43,
+        47
+      ],
+      "wallWindow": 46,
+      "base": {
+        "left": 54,
+        "mid": 55,
+        "right": 59,
+        "door": 58,
+        "window": [
+          56,
+          57
+        ]
+      }
+    },
+    "civic": {
+      "pack": "city",
+      "roof": {
+        "top": [
+          6,
+          7,
+          8
+        ],
+        "mid": [
+          18,
+          19,
+          20
+        ],
+        "bottom": [
+          30,
+          31,
+          32
+        ]
+      },
+      "wall": [
+        36,
+        37,
+        41
+      ],
+      "wallWindow": 40,
+      "base": {
+        "left": 48,
+        "mid": 49,
+        "right": 53,
+        "door": 50,
+        "doubleDoor": [
+          50,
+          51
+        ]
+      }
+    },
+    "school": {
+      "pack": "city",
+      "roof": {
+        "top": [
+          0,
+          1,
+          2
+        ],
+        "mid": [
+          12,
+          13,
+          14
+        ],
+        "bottom": [
+          24,
+          25,
+          26
+        ]
+      },
+      "wall": [
+        36,
+        37,
+        41
+      ],
+      "wallWindow": 40,
+      "base": {
+        "left": 48,
+        "mid": 49,
+        "right": 53,
+        "door": 50,
+        "doubleDoor": [
+          50,
+          51
+        ]
+      }
+    },
+    "hospital": {
+      "pack": "city",
+      "roof": {
+        "top": [
+          6,
+          7,
+          8
+        ],
+        "mid": [
+          18,
+          19,
+          20
+        ],
+        "bottom": [
+          30,
+          31,
+          32
+        ]
+      },
+      "wall": [
+        42,
+        43,
+        47
+      ],
+      "wallWindow": 46,
+      "base": {
+        "left": 54,
+        "mid": 55,
+        "right": 59,
+        "door": 58
+      }
+    },
+    "house_blue": {
+      "pack": "town",
+      "roof": {
+        "top": [
+          48,
+          49,
+          50
+        ],
+        "bottom": [
+          60,
+          61,
+          62
+        ],
+        "gable": 63
+      },
+      "wall": [
+        72,
+        73,
+        75
+      ],
+      "base": {
+        "left": 84,
+        "mid": 84,
+        "right": 84,
+        "door": 85
+      },
+      "roofTint": "blue"
+    },
+    "house_green": {
+      "pack": "town",
+      "roof": {
+        "top": [
+          48,
+          49,
+          50
+        ],
+        "bottom": [
+          60,
+          61,
+          62
+        ],
+        "gable": 63
+      },
+      "wall": [
+        72,
+        73,
+        75
+      ],
+      "base": {
+        "left": 84,
+        "mid": 84,
+        "right": 84,
+        "door": 85
+      },
+      "roofTint": "green"
+    },
+    "stone_plum": {
+      "pack": "town",
+      "roof": {
+        "top": [
+          48,
+          49,
+          50
+        ],
+        "bottom": [
+          60,
+          61,
+          62
+        ],
+        "gable": 63
+      },
+      "wall": [
+        76,
+        77,
+        79
+      ],
+      "base": {
+        "left": 88,
+        "mid": 88,
+        "right": 88,
+        "door": 89
+      },
+      "roofTint": "plum"
+    },
+    "stone_sand": {
+      "pack": "town",
+      "roof": {
+        "top": [
+          48,
+          49,
+          50
+        ],
+        "bottom": [
+          60,
+          61,
+          62
+        ],
+        "gable": 63
+      },
+      "wall": [
+        76,
+        77,
+        79
+      ],
+      "base": {
+        "left": 88,
+        "mid": 88,
+        "right": 88,
+        "door": 89
+      },
+      "roofTint": "sand"
+    }
   },
   "props": {
-    "lamp": {"pack": "city", "tiles": [86]},
-    "bin": {"pack": "city", "tiles": [109]},
-    "hydrant": {"pack": "city", "tiles": [102]},
-    "busstop": {"pack": "city", "tiles": [96]},
-    "planter": {"pack": "city", "tiles": [70]},
-    "well": {"pack": "town", "tiles": [104]},
-    "crate": {"pack": "town", "tiles": [103]},
-    "target": {"pack": "town", "tiles": [95]},
-    "sign": {"pack": "town", "tiles": [83]},
-    "mailbox": {"pack": "city", "tiles": [97]},
-    "grave": {"pack": "city", "tiles": [103]},
-    "tower": {"pack": "city", "tiles": [87]},
-    "hoop": {"pack": "city", "tiles": [85]},
-    "bench": {"pack": "city", "tiles": [93, 94, 95]},
-    "car": {"pack": "city", "tiles": [122, 123]},
-    "default": {"pack": "town", "tiles": [17]}
+    "lamp": {
+      "pack": "city",
+      "tiles": [
+        86
+      ]
+    },
+    "bin": {
+      "pack": "city",
+      "tiles": [
+        109
+      ]
+    },
+    "hydrant": {
+      "pack": "city",
+      "tiles": [
+        102
+      ]
+    },
+    "busstop": {
+      "pack": "city",
+      "tiles": [
+        96
+      ]
+    },
+    "planter": {
+      "pack": "city",
+      "tiles": [
+        70
+      ]
+    },
+    "well": {
+      "pack": "town",
+      "tiles": [
+        104
+      ]
+    },
+    "crate": {
+      "pack": "town",
+      "tiles": [
+        103
+      ]
+    },
+    "target": {
+      "pack": "town",
+      "tiles": [
+        95
+      ]
+    },
+    "sign": {
+      "pack": "town",
+      "tiles": [
+        83
+      ]
+    },
+    "mailbox": {
+      "pack": "city",
+      "tiles": [
+        97
+      ]
+    },
+    "grave": {
+      "pack": "city",
+      "tiles": [
+        103
+      ]
+    },
+    "tower": {
+      "pack": "city",
+      "tiles": [
+        87
+      ]
+    },
+    "hoop": {
+      "pack": "city",
+      "tiles": [
+        85
+      ]
+    },
+    "bench": {
+      "pack": "city",
+      "tiles": [
+        93,
+        94,
+        95
+      ]
+    },
+    "car": {
+      "pack": "city",
+      "tiles": [
+        122,
+        123
+      ]
+    },
+    "default": {
+      "pack": "town",
+      "tiles": [
+        17
+      ]
+    }
   },
-  "trees": {"pack": "town", "tiles": [16, 16, 4, 28, 16, 5, 15]},
-  "fence": {"pack": "town", "left": 44, "mid": 45, "right": 46, "post": 47},
-  "chainfence": {"pack": "city", "tile": 127}
+  "trees": {
+    "pack": "town",
+    "tiles": [
+      16,
+      16,
+      4,
+      28,
+      16,
+      5,
+      15
+    ]
+  },
+  "fence": {
+    "pack": "town",
+    "left": 44,
+    "mid": 45,
+    "right": 46,
+    "post": 47
+  },
+  "chainfence": {
+    "pack": "city",
+    "tile": 127
+  },
+  "roofTints": {
+    "blue": "#8fb0ff",
+    "green": "#9fd89a",
+    "plum": "#d6a3dc",
+    "sand": "#f2d49a"
+  }
 }

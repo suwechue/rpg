@@ -4,12 +4,62 @@
   "baseWidth": 640,
   "baseHeight": 360,
   "windowScale": 2,
-  "characterSize": [32, 32],
-  "portraitSize": [64, 64],
-  "cardArtSize": [48, 48],
+  "characterSize": [
+    32,
+    32
+  ],
+  "portraitSize": [
+    64,
+    64
+  ],
+  "cardArtSize": [
+    48,
+    48
+  ],
   "uiIconSize": 16,
   "itemIconSize": 32,
   "detailScale": 2,
   "detailScaleNote": "Hand-drawn overlay details (furniture, boards, status chips, unit shadows) were authored for 16 px tiles; offsets are multiplied by this.",
-  "combat": { "frontY": 0.69, "cellWidth": 1.8, "cellWidthWide": 1.6, "cellHeight": 0.9, "cellHeightTall": 0.78, "shrink": 0.9 }
+  "combat": {
+    "frontY": 0.69,
+    "cellWidth": 1.8,
+    "cellWidthWide": 1.6,
+    "cellHeight": 0.9,
+    "cellHeightTall": 0.78,
+    "shrink": 0.9
+  },
+  "dayTint": {
+    "comment": "M12b: the town's light per day part (multiplied over the map). Interiors use 'interior'.",
+    "before_school": "#ffe8cf",
+    "period_1": "#fff6e8",
+    "period_2": "#ffffff",
+    "lunch": "#ffffff",
+    "period_3": "#fffaf0",
+    "after_school": "#ffd9a8",
+    "evening": "#c9a6c8",
+    "night": "#7d8cc4",
+    "interior": "#ffffff"
+  },
+  "ambient": {
+    "comment": "M12b: ambient particles in town by zone and time: leaves by day, fireflies at night.",
+    "leaves": {
+      "zones": [
+        "residential",
+        "outskirts",
+        "school"
+      ],
+      "color": "#d9a441",
+      "amount": 14,
+      "day": true
+    },
+    "fireflies": {
+      "zones": [
+        "residential",
+        "outskirts"
+      ],
+      "color": "#f4ff9a",
+      "amount": 18,
+      "day": false
+    }
+  }
 }

@@ -2,12 +2,12 @@
 
 [ext_resource type="TileSet" path="res://src/world/world_tileset.tres" id="1_ujdw0"]
 
-[node name="PropsStreet" type="Node2D" unique_id=1609445473]
+[node name="PropsStreet" type="Node2D" unique_id=598441938]
 
-[node name="Ground" type="TileMapLayer" parent="." unique_id=1386377647]
+[node name="Ground" type="TileMapLayer" parent="." unique_id=1704371518]
 tile_map_data = PackedByteArray("AAAAAAAAAQAEAAcAAAABAAAAAQAEAAgAAAACAAAAAQAEAAcAAAADAAAAAQAEAAcAAAAEAAAAAQAEAAcAAAAFAAAAAQAEAAgAAAA=")
 tile_set = ExtResource("1_ujdw0")
 
-[node name="Objects" type="TileMapLayer" parent="." unique_id=446388521]
+[node name="Objects" type="TileMapLayer" parent="." unique_id=330189922]
 tile_map_data = PackedByteArray("AAAAAAAAAQACAAcAAAABAAAAAQAJAAcAAAACAAAAAQAKAAcAAAADAAAAAQABAAkAAAAEAAAAAQAGAAgAAAAFAAAAAQAKAAUAAAA=")
 tile_set = ExtResource("1_ujdw0")

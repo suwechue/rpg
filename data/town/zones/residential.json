@@ -1,52 +1,485 @@
 {
-  "id": "residential", "name": "Residential", "size": [60, 46], "ground": "grass", "music": "town",
-  "fills": [ { "ground": "path", "rect": [0, 38, 60, 1] } ],
+  "id": "residential",
+  "name": "Residential",
+  "size": [
+    60,
+    46
+  ],
+  "ground": "grass",
+  "music": "town",
+  "fills": [
+    {
+      "ground": "path",
+      "rect": [
+        0,
+        38,
+        60,
+        1
+      ]
+    }
+  ],
   "roads": [
-    { "dir": "v", "x": 28, "y": 0, "len": 38 },
-    { "dir": "h", "x": 0, "y": 8, "len": 60 },
-    { "dir": "h", "x": 0, "y": 18, "len": 60 },
-    { "dir": "h", "x": 0, "y": 28, "len": 60 }
+    {
+      "dir": "v",
+      "x": 28,
+      "y": 0,
+      "len": 38
+    },
+    {
+      "dir": "h",
+      "x": 0,
+      "y": 8,
+      "len": 60
+    },
+    {
+      "dir": "h",
+      "x": 0,
+      "y": 18,
+      "len": 60
+    },
+    {
+      "dir": "h",
+      "x": 0,
+      "y": 28,
+      "len": 60
+    }
   ],
   "buildings": [
-    { "loc": "kelly_house", "rect": [1, 2, 7, 5], "style": "stone_red", "door": 3 },
-    { "loc": "priya_house", "rect": [9, 2, 6, 5], "style": "house_red", "door": 2 },
-    { "loc": "baxter_house", "rect": [16, 2, 6, 5], "style": "stone_gray", "door": 2 },
-    { "loc": "penny_house", "rect": [22, 2, 5, 5], "style": "stone_red", "door": 2 },
-    { "loc": "sam_estate", "rect": [31, 2, 9, 5], "style": "stone_gray", "door": 4 },
-    { "loc": "mayor_residence", "rect": [41, 2, 6, 5], "style": "stone_red", "door": 2 },
-    { "loc": "mr_b_house", "rect": [48, 2, 6, 5], "style": "stone_gray", "door": 2 },
-    { "loc": "reyes_house", "rect": [55, 2, 5, 5], "style": "house_gray", "door": 2 },
-    { "loc": "elm_apartments", "rect": [1, 11, 12, 6], "style": "stone_gray", "door": 5, "label": "Elm St Apts" },
-    { "loc": "byrne_house", "rect": [15, 11, 6, 6], "style": "house_red", "door": 2 },
-    { "loc": "ms_g_house", "rect": [31, 11, 6, 6], "style": "house_gray", "door": 2 },
-    { "loc": "mr_j_house", "rect": [38, 11, 7, 6], "style": "house_gray", "door": 2 },
-    { "loc": "nonsense_house", "rect": [47, 11, 6, 6], "style": "stone_red", "door": 2 },
-    { "loc": "theo_house", "rect": [1, 21, 6, 6], "style": "house_red", "door": 2 },
-    { "loc": "mara_house", "rect": [8, 21, 6, 6], "style": "house_gray", "door": 2 },
-    { "loc": "dex_house", "rect": [15, 21, 6, 6], "style": "house_red", "door": 2 },
-    { "loc": "jon_house", "rect": [21, 21, 6, 6], "style": "house_gray", "door": 2 },
-    { "loc": "kris_house", "rect": [31, 21, 6, 6], "style": "house_red", "door": 2 },
-    { "loc": "jake_house", "rect": [38, 21, 6, 6], "style": "house_gray", "door": 2 },
-    { "loc": "phase_house", "rect": [45, 21, 6, 6], "style": "house_red", "door": 2 },
-    { "loc": "mel_house", "rect": [52, 21, 6, 6], "style": "house_gray", "door": 2 },
-    { "loc": "player_home", "rect": [1, 31, 7, 6], "style": "house_red", "door": 3, "label": "Home" },
-    { "loc": "diane_house", "rect": [9, 31, 6, 6], "style": "house_gray", "door": 2 },
-    { "loc": "kara_house", "rect": [16, 31, 6, 6], "style": "house_red", "door": 2 },
-    { "loc": "kayla_house", "rect": [31, 31, 6, 6], "style": "house_gray", "door": 2 },
-    { "loc": "todd_house", "rect": [38, 31, 6, 6], "style": "house_gray", "door": 2 },
-    { "loc": "bystander_house", "rect": [45, 31, 6, 6], "style": "house_red", "door": 2 }
+    {
+      "loc": "kelly_house",
+      "rect": [
+        1,
+        2,
+        7,
+        5
+      ],
+      "style": "stone_red",
+      "door": 3
+    },
+    {
+      "loc": "priya_house",
+      "rect": [
+        9,
+        2,
+        6,
+        5
+      ],
+      "style": "stone_sand",
+      "door": 2
+    },
+    {
+      "loc": "baxter_house",
+      "rect": [
+        16,
+        2,
+        6,
+        5
+      ],
+      "style": "stone_gray",
+      "door": 2
+    },
+    {
+      "loc": "penny_house",
+      "rect": [
+        22,
+        2,
+        5,
+        5
+      ],
+      "style": "stone_plum",
+      "door": 2
+    },
+    {
+      "loc": "sam_estate",
+      "rect": [
+        31,
+        2,
+        9,
+        5
+      ],
+      "style": "stone_red",
+      "door": 4
+    },
+    {
+      "loc": "mayor_residence",
+      "rect": [
+        41,
+        2,
+        6,
+        5
+      ],
+      "style": "stone_sand",
+      "door": 2
+    },
+    {
+      "loc": "mr_b_house",
+      "rect": [
+        48,
+        2,
+        6,
+        5
+      ],
+      "style": "stone_gray",
+      "door": 2
+    },
+    {
+      "loc": "reyes_house",
+      "rect": [
+        55,
+        2,
+        5,
+        5
+      ],
+      "style": "stone_plum",
+      "door": 2
+    },
+    {
+      "loc": "elm_apartments",
+      "rect": [
+        1,
+        11,
+        12,
+        6
+      ],
+      "style": "house_gray",
+      "door": 5,
+      "label": "Elm St Apts"
+    },
+    {
+      "loc": "byrne_house",
+      "rect": [
+        15,
+        11,
+        6,
+        6
+      ],
+      "style": "house_green",
+      "door": 2
+    },
+    {
+      "loc": "ms_g_house",
+      "rect": [
+        31,
+        11,
+        6,
+        6
+      ],
+      "style": "stone_red",
+      "door": 2
+    },
+    {
+      "loc": "mr_j_house",
+      "rect": [
+        38,
+        11,
+        7,
+        6
+      ],
+      "style": "house_blue",
+      "door": 2
+    },
+    {
+      "loc": "nonsense_house",
+      "rect": [
+        47,
+        11,
+        6,
+        6
+      ],
+      "style": "stone_sand",
+      "door": 2
+    },
+    {
+      "loc": "theo_house",
+      "rect": [
+        1,
+        21,
+        6,
+        6
+      ],
+      "style": "stone_red",
+      "door": 2
+    },
+    {
+      "loc": "mara_house",
+      "rect": [
+        8,
+        21,
+        6,
+        6
+      ],
+      "style": "house_blue",
+      "door": 2
+    },
+    {
+      "loc": "dex_house",
+      "rect": [
+        15,
+        21,
+        6,
+        6
+      ],
+      "style": "stone_sand",
+      "door": 2
+    },
+    {
+      "loc": "jon_house",
+      "rect": [
+        21,
+        21,
+        6,
+        6
+      ],
+      "style": "house_green",
+      "door": 2
+    },
+    {
+      "loc": "kris_house",
+      "rect": [
+        31,
+        21,
+        6,
+        6
+      ],
+      "style": "house_red",
+      "door": 2
+    },
+    {
+      "loc": "jake_house",
+      "rect": [
+        38,
+        21,
+        6,
+        6
+      ],
+      "style": "house_blue",
+      "door": 2
+    },
+    {
+      "loc": "phase_house",
+      "rect": [
+        45,
+        21,
+        6,
+        6
+      ],
+      "style": "house_gray",
+      "door": 2
+    },
+    {
+      "loc": "mel_house",
+      "rect": [
+        52,
+        21,
+        6,
+        6
+      ],
+      "style": "house_green",
+      "door": 2
+    },
+    {
+      "loc": "player_home",
+      "rect": [
+        1,
+        31,
+        7,
+        6
+      ],
+      "style": "stone_sand",
+      "door": 3,
+      "label": "Home"
+    },
+    {
+      "loc": "diane_house",
+      "rect": [
+        9,
+        31,
+        6,
+        6
+      ],
+      "style": "house_green",
+      "door": 2
+    },
+    {
+      "loc": "kara_house",
+      "rect": [
+        16,
+        31,
+        6,
+        6
+      ],
+      "style": "house_red",
+      "door": 2
+    },
+    {
+      "loc": "kayla_house",
+      "rect": [
+        31,
+        31,
+        6,
+        6
+      ],
+      "style": "house_blue",
+      "door": 2
+    },
+    {
+      "loc": "todd_house",
+      "rect": [
+        38,
+        31,
+        6,
+        6
+      ],
+      "style": "house_gray",
+      "door": 2
+    },
+    {
+      "loc": "bystander_house",
+      "rect": [
+        45,
+        31,
+        6,
+        6
+      ],
+      "style": "house_green",
+      "door": 2
+    }
   ],
   "props": [
-    { "kind": "trees", "rect": [0, 39, 60, 7], "step": 3 },
-    { "kind": "trees", "rect": [22, 11, 5, 6], "step": 3 },
-    { "kind": "trees", "rect": [54, 11, 6, 6], "step": 3 },
-    { "kind": "trees", "rect": [52, 31, 8, 6], "step": 3 },
-    { "kind": "trees", "rect": [23, 31, 4, 6], "step": 3 },
-    { "kind": "sign", "at": [27, 7], "text": "Hillside" }, { "kind": "sign", "at": [27, 17], "text": "Elm Street" }, { "kind": "sign", "at": [27, 27], "text": "Maple Street" },
-    { "kind": "fence", "rect": [30, 1, 11, 1] }, { "kind": "fence", "rect": [30, 2, 1, 5] }, { "kind": "fence", "rect": [40, 2, 1, 5] },
-    { "kind": "hoop", "at": [50, 27] }, { "kind": "mailbox", "at": [12, 37] }
+    {
+      "kind": "trees",
+      "rect": [
+        0,
+        39,
+        60,
+        7
+      ],
+      "step": 3
+    },
+    {
+      "kind": "trees",
+      "rect": [
+        22,
+        11,
+        5,
+        6
+      ],
+      "step": 3
+    },
+    {
+      "kind": "trees",
+      "rect": [
+        54,
+        11,
+        6,
+        6
+      ],
+      "step": 3
+    },
+    {
+      "kind": "trees",
+      "rect": [
+        52,
+        31,
+        8,
+        6
+      ],
+      "step": 3
+    },
+    {
+      "kind": "trees",
+      "rect": [
+        23,
+        31,
+        4,
+        6
+      ],
+      "step": 3
+    },
+    {
+      "kind": "sign",
+      "at": [
+        27,
+        7
+      ],
+      "text": "Hillside"
+    },
+    {
+      "kind": "sign",
+      "at": [
+        27,
+        17
+      ],
+      "text": "Elm Street"
+    },
+    {
+      "kind": "sign",
+      "at": [
+        27,
+        27
+      ],
+      "text": "Maple Street"
+    },
+    {
+      "kind": "fence",
+      "rect": [
+        30,
+        1,
+        11,
+        1
+      ]
+    },
+    {
+      "kind": "fence",
+      "rect": [
+        30,
+        2,
+        1,
+        5
+      ]
+    },
+    {
+      "kind": "fence",
+      "rect": [
+        40,
+        2,
+        1,
+        5
+      ]
+    },
+    {
+      "kind": "hoop",
+      "at": [
+        50,
+        27
+      ]
+    },
+    {
+      "kind": "mailbox",
+      "at": [
+        12,
+        37
+      ]
+    }
   ],
   "spots": {},
-  "exits": [ { "rect": [59, 18, 1, 2], "to": "downtown", "spawn": [29, 31] } ],
-  "starts": { "before_school": "player_home", "morning": "player_home" }
+  "exits": [
+    {
+      "rect": [
+        59,
+        18,
+        1,
+        2
+      ],
+      "to": "downtown",
+      "spawn": [
+        29,
+        31
+      ]
+    }
+  ],
+  "starts": {
+    "before_school": "player_home",
+    "morning": "player_home"
+  }
 }
