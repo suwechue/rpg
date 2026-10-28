@@ -15,7 +15,8 @@ const OPS := ["burn_tiles", "fire_wall", "empower", "detonate", "self_burn", "st
 	"delayed", "push", "pin", "gravity", "breach", "brace", "recoil", "dash", "blink", "swap", "haste_full", "reposition", "lunge", "decoy",
 	"tailwind", "tether", "leash", "regen", "root_area", "pact", "heal", "taunt", "reveal", "halo", "radiance", "parry", "throw", "overwatch",
 	"transmute_ground", "strip", "toxic_tiles", "shred", "once_heal_pct",
-	"hit_and_run", "shadow_step", "blind_adjacent", "free_move", "ward", "pull_ally", "sanctuary", "intercept", "encore"]
+	"hit_and_run", "shadow_step", "blind_adjacent", "free_move", "ward", "pull_ally", "sanctuary", "intercept", "encore",
+	"strike_x", "dash_line", "pull_root", "status_target", "status_self", "status_area"]
 const TARGETING := ["self", "enemy", "ally", "unit", "empty", "any", "dir"]
 
 ## Statuses that count as "bad" for Cleanse.
@@ -367,8 +368,67 @@ static func _op(st, u: UnitScript, card: Dictionary, fx: Dictionary, target: Vec
 				elif st.is_hostile(u, t):
 					st._hit_unit(u, t, spec, false)
 		# --- Basic and weapon ---
+		# --- PT Part 7: class pools ---
+		"strike_x":
+			# A weapon hit in a shape: single, cleave (the 3 tiles in front), cone, or twin (a second foe within 2).
+			var stat := str(fx.get("stat", "str"))
+			var mult := float(fx.get("mult", 1.0))
+			var victims: Array = []
+			match str(fx.get("pattern", "single")):
+				"cleave":
+					victims = _foes(st, Forms.footprint(grid, { "footprint": "cleave" }, u.cell, target, {}), u)
+				"cone":
+					victims = _foes(st, Forms.footprint(grid, { "footprint": "cone" }, u.cell, target, {}), u)
+				_:
+					var t0: UnitScript = st.unit_at(target)
+					if t0 != null and t0.alive():
+						victims.append(t0)
+					if str(fx.get("pattern", "")) == "twin" and t0 != null:
+						for o in st.opponents_of(u):
+							if o != t0 and o.alive() and GridScript.manhattan(o.cell, t0.cell) <= 2:
+								victims.append(o)
+								break
+			for t in victims:
+				if t.alive():
+					st._basic(u, { "action": "strike", "stat": stat, "mult": mult, "name": str(card.get("name", "")), "breaker": bool(fx.get("breaker", false)) }, t.cell)
+					if fx.has("status") and t.alive():
+						st.add_status(t, str(fx["status"]), int(fx.get("turns", -1)))
+		"dash_line":
+			# Shoulder Charge: run up to N tiles toward the target, slam it, knock it back.
+			var dir2 := Forms.direction_to(u.cell, target)
+			for i in int(fx.get("tiles", 3)):
+				var nx: Vector2i = u.cell + dir2
+				if not grid.in_bounds(nx) or not grid.walkable_terrain(nx) or st.unit_at(nx) != null:
+					break
+				u.cell = nx
+				st._emit({ "t": "move", "unit": u.id, "path": [nx] })
+			var hit_u: UnitScript = st.unit_at(u.cell + dir2)
+			if hit_u != null and st.is_hostile(u, hit_u):
+				st._basic(u, { "action": "strike", "stat": "str", "mult": float(fx.get("mult", 1.0)), "name": str(card.get("name", "")) }, hit_u.cell)
+				if hit_u.alive():
+					st._push(u, hit_u, dir2, int(fx.get("knock", 1)))
+		"pull_root":
+			var t: UnitScript = st.unit_at(target)
+			if t != null and t.alive() and st.is_hostile(u, t):
+				if GridScript.manhattan(t.cell, u.cell) > 1:
+					st._push(u, t, Forms.direction_to(t.cell, u.cell), GridScript.manhattan(t.cell, u.cell) - 1, false)
+				t.statuses["root"] = int(fx.get("turns", 1))
+				st._emit({ "t": "status", "unit": t.id, "status": "root" })
+		"status_target":
+			st.add_status(st.unit_at(target), str(fx.get("status", "")), int(fx.get("turns", -1)))
+		"status_self":
+			st.add_status(u, str(fx.get("status", "")), int(fx.get("turns", -1)))
+			if bool(fx.get("adjacent", false)):
+				for a in st.allies_of(u):
+					if a != u and GridScript.manhattan(a.cell, u.cell) == 1:
+						st.add_status(a, str(fx.get("status", "")), int(fx.get("turns", -1)))
+		"status_area":
+			for t in _foes(st, cells if not cells.is_empty() else [target], u):
+				st.add_status(t, str(fx.get("status", "")), int(fx.get("turns", -1)))
 		"parry":
 			u.statuses["parry"] = 1
+			if fx.has("mult"):
+				u.links["parry_mult"] = str(fx["mult"])
 			st._emit({ "t": "status", "unit": u.id, "status": "parry" })
 		"throw":
 			var t: UnitScript = st.unit_at(target)

@@ -1,0 +1,384 @@
+{
+  "comment": "PT Part 7: the fighter class card pool (rewards for this class and its advanced classes). Every card lists its shape, tags and timing.",
+  "cards": [
+    {
+      "id": "card_shoulder_charge",
+      "name": "Shoulder Charge",
+      "kind": "basic",
+      "rarity": "common",
+      "cost": 2,
+      "short": "Charge",
+      "text": "Run up to 3 tiles in a line, slam the first enemy (STR) and knock it back 1.",
+      "action": "effects",
+      "targeting": {
+        "type": "dir",
+        "range": 4
+      },
+      "effects": [
+        {
+          "op": "dash_line",
+          "tiles": 3,
+          "knock": 1,
+          "mult": 1.2
+        }
+      ],
+      "shape": "line",
+      "tags": {
+        "setsUp": [
+          "push"
+        ],
+        "paysOff": []
+      },
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "moves": true,
+      "pool": "fighter"
+    },
+    {
+      "id": "card_grapple",
+      "name": "Grapple",
+      "kind": "basic",
+      "rarity": "common",
+      "cost": 1,
+      "short": "Pull+root",
+      "text": "Pull an enemy within 2 next to you and Root it until its turn ends.",
+      "action": "effects",
+      "targeting": {
+        "type": "enemy",
+        "range": 2
+      },
+      "effects": [
+        {
+          "op": "pull_root",
+          "turns": 1
+        }
+      ],
+      "shape": "single",
+      "tags": {
+        "setsUp": [
+          "rooted"
+        ],
+        "paysOff": []
+      },
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "pool": "fighter"
+    },
+    {
+      "id": "card_cleave",
+      "name": "Cleave",
+      "kind": "basic",
+      "rarity": "common",
+      "cost": 1,
+      "short": "Cleave",
+      "text": "Hit the 3 tiles in front of you (STR).",
+      "action": "effects",
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "strike_x",
+          "pattern": "cleave",
+          "stat": "str",
+          "mult": 1.0
+        }
+      ],
+      "shape": "cleave",
+      "tags": {
+        "setsUp": [],
+        "paysOff": []
+      },
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "pool": "fighter"
+    },
+    {
+      "id": "card_iron_wall",
+      "name": "Iron Wall",
+      "kind": "basic",
+      "rarity": "common",
+      "cost": 1,
+      "short": "Wall up",
+      "text": "Quick. Brace, and you and adjacent allies gain a 4 Shield until your next turn.",
+      "action": "effects",
+      "targeting": {
+        "type": "self",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "brace"
+        },
+        {
+          "op": "halo",
+          "amount": 4
+        }
+      ],
+      "shape": "plus_self",
+      "tags": {
+        "setsUp": [],
+        "paysOff": []
+      },
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "quick": true,
+      "pool": "fighter"
+    },
+    {
+      "id": "card_hurl",
+      "name": "Hurl",
+      "kind": "basic",
+      "rarity": "common",
+      "cost": 1,
+      "short": "Hurl",
+      "text": "Throw something at an enemy within 3 (STR). An adjacent crate hits much harder.",
+      "action": "effects",
+      "targeting": {
+        "type": "enemy",
+        "range": 3
+      },
+      "effects": [
+        {
+          "op": "throw",
+          "mult": 1.1
+        }
+      ],
+      "shape": "single",
+      "tags": {
+        "setsUp": [],
+        "paysOff": []
+      },
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "pool": "fighter"
+    },
+    {
+      "id": "card_riposte",
+      "name": "Riposte",
+      "kind": "basic",
+      "rarity": "common",
+      "cost": 0,
+      "short": "Counter",
+      "text": "Quick. Until your next turn, the next melee attack on you is countered at x1.5.",
+      "action": "effects",
+      "targeting": {
+        "type": "self",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "parry",
+          "mult": 1.5
+        }
+      ],
+      "shape": "self",
+      "tags": {
+        "setsUp": [],
+        "paysOff": []
+      },
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "quick": true,
+      "pool": "fighter"
+    },
+    {
+      "id": "card_earthshaker",
+      "name": "Earthshaker",
+      "kind": "basic",
+      "rarity": "uncommon",
+      "cost": 2,
+      "short": "Quake",
+      "text": "A shockwave along a line (STR) that cracks walls and cover (double damage to them).",
+      "action": "effects",
+      "targeting": {
+        "type": "dir",
+        "range": 3
+      },
+      "effects": [
+        {
+          "op": "strike_x",
+          "pattern": "cone",
+          "stat": "str",
+          "mult": 0.8,
+          "breaker": true
+        }
+      ],
+      "shape": "cone",
+      "tags": {
+        "setsUp": [
+          "push"
+        ],
+        "paysOff": []
+      },
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "pool": "fighter"
+    },
+    {
+      "id": "card_hamstring_blow",
+      "name": "Low Blow",
+      "kind": "basic",
+      "rarity": "common",
+      "cost": 0,
+      "short": "Hit+slow",
+      "text": "A short hit (STR x0.7) that Slows.",
+      "action": "effects",
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "strike_x",
+          "stat": "str",
+          "mult": 0.7,
+          "status": "slow",
+          "turns": 1
+        }
+      ],
+      "shape": "single",
+      "tags": {
+        "setsUp": [
+          "slow"
+        ],
+        "paysOff": []
+      },
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "pool": "fighter"
+    },
+    {
+      "id": "card_bulwark",
+      "name": "Bulwark",
+      "kind": "basic",
+      "rarity": "uncommon",
+      "cost": 1,
+      "short": "Taunt+wall",
+      "text": "Taunt enemies within 3 and gain a 6 Shield.",
+      "action": "effects",
+      "targeting": {
+        "type": "self",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "taunt",
+          "radius": 3,
+          "turns": 1
+        },
+        {
+          "op": "halo",
+          "amount": 6
+        }
+      ],
+      "shape": "self",
+      "tags": {
+        "setsUp": [],
+        "paysOff": []
+      },
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "pool": "fighter"
+    },
+    {
+      "id": "card_crushing_blow",
+      "name": "Crushing Blow",
+      "kind": "basic",
+      "rarity": "uncommon",
+      "cost": 2,
+      "short": "Crush",
+      "text": "A huge hit (STR x1.8) that also Exposes the target.",
+      "action": "effects",
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "strike_x",
+          "stat": "str",
+          "mult": 1.8,
+          "status": "exposed",
+          "turns": 1
+        }
+      ],
+      "shape": "single",
+      "tags": {
+        "setsUp": [
+          "exposed"
+        ],
+        "paysOff": []
+      },
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "pool": "fighter"
+    },
+    {
+      "id": "card_rally_cry",
+      "name": "Rally Cry",
+      "kind": "basic",
+      "rarity": "common",
+      "cost": 1,
+      "short": "Rally",
+      "text": "Quick. Adjacent allies and you shake off Slow and Root.",
+      "action": "effects",
+      "targeting": {
+        "type": "ally",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "cleanse",
+          "all": true
+        }
+      ],
+      "shape": "plus_self",
+      "tags": {
+        "setsUp": [],
+        "paysOff": []
+      },
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "quick": true,
+      "pool": "fighter"
+    },
+    {
+      "id": "card_whirlwind",
+      "name": "Whirlwind",
+      "kind": "basic",
+      "rarity": "rare",
+      "cost": 2,
+      "short": "Spin",
+      "text": "Hit every enemy next to you (STR x0.9).",
+      "action": "effects",
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "strike_x",
+          "pattern": "cleave",
+          "stat": "str",
+          "mult": 0.9
+        },
+        {
+          "op": "strike_x",
+          "pattern": "single",
+          "stat": "str",
+          "mult": 0.5
+        }
+      ],
+      "shape": "plus_self",
+      "tags": {
+        "setsUp": [],
+        "paysOff": []
+      },
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "pool": "fighter"
+    }
+  ]
+}

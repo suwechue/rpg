@@ -60,6 +60,17 @@
             "pride": 0.9
           },
           "damage": 11
+        },
+        {
+          "id": "foam_flood",
+          "name": "Foam Flood",
+          "form": "cone",
+          "magnitude": "standard",
+          "vectors": {
+            "cold": 1
+          },
+          "damage": 12,
+          "statusAfter": "wet"
         }
       ],
       "phases": [
@@ -210,6 +221,17 @@
             "greed": 0.7
           },
           "damage": 11
+        },
+        {
+          "id": "deep_freeze",
+          "name": "Deep Freeze",
+          "form": "burst",
+          "magnitude": "standard",
+          "vectors": {
+            "cold": 1
+          },
+          "damage": 13,
+          "charge": 1
         }
       ],
       "phases": [
@@ -355,6 +377,16 @@
             "pride": 0.7
           },
           "damage": 11
+        },
+        {
+          "id": "slag_spray",
+          "name": "Slag Spray",
+          "form": "cone",
+          "magnitude": "standard",
+          "vectors": {
+            "heat": 1
+          },
+          "damage": 14
         }
       ],
       "phases": [
@@ -502,6 +534,16 @@
             "greed": 0.6
           },
           "damage": 21
+        },
+        {
+          "id": "sedative_mist",
+          "name": "Sedative Mist",
+          "form": "burst",
+          "magnitude": "standard",
+          "vectors": {
+            "corrosion": 1
+          },
+          "damage": 12
         }
       ],
       "phases": [
@@ -664,6 +706,16 @@
             "pride": 1.0
           },
           "damage": 18
+        },
+        {
+          "id": "spotlight_glare",
+          "name": "Spotlight Glare",
+          "form": "cone",
+          "magnitude": "standard",
+          "vectors": {
+            "light": 1
+          },
+          "damage": 13
         }
       ],
       "phases": [

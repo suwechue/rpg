@@ -1,0 +1,781 @@
+{
+  "comment": "PT Part 7: new enemies for the base Vectors (families for the new Vectors arrive with PT Part 8).",
+  "enemies": [
+    {
+      "id": "puddle_imp",
+      "name": "Puddle Imp",
+      "tier": "normal",
+      "weeks": [
+        1,
+        2
+      ],
+      "text": "Leaves everyone damp and annoyed.",
+      "hp": 13,
+      "movement": 3,
+      "initiative": 6,
+      "physDefense": 1,
+      "magicResist": 2,
+      "stability": 6,
+      "stats": {
+        "str": 6,
+        "dex": 6
+      },
+      "weakTo": [
+        "heat"
+      ],
+      "strongAgainst": [],
+      "signature": {
+        "cold": 1.0
+      },
+      "disposition": {
+        "courage": 50,
+        "pride": 30
+      },
+      "actions": [
+        {
+          "id": "splash",
+          "name": "Splash",
+          "form": "burst",
+          "magnitude": "minor",
+          "vectors": {
+            "cold": 1
+          },
+          "damage": 7,
+          "statusAfter": "wet"
+        },
+        {
+          "id": "nip",
+          "name": "Nip",
+          "kind": "strike",
+          "damage": 9
+        }
+      ],
+      "xp": 8,
+      "money": 2,
+      "sprite": "enemy_puddle_imp"
+    },
+    {
+      "id": "frost_fang",
+      "name": "Frost Fang",
+      "tier": "normal",
+      "weeks": [
+        2,
+        3
+      ],
+      "text": "Freezes anything wet it bites.",
+      "hp": 16,
+      "movement": 3,
+      "initiative": 6,
+      "physDefense": 1,
+      "magicResist": 2,
+      "stability": 6,
+      "stats": {
+        "str": 6,
+        "dex": 6
+      },
+      "weakTo": [
+        "heat"
+      ],
+      "strongAgainst": [
+        "cold"
+      ],
+      "signature": {
+        "cold": 1.0
+      },
+      "disposition": {
+        "courage": 50,
+        "pride": 30
+      },
+      "actions": [
+        {
+          "id": "bite",
+          "name": "Freezing Bite",
+          "kind": "strike",
+          "damage": 12,
+          "vectors": {
+            "cold": 1
+          }
+        },
+        {
+          "id": "cone",
+          "name": "Frost Breath",
+          "form": "cone",
+          "magnitude": "minor",
+          "vectors": {
+            "cold": 1
+          },
+          "damage": 8
+        }
+      ],
+      "xp": 8,
+      "money": 2,
+      "sprite": "enemy_frost_fang"
+    },
+    {
+      "id": "ember_tick",
+      "name": "Ember Tick",
+      "tier": "minion",
+      "weeks": [
+        1,
+        3
+      ],
+      "text": "Small, hot, and everywhere.",
+      "hp": 6,
+      "movement": 3,
+      "initiative": 6,
+      "physDefense": 1,
+      "magicResist": 2,
+      "stability": 6,
+      "stats": {
+        "str": 6,
+        "dex": 6
+      },
+      "weakTo": [
+        "cold"
+      ],
+      "strongAgainst": [],
+      "signature": {
+        "heat": 1.0
+      },
+      "disposition": {
+        "courage": 50,
+        "pride": 30
+      },
+      "actions": [
+        {
+          "id": "singe",
+          "name": "Singe",
+          "kind": "strike",
+          "damage": 5,
+          "vectors": {
+            "heat": 1
+          }
+        }
+      ],
+      "xp": 3,
+      "money": 2,
+      "sprite": "enemy_ember_tick"
+    },
+    {
+      "id": "root_weaver",
+      "name": "Root Weaver",
+      "tier": "normal",
+      "weeks": [
+        2,
+        4
+      ],
+      "text": "Ties your feet to the floor.",
+      "hp": 15,
+      "movement": 3,
+      "initiative": 6,
+      "physDefense": 1,
+      "magicResist": 2,
+      "stability": 6,
+      "stats": {
+        "str": 6,
+        "dex": 6
+      },
+      "weakTo": [
+        "heat"
+      ],
+      "strongAgainst": [],
+      "signature": {
+        "binding": 1.0
+      },
+      "disposition": {
+        "courage": 50,
+        "pride": 30
+      },
+      "actions": [
+        {
+          "id": "snare",
+          "name": "Snare",
+          "form": "line",
+          "magnitude": "minor",
+          "vectors": {
+            "binding": 1
+          },
+          "damage": 7
+        },
+        {
+          "id": "lash",
+          "name": "Lash",
+          "kind": "strike",
+          "damage": 11
+        }
+      ],
+      "xp": 8,
+      "money": 2,
+      "sprite": "enemy_root_weaver"
+    },
+    {
+      "id": "spotlight_drone",
+      "name": "Spotlight Drone",
+      "tier": "normal",
+      "weeks": [
+        1,
+        3
+      ],
+      "text": "Points everyone at you.",
+      "hp": 11,
+      "movement": 3,
+      "initiative": 6,
+      "physDefense": 1,
+      "magicResist": 2,
+      "stability": 6,
+      "stats": {
+        "str": 6,
+        "dex": 6
+      },
+      "weakTo": [
+        "corrosion"
+      ],
+      "strongAgainst": [],
+      "signature": {
+        "light": 1.0
+      },
+      "disposition": {
+        "courage": 50,
+        "pride": 30
+      },
+      "actions": [
+        {
+          "id": "mark",
+          "name": "Spotlight",
+          "form": "bolt",
+          "magnitude": "minor",
+          "vectors": {
+            "light": 1
+          },
+          "damage": 6,
+          "statusAfter": "marked"
+        },
+        {
+          "id": "glare",
+          "name": "Glare",
+          "form": "cone",
+          "magnitude": "minor",
+          "vectors": {
+            "light": 1
+          },
+          "damage": 7
+        }
+      ],
+      "xp": 8,
+      "money": 2,
+      "sprite": "enemy_spotlight_drone",
+      "behavior": "sniper"
+    },
+    {
+      "id": "acid_drip",
+      "name": "Acid Drip",
+      "tier": "normal",
+      "weeks": [
+        3,
+        5
+      ],
+      "text": "Eats armor and patience.",
+      "hp": 16,
+      "movement": 3,
+      "initiative": 6,
+      "physDefense": 1,
+      "magicResist": 2,
+      "stability": 6,
+      "stats": {
+        "str": 6,
+        "dex": 6
+      },
+      "weakTo": [
+        "light"
+      ],
+      "strongAgainst": [],
+      "signature": {
+        "corrosion": 1.0
+      },
+      "disposition": {
+        "courage": 50,
+        "pride": 30
+      },
+      "actions": [
+        {
+          "id": "drip",
+          "name": "Drip",
+          "form": "bolt",
+          "magnitude": "minor",
+          "vectors": {
+            "corrosion": 1
+          },
+          "damage": 9,
+          "statusAfter": "exposed"
+        },
+        {
+          "id": "puddle",
+          "name": "Acid Puddle",
+          "form": "burst",
+          "magnitude": "minor",
+          "vectors": {
+            "corrosion": 1
+          },
+          "damage": 8
+        }
+      ],
+      "xp": 8,
+      "money": 2,
+      "sprite": "enemy_acid_drip",
+      "trail": "toxic"
+    },
+    {
+      "id": "gym_rope",
+      "name": "Gym Rope",
+      "tier": "normal",
+      "weeks": [
+        1,
+        2
+      ],
+      "text": "Climb it in gym class. It remembers.",
+      "hp": 14,
+      "movement": 3,
+      "initiative": 6,
+      "physDefense": 1,
+      "magicResist": 2,
+      "stability": 6,
+      "stats": {
+        "str": 6,
+        "dex": 6
+      },
+      "weakTo": [
+        "heat"
+      ],
+      "strongAgainst": [],
+      "signature": {
+        "binding": 1.0
+      },
+      "disposition": {
+        "courage": 50,
+        "pride": 30
+      },
+      "actions": [
+        {
+          "id": "yank",
+          "name": "Yank",
+          "form": "line",
+          "magnitude": "minor",
+          "vectors": {
+            "binding": 1
+          },
+          "damage": 8
+        },
+        {
+          "id": "whip",
+          "name": "Whip",
+          "kind": "strike",
+          "damage": 10
+        }
+      ],
+      "xp": 8,
+      "money": 2,
+      "sprite": "enemy_gym_rope"
+    },
+    {
+      "id": "locker_leaper",
+      "name": "Locker Leaper",
+      "tier": "normal",
+      "weeks": [
+        2,
+        3
+      ],
+      "text": "Comes out of the wrong locker.",
+      "hp": 15,
+      "movement": 5,
+      "initiative": 6,
+      "physDefense": 1,
+      "magicResist": 2,
+      "stability": 6,
+      "stats": {
+        "str": 6,
+        "dex": 6
+      },
+      "weakTo": [
+        "binding"
+      ],
+      "strongAgainst": [],
+      "signature": {
+        "motion": 1.0
+      },
+      "disposition": {
+        "courage": 50,
+        "pride": 30
+      },
+      "actions": [
+        {
+          "id": "pounce",
+          "name": "Pounce",
+          "kind": "strike",
+          "damage": 12
+        },
+        {
+          "id": "dash",
+          "name": "Dash Slash",
+          "form": "line",
+          "magnitude": "minor",
+          "vectors": {
+            "motion": 1
+          },
+          "damage": 9
+        }
+      ],
+      "xp": 8,
+      "money": 2,
+      "sprite": "enemy_locker_leaper"
+    },
+    {
+      "id": "fire_alarm",
+      "name": "Fire Alarm",
+      "tier": "normal",
+      "weeks": [
+        2,
+        4
+      ],
+      "text": "Everyone out. Everyone wet. Everyone on fire.",
+      "hp": 17,
+      "movement": 3,
+      "initiative": 6,
+      "physDefense": 1,
+      "magicResist": 2,
+      "stability": 6,
+      "stats": {
+        "str": 6,
+        "dex": 6
+      },
+      "weakTo": [
+        "cold"
+      ],
+      "strongAgainst": [],
+      "signature": {
+        "heat": 1.0
+      },
+      "disposition": {
+        "courage": 50,
+        "pride": 30
+      },
+      "actions": [
+        {
+          "id": "ring",
+          "name": "Alarm Ring",
+          "form": "burst",
+          "magnitude": "minor",
+          "vectors": {
+            "heat": 1
+          },
+          "damage": 8
+        },
+        {
+          "id": "sprinkle",
+          "name": "Sprinklers",
+          "form": "cone",
+          "magnitude": "minor",
+          "vectors": {
+            "cold": 1
+          },
+          "damage": 6,
+          "statusAfter": "wet"
+        }
+      ],
+      "xp": 8,
+      "money": 2,
+      "sprite": "enemy_fire_alarm"
+    },
+    {
+      "id": "mop_golem",
+      "name": "Mop Golem",
+      "tier": "elite",
+      "weeks": [
+        3,
+        4
+      ],
+      "text": "Elite. Caution: floor is wet. Floor is you.",
+      "hp": 34,
+      "movement": 3,
+      "initiative": 6,
+      "physDefense": 1,
+      "magicResist": 2,
+      "stability": 6,
+      "stats": {
+        "str": 6,
+        "dex": 6
+      },
+      "weakTo": [
+        "heat",
+        "force"
+      ],
+      "strongAgainst": [],
+      "signature": {
+        "cold": 1.0
+      },
+      "disposition": {
+        "courage": 50,
+        "pride": 30
+      },
+      "actions": [
+        {
+          "id": "mop",
+          "name": "Mop Sweep",
+          "form": "cone",
+          "magnitude": "standard",
+          "vectors": {
+            "cold": 1
+          },
+          "damage": 11,
+          "statusAfter": "wet"
+        },
+        {
+          "id": "bucket",
+          "name": "Bucket Slam",
+          "kind": "strike",
+          "damage": 15
+        },
+        {
+          "id": "slide",
+          "name": "Wet Floor",
+          "form": "line",
+          "magnitude": "minor",
+          "vectors": {
+            "cold": 1
+          },
+          "damage": 9
+        }
+      ],
+      "xp": 20,
+      "money": 2,
+      "sprite": "enemy_mop_golem",
+      "trail": "ice",
+      "signatureText": "Wet Floor: leaves ice behind it."
+    },
+    {
+      "id": "hall_monitor",
+      "name": "Hall Monitor",
+      "tier": "normal",
+      "weeks": [
+        1,
+        2
+      ],
+      "text": "Demands a pass you don't have.",
+      "hp": 14,
+      "movement": 3,
+      "initiative": 6,
+      "physDefense": 1,
+      "magicResist": 2,
+      "stability": 6,
+      "stats": {
+        "str": 6,
+        "dex": 6
+      },
+      "weakTo": [
+        "motion"
+      ],
+      "strongAgainst": [],
+      "signature": {
+        "light": 1.0
+      },
+      "disposition": {
+        "courage": 50,
+        "pride": 30
+      },
+      "actions": [
+        {
+          "id": "whistle",
+          "name": "Whistle",
+          "form": "burst",
+          "magnitude": "minor",
+          "vectors": {
+            "light": 1
+          },
+          "damage": 7
+        },
+        {
+          "id": "write_up",
+          "name": "Write-Up",
+          "form": "bolt",
+          "magnitude": "minor",
+          "vectors": {
+            "binding": 1
+          },
+          "damage": 9
+        }
+      ],
+      "xp": 8,
+      "money": 2,
+      "sprite": "enemy_hall_monitor"
+    },
+    {
+      "id": "rust_bucket",
+      "name": "Rust Bucket",
+      "tier": "normal",
+      "weeks": [
+        4,
+        5
+      ],
+      "text": "Eats cover. Leaves tetanus.",
+      "hp": 19,
+      "movement": 3,
+      "initiative": 6,
+      "physDefense": 1,
+      "magicResist": 2,
+      "stability": 6,
+      "stats": {
+        "str": 6,
+        "dex": 6
+      },
+      "weakTo": [
+        "light"
+      ],
+      "strongAgainst": [],
+      "signature": {
+        "corrosion": 1.0
+      },
+      "disposition": {
+        "courage": 50,
+        "pride": 30
+      },
+      "actions": [
+        {
+          "id": "rust_bash",
+          "name": "Rust Bash",
+          "kind": "strike",
+          "damage": 13,
+          "vectors": {
+            "corrosion": 1
+          }
+        },
+        {
+          "id": "flakes",
+          "name": "Rust Flakes",
+          "form": "cone",
+          "magnitude": "minor",
+          "vectors": {
+            "corrosion": 1
+          },
+          "damage": 9,
+          "statusAfter": "exposed"
+        }
+      ],
+      "xp": 8,
+      "money": 2,
+      "sprite": "enemy_rust_bucket"
+    },
+    {
+      "id": "cinder_swarm",
+      "name": "Cinder Swarm",
+      "tier": "minion",
+      "weeks": [
+        3,
+        5
+      ],
+      "text": "A cloud of angry sparks.",
+      "hp": 6,
+      "movement": 3,
+      "initiative": 6,
+      "physDefense": 1,
+      "magicResist": 2,
+      "stability": 6,
+      "stats": {
+        "str": 6,
+        "dex": 6
+      },
+      "weakTo": [
+        "cold"
+      ],
+      "strongAgainst": [],
+      "signature": {
+        "heat": 1.0
+      },
+      "disposition": {
+        "courage": 50,
+        "pride": 30
+      },
+      "actions": [
+        {
+          "id": "swarm",
+          "name": "Swarm",
+          "form": "burst",
+          "magnitude": "minor",
+          "vectors": {
+            "heat": 1
+          },
+          "damage": 4
+        }
+      ],
+      "xp": 3,
+      "money": 2,
+      "sprite": "enemy_cinder_swarm"
+    },
+    {
+      "id": "frost_chorister",
+      "name": "Frost Chorister",
+      "tier": "elite",
+      "weeks": [
+        4,
+        5
+      ],
+      "text": "Elite. Sings everything still.",
+      "hp": 36,
+      "movement": 3,
+      "initiative": 6,
+      "physDefense": 1,
+      "magicResist": 2,
+      "stability": 6,
+      "stats": {
+        "str": 6,
+        "dex": 6
+      },
+      "weakTo": [
+        "heat"
+      ],
+      "strongAgainst": [
+        "cold"
+      ],
+      "signature": {
+        "cold": 1.0
+      },
+      "disposition": {
+        "courage": 50,
+        "pride": 30
+      },
+      "actions": [
+        {
+          "id": "hymn",
+          "name": "Cold Hymn",
+          "form": "sphere",
+          "magnitude": "minor",
+          "vectors": {
+            "cold": 1
+          },
+          "damage": 10
+        },
+        {
+          "id": "lance",
+          "name": "Ice Lance",
+          "form": "line",
+          "magnitude": "standard",
+          "vectors": {
+            "cold": 1
+          },
+          "damage": 13
+        },
+        {
+          "id": "chill",
+          "name": "Chill Touch",
+          "kind": "strike",
+          "damage": 14,
+          "vectors": {
+            "cold": 1
+          }
+        }
+      ],
+      "xp": 20,
+      "money": 2,
+      "sprite": "enemy_frost_chorister",
+      "signatureText": "Chorus: freezes Wet targets at the start of its turn."
+    }
+  ]
+}

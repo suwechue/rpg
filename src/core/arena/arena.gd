@@ -5,6 +5,7 @@
 ## one Dictionary (in the run as run["arena"] or run["rift"]).
 extends RefCounted
 
+const CardRules := preload("res://src/core/card.gd")
 const Str := preload("res://src/core/strings.gd")
 
 const DT := preload("res://src/core/data_tables.gd")
@@ -195,6 +196,12 @@ static func card_offer(db: Dictionary, arena: Dictionary, party: Array, wave: in
 		for v in ch.get("knownVectors", []):
 			known[str(v)] = true
 	var t := clampf(float(wave) / float(maxi(1, int(cr.get("lateWave", 20)))), 0.0, 1.0)
+	var deck_tags := {}
+	for ch in party:
+		for id in ch.get("deck", []):
+			var tg0 := CardRules.tags(db, CardRules.resolve(db, str(id)))
+			for k in tg0["setsUp"] + tg0["paysOff"]:
+				deck_tags[k] = true
 	var early: Dictionary = cr.get("rarityWeights", {}).get("early", {})
 	var late: Dictionary = cr.get("rarityWeights", {}).get("late", {})
 	var pool: Array = []
@@ -214,6 +221,12 @@ static func card_offer(db: Dictionary, arena: Dictionary, party: Array, wave: in
 			continue
 		if not axes.is_empty():
 			w *= float(cr.get("partyVectorWeight", 3.0))
+		# Lean toward cards that pay off what the party's decks set up (and back).
+		var tg := CardRules.tags(db, c)
+		for tag in tg["paysOff"] + tg["setsUp"]:
+			if deck_tags.has(tag):
+				w *= float(cr.get("synergyWeight", 1.5))
+				break
 		pool.append(str(c["id"]))
 		weights.append(w)
 	var out: Array = []

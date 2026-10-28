@@ -1,0 +1,300 @@
+{
+  "comment": "PT Part 7: the mage class card pool (rewards for this class and its advanced classes). Every card lists its shape, tags and timing.",
+  "cards": [
+    {
+      "id": "card_steam_burst",
+      "name": "Steam Burst",
+      "kind": "spell",
+      "vectors": {
+        "heat": 1.0
+      },
+      "form": "burst",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Burst {power}",
+      "text": "A Heat Burst. Sets targets Burning; Frozen targets melt and turn Wet.",
+      "vfx": "vfx_heat_burst",
+      "sfx": "card_play_heat",
+      "tags": {
+        "setsUp": [
+          "burning",
+          "wet"
+        ],
+        "paysOff": [
+          "frozen"
+        ]
+      },
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "pool": "mage",
+      "cost": 3
+    },
+    {
+      "id": "card_deluge",
+      "name": "Deluge",
+      "kind": "spell",
+      "vectors": {
+        "cold": 1.0
+      },
+      "form": "burst",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Soak",
+      "text": "Soak enemies in a plus shape (Wet). Cold on them Freezes.",
+      "vfx": "vfx_cold_burst",
+      "sfx": "card_play_cold",
+      "tags": {
+        "setsUp": [
+          "wet"
+        ],
+        "paysOff": []
+      },
+      "effects": [
+        {
+          "op": "status_area",
+          "status": "wet",
+          "turns": 2
+        }
+      ],
+      "targeting": {
+        "type": "any",
+        "range": 4
+      },
+      "effectsOnly": true,
+      "area": "plus",
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "pool": "mage",
+      "cost": 3
+    },
+    {
+      "id": "card_flash_frost",
+      "name": "Flash Frost",
+      "kind": "spell",
+      "vectors": {
+        "cold": 1.0
+      },
+      "form": "cone",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Cone {power}",
+      "text": "A Cold Cone; Wet targets freeze solid.",
+      "vfx": "vfx_cold_bolt",
+      "sfx": "card_play_cold",
+      "tags": {
+        "setsUp": [
+          "frozen"
+        ],
+        "paysOff": [
+          "wet"
+        ]
+      },
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "pool": "mage",
+      "cost": 3
+    },
+    {
+      "id": "card_shatter_bolt",
+      "name": "Shatter Bolt",
+      "kind": "spell",
+      "vectors": {
+        "force": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "standard",
+      "rarity": "common",
+      "short": "Bolt {power}",
+      "text": "A Force Bolt; Frozen targets shatter for x1.5.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "tags": {
+        "setsUp": [
+          "push"
+        ],
+        "paysOff": [
+          "frozen"
+        ]
+      },
+      "upgrade": {
+        "magnitude": "major"
+      },
+      "pool": "mage",
+      "cost": 2
+    },
+    {
+      "id": "card_fire_fan",
+      "name": "Fire Fan",
+      "kind": "spell",
+      "vectors": {
+        "heat": 1.0
+      },
+      "form": "cone",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Cone {power}",
+      "text": "A Heat Cone that sets targets Burning.",
+      "vfx": "vfx_heat_bolt",
+      "sfx": "card_play_heat",
+      "tags": {
+        "setsUp": [
+          "burning"
+        ],
+        "paysOff": []
+      },
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "pool": "mage",
+      "cost": 3
+    },
+    {
+      "id": "card_gust",
+      "name": "Gust",
+      "kind": "spell",
+      "vectors": {
+        "motion": 1.0
+      },
+      "form": "line",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Line {power}",
+      "text": "A Motion Line that pushes and spreads Burning.",
+      "vfx": "vfx_motion_line",
+      "sfx": "card_play_motion",
+      "tags": {
+        "setsUp": [
+          "push"
+        ],
+        "paysOff": [
+          "burning"
+        ]
+      },
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "pool": "mage",
+      "cost": 2
+    },
+    {
+      "id": "card_binding_glyph",
+      "name": "Binding Glyph",
+      "kind": "spell",
+      "vectors": {
+        "binding": 1.0
+      },
+      "form": "glyph",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Root trap",
+      "text": "A Glyph that Roots whoever steps on it.",
+      "vfx": "vfx_binding_glyph",
+      "sfx": "card_play_binding",
+      "tags": {
+        "setsUp": [
+          "rooted"
+        ],
+        "paysOff": []
+      },
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "pool": "mage",
+      "cost": 4
+    },
+    {
+      "id": "card_arcane_mark",
+      "name": "Arcane Mark",
+      "kind": "spell",
+      "vectors": {
+        "light": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Mark",
+      "text": "Quick. Quick. Mark an enemy within 5.",
+      "vfx": "vfx_light_bolt",
+      "sfx": "card_play_light",
+      "tags": {
+        "setsUp": [
+          "marked"
+        ],
+        "paysOff": []
+      },
+      "effects": [
+        {
+          "op": "status_target",
+          "status": "marked",
+          "turns": 1
+        }
+      ],
+      "targeting": {
+        "type": "enemy",
+        "range": 5
+      },
+      "quick": true,
+      "effectsOnly": true,
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "pool": "mage",
+      "cost": 1
+    },
+    {
+      "id": "card_meteor",
+      "name": "Meteor",
+      "kind": "spell",
+      "vectors": {
+        "heat": 1.0
+      },
+      "form": "burst",
+      "magnitude": "major",
+      "rarity": "rare",
+      "short": "Burst {power}",
+      "text": "A Major Heat Burst.",
+      "vfx": "vfx_heat_burst",
+      "sfx": "card_play_heat",
+      "tags": {
+        "setsUp": [
+          "burning"
+        ],
+        "paysOff": []
+      },
+      "upgrade": {
+        "magnitude": "major"
+      },
+      "pool": "mage",
+      "cost": 6
+    },
+    {
+      "id": "card_frost_circle",
+      "name": "Frost Circle",
+      "kind": "spell",
+      "vectors": {
+        "cold": 1.0
+      },
+      "form": "aura",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Aura {power}",
+      "text": "A Cold Aura around you that Slows.",
+      "vfx": "vfx_cold_aura",
+      "sfx": "card_play_cold",
+      "tags": {
+        "setsUp": [
+          "slow"
+        ],
+        "paysOff": []
+      },
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "pool": "mage",
+      "cost": 3
+    }
+  ]
+}

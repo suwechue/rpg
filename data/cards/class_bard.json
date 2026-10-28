@@ -1,0 +1,330 @@
+{
+  "comment": "PT Part 7: the bard class card pool (rewards for this class and its advanced classes). Every card lists its shape, tags and timing.",
+  "cards": [
+    {
+      "id": "card_battle_hymn",
+      "name": "Battle Hymn",
+      "kind": "basic",
+      "rarity": "common",
+      "cost": 1,
+      "short": "Hymn",
+      "text": "Allies within 3 deal +20% damage and gain +1 Movement until their next turn ends.",
+      "action": "rally",
+      "shape": "self",
+      "tags": {
+        "setsUp": [],
+        "paysOff": []
+      },
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "pool": "bard",
+      "range": 3,
+      "amount": 0.2
+    },
+    {
+      "id": "card_discord",
+      "name": "Discord",
+      "kind": "spell",
+      "vectors": {
+        "light": 1.0
+      },
+      "form": "burst",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Daze area",
+      "text": "Daze enemies in a plus shape: they lose their Quick and miss more.",
+      "vfx": "vfx_light_burst",
+      "sfx": "card_play_light",
+      "tags": {
+        "setsUp": [
+          "dazed"
+        ],
+        "paysOff": []
+      },
+      "effects": [
+        {
+          "op": "status_area",
+          "status": "dazed",
+          "turns": 1
+        }
+      ],
+      "targeting": {
+        "type": "any",
+        "range": 4
+      },
+      "effectsOnly": true,
+      "area": "plus",
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "pool": "bard",
+      "cost": 3
+    },
+    {
+      "id": "card_spotlight",
+      "name": "Spotlight",
+      "kind": "spell",
+      "vectors": {
+        "light": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Mark",
+      "text": "Quick. Quick. Mark an enemy: everyone hits it harder for a round.",
+      "vfx": "vfx_light_bolt",
+      "sfx": "card_play_light",
+      "tags": {
+        "setsUp": [
+          "marked"
+        ],
+        "paysOff": []
+      },
+      "effects": [
+        {
+          "op": "status_target",
+          "status": "marked",
+          "turns": 1
+        }
+      ],
+      "targeting": {
+        "type": "enemy",
+        "range": 5
+      },
+      "quick": true,
+      "effectsOnly": true,
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "pool": "bard",
+      "cost": 1
+    },
+    {
+      "id": "card_encore_lite",
+      "name": "Quick Tempo",
+      "kind": "basic",
+      "rarity": "common",
+      "cost": 1,
+      "short": "+2 next turn",
+      "text": "An ally within 3 gets +2 Movement on their next turn.",
+      "action": "effects",
+      "targeting": {
+        "type": "ally",
+        "range": 3
+      },
+      "effects": [
+        {
+          "op": "tailwind",
+          "tiles": 2
+        }
+      ],
+      "shape": "self",
+      "tags": {
+        "setsUp": [],
+        "paysOff": []
+      },
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "moves": true,
+      "pool": "bard"
+    },
+    {
+      "id": "card_lullaby",
+      "name": "Lullaby",
+      "kind": "spell",
+      "vectors": {
+        "binding": 1.0
+      },
+      "form": "burst",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Root area",
+      "text": "Root enemies in a plus shape. No damage.",
+      "vfx": "vfx_binding_burst",
+      "sfx": "card_play_binding",
+      "tags": {
+        "setsUp": [
+          "rooted"
+        ],
+        "paysOff": []
+      },
+      "effects": [
+        {
+          "op": "root_area",
+          "turns": 1
+        }
+      ],
+      "targeting": {
+        "type": "any",
+        "range": 3
+      },
+      "effectsOnly": true,
+      "area": "plus",
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "pool": "bard",
+      "cost": 3
+    },
+    {
+      "id": "card_crescendo",
+      "name": "Crescendo",
+      "kind": "spell",
+      "vectors": {
+        "force": 1.0
+      },
+      "form": "line",
+      "magnitude": "standard",
+      "rarity": "uncommon",
+      "short": "Line {power}",
+      "text": "A Force Line that pierces.",
+      "vfx": "vfx_force_line",
+      "sfx": "card_play_force",
+      "tags": {
+        "setsUp": [],
+        "paysOff": []
+      },
+      "upgrade": {
+        "magnitude": "major"
+      },
+      "pool": "bard",
+      "cost": 3
+    },
+    {
+      "id": "card_ballad",
+      "name": "Ballad of Mending",
+      "kind": "spell",
+      "vectors": {
+        "light": 1.0
+      },
+      "form": "aura",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Mend",
+      "text": "Allies next to you heal 3 now and Regen 2 for 2 turns.",
+      "vfx": "vfx_light_aura",
+      "sfx": "card_play_light",
+      "tags": {
+        "setsUp": [],
+        "paysOff": []
+      },
+      "effects": [
+        {
+          "op": "heal",
+          "amount": 3
+        },
+        {
+          "op": "regen",
+          "amount": 2,
+          "turns": 2
+        }
+      ],
+      "targeting": {
+        "type": "ally",
+        "range": 1
+      },
+      "effectsOnly": true,
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "pool": "bard",
+      "cost": 3
+    },
+    {
+      "id": "card_dissonance",
+      "name": "Dissonance",
+      "kind": "spell",
+      "vectors": {
+        "force": 1.0
+      },
+      "form": "cone",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Cone {power}",
+      "text": "A Force Cone that Exposes what it hits.",
+      "vfx": "vfx_force_bolt",
+      "sfx": "card_play_force",
+      "tags": {
+        "setsUp": [
+          "exposed"
+        ],
+        "paysOff": []
+      },
+      "effects": [
+        {
+          "op": "status_area",
+          "status": "exposed",
+          "turns": 1
+        }
+      ],
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "pool": "bard",
+      "cost": 3
+    },
+    {
+      "id": "card_showstopper",
+      "name": "Showstopper",
+      "kind": "basic",
+      "rarity": "rare",
+      "cost": 2,
+      "short": "Show!",
+      "text": "Taunt enemies within 4 at you, and Blind those next to you.",
+      "action": "effects",
+      "targeting": {
+        "type": "self",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "taunt",
+          "radius": 4,
+          "turns": 1
+        },
+        {
+          "op": "blind_adjacent",
+          "turns": 1
+        }
+      ],
+      "shape": "self",
+      "tags": {
+        "setsUp": [],
+        "paysOff": []
+      },
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "pool": "bard"
+    },
+    {
+      "id": "card_cue",
+      "name": "Cue",
+      "kind": "basic",
+      "rarity": "common",
+      "cost": 0,
+      "short": "+1 card",
+      "text": "Quick. An ally within 4 draws an extra card on their next turn.",
+      "action": "effects",
+      "targeting": {
+        "type": "ally",
+        "range": 4
+      },
+      "effects": [
+        {
+          "op": "status_target",
+          "status": "hype_draw",
+          "turns": 1
+        }
+      ],
+      "shape": "self",
+      "tags": {
+        "setsUp": [],
+        "paysOff": []
+      },
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "quick": true,
+      "pool": "bard"
+    }
+  ]
+}

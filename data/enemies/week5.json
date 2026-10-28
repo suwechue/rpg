@@ -110,6 +110,32 @@
             "courage": 0.9
           },
           "damage": 21
+        },
+        {
+          "id": "frost_cone",
+          "name": "Frost Breath",
+          "form": "cone",
+          "magnitude": "minor",
+          "vectors": {
+            "cold": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
+        },
+        {
+          "id": "ice_line",
+          "name": "Ice Line",
+          "form": "line",
+          "magnitude": "minor",
+          "vectors": {
+            "cold": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
         }
       ],
       "xp": 13,
@@ -255,7 +281,9 @@
       ],
       "xp": 46,
       "money": 20,
-      "sprite": "enemy_mr_b_aide"
+      "sprite": "enemy_mr_b_aide",
+      "signatureText": "Anchor: roots anyone who starts next to it.",
+      "anchorRoot": true
     }
   ]
 }

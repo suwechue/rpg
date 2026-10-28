@@ -93,7 +93,7 @@ Most numbers live in `data/` (JSON). The main files:
 | MP regen | **1 per turn**. MP is **not** refilled between fights in a night, only by rest rooms, food and sleeping | derived.mpRegen |
 | Spell cost | Magnitude cost (Minor 1, Standard 2, Major 4, Grand 7) + Form cost (0 to 3) + 1 if hybrid | `data/vectors.json` magnitudes; `data/forms.json` |
 | Magnitude | Minor 4 power, Standard 7, Major 14, Grand 25. Capped by Knowledge Tier (Tier 1: Standard, Tier 2: Major, Tier 3: Grand). Force pushes 1 tile per 7 power | `data/vectors.json`; `data/stats.json` pushPowerPerStep |
-| Card kinds | **Spell** (Vector + Form + Magnitude), **basic** (Lunge, Dash, Shove...), **item**. 84 card records plus generated spell designs | `data/cards/*.json` |
+| Card kinds | **Spell** (Vector + Form + Magnitude), **basic** (Lunge, Dash, Shove...), **item**. 152 card records plus generated spell designs. Every class has a **class card pool** of 10 to 15 cards (`data/cards/class_<id>.json`, only that class draws them as rewards) and there are 14 status setup and payoff cards (`data/cards/synergy_cards.json`). New Form: **Cone** (1-3-5 tiles, range 3 from the caster, x0.7, cost 2), also used by enemies | `data/cards/*.json`; `data/forms.json` |
 | Card text | Every card's text says when it applies: quick cards start with "Quick.", movement cards say "or next turn", once-per-fight cards say so. Short lines use the real power (`{power}`). A test checks this | `tests/suites/test_pt_turns.gd` |
 | Rarity and upgrades | Common, uncommon, rare. Upgraded versions ("Ember Bolt+") via crafting and arena rewards | card rarity, upgrade |
 | Can't play | Unaffordable cards, or ones needing a spent Action, are greyed out with the reason on hover | — |
@@ -197,7 +197,24 @@ Change these in `src/core/combat/enemy_ai.gd`, `data/ai.json` and enemy action d
 | Decoy | Draws enemy attacks | Varies |
 | Taunt (Beacon) | Enemies retarget to the caster | Varies |
 
-Statuses last through the unit's next turn. Change them in `data/stats.json` combat and `data/ui.json` (names and icons).
+**Setups and payoffs (PT Part 7):**
+
+| Status | Comes from | Payoff | Lasts |
+| --- | --- | --- | --- |
+| Wet | Splash, Deluge, Soothing Rain, sprinklers, puddles; Heat melting a Frozen unit | Cold on a Wet unit **Freezes** it; Lightning arcs through it (PT Part 8) | 2 turns |
+| Frozen | Cold on Wet, Freeze cards | Rooted; **Force or Sound shatters it for x1.5** | 1 turn |
+| Burning (status) | Heat hits | 3 damage at the start of each turn; **Force or Motion spreads it** to the tiles around | 2 turns |
+| Rooted | Binding | Gravity's **Crush** deals +50% (PT Part 8) | 1 turn |
+| Poisoned | Poison (PT Part 8), Garrote | 2 damage per stack each turn (stacks to 5, duration doesn't refresh); **Corrosion doubles the stacks**; healing on it is halved | 3 turns |
+| Marked | Light marks (Lantern Mark, Spotlight, Flare Mark), Cognition (PT Part 8) | All damage to it +25% | 1 round |
+| Dazed | Discord, the Daze rider, Sound | Loses its Quick; 20% miss chance | 1 turn |
+| Exposed | Corrosion, Crushing Blow, warding (PT Part 8) | No Magic Resistance; x1.25 from its weaknesses | 1 turn |
+| Shadowed | Vanish, Smoke Pellet, Shadow (PT Part 8) | Can't be targeted from more than 2 tiles away; its attacks count as flanking (ignore cover) | 1 round |
+| Conductive | Lightning, metal props (PT Part 8) | Lightning jumps to and from it | 2 turns |
+
+Every card lists what it **sets up** and **pays off** ("Sets up: Wet. Pays off: Frozen."), shown in its text and used by the deck editor's filters and the arena's card offers.
+
+Statuses last through the unit's next turn unless listed. Change them in `data/stats.json` combat, statusRules and synergyTags, and `data/ui.json` (names and icons).
 
 ## B9. Terrain and hazards
 
@@ -256,6 +273,8 @@ Advanced classes (Class Change at levels 5 and 12): Elementalist, Kinetic Logici
 | Minions | Weak, often one-hit; count as half an enemy | `data/encounters.json` minionWeight |
 | Encounters | Built from templates: Pack, Front and back, Swarm, Healer core, Ambush, Reinforcements, Summoner nest, Hazard lords, Elite escort. Count per week (raised for 2 Actions): 4–5, 5–6, 5–7, 6–7, 6–8 (elite rooms 4, 4–5, 5, 5–6, 6; elites get 1 affix). Smaller parties face fewer, weaker enemies | `data/encounters.json` |
 | Bosses | 5 (Hollow Mascot, Cold Cut, Forge Revenant, Night Ward, Mirror Town), with phases, adds and reinforcements from week 3 | `data/enemies/bosses.json` |
+
+**Variety (PT Part 7):** every normal and elite enemy has **2 to 4 actions** with different shapes (single, line, cone, burst, ring, cross, charge, buff), some leaving statuses on whoever they hit (Wet, Marked, Exposed). 14 new base-Vector enemies (`data/enemies/patch_enemies.json`): Puddle Imp, Frost Fang, Ember Tick, Root Weaver, Spotlight Drone, Acid Drip, Gym Rope, Locker Leaper, Fire Alarm, Mop Golem (elite), Hall Monitor, Rust Bucket, Cinder Swarm, Frost Chorister (elite), palette swaps until there's art. Every elite has a **signature mechanic** by its Vector (Firebrand leaves fire, Permafrost makes you Wet, Juggernaut can't be pushed, Blur moves and attacks, Glare marks, Anchor roots, Rot exposes, Leech heals). Each boss has a new status attack (Foam Flood, Deep Freeze, Slag Spray, Sedative Mist, Spotlight Glare). The new Vectors' enemy families and combo encounter templates come with PT Part 8.
 
 ## B12. The Endless Arena
 
@@ -477,6 +496,5 @@ Change these in `data/story/*.json`, `data/journal.json` and `data/endings.json`
 
 CT is done, with PT Parts 1 and 2 (2 Actions, Quicks, Cantrip, Hold, undo, deck rules) adopted inside it. Next, from `docs/PATCH_1.md`:
 
-- Part 7: status synergies, 80 more cards, 24 more enemies, the Cone Form.
 - Part 8: the Vector expansion, fusion synergy and antagonism, Instability by Magnitude, Techniques.
 - Part 9: point-buy stats.

@@ -235,6 +235,32 @@
             "courage": 0.9
           },
           "damage": 21
+        },
+        {
+          "id": "shove_line",
+          "name": "Shockwave",
+          "form": "line",
+          "magnitude": "minor",
+          "vectors": {
+            "force": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
+        },
+        {
+          "id": "slam",
+          "name": "Slam",
+          "form": "burst",
+          "magnitude": "minor",
+          "vectors": {
+            "force": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
         }
       ],
       "xp": 10,
@@ -356,6 +382,32 @@
             "greed": 0.4
           },
           "damage": 11
+        },
+        {
+          "id": "snare_line",
+          "name": "Snare Line",
+          "form": "line",
+          "magnitude": "minor",
+          "vectors": {
+            "binding": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
+        },
+        {
+          "id": "web",
+          "name": "Web",
+          "form": "burst",
+          "magnitude": "minor",
+          "vectors": {
+            "binding": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
         }
       ],
       "xp": 7,
@@ -441,7 +493,9 @@
       ],
       "xp": 25,
       "money": 12,
-      "sprite": "enemy_varsity_shade"
+      "sprite": "enemy_varsity_shade",
+      "signatureText": "Juggernaut: can't be pushed.",
+      "immovable": true
     }
   ]
 }

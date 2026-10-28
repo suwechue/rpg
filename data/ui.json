@@ -286,6 +286,54 @@
       "text": "Deals -25% damage.",
       "icon": "icon_status_slow",
       "color": "#a0a0a0"
+    },
+    "wet": {
+      "name": "Wet",
+      "text": "Cold freezes it; Lightning arcs through it.",
+      "icon": "icon_status_slow",
+      "color": "#5fa8e8"
+    },
+    "frozen": {
+      "name": "Frozen",
+      "text": "Rooted. Force or Sound shatters it for x1.5.",
+      "icon": "icon_status_root",
+      "color": "#bfe8ff"
+    },
+    "burning": {
+      "name": "Burning",
+      "text": "Takes damage each turn. Force or Motion spreads it.",
+      "icon": "icon_status_haste",
+      "color": "#ff8a3d"
+    },
+    "poisoned": {
+      "name": "Poisoned",
+      "text": "Stacking damage each turn; healing on it is halved.",
+      "icon": "icon_status_slow",
+      "color": "#7bd45f"
+    },
+    "marked": {
+      "name": "Marked",
+      "text": "All damage to it +25%.",
+      "icon": "icon_status_rally",
+      "color": "#f5e27a"
+    },
+    "exposed": {
+      "name": "Exposed",
+      "text": "No resistances; x1.25 from its weaknesses.",
+      "icon": "icon_status_blind",
+      "color": "#e87c7c"
+    },
+    "shadowed": {
+      "name": "Shadowed",
+      "text": "Can't be targeted from more than 2 tiles away; its attacks count as flanking.",
+      "icon": "icon_status_blind",
+      "color": "#6b5a8a"
+    },
+    "conductive": {
+      "name": "Conductive",
+      "text": "Lightning jumps to and from it.",
+      "icon": "icon_status_haste",
+      "color": "#f2e66b"
     }
   },
   "affixes": {

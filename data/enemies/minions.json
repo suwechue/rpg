@@ -38,6 +38,19 @@
             "courage": 0.7
           },
           "damage": 7
+        },
+        {
+          "id": "gust_cone",
+          "name": "Gust",
+          "form": "cone",
+          "magnitude": "minor",
+          "vectors": {
+            "motion": 1
+          },
+          "damage": 4,
+          "profile": {
+            "courage": 0.5
+          }
         }
       ],
       "xp": 2,
@@ -84,6 +97,19 @@
             "courage": 0.7
           },
           "damage": 7
+        },
+        {
+          "id": "acid_cone",
+          "name": "Acid Spray",
+          "form": "cone",
+          "magnitude": "minor",
+          "vectors": {
+            "corrosion": 1
+          },
+          "damage": 4,
+          "profile": {
+            "courage": 0.5
+          }
         }
       ],
       "xp": 2,
@@ -132,6 +158,19 @@
             "courage": 0.7
           },
           "damage": 8
+        },
+        {
+          "id": "frost_cone",
+          "name": "Frost Breath",
+          "form": "cone",
+          "magnitude": "minor",
+          "vectors": {
+            "cold": 1
+          },
+          "damage": 4,
+          "profile": {
+            "courage": 0.5
+          }
         }
       ],
       "xp": 2,
@@ -176,6 +215,19 @@
             "courage": 0.7
           },
           "damage": 7
+        },
+        {
+          "id": "acid_cone",
+          "name": "Acid Spray",
+          "form": "cone",
+          "magnitude": "minor",
+          "vectors": {
+            "corrosion": 1
+          },
+          "damage": 4,
+          "profile": {
+            "courage": 0.5
+          }
         }
       ],
       "xp": 2,
@@ -224,6 +276,19 @@
             "courage": 0.7
           },
           "damage": 7
+        },
+        {
+          "id": "flare_ring",
+          "name": "Flare Ring",
+          "form": "burst",
+          "magnitude": "minor",
+          "vectors": {
+            "heat": 1
+          },
+          "damage": 4,
+          "profile": {
+            "courage": 0.5
+          }
         }
       ],
       "xp": 2,
@@ -270,6 +335,19 @@
             "courage": 0.7
           },
           "damage": 8
+        },
+        {
+          "id": "acid_cone",
+          "name": "Acid Spray",
+          "form": "cone",
+          "magnitude": "minor",
+          "vectors": {
+            "corrosion": 1
+          },
+          "damage": 4,
+          "profile": {
+            "courage": 0.5
+          }
         }
       ],
       "xp": 2,
@@ -313,6 +391,19 @@
             "courage": 0.7
           },
           "damage": 11
+        },
+        {
+          "id": "shove_line",
+          "name": "Shockwave",
+          "form": "line",
+          "magnitude": "minor",
+          "vectors": {
+            "force": 1
+          },
+          "damage": 4,
+          "profile": {
+            "courage": 0.5
+          }
         }
       ],
       "xp": 2,
@@ -359,6 +450,19 @@
             "courage": 0.7
           },
           "damage": 5
+        },
+        {
+          "id": "snare_line",
+          "name": "Snare Line",
+          "form": "line",
+          "magnitude": "minor",
+          "vectors": {
+            "binding": 1
+          },
+          "damage": 4,
+          "profile": {
+            "courage": 0.5
+          }
         }
       ],
       "xp": 2,
@@ -405,6 +509,19 @@
             "courage": 0.7
           },
           "damage": 11
+        },
+        {
+          "id": "glare_cone",
+          "name": "Glare",
+          "form": "cone",
+          "magnitude": "minor",
+          "vectors": {
+            "light": 1
+          },
+          "damage": 4,
+          "profile": {
+            "courage": 0.5
+          }
         }
       ],
       "xp": 2,
@@ -451,6 +568,19 @@
             "courage": 0.7
           },
           "damage": 7
+        },
+        {
+          "id": "gust_cone",
+          "name": "Gust",
+          "form": "cone",
+          "magnitude": "minor",
+          "vectors": {
+            "motion": 1
+          },
+          "damage": 4,
+          "profile": {
+            "courage": 0.5
+          }
         }
       ],
       "xp": 2,

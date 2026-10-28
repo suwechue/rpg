@@ -1,0 +1,354 @@
+{
+  "comment": "PT Part 7: the healer class card pool (rewards for this class and its advanced classes). Every card lists its shape, tags and timing.",
+  "cards": [
+    {
+      "id": "card_soothing_rain",
+      "name": "Soothing Rain",
+      "kind": "spell",
+      "vectors": {
+        "light": 1.0
+      },
+      "form": "burst",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Rain",
+      "text": "Heal allies in a plus shape for 6 and make enemies there Wet.",
+      "vfx": "vfx_light_burst",
+      "sfx": "card_play_light",
+      "tags": {
+        "setsUp": [
+          "wet"
+        ],
+        "paysOff": []
+      },
+      "effects": [
+        {
+          "op": "heal",
+          "amount": 6
+        },
+        {
+          "op": "status_area",
+          "status": "wet",
+          "turns": 2
+        }
+      ],
+      "effectsOnly": true,
+      "targeting": {
+        "type": "any",
+        "range": 3
+      },
+      "area": "plus",
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "pool": "healer",
+      "cost": 3
+    },
+    {
+      "id": "card_lantern_mark",
+      "name": "Lantern Mark",
+      "kind": "spell",
+      "vectors": {
+        "light": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Mark",
+      "text": "Mark an enemy: all damage to it +25% for a round.",
+      "vfx": "vfx_light_bolt",
+      "sfx": "card_play_light",
+      "tags": {
+        "setsUp": [
+          "marked"
+        ],
+        "paysOff": []
+      },
+      "effects": [
+        {
+          "op": "status_target",
+          "status": "marked",
+          "turns": 1
+        }
+      ],
+      "targeting": {
+        "type": "enemy",
+        "range": 5
+      },
+      "effectsOnly": true,
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "pool": "healer",
+      "cost": 1
+    },
+    {
+      "id": "card_restore",
+      "name": "Restore",
+      "kind": "spell",
+      "vectors": {
+        "light": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "standard",
+      "rarity": "uncommon",
+      "short": "Heal 20",
+      "text": "Heal an ally within 3 for 20.",
+      "vfx": "vfx_light_bolt",
+      "sfx": "card_play_light",
+      "tags": {
+        "setsUp": [],
+        "paysOff": []
+      },
+      "effects": [
+        {
+          "op": "heal",
+          "amount": 20
+        }
+      ],
+      "targeting": {
+        "type": "ally",
+        "range": 3,
+        "downed": true
+      },
+      "effectsOnly": true,
+      "upgrade": {
+        "magnitude": "major"
+      },
+      "pool": "healer",
+      "cost": 2
+    },
+    {
+      "id": "card_purify",
+      "name": "Purify",
+      "kind": "spell",
+      "vectors": {
+        "light": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Purify",
+      "text": "Quick. Quick. Remove Burning, Poison and Root from an ally within 3.",
+      "vfx": "vfx_light_bolt",
+      "sfx": "card_play_light",
+      "tags": {
+        "setsUp": [],
+        "paysOff": []
+      },
+      "effects": [
+        {
+          "op": "cleanse",
+          "all": true
+        }
+      ],
+      "targeting": {
+        "type": "ally",
+        "range": 3
+      },
+      "quick": true,
+      "effectsOnly": true,
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "pool": "healer",
+      "cost": 1
+    },
+    {
+      "id": "card_radiant_ward",
+      "name": "Radiant Ward",
+      "kind": "spell",
+      "vectors": {
+        "light": 1.0
+      },
+      "form": "aura",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Shields",
+      "text": "You and adjacent allies gain a 5 Shield.",
+      "vfx": "vfx_light_aura",
+      "sfx": "card_play_light",
+      "tags": {
+        "setsUp": [],
+        "paysOff": []
+      },
+      "effects": [
+        {
+          "op": "halo",
+          "amount": 5
+        }
+      ],
+      "targeting": {
+        "type": "self",
+        "range": 1
+      },
+      "effectsOnly": true,
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "pool": "healer",
+      "cost": 3
+    },
+    {
+      "id": "card_dazzling_flash",
+      "name": "Dazzling Flash",
+      "kind": "spell",
+      "vectors": {
+        "light": 1.0
+      },
+      "form": "burst",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Blind area",
+      "text": "Blind enemies in a plus shape. No damage.",
+      "vfx": "vfx_light_burst",
+      "sfx": "card_play_light",
+      "tags": {
+        "setsUp": [
+          "blind"
+        ],
+        "paysOff": []
+      },
+      "effects": [
+        {
+          "op": "status_area",
+          "status": "blind",
+          "turns": 1
+        }
+      ],
+      "targeting": {
+        "type": "any",
+        "range": 4
+      },
+      "effectsOnly": true,
+      "area": "plus",
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "pool": "healer",
+      "cost": 3
+    },
+    {
+      "id": "card_vigil",
+      "name": "Vigil",
+      "kind": "spell",
+      "vectors": {
+        "light": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Regen 4",
+      "text": "An ally heals 4 at the start of each of their turns for 3 turns.",
+      "vfx": "vfx_light_bolt",
+      "sfx": "card_play_light",
+      "tags": {
+        "setsUp": [],
+        "paysOff": []
+      },
+      "effects": [
+        {
+          "op": "regen",
+          "amount": 4,
+          "turns": 3
+        }
+      ],
+      "targeting": {
+        "type": "ally",
+        "range": 3
+      },
+      "effectsOnly": true,
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "pool": "healer",
+      "cost": 1
+    },
+    {
+      "id": "card_judgment",
+      "name": "Judgment",
+      "kind": "spell",
+      "vectors": {
+        "light": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "standard",
+      "rarity": "common",
+      "short": "Bolt {power}",
+      "text": "A Light Bolt. Marked targets take +25% from it, as from everything.",
+      "vfx": "vfx_light_bolt",
+      "sfx": "card_play_light",
+      "tags": {
+        "setsUp": [],
+        "paysOff": [
+          "marked"
+        ]
+      },
+      "upgrade": {
+        "magnitude": "major"
+      },
+      "pool": "healer",
+      "cost": 2
+    },
+    {
+      "id": "card_shelter",
+      "name": "Shelter",
+      "kind": "spell",
+      "vectors": {
+        "light": 1.0
+      },
+      "form": "shield",
+      "magnitude": "standard",
+      "rarity": "uncommon",
+      "short": "Shield",
+      "text": "A strong Light Shield on an ally.",
+      "vfx": "vfx_light_shield",
+      "sfx": "card_play_light",
+      "tags": {
+        "setsUp": [],
+        "paysOff": []
+      },
+      "upgrade": {
+        "magnitude": "major"
+      },
+      "pool": "healer",
+      "cost": 3
+    },
+    {
+      "id": "card_guardian_angel",
+      "name": "Guardian Angel",
+      "kind": "spell",
+      "vectors": {
+        "light": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "standard",
+      "rarity": "rare",
+      "short": "Revive",
+      "text": "Revive a downed ally within 4 with 15 HP.",
+      "vfx": "vfx_light_bolt",
+      "sfx": "card_play_light",
+      "tags": {
+        "setsUp": [],
+        "paysOff": []
+      },
+      "effects": [
+        {
+          "op": "heal",
+          "amount": 15
+        }
+      ],
+      "targeting": {
+        "type": "ally",
+        "range": 4,
+        "downed": true
+      },
+      "effectsOnly": true,
+      "upgrade": {
+        "magnitude": "major"
+      },
+      "pool": "healer",
+      "cost": 2
+    }
+  ]
+}

@@ -1,0 +1,397 @@
+{
+  "comment": "PT Part 7: status setup and payoff cards for every class.",
+  "cards": [
+    {
+      "id": "card_splash",
+      "name": "Splash",
+      "kind": "spell",
+      "vectors": {
+        "cold": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Wet",
+      "text": "Make an enemy Wet. Cold freezes it; Lightning arcs through it.",
+      "vfx": "vfx_cold_bolt",
+      "sfx": "card_play_cold",
+      "tags": {
+        "setsUp": [
+          "wet"
+        ],
+        "paysOff": []
+      },
+      "effects": [
+        {
+          "op": "status_target",
+          "status": "wet",
+          "turns": 2
+        }
+      ],
+      "targeting": {
+        "type": "enemy",
+        "range": 4
+      },
+      "effectsOnly": true,
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "cost": 1
+    },
+    {
+      "id": "card_acid_spit",
+      "name": "Acid Spit",
+      "kind": "spell",
+      "vectors": {
+        "corrosion": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Bolt {power}",
+      "text": "A Corrosion Bolt that Exposes the target.",
+      "vfx": "vfx_corrosion_bolt",
+      "sfx": "card_play_corrosion",
+      "tags": {
+        "setsUp": [
+          "exposed"
+        ],
+        "paysOff": []
+      },
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "cost": 1
+    },
+    {
+      "id": "card_kindle_cone",
+      "name": "Kindling Breath",
+      "kind": "spell",
+      "vectors": {
+        "heat": 1.0
+      },
+      "form": "cone",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Cone {power}",
+      "text": "A Heat Cone. Sets the targets Burning.",
+      "vfx": "vfx_heat_bolt",
+      "sfx": "card_play_heat",
+      "tags": {
+        "setsUp": [
+          "burning"
+        ],
+        "paysOff": []
+      },
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "cost": 3
+    },
+    {
+      "id": "card_ice_lance",
+      "name": "Ice Lance",
+      "kind": "spell",
+      "vectors": {
+        "cold": 1.0
+      },
+      "form": "line",
+      "magnitude": "standard",
+      "rarity": "uncommon",
+      "short": "Line {power}",
+      "text": "A Cold Line; Wet targets freeze.",
+      "vfx": "vfx_cold_line",
+      "sfx": "card_play_cold",
+      "tags": {
+        "setsUp": [
+          "frozen"
+        ],
+        "paysOff": [
+          "wet"
+        ]
+      },
+      "upgrade": {
+        "magnitude": "major"
+      },
+      "cost": 3
+    },
+    {
+      "id": "card_hammer_drop",
+      "name": "Hammer Drop",
+      "kind": "spell",
+      "vectors": {
+        "force": 1.0
+      },
+      "form": "burst",
+      "magnitude": "standard",
+      "rarity": "uncommon",
+      "short": "Burst {power}",
+      "text": "A Force Burst; shatters the Frozen.",
+      "vfx": "vfx_force_burst",
+      "sfx": "card_play_force",
+      "tags": {
+        "setsUp": [
+          "push"
+        ],
+        "paysOff": [
+          "frozen"
+        ]
+      },
+      "upgrade": {
+        "magnitude": "major"
+      },
+      "cost": 4
+    },
+    {
+      "id": "card_flare_mark",
+      "name": "Flare Mark",
+      "kind": "spell",
+      "vectors": {
+        "light": 1.0
+      },
+      "form": "burst",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Mark area",
+      "text": "Mark every enemy in a plus shape.",
+      "vfx": "vfx_light_burst",
+      "sfx": "card_play_light",
+      "tags": {
+        "setsUp": [
+          "marked"
+        ],
+        "paysOff": []
+      },
+      "effects": [
+        {
+          "op": "status_area",
+          "status": "marked",
+          "turns": 1
+        }
+      ],
+      "targeting": {
+        "type": "any",
+        "range": 4
+      },
+      "effectsOnly": true,
+      "area": "plus",
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "cost": 3
+    },
+    {
+      "id": "card_tar_pit",
+      "name": "Tar Pit",
+      "kind": "spell",
+      "vectors": {
+        "binding": 1.0
+      },
+      "form": "glyph",
+      "magnitude": "standard",
+      "rarity": "common",
+      "short": "Trap",
+      "text": "A sticky Glyph that Roots and Slows.",
+      "vfx": "vfx_binding_glyph",
+      "sfx": "card_play_binding",
+      "tags": {
+        "setsUp": [
+          "rooted",
+          "slow"
+        ],
+        "paysOff": []
+      },
+      "upgrade": {
+        "magnitude": "major"
+      },
+      "cost": 5
+    },
+    {
+      "id": "card_rust_cloud",
+      "name": "Rust Cloud",
+      "kind": "spell",
+      "vectors": {
+        "corrosion": 1.0
+      },
+      "form": "burst",
+      "magnitude": "minor",
+      "rarity": "uncommon",
+      "short": "Burst {power}",
+      "text": "A Corrosion Burst that Exposes and doubles Poison.",
+      "vfx": "vfx_corrosion_burst",
+      "sfx": "card_play_corrosion",
+      "tags": {
+        "setsUp": [
+          "exposed"
+        ],
+        "paysOff": [
+          "poisoned"
+        ]
+      },
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "cost": 3
+    },
+    {
+      "id": "card_blaze_line",
+      "name": "Blaze Line",
+      "kind": "spell",
+      "vectors": {
+        "heat": 1.0
+      },
+      "form": "line",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Line {power}",
+      "text": "A Heat Line. Everything in it Burns.",
+      "vfx": "vfx_heat_line",
+      "sfx": "card_play_heat",
+      "tags": {
+        "setsUp": [
+          "burning"
+        ],
+        "paysOff": []
+      },
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "cost": 2
+    },
+    {
+      "id": "card_updraft",
+      "name": "Updraft",
+      "kind": "spell",
+      "vectors": {
+        "motion": 1.0
+      },
+      "form": "burst",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Burst {power}",
+      "text": "A Motion Burst that throws everyone 1 tile out.",
+      "vfx": "vfx_motion_burst",
+      "sfx": "card_play_motion",
+      "tags": {
+        "setsUp": [
+          "push"
+        ],
+        "paysOff": []
+      },
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "cost": 3
+    },
+    {
+      "id": "card_frost_ring",
+      "name": "Frost Ring",
+      "kind": "spell",
+      "vectors": {
+        "cold": 1.0
+      },
+      "form": "sphere",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Sphere {power}",
+      "text": "A Cold Sphere around you; Wet targets freeze.",
+      "vfx": "vfx_cold_sphere",
+      "sfx": "card_play_cold",
+      "tags": {
+        "setsUp": [
+          "frozen"
+        ],
+        "paysOff": [
+          "wet"
+        ]
+      },
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "cost": 3
+    },
+    {
+      "id": "card_ember_storm",
+      "name": "Ember Storm",
+      "kind": "spell",
+      "vectors": {
+        "heat": 1.0
+      },
+      "form": "burst",
+      "magnitude": "major",
+      "rarity": "rare",
+      "short": "Burst {power}",
+      "text": "A Major Heat Burst.",
+      "vfx": "vfx_heat_burst",
+      "sfx": "card_play_heat",
+      "tags": {
+        "setsUp": [
+          "burning"
+        ],
+        "paysOff": []
+      },
+      "upgrade": {
+        "magnitude": "major"
+      },
+      "cost": 6
+    },
+    {
+      "id": "card_glare",
+      "name": "Glare",
+      "kind": "spell",
+      "vectors": {
+        "light": 1.0
+      },
+      "form": "cone",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Cone {power}",
+      "text": "A Light Cone that Blinds.",
+      "vfx": "vfx_light_bolt",
+      "sfx": "card_play_light",
+      "tags": {
+        "setsUp": [
+          "blind"
+        ],
+        "paysOff": []
+      },
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "cost": 3
+    },
+    {
+      "id": "card_steam_vent",
+      "name": "Steam Vent",
+      "kind": "spell",
+      "vectors": {
+        "heat": 1.0
+      },
+      "form": "burst",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Burst {power}",
+      "text": "Heat that leaves enemies Wet as the steam settles.",
+      "vfx": "vfx_heat_burst",
+      "sfx": "card_play_heat",
+      "tags": {
+        "setsUp": [
+          "wet",
+          "burning"
+        ],
+        "paysOff": []
+      },
+      "effects": [
+        {
+          "op": "status_area",
+          "status": "wet",
+          "turns": 1
+        }
+      ],
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "cost": 3
+    }
+  ]
+}

@@ -169,6 +169,32 @@
             "curiosity": 0.8
           },
           "damage": 11
+        },
+        {
+          "id": "flare_ring",
+          "name": "Flare Ring",
+          "form": "burst",
+          "magnitude": "minor",
+          "vectors": {
+            "heat": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
+        },
+        {
+          "id": "fire_spit",
+          "name": "Fire Spit",
+          "form": "cone",
+          "magnitude": "minor",
+          "vectors": {
+            "heat": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
         }
       ],
       "xp": 8,
@@ -222,6 +248,32 @@
             "courage": 0.7
           },
           "damage": 21
+        },
+        {
+          "id": "shove_line",
+          "name": "Shockwave",
+          "form": "line",
+          "magnitude": "minor",
+          "vectors": {
+            "force": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
+        },
+        {
+          "id": "slam",
+          "name": "Slam",
+          "form": "burst",
+          "magnitude": "minor",
+          "vectors": {
+            "force": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
         }
       ],
       "xp": 12,
@@ -303,7 +355,9 @@
       ],
       "xp": 36,
       "money": 16,
-      "sprite": "enemy_foreman_ghost"
+      "sprite": "enemy_foreman_ghost",
+      "signatureText": "Firebrand: leaves fire behind it.",
+      "trail": "burning"
     }
   ]
 }

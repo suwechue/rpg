@@ -1,0 +1,394 @@
+{
+  "comment": "PT Part 7: the rogue class card pool (rewards for this class and its advanced classes). Every card lists its shape, tags and timing.",
+  "cards": [
+    {
+      "id": "card_knife_fan",
+      "name": "Knife Fan",
+      "kind": "spell",
+      "vectors": {
+        "motion": 1.0
+      },
+      "form": "cone",
+      "magnitude": "minor",
+      "rarity": "common",
+      "short": "Cone {power}",
+      "text": "A Cone of throwing knives.",
+      "vfx": "vfx_motion_bolt",
+      "sfx": "card_play_motion",
+      "tags": {
+        "setsUp": [
+          "push"
+        ],
+        "paysOff": []
+      },
+      "upgrade": {
+        "magnitude": "standard"
+      },
+      "pool": "rogue",
+      "cost": 3
+    },
+    {
+      "id": "card_hamstring",
+      "name": "Hamstring",
+      "kind": "basic",
+      "rarity": "common",
+      "cost": 0,
+      "short": "Hit+slow",
+      "text": "Quick. A quick Strike (DEX) that Slows.",
+      "action": "effects",
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "strike_x",
+          "stat": "dex",
+          "mult": 0.8,
+          "status": "slow",
+          "turns": 1
+        }
+      ],
+      "shape": "single",
+      "tags": {
+        "setsUp": [
+          "slow"
+        ],
+        "paysOff": []
+      },
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "quick": true,
+      "pool": "rogue"
+    },
+    {
+      "id": "card_vanish",
+      "name": "Vanish",
+      "kind": "basic",
+      "rarity": "common",
+      "cost": 1,
+      "short": "Vanish",
+      "text": "Quick. Become Shadowed until your next turn: can't be targeted from more than 2 tiles, and your attacks count as flanking.",
+      "action": "effects",
+      "targeting": {
+        "type": "self",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "status_self",
+          "status": "shadowed",
+          "turns": 2
+        }
+      ],
+      "shape": "self",
+      "tags": {
+        "setsUp": [
+          "shadowed"
+        ],
+        "paysOff": []
+      },
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "quick": true,
+      "pool": "rogue"
+    },
+    {
+      "id": "card_ricochet",
+      "name": "Ricochet",
+      "kind": "basic",
+      "rarity": "common",
+      "cost": 1,
+      "short": "Bounce",
+      "text": "Throw (DEX) at an enemy within 4; it bounces to a second enemy within 2.",
+      "action": "effects",
+      "targeting": {
+        "type": "enemy",
+        "range": 4
+      },
+      "effects": [
+        {
+          "op": "strike_x",
+          "pattern": "twin",
+          "stat": "dex",
+          "mult": 0.9
+        }
+      ],
+      "shape": "single",
+      "tags": {
+        "setsUp": [],
+        "paysOff": []
+      },
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "pool": "rogue"
+    },
+    {
+      "id": "card_smoke_pellet",
+      "name": "Smoke Pellet",
+      "kind": "basic",
+      "rarity": "common",
+      "cost": 1,
+      "short": "Smoke",
+      "text": "You and adjacent allies become Shadowed until your next turn.",
+      "action": "effects",
+      "targeting": {
+        "type": "self",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "status_self",
+          "status": "shadowed",
+          "turns": 2,
+          "adjacent": true
+        }
+      ],
+      "shape": "plus_self",
+      "tags": {
+        "setsUp": [
+          "shadowed"
+        ],
+        "paysOff": []
+      },
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "pool": "rogue"
+    },
+    {
+      "id": "card_garrote",
+      "name": "Garrote",
+      "kind": "basic",
+      "rarity": "uncommon",
+      "cost": 1,
+      "short": "Choke",
+      "text": "From behind: Root the target and Poison it.",
+      "action": "effects",
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "strike_x",
+          "stat": "dex",
+          "mult": 0.6,
+          "status": "poisoned"
+        },
+        {
+          "op": "pull_root",
+          "turns": 1
+        }
+      ],
+      "shape": "single",
+      "tags": {
+        "setsUp": [
+          "rooted",
+          "poisoned"
+        ],
+        "paysOff": []
+      },
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "pool": "rogue"
+    },
+    {
+      "id": "card_pickpocket",
+      "name": "Pickpocket",
+      "kind": "basic",
+      "rarity": "common",
+      "cost": 0,
+      "short": "Steal",
+      "text": "Quick. Strip an adjacent enemy's shield and buffs.",
+      "action": "effects",
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "strip"
+        }
+      ],
+      "shape": "single",
+      "tags": {
+        "setsUp": [],
+        "paysOff": []
+      },
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "quick": true,
+      "pool": "rogue"
+    },
+    {
+      "id": "card_backstab",
+      "name": "Backstab",
+      "kind": "basic",
+      "rarity": "common",
+      "cost": 1,
+      "short": "Stab",
+      "text": "A precise hit (DEX x1.4). From behind it also flanks, and Marked targets take +25%.",
+      "action": "effects",
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "strike_x",
+          "stat": "dex",
+          "mult": 1.4
+        }
+      ],
+      "shape": "single",
+      "tags": {
+        "setsUp": [],
+        "paysOff": [
+          "marked",
+          "rooted"
+        ]
+      },
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "pool": "rogue"
+    },
+    {
+      "id": "card_dirty_trick",
+      "name": "Dirty Trick",
+      "kind": "basic",
+      "rarity": "common",
+      "cost": 0,
+      "short": "Blind+mark",
+      "text": "Quick. Blind an adjacent enemy and Mark it.",
+      "action": "effects",
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "status_target",
+          "status": "marked",
+          "turns": 1
+        },
+        {
+          "op": "blind_adjacent",
+          "turns": 1
+        }
+      ],
+      "shape": "single",
+      "tags": {
+        "setsUp": [
+          "marked",
+          "blind"
+        ],
+        "paysOff": []
+      },
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "quick": true,
+      "pool": "rogue"
+    },
+    {
+      "id": "card_tumble",
+      "name": "Tumble",
+      "kind": "basic",
+      "rarity": "common",
+      "cost": 0,
+      "short": "Tumble",
+      "text": "Quick. A free move of 2 tiles.",
+      "action": "effects",
+      "targeting": {
+        "type": "self",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "free_move",
+          "tiles": 2
+        }
+      ],
+      "shape": "self",
+      "tags": {
+        "setsUp": [],
+        "paysOff": []
+      },
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "quick": true,
+      "moves": true,
+      "pool": "rogue"
+    },
+    {
+      "id": "card_flurry",
+      "name": "Flurry",
+      "kind": "basic",
+      "rarity": "rare",
+      "cost": 2,
+      "short": "3 stabs",
+      "text": "Three quick stabs (DEX x0.6 each).",
+      "action": "effects",
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "strike_x",
+          "stat": "dex",
+          "mult": 0.6
+        },
+        {
+          "op": "strike_x",
+          "stat": "dex",
+          "mult": 0.6
+        },
+        {
+          "op": "strike_x",
+          "stat": "dex",
+          "mult": 0.6
+        }
+      ],
+      "shape": "single",
+      "tags": {
+        "setsUp": [],
+        "paysOff": []
+      },
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "pool": "rogue"
+    },
+    {
+      "id": "card_caltrops",
+      "name": "Caltrops",
+      "kind": "basic",
+      "rarity": "common",
+      "cost": 1,
+      "short": "Slow cone",
+      "text": "Every enemy in a cone in front of you is Slowed.",
+      "action": "effects",
+      "targeting": {
+        "type": "dir",
+        "range": 3
+      },
+      "effects": [
+        {
+          "op": "status_area",
+          "status": "slow",
+          "turns": 1
+        }
+      ],
+      "shape": "cone",
+      "tags": {
+        "setsUp": [
+          "slow"
+        ],
+        "paysOff": []
+      },
+      "vfx": "vfx_basic_effect",
+      "sfx": "card_play_basic",
+      "pool": "rogue",
+      "area": "cone"
+    }
+  ]
+}

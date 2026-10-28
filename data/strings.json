@@ -670,6 +670,8 @@
     "arena.perk_pick": "Pick a perk for someone (once per checkpoint)",
     "arena.score_cards": "Cards picked: %s",
     "arena.score_picks": "Perks taken: %s",
-    "arena.score_highest_hit": "Highest hit: %d"
+    "arena.score_highest_hit": "Highest hit: %d",
+    "card.sets_up": "Sets up: %s.",
+    "card.pays_off": "Pays off: %s."
   }
 }

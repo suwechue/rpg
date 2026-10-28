@@ -271,8 +271,8 @@ func test_tier3_cards() -> void:
 
 func test_effect_ops_are_all_used() -> void:
 	var used := {}
-	for key in ["cards/vector_cards", "cards/basic_cards", "cards/tier3_cards", "cards/class_cards"]:
-		for c in db()[key]["cards"]:
+	for c in DT.records_under(db(), "cards/", "cards"):
+		if true:
 			for e in c.get("effects", []):
 				used[str(e["op"])] = true
 	for op in Effects.OPS:

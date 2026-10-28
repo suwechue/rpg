@@ -6,7 +6,7 @@
     "tieBreak": "axisOrder"
   },
   "forms": {
-    "axes": ["bolt", "burst", "shield", "weapon_infusion", "line", "sphere", "projectile", "touch", "aura", "construct", "glyph"],
+    "axes": ["bolt", "burst", "shield", "weapon_infusion", "line", "sphere", "projectile", "touch", "aura", "construct", "glyph", "cone"],
     "signed": false
   },
   "stats": {

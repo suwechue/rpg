@@ -114,6 +114,19 @@
             "courage": 0.9
           },
           "damage": 32
+        },
+        {
+          "id": "fire_spit",
+          "name": "Fire Spit",
+          "form": "cone",
+          "magnitude": "minor",
+          "vectors": {
+            "heat": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
         }
       ],
       "xp": 8,
@@ -235,6 +248,32 @@
             "courage": 0.3
           },
           "damage": 11
+        },
+        {
+          "id": "acid_cone",
+          "name": "Acid Spray",
+          "form": "cone",
+          "magnitude": "minor",
+          "vectors": {
+            "corrosion": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
+        },
+        {
+          "id": "rust_burst",
+          "name": "Rust Burst",
+          "form": "burst",
+          "magnitude": "minor",
+          "vectors": {
+            "corrosion": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
         }
       ],
       "xp": 12,
@@ -289,6 +328,32 @@
             "courage": 0.8
           },
           "damage": 21
+        },
+        {
+          "id": "shove_line",
+          "name": "Shockwave",
+          "form": "line",
+          "magnitude": "minor",
+          "vectors": {
+            "force": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
+        },
+        {
+          "id": "slam",
+          "name": "Slam",
+          "form": "burst",
+          "magnitude": "minor",
+          "vectors": {
+            "force": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
         }
       ],
       "xp": 12,
@@ -339,6 +404,32 @@
             "courage": 0.8
           },
           "damage": 20
+        },
+        {
+          "id": "shove_line",
+          "name": "Shockwave",
+          "form": "line",
+          "magnitude": "minor",
+          "vectors": {
+            "force": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
+        },
+        {
+          "id": "slam",
+          "name": "Slam",
+          "form": "burst",
+          "magnitude": "minor",
+          "vectors": {
+            "force": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
         }
       ],
       "xp": 10,
@@ -393,6 +484,32 @@
             "pride": 0.8
           },
           "damage": 42
+        },
+        {
+          "id": "glare_cone",
+          "name": "Glare",
+          "form": "cone",
+          "magnitude": "minor",
+          "vectors": {
+            "light": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
+        },
+        {
+          "id": "sunburst",
+          "name": "Sunburst",
+          "form": "burst",
+          "magnitude": "minor",
+          "vectors": {
+            "light": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
         }
       ],
       "xp": 10,
@@ -447,6 +564,32 @@
             "courage": 0.8
           },
           "damage": 14
+        },
+        {
+          "id": "acid_cone",
+          "name": "Acid Spray",
+          "form": "cone",
+          "magnitude": "minor",
+          "vectors": {
+            "corrosion": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
+        },
+        {
+          "id": "rust_burst",
+          "name": "Rust Burst",
+          "form": "burst",
+          "magnitude": "minor",
+          "vectors": {
+            "corrosion": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
         }
       ],
       "xp": 10,
@@ -499,6 +642,32 @@
             "courage": 0.8
           },
           "damage": 16
+        },
+        {
+          "id": "flare_ring",
+          "name": "Flare Ring",
+          "form": "burst",
+          "magnitude": "minor",
+          "vectors": {
+            "heat": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
+        },
+        {
+          "id": "fire_spit",
+          "name": "Fire Spit",
+          "form": "cone",
+          "magnitude": "minor",
+          "vectors": {
+            "heat": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
         }
       ],
       "xp": 11,
@@ -548,6 +717,32 @@
             "curiosity": 0.6
           },
           "damage": 20
+        },
+        {
+          "id": "warp_line",
+          "name": "Warp",
+          "form": "line",
+          "magnitude": "minor",
+          "vectors": {
+            "transmutation": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
+        },
+        {
+          "id": "melt",
+          "name": "Melt",
+          "form": "burst",
+          "magnitude": "minor",
+          "vectors": {
+            "transmutation": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
         }
       ],
       "xp": 12,
@@ -601,6 +796,32 @@
             "courage": 0.8
           },
           "damage": 11
+        },
+        {
+          "id": "gust_cone",
+          "name": "Gust",
+          "form": "cone",
+          "magnitude": "minor",
+          "vectors": {
+            "motion": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
+        },
+        {
+          "id": "dart",
+          "name": "Dart",
+          "form": "line",
+          "magnitude": "minor",
+          "vectors": {
+            "motion": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
         }
       ],
       "xp": 10,
@@ -655,6 +876,32 @@
             "courage": 0.8
           },
           "damage": 21
+        },
+        {
+          "id": "snare_line",
+          "name": "Snare Line",
+          "form": "line",
+          "magnitude": "minor",
+          "vectors": {
+            "binding": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
+        },
+        {
+          "id": "web",
+          "name": "Web",
+          "form": "burst",
+          "magnitude": "minor",
+          "vectors": {
+            "binding": 1
+          },
+          "damage": 8,
+          "profile": {
+            "courage": 0.5
+          }
         }
       ],
       "xp": 14,

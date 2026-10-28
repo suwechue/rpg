@@ -143,7 +143,7 @@ func test_weeks_content() -> void:
 			normals += 1
 		elif e.get("tier", "") == "elite":
 			elites += 1
-	check(normals >= 15 and elites == 5, "at least 15 normal and 5 elite enemy types (%d, %d)" % [normals, elites])
+	check(normals >= 15 and elites >= 5, "at least 15 normal and 5 elite enemy types (%d, %d)" % [normals, elites])
 
 
 func test_main_story_beats() -> void:

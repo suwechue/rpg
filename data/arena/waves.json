@@ -93,7 +93,8 @@
         "uncommon": 4,
         "rare": 4
       }
-    }
+    },
+    "synergyWeight": 1.5
   },
   "checkpointPick": {
     "comment": "PT Part 6: every checkpoint, one party member picks 1 of 'choices' perks (Techniques once PT Part 8 lands).",

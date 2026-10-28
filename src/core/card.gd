@@ -192,6 +192,21 @@ static func heals(card: Dictionary) -> bool:
 
 ## Short description for tooltips and the card UI.
 static func describe(db: Dictionary, card: Dictionary) -> String:
+	return (_describe(db, card) + " " + tag_line(db, card)).strip_edges()
+
+
+## "Sets up: Wet. Pays off: Frozen." (PT Part 7), or "".
+static func tag_line(db: Dictionary, card: Dictionary) -> String:
+	var tg := tags(db, card)
+	var parts: Array = []
+	if not tg["setsUp"].is_empty():
+		parts.append(Str.t(db, "card.sets_up") % ", ".join(PackedStringArray(tg["setsUp"])))
+	if not tg["paysOff"].is_empty():
+		parts.append(Str.t(db, "card.pays_off") % ", ".join(PackedStringArray(tg["paysOff"])))
+	return " ".join(PackedStringArray(parts))
+
+
+static func _describe(db: Dictionary, card: Dictionary) -> String:
 	if not is_spell(card):
 		return str(card.get("text", ""))
 	var form_rec := DT.record(db, "forms", str(card.get("form", "")))
@@ -208,6 +223,24 @@ static func describe(db: Dictionary, card: Dictionary) -> String:
 	if not card.get("properties", []).is_empty():
 		text += Str.t(db, "card.properties") % ", ".join(PackedStringArray(card["properties"]))
 	return text.strip_edges()
+
+
+## What a card sets up and pays off (PT Part 7): its Vectors' synergy tags
+## (data/stats.json synergyTags) plus the card's own "tags".
+static func tags(db: Dictionary, card: Dictionary) -> Dictionary:
+	var up := {}
+	var off := {}
+	var table: Dictionary = db.get("stats", {}).get("synergyTags", {})
+	for axis in card.get("vectors", {}).keys() + card.get("infuse", {}).keys():
+		for t in table.get(str(axis), {}).get("setsUp", []):
+			up[str(t)] = true
+		for t in table.get(str(axis), {}).get("paysOff", []):
+			off[str(t)] = true
+	for t in card.get("tags", {}).get("setsUp", []):
+		up[str(t)] = true
+	for t in card.get("tags", {}).get("paysOff", []):
+		off[str(t)] = true
+	return { "setsUp": up.keys(), "paysOff": off.keys() }
 
 
 ## "Plus shape, range 4." for a Form at a Magnitude (PT Part 3).

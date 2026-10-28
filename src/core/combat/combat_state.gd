@@ -302,7 +302,7 @@ func occupied(except: UnitScript = null) -> Dictionary:
 ## Status ids on a unit for display, in a fixed order (icons and names in data/ui.json).
 func status_list(u: UnitScript) -> Array:
 	var out: Array = []
-	for s in ["root", "slow", "blind", "haste", "rally"]:
+	for s in ["root", "slow", "blind", "haste", "rally", "wet", "frozen", "burning", "poisoned", "marked", "exposed", "shadowed", "conductive", "dazed", "weakened"]:
 		if u.statuses.has(s):
 			out.append(s)
 	if not u.infusion.is_empty():
@@ -544,6 +544,10 @@ func _start_turn(u: UnitScript) -> void:
 	u.turns_taken += 1
 	u.last_turn_round = round_num
 	u.actions_left = 1 if u.statuses.has("encore") else actions_per_turn()
+	if u.statuses.has("burning") and u.alive():
+		_damage(u, int(status_rules().get("burning", {}).get("damage", 3)), null, "heat", "burn")
+	if u.statuses.has("poisoned") and u.alive():
+		_damage(u, int(status_rules().get("poisoned", {}).get("damagePerStack", 2)) * int(u.links.get("poison", "1")), null, "poison", "poison")
 	if u.statuses.has("lingering") and u.links.has("linger"):
 		_damage(u, int(str(u.links["linger"])), null, "", "lingering")
 		u.links.erase("linger")
@@ -631,7 +635,8 @@ func _end_cleanup(u: UnitScript) -> void:
 	u.statuses.erase("encore")
 	u.links.erase("taunted_by")
 	u.statuses.erase("free_move")
-	for s in ["slow", "root", "blind", "haste", "rally", "rime", "tether", "pact", "regen", "taunting", "haste_full", "sanctuary", "intercept", "slowed2", "dazed", "weakened"]:
+	for s in ["slow", "root", "blind", "haste", "rally", "rime", "tether", "pact", "regen", "taunting", "haste_full", "sanctuary", "intercept", "slowed2", "dazed", "weakened",
+			"wet", "frozen", "burning", "marked", "exposed", "shadowed", "conductive", "poisoned"]:
 		if u.statuses.has(s):
 			u.statuses[s] = int(u.statuses[s]) - 1
 			if int(u.statuses[s]) <= 0:
@@ -847,6 +852,8 @@ func _leave_trail(u: UnitScript, cells: Array) -> void:
 		match kind:
 			"burning":
 				grid.burning[cell] = 2
+			"toxic":
+				grid.toxic[cell] = 3
 			"ice":
 				if grid.get_terrain(cell) == GridScript.FLOOR:
 					grid.set_terrain(cell, GridScript.ICE)
@@ -1004,6 +1011,10 @@ func _generic_targets(u: UnitScript, tg: Dictionary) -> Array:
 
 func _spell_targets(u: UnitScript, form: Dictionary, heals: bool) -> Array:
 	var cells := Forms.valid_targets(grid, form, u.cell, occupied(), sight_blockers())
+	var far := int(status_rules().get("shadowed", {}).get("maxTargetRange", 2))
+	cells = cells.filter(func(c: Vector2i) -> bool:
+		var o := unit_at(c)
+		return o == null or not o.statuses.has("shadowed") or o.team == u.team or GridScript.manhattan(c, u.cell) <= far)
 	var kind := str(form.get("target", "any"))
 	if kind == "ally":
 		var out: Array = []
@@ -1085,6 +1096,100 @@ func play_card(u: UnitScript, hand_index: int, target: Vector2i) -> bool:
 	return true
 
 
+func status_rules() -> Dictionary:
+	return db.get("stats", {}).get("statusRules", {})
+
+
+## PT Part 7 payoffs (multiplier on a hit): Frozen shatters to Force/Sound,
+## Marked takes +25%, Exposed takes more from its weaknesses and ignores its
+## Magic Resistance, Rooted takes Gravity's Crush.
+func _status_payoff(t: UnitScript, spec: Dictionary) -> float:
+	var sr := status_rules()
+	var m := 1.0
+	var vecs: Dictionary = spec.get("vectors", {})
+	if t.statuses.has("frozen"):
+		for v in sr.get("frozen", {}).get("shatterBy", []):
+			if vecs.has(v):
+				m *= float(sr["frozen"].get("shatterMul", 1.5))
+				break
+	if t.statuses.has("root"):
+		for v in sr.get("rooted", {}).get("crushBy", []):
+			if vecs.has(v):
+				m *= float(sr["rooted"].get("crushMul", 1.5))
+				break
+	if t.statuses.has("marked"):
+		m *= float(sr.get("marked", {}).get("damageMul", 1.25))
+	if t.statuses.has("exposed"):
+		if Res.contest_mult(db, vecs, t) > 1.05:
+			m *= float(sr.get("exposed", {}).get("weaknessMul", 1.25))
+		m /= maxf(0.4, 1.0 - Res.magic_resist_pct(db, t)) if str(spec.get("kind", "spell")) != "strike" else 1.0
+	return m
+
+
+## Put a status on a unit for its rule's turns (Poisoned stacks instead).
+func add_status(t: UnitScript, status: String, turns: int = -1) -> void:
+	if t == null or t.is_prop() or not t.alive():
+		return
+	var rule: Dictionary = status_rules().get(status, {})
+	if status == "poisoned":
+		var stacks := mini(int(t.links.get("poison", "0")) + 1, int(rule.get("maxStacks", 5)))
+		t.links["poison"] = str(stacks)
+		if not t.statuses.has("poisoned"):
+			t.statuses["poisoned"] = int(rule.get("turns", 3))
+	else:
+		t.statuses[status] = maxi(int(t.statuses.get(status, 0)), turns if turns > 0 else int(rule.get("turns", 1)))
+	if status == "frozen":
+		t.statuses["root"] = maxi(int(t.statuses.get("root", 0)), int(rule.get("turns", 1)))
+	_emit({ "t": "status", "unit": t.id, "status": status })
+
+
+## PT Part 7 setups after a hit: Heat burns (and melts Frozen into Wet), Cold
+## freezes the Wet, Force and Motion spread Burning, Corrosion exposes and
+## doubles Poison, Frozen shatters.
+func _status_setups(u: UnitScript, spec: Dictionary, hit: Array) -> void:
+	var sr := status_rules()
+	var v: Dictionary = spec.get("vectors", {})
+	for t in hit:
+		if not t.alive() or t.is_prop():
+			continue
+		if v.has("heat"):
+			if t.statuses.has("frozen"):
+				t.statuses.erase("frozen")
+				t.statuses.erase("root")
+				add_status(t, "wet")
+			else:
+				add_status(t, "burning")
+		if v.has("cold") and t.statuses.has("wet"):
+			t.statuses.erase("wet")
+			add_status(t, "frozen")
+		if t.statuses.has("burning"):
+			for by in sr.get("burning", {}).get("spreadBy", []):
+				if v.has(by):
+					for d in GridScript.DIRS:
+						if grid.walkable_terrain(t.cell + d):
+							grid.burning[t.cell + d] = int(Res.combat_cfg(db).get("burnTurns", 2))
+					_emit({ "t": "tiles", "kind": "burning", "cells": GridScript.DIRS.map(func(d: Vector2i) -> Vector2i: return t.cell + d) })
+					break
+		if t.statuses.has("frozen"):
+			for by in sr.get("frozen", {}).get("shatterBy", []):
+				if v.has(by):
+					t.statuses.erase("frozen")
+					t.statuses.erase("root")
+					break
+		if v.has("corrosion"):
+			add_status(t, "exposed")
+			if t.statuses.has("poisoned"):
+				t.links["poison"] = str(mini(int(t.links.get("poison", "1")) * 2, int(sr.get("poisoned", {}).get("maxStacks", 5)) * 2))
+		if v.has("poison"):
+			add_status(t, "poisoned")
+		if v.has("sound"):
+			add_status(t, "dazed")
+		if v.has("lightning"):
+			add_status(t, "conductive")
+		if v.has("light") and bool(spec.get("marks", false)):
+			add_status(t, "marked")
+
+
 ## Riders (PT Part 5) on whoever the card hit: Slow, Push, Daze, Lingering,
 ## Weaken, Twin and Extended. Widen changes the footprint (see _widen).
 func _apply_riders(u: UnitScript, card: Dictionary, target: Vector2i, cells: Array) -> void:
@@ -1157,8 +1262,8 @@ func _effects_script() -> GDScript:
 
 ## The cells a card covers at a target (its Form's footprint, or the target tile).
 func effect_cells(u: UnitScript, card: Dictionary, target: Vector2i) -> Array:
-	if card.has("area"):
-		var form := { "footprint": str(card["area"]), "range": int(card.get("targeting", {}).get("range", 4)) }
+	if card.has("area") or str(card.get("shape", "")) in ["cone", "cleave"]:
+		var form := { "footprint": str(card.get("area", card.get("shape", ""))), "range": int(card.get("targeting", {}).get("range", 4)) }
 		return Forms.footprint(grid, form, u.cell, target, occupied())
 	if CardRules.is_spell(card):
 		return Forms.footprint(grid, _spell_spec(u, card)["form"], u.cell, target, occupied())
@@ -1405,6 +1510,7 @@ func _expected_hit(u: UnitScript, t: UnitScript, spec: Dictionary) -> float:
 		area *= float(Res.combat_cfg(db).get("encoreMul", 0.5))
 	if u.statuses.has("weakened"):
 		area *= 1.0 - float(Res.combat_cfg(db).get("weakenPct", 0.25))
+	area *= _status_payoff(t, spec)
 	# Arena mutators: "Cold is stronger" and friends.
 	for axis in spec.get("vectors", {}):
 		area *= float(mutator_rules().get("vectorDamage", {}).get(str(axis), 1.0))
@@ -1505,6 +1611,9 @@ func cover_piece(from: Vector2i, cell: Vector2i) -> UnitScript:
 ## Damage multiplier from cover: x0.5 ranged and area, x0.75 melee, 1 without.
 func cover_mul(from: Vector2i, cell: Vector2i, ranged: bool) -> float:
 	if from == cell or cover_piece(from, cell) == null:
+		return 1.0
+	var att := unit_at(from)
+	if att != null and att.statuses.has("shadowed"):
 		return 1.0
 	return float(cover_cfg().get("rangedMul" if ranged else "meleeMul", 0.5 if ranged else 0.75))
 
@@ -1758,7 +1867,8 @@ func parried(u: UnitScript, t: UnitScript) -> bool:
 		return false
 	t.statuses.erase("parry")
 	_emit({ "t": "log", "text": Str.t(db, "combat_state.parries_and_strikes_back") % t.name })
-	var dmg := Res.finalize(db, _expected_strike(t, u, { "stat": "str", "mult": 1.0 }), t, rng)
+	var dmg := Res.finalize(db, _expected_strike(t, u, { "stat": "str", "mult": float(str(t.links.get("parry_mult", "1.0"))) }), t, rng)
+	t.links.erase("parry_mult")
 	_damage(u, int(dmg["amount"]), t, "", "hit", bool(dmg["crit"]), bool(dmg.get("high", false)))
 	return true
 
@@ -1807,6 +1917,7 @@ func _tick_aura(u: UnitScript, aura: Dictionary) -> void:
 
 ## Positional Vector effects (DESIGN.md Section 9, "Vector effects on the grid").
 func _apply_vector_effects(u: UnitScript, spec: Dictionary, cells: Array, hit: Array) -> void:
+	_status_setups(u, spec, hit)
 	var cfg := Res.combat_cfg(db)
 	var v: Dictionary = spec["vectors"]
 	var power := float(spec["power"])
@@ -1871,6 +1982,9 @@ func _apply_vector_effects(u: UnitScript, spec: Dictionary, cells: Array, hit: A
 
 ## Push (or pull) a unit. Collisions with walls, edges or units deal bonus damage.
 func _push(u: UnitScript, t: UnitScript, dir: Vector2i, steps: int, collide: bool = true) -> void:
+	if bool(t.source.get("immovable", false)) and t != u:
+		_emit({ "t": "log", "text": Str.t(db, "combat_state.braces_and_doesn_t_budge") % t.name })
+		return
 	if t.statuses.has("brace") and t != u:
 		_emit({ "t": "log", "text": Str.t(db, "combat_state.braces_and_doesn_t_budge") % t.name })
 		return
@@ -2044,6 +2158,8 @@ func _on_enemy_death(t: UnitScript) -> void:
 func _heal(u: UnitScript, t: UnitScript, amount: int) -> void:
 	if t.dead or t.is_prop():
 		return
+	if t.statuses.has("poisoned"):
+		amount = maxi(1, roundi(float(amount) * float(status_rules().get("poisoned", {}).get("healMul", 0.5))))
 	var revived := false
 	if t.downed:
 		t.downed = false
@@ -3025,6 +3141,9 @@ func _resolve_locked(u: UnitScript, it: Dictionary) -> void:
 			hit.append(t)
 	if not bool(spec["heal"]):
 		_apply_vector_effects(u, spec, cells, hit)
+		if act.has("statusAfter"):
+			for t in hit:
+				add_status(t, str(act["statusAfter"]))
 	if bool(act.get("selfDestruct", false)) and u.alive():
 		u.hp = 0
 		_on_zero_hp(u, null)

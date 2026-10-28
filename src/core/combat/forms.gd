@@ -61,6 +61,22 @@ static func footprint(grid: GridScript, form: Dictionary, caster: Vector2i, targ
 				if occupied.has(c):
 					out.append(c)
 					break
+		"cone":
+			# PT Part 7: widening 1-3-5 tiles over 3 rows from the caster.
+			var cdir := direction_to(caster, target)
+			var side := Vector2i(cdir.y, cdir.x)
+			for depth in range(1, 4):
+				for w in range(-(depth - 1), depth):
+					var c: Vector2i = caster + cdir * depth + side * w
+					if grid.in_bounds(c) and grid.get_terrain(c) != GridScript.WALL:
+						out.append(c)
+		"cleave":
+			var kdir := direction_to(caster, target)
+			var kside := Vector2i(kdir.y, kdir.x)
+			for w in [-1, 0, 1]:
+				var c: Vector2i = caster + kdir + kside * w
+				if grid.in_bounds(c):
+					out.append(c)
 		"line":
 			var dir := direction_to(caster, target)
 			for step in range(1, int(form.get("range", 4)) + 1):

@@ -184,7 +184,7 @@ func _deck_editor() -> void:
 		mix.append("%s %d" % [str(axis).capitalize(), int(st["mix"][axis])])
 	text(Strings.t("workbench.deck_stats") % [", ".join(PackedStringArray(curve)), ", ".join(PackedStringArray(mix)), int(st["quick"])], UiTheme.DIM)
 	var fr := row()
-	for f in ["", "quick"] + GameState.player.get("knownVectors", []):
+	for f in ["", "quick"] + GameState.player.get("knownVectors", []) + ["burning", "wet", "frozen", "marked"]:
 		var key := str(f)
 		var b := UiTheme.button(Strings.t("workbench.filter_all") if key == "" else key.capitalize(), func() -> void:
 			_filter = key
@@ -204,7 +204,8 @@ func _deck_editor() -> void:
 			continue
 		if _filter == "quick" and not bool(card.get("quick", false)):
 			continue
-		if _filter != "" and _filter != "quick" and not card.get("vectors", {}).has(_filter):
+		var tg := CardRules.tags(db, card)
+		if _filter != "" and _filter != "quick" and not card.get("vectors", {}).has(_filter) and not tg["setsUp"].has(_filter) and not tg["paysOff"].has(_filter):
 			continue
 		var in_deck := _deck.count(id)
 		var r := row()

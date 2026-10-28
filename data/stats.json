@@ -139,5 +139,179 @@
     "chaDivisor": 25,
     "badMoodMultiplier": 1.5,
     "minimum": 0.02
+  },
+  "statusRules": {
+    "comment": "PT Part 7: statuses as setups and payoffs. Numbers here; the code in combat_state.gd _status_payoff and _status_setups.",
+    "wet": {
+      "turns": 2
+    },
+    "frozen": {
+      "turns": 1,
+      "shatterMul": 1.5,
+      "shatterBy": [
+        "force",
+        "sound"
+      ]
+    },
+    "burning": {
+      "turns": 2,
+      "damage": 3,
+      "spreadBy": [
+        "force",
+        "motion"
+      ]
+    },
+    "rooted": {
+      "crushMul": 1.5,
+      "crushBy": [
+        "gravity"
+      ]
+    },
+    "poisoned": {
+      "turns": 3,
+      "damagePerStack": 2,
+      "maxStacks": 5,
+      "doubledBy": [
+        "corrosion"
+      ],
+      "healMul": 0.5
+    },
+    "marked": {
+      "turns": 1,
+      "damageMul": 1.25
+    },
+    "dazed": {
+      "turns": 1
+    },
+    "exposed": {
+      "turns": 1,
+      "weaknessMul": 1.25
+    },
+    "shadowed": {
+      "turns": 1,
+      "maxTargetRange": 2
+    },
+    "conductive": {
+      "turns": 2
+    }
+  },
+  "synergyTags": {
+    "comment": "PT Part 7: what each Vector sets up and pays off (cards also list their own 'tags').",
+    "heat": {
+      "setsUp": [
+        "burning"
+      ],
+      "paysOff": [
+        "frozen"
+      ]
+    },
+    "cold": {
+      "setsUp": [
+        "frozen",
+        "slow"
+      ],
+      "paysOff": [
+        "wet"
+      ]
+    },
+    "force": {
+      "setsUp": [
+        "push"
+      ],
+      "paysOff": [
+        "frozen",
+        "burning"
+      ]
+    },
+    "motion": {
+      "setsUp": [
+        "push"
+      ],
+      "paysOff": [
+        "burning"
+      ]
+    },
+    "light": {
+      "setsUp": [
+        "blind",
+        "marked"
+      ],
+      "paysOff": []
+    },
+    "binding": {
+      "setsUp": [
+        "rooted"
+      ],
+      "paysOff": []
+    },
+    "corrosion": {
+      "setsUp": [
+        "exposed"
+      ],
+      "paysOff": [
+        "poisoned"
+      ]
+    },
+    "vitality": {
+      "setsUp": [],
+      "paysOff": []
+    },
+    "transmutation": {
+      "setsUp": [
+        "wet"
+      ],
+      "paysOff": []
+    },
+    "lightning": {
+      "setsUp": [
+        "conductive"
+      ],
+      "paysOff": [
+        "wet",
+        "conductive"
+      ]
+    },
+    "sound": {
+      "setsUp": [
+        "dazed"
+      ],
+      "paysOff": [
+        "frozen"
+      ]
+    },
+    "gravity": {
+      "setsUp": [
+        "rooted"
+      ],
+      "paysOff": [
+        "rooted"
+      ]
+    },
+    "shadow": {
+      "setsUp": [
+        "shadowed"
+      ],
+      "paysOff": []
+    },
+    "poison": {
+      "setsUp": [
+        "poisoned"
+      ],
+      "paysOff": []
+    },
+    "warding": {
+      "setsUp": [
+        "exposed"
+      ],
+      "paysOff": []
+    },
+    "cognition": {
+      "setsUp": [
+        "marked"
+      ],
+      "paysOff": [
+        "marked"
+      ]
+    }
   }
 }
