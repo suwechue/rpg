@@ -734,6 +734,7 @@
     "technique.reconfigure": "Reconfigure Techniques (%d AP)",
     "technique.swap_out": "Swap out %s for:",
     "technique.planned": "(coming later)",
-    "arena.technique_pick": "Pick a Technique for someone (once per checkpoint)"
+    "arena.technique_pick": "Pick a Technique for someone (once per checkpoint)",
+    "arena.next_theme": "Next 5 waves: %s. %s"
   }
 }

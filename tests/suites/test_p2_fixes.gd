@@ -93,3 +93,29 @@ func test_every_mutator_and_perk_has_text_and_icon() -> void:
 	for p in DT.records_under(db(), "perks", "perks"):
 		check(str(p.get("text", "")) != "", "perk %s has a description" % p["id"])
 		check(assets.has(Effects.icon_for(db(), "perk", str(p["id"]))), "perk %s has an icon" % p["id"])
+
+
+## User request (Oct 28): arena themes in blocks of 5 waves; ranged Strike/Guard as Actions on Hard.
+func test_arena_block_themes() -> void:
+	var arena := Arena.new_arena(9, false)
+	var t1 := Arena.theme_for(db(), arena, 1)
+	check(not t1.is_empty(), "wave 1 has a theme")
+	for w in range(2, 6):
+		check(Arena.theme_for(db(), arena, w)["id"] == t1["id"], "wave %d shares the block's theme" % w)
+	check(Arena.theme_for(db(), arena, 6)["id"] != t1["id"], "the next block has a new theme")
+	check(Arena.hazard_set(db(), 3, arena)["id"] == t1["hazard"], "the hazards follow the theme")
+
+
+func test_ranged_builtins_on_hard() -> void:
+	var mage := Char.create(db(), "mage", seeded(1), { "isPlayer": true })
+	var e: Dictionary = DT.index_under(db(), "enemies/", "enemies")["pom_pom_wisp"].duplicate(true)
+	var hard := StateScript.new(db(), seeded(5), { "layout": { "map": ["PE......."] }, "party": [{ "char": mage }], "enemies": [e], "difficulty": "hard", "partyFirst": true })
+	var p = hard.units[0]
+	hard.units[1].hp = 999
+	check(not hard.is_quick_now(p, { "builtin": true }), "Hard: a ranged character's Strike is an Action")
+	check(hard.strike(p, hard.units[1].cell) and p.actions_left == 1 and not p.quick_used, "it spends an Action, not the Quick")
+	var fighter := Char.create(db(), "fighter", seeded(2), { "isPlayer": true })
+	var hard2 := StateScript.new(db(), seeded(5), { "layout": { "map": ["PE......."] }, "party": [{ "char": fighter }], "enemies": [e.duplicate(true)], "difficulty": "hard", "partyFirst": true })
+	check(hard2.is_quick_now(hard2.units[0], { "builtin": true }), "melee characters keep the Quick")
+	var normal := StateScript.new(db(), seeded(5), { "layout": { "map": ["PE......."] }, "party": [{ "char": mage }], "enemies": [e.duplicate(true)], "partyFirst": true })
+	check(normal.is_quick_now(normal.units[0], { "builtin": true }), "Normal: ranged characters keep the Quick")

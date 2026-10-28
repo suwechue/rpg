@@ -2509,18 +2509,32 @@ func move_budget(u: UnitScript) -> int:
 func is_quick_now(u: UnitScript, card: Dictionary) -> bool:
 	if turn_mode != "two_actions" or u == null or u.team != "party":
 		return false
+	if bool(card.get("builtin", false)) and ranged_builtins_cost(u):
+		return false
 	return bool(card.get("builtin", false)) or bool(card.get("quick", false))
+
+
+## Ranged characters pay an Action for Strike and Guard when the difficulty says so (user request).
+func ranged_builtins_cost(u: UnitScript) -> bool:
+	if u.team != "party" or not bool(difficulty_rules().get("rangedBuiltinsCostAction", false)):
+		return false
+	for c in db.get("classes", {}).get("classes", []):
+		if str(c.get("id", "")) == str(u.source.get("class", "")):
+			return bool(c.get("ranged", false))
+	return false
 
 
 ## Why the Quick can't be used now ("" if it can).
 func quick_block(u: UnitScript) -> String:
-	if turn_mode != "two_actions" or u.team != "party":
+	if turn_mode != "two_actions" or u.team != "party" or ranged_builtins_cost(u):
 		return act_block(u)
 	return Str.t(db, "combat_state.quick_used") if u.quick_used else ""
 
 
 func _use_quick_builtin(u: UnitScript) -> void:
-	if turn_mode == "two_actions" and u.team == "party":
+	if turn_mode == "two_actions" and u.team == "party" and ranged_builtins_cost(u):
+		spend_action(u)
+	elif turn_mode == "two_actions" and u.team == "party":
 		u.quick_used = true
 	else:
 		u.action_used = true

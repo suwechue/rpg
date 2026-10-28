@@ -100,7 +100,8 @@
         "kinetics",
         "meditation"
       ],
-      "startingTechnique": "still_mind"
+      "startingTechnique": "still_mind",
+      "ranged": true
     },
     {
       "id": "fighter",
@@ -193,7 +194,8 @@
       "techniqueLean": [
         "forging"
       ],
-      "startingTechnique": "runic_toolkit"
+      "startingTechnique": "runic_toolkit",
+      "ranged": false
     },
     {
       "id": "rogue",
@@ -286,7 +288,8 @@
       "techniqueLean": [
         "kinetics"
       ],
-      "startingTechnique": "vector_redirection"
+      "startingTechnique": "vector_redirection",
+      "ranged": false
     },
     {
       "id": "healer",
@@ -377,7 +380,8 @@
         "alchemy",
         "meditation"
       ],
-      "startingTechnique": "meditative_reserve"
+      "startingTechnique": "meditative_reserve",
+      "ranged": true
     },
     {
       "id": "bard",
@@ -461,7 +465,8 @@
       "techniqueLean": [
         "meditation"
       ],
-      "startingTechnique": "still_mind"
+      "startingTechnique": "still_mind",
+      "ranged": true
     },
     {
       "id": "elementalist",
@@ -504,7 +509,8 @@
         "id": "prism",
         "text": "Hybrid spells don't pay the extra hybrid cost; spells +10% damage."
       },
-      "text": "Two-Vector hybrid cards, bigger area Forms."
+      "text": "Two-Vector hybrid cards, bigger area Forms.",
+      "ranged": true
     },
     {
       "id": "kinetic_logician",
@@ -544,7 +550,8 @@
         "id": "momentum",
         "text": "Force pushes 1 tile further and collisions hit 4 harder."
       },
-      "text": "Knockback and push combos on the grid."
+      "text": "Knockback and push combos on the grid.",
+      "ranged": true
     },
     {
       "id": "spellblade",
@@ -587,7 +594,8 @@
         "id": "spellsteel",
         "text": "Weapon Infusion lasts 3 Strikes; Strikes +15% damage."
       },
-      "text": "Infuses melee cards with Vectors."
+      "text": "Infuses melee cards with Vectors.",
+      "ranged": false
     },
     {
       "id": "guardian",
@@ -626,7 +634,8 @@
         "id": "bulwark_aura",
         "text": "Guard also shields every adjacent ally for 5. +2 Defense."
       },
-      "text": "Taunt, zone control, ally shielding."
+      "text": "Taunt, zone control, ally shielding.",
+      "ranged": false
     },
     {
       "id": "trickster",
@@ -668,7 +677,8 @@
         "id": "sleight",
         "text": "Backstab still applies; +10% crit; roots last longer."
       },
-      "text": "Card tricks, status effects, misdirection."
+      "text": "Card tricks, status effects, misdirection.",
+      "ranged": false
     },
     {
       "id": "medic",
@@ -707,7 +717,8 @@
         "id": "lifeline",
         "text": "Healing +30%; healing cards on allies under half HP cost 1 less."
       },
-      "text": "Strong single-target healing, revives."
+      "text": "Strong single-target healing, revives.",
+      "ranged": true
     },
     {
       "id": "idol",
@@ -750,7 +761,8 @@
         "id": "encore",
         "text": "The whole party gains initiative and +1 draw on turn 1; Rally reaches everyone."
       },
-      "text": "Party-wide buffs, crowd control by charm."
+      "text": "Party-wide buffs, crowd control by charm.",
+      "ranged": true
     },
     {
       "id": "deli_knight",
@@ -798,7 +810,8 @@
         "id": "brunch",
         "text": "Food items heal twice as much; +10 Max HP; Heat-and-Force tank."
       },
-      "text": "Food items in combat, a Heat-and-Force tank."
+      "text": "Food items in combat, a Heat-and-Force tank.",
+      "ranged": false
     },
     {
       "id": "smith_mage",
@@ -839,7 +852,8 @@
         "text": "Constructs have double HP and last 2 rounds longer; +2 Strike power."
       },
       "text": "Builds constructs and gear mid-fight. The hidden upgraded Runesmith.",
-      "upgradeOf": "runesmith"
+      "upgradeOf": "runesmith",
+      "ranged": false
     },
     {
       "id": "upside_touched",
@@ -874,7 +888,8 @@
         "id": "unstable",
         "text": "Improvised casts skip the +3 Instability penalty; spells +20% damage."
       },
-      "text": "Unstable, very strong improvised casts."
+      "text": "Unstable, very strong improvised casts.",
+      "ranged": false
     },
     {
       "id": "alchemist",
@@ -945,7 +960,8 @@
         "techniques": [
           "stored_formula"
         ]
-      }
+      },
+      "ranged": true
     },
     {
       "id": "runesmith",
@@ -1016,7 +1032,8 @@
         "techniques": [
           "runic_toolkit"
         ]
-      }
+      },
+      "ranged": false
     }
   ]
 }

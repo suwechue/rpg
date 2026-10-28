@@ -82,6 +82,7 @@ Most numbers live in `data/` (JSON). The main files:
 | Effects strip (P2 Part 2) | Icons on the left edge (combat, arena, dungeon, town) for everything active: arena mutators (waves to the checkpoint; red border if risky, green if helpful), difficulty, Easy minigames, the starting trait, injuries, Kelly's Risk, and the F1 override (amber). Hover for details; click for the **Effects page** (Party panel tab). Party members show perk badges in the timeline, the turn banner names their perks, perks float their name when they trigger, and mutator bonuses show in the hover breakdown ("+50% (Cold is stronger)", "+50% HP (Thick skin)") | `src/core/effects.gd` |
 | Enemy turns | Played one beat at a time: banner, highlight, move, wind-up, hit, log line. Combat speed setting; hold a key to fast-forward | — |
 | Fleeing | Allowed in non-boss fights (not boss floors). The room stays uncleared | fight setup fleeAllowed |
+| Ranged Strike and Guard (user request) | On **Hard**, ranged characters (Mage, Healer, Bard and their advanced classes) pay an **Action** for the built-in Strike and Guard instead of their Quick; melee characters keep the Quick. Normal keeps the Quick for everyone | `data/combat_rules.json` difficulties.rangedBuiltinsCostAction; classes `ranged` |
 | Combat difficulty | Chosen at new run. Enemies get **2 Actions** like you: move + attack, or move + move when nothing is in reach. **Double attack chance** (an enemy already in reach attacks twice): Normal minion 40%, normal 50%, elite 35%, boss 50%; Hard 75%. **Hard** also gives enemies x1.2 HP and x1.25 damage | `data/combat_rules.json` difficulties.enemyDoubleAttackChance |
 
 ## B2. Cards, hand and MP
@@ -316,6 +317,8 @@ Change these in `data/arena/*.json`.
 ---
 
 # Part C: Everything outside combat
+
+**Themes in blocks of 5 waves (user request, Oct 28):** waves 1 to 5, 6 to 10 and so on each share one theme: its hazard set and an enemy lean toward its Vectors (Fire Drill, Cold Snap, Pitfall, Trench War, Rune Maze, Cave-In, Assembly Line, Lights Out, Toxic Spill). Themes are seeded per run and never repeat back to back. The checkpoint shows the next block's theme, so you can rebuild decks for it. Change them in `data/arena/waves.json` themes.
 
 **Progression (PT Part 6):**
 - After **every wave**: pick 1 of 3 cards (or skip for 2 Scraps). Offers lean toward the party's Vectors (x3), get rarer as waves go up (common 6 / uncommon 3 / rare 1 early, 2 / 4 / 4 by wave 20), and 20% of the time include a Vector nobody in the party knows.

@@ -28,12 +28,12 @@ func test_waves_from_a_seed() -> void:
 func test_layouts_rotate_hazards() -> void:
 	var a := Arena.new_arena(7, false)
 	var seen := {}
-	for wave in range(1, 10):
+	for wave in range(1, 46):
 		var lay := Arena.layout_for(db(), a, wave)
 		seen[lay["hazard"]] = true
 		var grid := GridScript.new(lay)
 		check(not grid.party_spawns.is_empty() and not grid.enemy_spawns.is_empty(), "wave %d layout has spawns" % wave)
-	check(seen.size() == 9, "nine waves meet all nine hazard sets (%d)" % seen.size())
+	check(seen.size() >= 5, "nine 5-wave blocks rotate through the themes' hazard sets (%d seen)" % seen.size())
 
 
 func test_wave_rewards_and_score() -> void:

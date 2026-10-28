@@ -340,8 +340,10 @@ static func _party_turn(state: StateScript, u: UnitScript) -> Dictionary:
 			break
 		last = plan
 		if str(plan["kind"]) == "guard":
-			state.guard(u)
-			break
+			# Guard is a Quick: take it, then keep using the Actions (P2 fix).
+			if not state.guard(u) or u.actions_left <= 0:
+				break
+			continue
 		if plan["move"] != u.cell:
 			state.move(u, plan["move"])
 		if state.result == "" and u.alive():

@@ -122,7 +122,7 @@ func _refresh() -> void:
 	if phase == "checkpoint":
 		_checkpoint()
 		return
-	var hz := Arena.hazard_set(db, next)
+	var hz := Arena.hazard_set(db, next, arena)
 	var kind := Strings.t("arena.boss_wave") if Arena.is_boss(db, next) else (Strings.t("arena.elite_wave") if Arena.is_elite(db, next) else "Wave")
 	_text(Strings.t("arena.terrain") % [kind, next, hz.get("name", "plain")], UiTheme.TEXT)
 	if not arena.get("lastPick", {}).is_empty():
@@ -163,7 +163,7 @@ func _start_wave() -> void:
 		before.append({ "id": str(ch.get("id", "")), "hp": int(ch.get("hp", 0)), "mp": int(ch.get("mp", 0)) })
 	arena["partyBefore"] = before
 	arena["inFight"] = true
-	setup["intro"] = Strings.t("arena.wave") % [wave, str(Arena.hazard_set(db, wave).get("name", ""))]
+	setup["intro"] = Strings.t("arena.wave") % [wave, str(Arena.hazard_set(db, wave, arena).get("name", ""))]
 	GameState.start_combat(setup, SELF)
 
 
@@ -283,8 +283,12 @@ func _checkpoint() -> void:
 	var db: Dictionary = DataDB.all()
 	var costs: Dictionary = Arena.checkpoint_cfg(db).get("costs", {})
 	_text(Strings.t("arena.checkpoint_arena_ap_unspent_ap") % int(arena["ap"]), UiTheme.ACCENT)
-	var hz := Arena.hazard_set(db, int(arena["wave"]) + 1)
+	var hz := Arena.hazard_set(db, int(arena["wave"]) + 1, arena)
 	_text(Strings.t("arena.next_wave_s_terrain") % hz.get("name", "plain"), UiTheme.DIM)
+	var nth := Arena.theme_for(db, arena, int(arena["wave"]) + 1)
+	if not nth.is_empty():
+		# The next block's theme: rebuild decks for it here.
+		_text(Strings.t("arena.next_theme") % [str(nth.get("name", "")), str(nth.get("text", ""))], UiTheme.ACCENT)
 	_button(Strings.t("arena.technique_pick"), _perk_pick, int(arena.get("perkPicked", -1)) == int(arena["wave"]))
 	_button(Strings.t("forge.title"), func() -> void:
 		var fs := preload("res://src/scenes/ui/forge_screen.gd").new()
@@ -478,7 +482,16 @@ func _autoplay() -> void:
 			if Arena.spend(db, arena, "rest"):
 				Arena.rest(db, Party.party(GameState.run))
 			if not arena.get("offered", []).is_empty():
-				Arena.choose_mutator(arena, str(arena["offered"][0]["id"]))
+				# Autoplay takes the safest mutator on offer (no extra enemy HP or damage, no rest ban).
+				var safest: Dictionary = arena["offered"][0]
+				var best_risk := 99.0
+				for m in arena["offered"]:
+					var eff: Dictionary = m.get("effects", {})
+					var risk := float(eff.get("enemyHpMul", 1.0)) + float(eff.get("enemyDamageMul", 1.0)) + (1.0 if bool(eff.get("noRest", false)) else 0.0)
+					if risk < best_risk:
+						best_risk = risk
+						safest = m
+				Arena.choose_mutator(arena, str(safest["id"]))
 			arena["phase"] = "ready"
 			_refresh()
 			_autoplay()

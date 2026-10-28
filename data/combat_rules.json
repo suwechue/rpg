@@ -1,23 +1,126 @@
 {
   "comment": "Turn rules (docs/ARENA.md Part 1). turnMode: move_or_act (move OR one action each turn, the default), move_then_act (move first, then one action), move_and_act (move and one action in any order). Quick cards work with either. F1 > Fights switches it mid-fight.",
   "turnMode": "two_actions",
-  "turnModes": ["two_actions", "move_or_act", "move_then_act", "move_and_act"],
-  "actions": { "comment": "PT Part 1: every party turn has actionsPerTurn Actions (a Move of up to your Movement, or a non-quick card) plus quicksPerTurn Quicks (Strike, Guard or a quick card). moveActionTiles is the typical Movement (stats.json derived.movement gives 4 at DEX 5 to 9).", "actionsPerTurn": 2, "quicksPerTurn": 1, "moveActionTiles": 4, "holdMax": 1, "holdCost": 1, "partyFirstInArena": true },
-  "cantrip": { "comment": "PT Part 1: a built-in 0 MP Action attack in the character's first Vector. Single target, Bolt or Touch, no riders.", "range": 4, "damage": { "default": 4, "force": 3, "heat": 4, "cold": 4, "motion": 3, "light": 4, "binding": 3, "vitality": 3, "corrosion": 4, "transmutation": 3 } },
-  "opportunityStrike": { "comment": "PT Part 1: standing on the tile an enemy plans to move to gives a free Strike when it is stopped next to you.", "mult": 1.0 },
+  "turnModes": [
+    "two_actions",
+    "move_or_act",
+    "move_then_act",
+    "move_and_act"
+  ],
+  "actions": {
+    "comment": "PT Part 1: every party turn has actionsPerTurn Actions (a Move of up to your Movement, or a non-quick card) plus quicksPerTurn Quicks (Strike, Guard or a quick card). moveActionTiles is the typical Movement (stats.json derived.movement gives 4 at DEX 5 to 9).",
+    "actionsPerTurn": 2,
+    "quicksPerTurn": 1,
+    "moveActionTiles": 4,
+    "holdMax": 1,
+    "holdCost": 1,
+    "partyFirstInArena": true
+  },
+  "cantrip": {
+    "comment": "PT Part 1: a built-in 0 MP Action attack in the character's first Vector. Single target, Bolt or Touch, no riders.",
+    "range": 4,
+    "damage": {
+      "default": 4,
+      "force": 3,
+      "heat": 4,
+      "cold": 4,
+      "motion": 3,
+      "light": 4,
+      "binding": 3,
+      "vitality": 3,
+      "corrosion": 4,
+      "transmutation": 3
+    }
+  },
+  "opportunityStrike": {
+    "comment": "PT Part 1: standing on the tile an enemy plans to move to gives a free Strike when it is stopped next to you.",
+    "mult": 1.0
+  },
   "enemyHpMul": 1.0,
   "bossHpMul": 2.0,
   "balanceTargets": {
     "comment": "Kill-time targets (docs/COMBAT_TUNING.md Part 1), week 1, party level 1 to 2, Normal. tools/sim_balance.gd and tests/suites/test_ct_balance.gd measure them.",
-    "actionsToKill": { "minion": [1, 1], "normal": [2, 3], "elite": [5, 7] },
-    "hitPct": { "minion": [0.08, 0.2], "normal": [0.2, 0.3], "normal_heavy": [0.35, 0.5], "elite": [0.2, 0.35], "elite_heavy": [0.35, 0.5], "boss": [0.2, 0.35], "boss_heavy": [0.6, 0.8] },
-    "partyHitsToKill": { "normal": [3, 4], "heavy": [2, 2] }
+    "actionsToKill": {
+      "minion": [
+        1,
+        1
+      ],
+      "normal": [
+        2,
+        3
+      ],
+      "elite": [
+        5,
+        7
+      ]
+    },
+    "hitPct": {
+      "minion": [
+        0.08,
+        0.2
+      ],
+      "normal": [
+        0.2,
+        0.3
+      ],
+      "normal_heavy": [
+        0.35,
+        0.5
+      ],
+      "elite": [
+        0.2,
+        0.35
+      ],
+      "elite_heavy": [
+        0.35,
+        0.5
+      ],
+      "boss": [
+        0.2,
+        0.35
+      ],
+      "boss_heavy": [
+        0.6,
+        0.8
+      ]
+    },
+    "partyHitsToKill": {
+      "normal": [
+        3,
+        4
+      ],
+      "heavy": [
+        2,
+        2
+      ]
+    }
   },
   "difficulty": "normal",
   "difficulties": {
-    "comment": "Combat difficulty (user decision, Oct 24). Enemies always telegraph during the player's turn and carry it out on theirs. Enemies telegraph right before their turn (docs/COMBAT_TUNING.md Part 2). Enemies get 2 Actions like the party (PT Part 1): move + attack, or move + move when nothing is in reach. enemyDoubleAttackChance (one number, or one per tier) is the chance that an enemy already in reach attacks twice instead. Hard raises the chance, enemy HP and damage.",
-    "normal": { "name": "Normal", "enemyDoubleAttackChance": { "minion": 0.4, "normal": 0.5, "elite": 0.35, "boss": 0.5, "default": 0.5 }, "enemyDamageMul": 1.0 },
-    "hard": { "name": "Hard", "enemyDoubleAttackChance": 0.75, "enemyHpMul": 1.2, "enemyDamageMul": 1.25 }
+    "comment": "Combat difficulty (user decision, Oct 24). Enemies always telegraph during the player's turn and carry it out on theirs. Enemies telegraph right before their turn (docs/COMBAT_TUNING.md Part 2). Enemies get 2 Actions like the party (PT Part 1): move + attack, or move + move when nothing is in reach. enemyDoubleAttackChance (one number, or one per tier) is the chance that an enemy already in reach attacks twice instead. Hard raises the chance, enemy HP and damage. rangedBuiltinsCostAction (user request, Oct 28): ranged characters (classes with 'ranged': true) pay an Action for the built-in Strike and Guard instead of their Quick.",
+    "normal": {
+      "name": "Normal",
+      "enemyDoubleAttackChance": {
+        "minion": 0.4,
+        "normal": 0.5,
+        "elite": 0.35,
+        "boss": 0.5,
+        "default": 0.5
+      },
+      "enemyDamageMul": 1.0,
+      "rangedBuiltinsCostAction": false
+    },
+    "hard": {
+      "name": "Hard",
+      "enemyDoubleAttackChance": 0.75,
+      "enemyHpMul": 1.2,
+      "enemyDamageMul": 1.25,
+      "rangedBuiltinsCostAction": true
+    }
   },
-  "areaFalloff": { "comment": "Area attacks deal this much to every target beyond the first `fullHits`.", "fullHits": 2, "mul": 0.75 }
+  "areaFalloff": {
+    "comment": "Area attacks deal this much to every target beyond the first `fullHits`.",
+    "fullHits": 2,
+    "mul": 0.75
+  }
 }

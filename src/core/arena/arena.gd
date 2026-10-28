@@ -56,11 +56,36 @@ static func budget(db: Dictionary, wave: int) -> float:
 
 
 ## The hazard set for a wave: the sets in order, so every hazard comes up.
-static func hazard_set(db: Dictionary, wave: int) -> Dictionary:
+static func hazard_set(db: Dictionary, wave: int, arena: Dictionary = {}) -> Dictionary:
 	var sets: Array = db.get("arena/layouts", {}).get("hazardSets", [])
 	if sets.is_empty():
 		return {}
+	# Block themes (user request): every wave of a block uses its theme's hazards.
+	var th := theme_for(db, arena, wave)
+	for s in sets:
+		if str(s.get("id", "")) == str(th.get("hazard", "")):
+			return s
 	return sets[(wave - 1) % sets.size()]
+
+
+## The theme of a wave's block (waves 1-5, 6-10, ...): seeded per arena run, no
+## theme twice in a row. {} if there are no themes in data.
+static func theme_for(db: Dictionary, arena: Dictionary, wave: int) -> Dictionary:
+	var th: Dictionary = waves(db).get("themes", {})
+	var list: Array = th.get("list", [])
+	if list.is_empty():
+		return {}
+	var size := maxi(1, int(th.get("blockSize", 5)))
+	var block := (maxi(1, wave) - 1) / size
+	var prev := -1
+	var pick := 0
+	for b in block + 1:
+		var rng := rng_for(arena if not arena.is_empty() else { "seed": 1 }, b + 1, "theme")
+		pick = rng.randi_range(0, list.size() - 1)
+		if pick == prev:
+			pick = (pick + 1) % list.size()
+		prev = pick
+	return list[pick]
 
 
 ## A layout for the wave: a base map with the wave's hazards scattered over
@@ -72,7 +97,7 @@ static func layout_for(db: Dictionary, arena: Dictionary, wave: int) -> Dictiona
 	var rows: Array = []
 	for line in base["map"]:
 		rows.append(str(line))
-	var hz := hazard_set(db, wave)
+	var hz := hazard_set(db, wave, arena)
 	var cols := str(rows[0]).length()
 	var middle: Array = []
 	for r in rows.size():
@@ -116,7 +141,12 @@ static func wave_enemies(db: Dictionary, arena: Dictionary, wave: int) -> Dictio
 		return { "enemies": [rec], "roles": ["boss"], "formation": "default", "boss": true }
 	var room := "elite" if is_elite(db, wave) else "combat"
 	var mixed := wave > int(w.get("mixedAfter", 10))
-	var enc := Enc.build(db, {}, week, room, rng, budget(db, wave), rng.randi_range(1, 5) if mixed else week)
+	# The block's theme leans the enemy pick toward its Vectors.
+	var theme := theme_for(db, arena, wave)
+	var lean_run := { "signature": {}, "themeLean": float(waves(db).get("themes", {}).get("lean", 3.0)) }
+	for axis in theme.get("vectors", {}):
+		lean_run["signature"][axis] = float(theme["vectors"][axis]) * 5.0
+	var enc := Enc.build(db, lean_run, week, room, rng, budget(db, wave), rng.randi_range(1, 5) if mixed else week)
 	var recs: Array = []
 	for i in enc["enemies"].size():
 		var rec: Dictionary = idx.get(str(enc["enemies"][i]), {}).duplicate(true)

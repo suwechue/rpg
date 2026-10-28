@@ -41,13 +41,16 @@ static func enemy_weights(db: Dictionary, run: Dictionary, week: int, tier: Stri
 	for e in DT.records_under(db, "enemies/", "enemies"):
 		if str(e.get("tier", "normal")) != tier:
 			continue
+		if bool(e.get("tutorial", false)):
+			continue
 		var weeks: Array = e.get("weeks", [])
 		var ok := weeks.is_empty()
 		for w in weeks:
 			ok = ok or int(w) == week
 		if not ok:
 			continue
-		out[str(e["id"])] = maxf(0.05, VO.similarity(sig, e.get("signature", {}))) * float(e.get("weight", 1.0))
+		# A theme lean (arena blocks) sharpens the match: weight^lean.
+		out[str(e["id"])] = pow(maxf(0.05, VO.similarity(sig, e.get("signature", {}))), float(run.get("themeLean", 1.0))) * float(e.get("weight", 1.0))
 	return out
 
 

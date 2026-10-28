@@ -99,5 +99,100 @@
   "checkpointPick": {
     "comment": "PT Part 6: every checkpoint, one party member picks 1 of 'choices' perks (Techniques once PT Part 8 lands).",
     "choices": 2
+  },
+  "themes": {
+    "comment": "User request (Oct 28): every block of 'blockSize' waves shares one theme (its hazard set and an enemy Vector lean), so each checkpoint is a chance to rebuild decks for the next theme. Themes are picked per block (seeded, no repeat back to back). 'lean' is how strongly enemies match the theme's Vectors (higher = purer).",
+    "blockSize": 5,
+    "lean": 3.0,
+    "list": [
+      {
+        "id": "fire_drill",
+        "name": "Fire Drill",
+        "hazard": "fire",
+        "vectors": {
+          "heat": 1.0
+        },
+        "text": "Burning floors and things that like it hot. Bring Cold and Motion."
+      },
+      {
+        "id": "cold_snap",
+        "name": "Cold Snap",
+        "hazard": "ice",
+        "vectors": {
+          "cold": 1.0
+        },
+        "text": "Ice underfoot, frost in the air. Heat melts it; Force shatters it."
+      },
+      {
+        "id": "pitfall",
+        "name": "Pitfall",
+        "hazard": "pits",
+        "vectors": {
+          "force": 1.0,
+          "gravity": 0.6
+        },
+        "text": "Holes everywhere and heavy hitters. Push them in first."
+      },
+      {
+        "id": "trench_war",
+        "name": "Trench War",
+        "hazard": "cover",
+        "vectors": {
+          "motion": 1.0,
+          "light": 0.6
+        },
+        "text": "Cover everywhere and shooters behind it. Flank or blow it up."
+      },
+      {
+        "id": "rune_maze",
+        "name": "Rune Maze",
+        "hazard": "glyphs",
+        "vectors": {
+          "binding": 1.0,
+          "warding": 0.6
+        },
+        "text": "Hidden traps and things that hold you still. Light reveals."
+      },
+      {
+        "id": "cave_in",
+        "name": "Cave-In",
+        "hazard": "collapse",
+        "vectors": {
+          "force": 1.0,
+          "sound": 0.6
+        },
+        "text": "The floor won't hold for long. Neither will they."
+      },
+      {
+        "id": "conveyor",
+        "name": "Assembly Line",
+        "hazard": "conveyors",
+        "vectors": {
+          "motion": 1.0,
+          "lightning": 0.6
+        },
+        "text": "Everything moves, fast. Root things down."
+      },
+      {
+        "id": "lights_out",
+        "name": "Lights Out",
+        "hazard": "dark",
+        "vectors": {
+          "shadow": 1.0,
+          "light": 0.4
+        },
+        "text": "You can't see them. They can see you. Bring Light."
+      },
+      {
+        "id": "toxic_spill",
+        "name": "Toxic Spill",
+        "hazard": "toxic",
+        "vectors": {
+          "corrosion": 1.0,
+          "poison": 0.8
+        },
+        "text": "Puddles that eat armor. Heal often; Transmutation cleans."
+      }
+    ]
   }
 }

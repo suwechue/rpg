@@ -38,6 +38,10 @@ Claude Code updates this at the end of every milestone and before stopping, so a
 
 ### Phase 2 notes
 
+- Fixed (found while checking the arena): the party AI ended its turn after choosing Guard, which became a Quick in PT Part 1, so parties low on MP stood around guarding. It now Guards and keeps using its Actions. `tests/smoke_arena.gd` now runs a level 14 party to wave 15 and checks card picks after every wave and a Technique pick (it checks flow; `tools/sim_arena.gd` measures balance); arena autoplay takes the safest mutator on offer. The arena smoke had been failing since the PT Part 8 commit because the standard check run didn't include it; it does now.
+
+- User requests (Oct 28), done as P2 additions: arena themes in blocks of 5 waves (hazards and an enemy Vector lean, shown at checkpoints); ranged characters' Strike and Guard cost an Action on Hard (a per-difficulty data flag, Normal unchanged). Also fixed: enemies with no weeks (the tutorial enemies) could appear in regular dungeon fights. New order: P2 Part 3 (M14, M15), a basic set of Endless Arena cutscenes, then the roadmap and VD.
+
 - PT Part 8 sims (week 1, Normal): actions to kill minion 1.0, normal 2.6, elite 7.0 (top of the target); hits unchanged. `tools/sim_ar.gd`: reads 97%, ignores 93%, solo 93%, boss 80%. Nights (2 allies): mage 14/18/17/13, fighter 19/20/18/20, rogue 19/20/17/19, healer 13/20/19/19, bard 19/20/17/11.
 - PT Part 8 decisions: 10 of the 24 Techniques are "planned" (listed greyed out) because they need potions, constructs that act, or once-per-night actions; Efficient Forging's cost cut and Reactive Casting are data that isn't wired yet. Reactions are automatic (Options "ask" acts like auto until the prompt exists). Perks still exist for old saves and the arena perk list; new characters get Techniques instead. Class change no longer keeps a perk. The new Vectors' cards reuse the Force VFX and card art tint until there's art.
 
