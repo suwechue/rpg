@@ -18,7 +18,7 @@ Sizes: tiles 32x32, characters 32x32 (up to 32x48 for tall ones), portraits 64x6
 
 Pack art is a placeholder: the 16x16 packs are scaled up 2x (nearest neighbour) to fit the 32x32 grid until you replace them.
 
-Replaced so far: Characters (walk sheets) 0/39, Portraits 0/35, Enemies and bosses 0/76, Tilesets 0/4, Single tiles 0/120, UI 0/19, Icons 0/42, Card art 0/24, VFX 0/38, Music 0/30, Sound effects 0/39, Ambience 0/9, Voice blips 0/10.
+Replaced so far: Characters (walk sheets) 0/39, Portraits 0/35, Enemies and bosses 0/76, Tilesets 0/4, Single tiles 0/120, UI 0/20, Icons 0/42, Card art 0/24, VFX 0/38, Music 0/30, Sound effects 0/39, Ambience 0/9, Voice blips 0/10.
 
 ## Characters (walk sheets) (39)
 
@@ -329,7 +329,7 @@ Single tiles inside a tileset. Replacing one changes it everywhere it's used. Dr
 | [ ] | `tile_dungeon_merchant` | 32x32 | - | top left | tile 84 of `tileset_dungeon` |  |
 | [ ] | `tile_dungeon_bones` | 32x32 | - | top left | tile 64 of `tileset_dungeon` |  |
 
-## UI (19)
+## UI (20)
 
 
 
@@ -354,6 +354,7 @@ Single tiles inside a tileset. Replacing one changes it everywhere it's used. Dr
 | [ ] | `font_dialogue` | - | - | - | skin placeholder | Dialogue and narrator text. A pixel font at its native size or a whole multiple. .ttf or .otf. |
 | [ ] | `font_title` | - | - | - | skin placeholder | Titles and big headings (drawn at 2x). A pixel font at its native size or a whole multiple. .ttf or .otf. |
 | [ ] | `font_damage_numbers` | - | - | - | skin placeholder | Floating damage and heal numbers in combat. A pixel font at its native size or a whole multiple. .ttf or .otf. |
+| [ ] | `art_logo` | 240x48 | - | top center | missing (add yours) | The title logo (VD Part 5). Drop assets/custom/ui/art_logo.png; until then the title is drawn as text. |
 
 ## Icons (42)
 

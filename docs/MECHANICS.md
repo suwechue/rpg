@@ -545,5 +545,4 @@ Change these in `data/combos.json`, `data/sparks.json`, `data/intro/spark_quiz.j
 
 # Part D: Changing next
 
-PT (`docs/PATCH_1.md`), P2 Parts 1 to 3 (`docs/PATCH_2.md`, with cutscenes M14 and the intro M15) and VD Parts 1 to 4 (combos, the spark, the card builder) are in. Next:
-- VD Parts 5 and 6: the demo build and feedback tools.
+PT (`docs/PATCH_1.md`), P2 Parts 1 to 3 (`docs/PATCH_2.md`, with cutscenes M14 and the intro M15) and VD (combos, the spark, the card builder, the demo and feedback) are in. Demo mode (`data/demo.json`) ends a story run after the week 1 boss. Next:

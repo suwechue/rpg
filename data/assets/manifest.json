@@ -6180,6 +6180,17 @@
       "layout": "48x48 card illustration",
       "anchor": "top left",
       "notes": "The last fallback for any card with no other art (VD Part 1)."
+    },
+    "art_logo": {
+      "type": "ui",
+      "kind": "image",
+      "planned": true,
+      "size": [
+        240,
+        48
+      ],
+      "anchor": "top center",
+      "notes": "The title logo (VD Part 5). Drop assets/custom/ui/art_logo.png; until then the title is drawn as text."
     }
   }
 }

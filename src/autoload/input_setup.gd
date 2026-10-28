@@ -17,6 +17,7 @@ const KEYS := {
 	"save_run": [KEY_F5],
 	"load_run": [KEY_F9],
 	"debug_menu": [KEY_F1],
+	"feedback": [KEY_F8],
 	"card_prev": [KEY_Q],
 	"card_next": [KEY_TAB],
 	"fast_forward": [KEY_SHIFT],

@@ -75,3 +75,23 @@ While you play (in a normal window, not in tests), the game quietly keeps a log 
 ## Sending feedback
 
 Copy this file, fill in the boxes and notes, and put it next to your gameplay log. That's everything the balance pass needs.
+
+## Running a playtest with friends (the demo)
+
+1. **Build the demo.** In the Godot editor: Project > Export > "Demo" > Export Project (needs the Windows export templates: Editor > Manage Export Templates > Download). That gives `build/demo/ProjectVector.exe`. Zip it with `build/demo/README.txt` (see docs/PRESS_KIT.md for the text). To try demo mode without exporting, set `"enabled": true` in `data/demo.json`.
+2. **Send it.** Ask testers to play until the "Thanks for playing" screen (after the Hollow Mascot, about an hour), answer the survey, and press **F8** whenever something feels off, confusing or great. F8 is also in Options as "Send feedback".
+3. **Collect the zips.** Every F8 note and the survey become a zip in the tester's feedback folder, which opens on its own after saving: `%APPDATA%\Godot\app_userdata\Project Vector\feedback\`. Ask them to send you everything in it.
+
+**What's in a feedback zip:**
+
+| File | What it tells you |
+| --- | --- |
+| `note.txt` | What the tester typed (F8) |
+| `survey.json` | Survey answers: fun 1 to 5, the most confusing moment, favorite character, was combat clear, would you play more, anything else |
+| `screenshot.png` | The screen when they pressed F8 |
+| `summary.json` | AP spent by action type, fights won and lost, average rounds per fight, cards played, combos discovered, average seconds per day, and `where` (week, day, part and scene; for a quit, the last zip shows where they stopped) |
+| `gameplay_log.jsonl` | The raw day-by-day log (see above) |
+| `run_save.json` | Their save: drop it into your own user folder to load their exact situation |
+| `version.txt` | The demo version and Godot version |
+
+**Reading them:** sort notes by `where` to find the spots several people mention. A low "fun" with "combat clear: Not really" points at combat readability; high rounds per fight points at slow fights. Survey questions live in `data/demo.json` if you want to change them.

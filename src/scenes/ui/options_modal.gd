@@ -23,5 +23,8 @@ func _refresh() -> void:
 		UiTheme.set_colorblind(not UiTheme.colorblind)
 		UiTheme.rebuild()
 		_refresh())
+	add_button(Strings.t("feedback.button"), func() -> void:
+		finish(null)
+		Feedback.send_feedback.call_deferred())
 	add_button(Strings.t("party_panel.close"), func() -> void: finish(null))
 	focus_first()

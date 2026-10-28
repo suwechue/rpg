@@ -119,6 +119,7 @@ func _design() -> void:
 		var cv := CardView.new()
 		cv.setup(card, int(card["cost"]))
 		cv.focus_mode = Control.FOCUS_NONE
+		cv.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		pr.add_child(cv)
 		var dg := preload("res://src/scenes/ui/shape_diagram.gd").new()
 		dg.setup(DataDB.record("forms", _form), _magnitude, UiTheme.vector_color(str(_vectors[0])), 5)
@@ -198,6 +199,7 @@ func _reveal(card: Dictionary) -> void:
 	var cv := CardView.new()
 	cv.setup(card, int(card.get("cost", 0)))
 	cv.focus_mode = Control.FOCUS_NONE
+	cv.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	holder.add_child(cv)
 	var axes := CardRules.ordered_vectors(DataDB.all(), card.get("vectors", {}))
 	var glow := UiTheme.vector_color(str(axes[0])) if not axes.is_empty() else UiTheme.ACCENT

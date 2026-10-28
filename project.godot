@@ -39,6 +39,7 @@ Flow="*res://src/autoload/flow.gd"
 Social="*res://src/autoload/social.gd"
 Journal="*res://src/autoload/journal.gd"
 Cutscenes="*res://src/autoload/cutscenes.gd"
+Feedback="*res://src/autoload/feedback.gd"
 DebugMenu="*res://src/autoload/debug_menu.gd"
 PlayLog="*res://src/autoload/play_log.gd"
 

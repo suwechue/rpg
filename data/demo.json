@@ -1,0 +1,19 @@
+{
+  "comment": "VD Parts 5 and 6: demo mode and feedback. The demo is on when 'enabled' is true or the build has the 'demo' feature tag (export preset \"Demo\"). It ends the run after week endAfterWeek's boss, shows the thanks screen, then the survey. The full game ignores this file unless demo mode is on; F8 feedback works in every build.",
+  "enabled": false,
+  "endAfterWeek": 1,
+  "version": "0.1.0",
+  "comingSoon": [
+    "Act 1: weeks 2 to 5, four more bosses and the truth about the town",
+    "More friends to meet, recruit and fight beside",
+    "More combos, Vectors and Techniques"
+  ],
+  "survey": [
+    { "id": "fun", "text": "How fun was it?", "type": "scale", "min": 1, "max": 5 },
+    { "id": "confusing", "text": "What was the most confusing moment?", "type": "text" },
+    { "id": "favorite", "text": "Who was your favorite character?", "type": "text" },
+    { "id": "combat_clear", "text": "Was combat clear?", "type": "choice", "options": ["Yes", "Mostly", "Not really"] },
+    { "id": "play_more", "text": "Would you play more?", "type": "choice", "options": ["Yes", "Maybe", "No"] },
+    { "id": "anything", "text": "Anything else?", "type": "text" }
+  ]
+}

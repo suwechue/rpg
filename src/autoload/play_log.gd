@@ -40,7 +40,7 @@ func _on_ap_spent(amount: int, kind: String) -> void:
 
 func _on_combat(summary: Dictionary) -> void:
 	if not _day.is_empty():
-		Log.add_fight(_day, str(summary.get("result", "")))
+		Log.add_fight(_day, str(summary.get("result", "")), int(summary.get("rounds", 0)), int(summary.get("cardsPlayed", 0)))
 
 
 func _flush() -> void:

@@ -760,6 +760,23 @@
     "workbench.combo_found": "Combo discovered: %s!",
     "workbench.grade": "Grade %s",
     "workbench.combo_badge": "[%s]",
-    "party_panel.tab_compendium": "Compendium"
+    "party_panel.tab_compendium": "Compendium",
+    "feedback.title": "Send feedback",
+    "feedback.prompt": "What's on your mind? A screenshot, your save and the gameplay log go with it.",
+    "feedback.send": "Save feedback",
+    "feedback.cancel": "Cancel",
+    "feedback.saved": "Feedback saved: %s",
+    "feedback.button": "Send feedback (F8)",
+    "demo.thanks_title": "Thanks for playing!",
+    "demo.thanks_text": "That's the end of the demo: the first week, and the Hollow Mascot.",
+    "demo.combos": "Combos discovered: %d of %d",
+    "demo.met": "People you met: %s",
+    "demo.coming": "Coming next:",
+    "demo.survey_title": "Quick survey",
+    "demo.next": "Next",
+    "demo.skip_survey": "Skip the survey",
+    "title.options": "Options",
+    "title.version": "v%s %s",
+    "title.demo_tag": "(demo)"
   }
 }

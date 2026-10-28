@@ -15,9 +15,11 @@ static func add_ap(rec: Dictionary, kind: String, amount: int) -> void:
 	ap[kind] = int(ap.get(kind, 0)) + amount
 
 
-static func add_fight(rec: Dictionary, result: String) -> void:
+static func add_fight(rec: Dictionary, result: String, rounds: int = 0, cards: int = 0) -> void:
 	var key := "won" if result == "win" else ("lost" if result == "lose" else "fled")
 	rec[key] = int(rec.get(key, 0)) + 1
+	rec["rounds"] = int(rec.get("rounds", 0)) + rounds
+	rec["cards"] = int(rec.get("cards", 0)) + cards
 
 
 static func group(kind: String) -> String:

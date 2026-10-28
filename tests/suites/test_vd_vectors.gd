@@ -161,3 +161,18 @@ func test_every_combo_resolves() -> void:
 		var target: Vector2i = Vector2i(3, 0)
 		st._combo(me, { "vectors": vec, "form": "burst" }, { "vectors": vec }, target)
 		check(st.combos_cast.has(str(c["id"])), "%s resolves" % c["id"])
+
+
+func test_demo_rules() -> void:
+	const Demo := preload("res://src/core/demo.gd")
+	check(not Demo.is_on(db(), false), "the full game has the demo off")
+	check(Demo.is_on(db(), true), "the demo build's feature tag turns it on")
+	check(Demo.ends_after(db(), 1) and not Demo.ends_after(db(), 0), "the demo ends after week 1")
+	var qs := Demo.survey(db())
+	check(qs.size() >= 5 and qs.size() <= 7, "5 to 7 survey questions")
+	var run := { "npcs": { "kelly": { "met": true }, "gary": { "met": false } }, "combos": ["slingshot"] }
+	var t := Demo.thanks(db(), run, { "combos": ["slingshot"] })
+	check(t["met"].size() == 1 and t["combos"] == ["Slingshot"] and not t["coming"].is_empty(), "thanks: who you met, combos found, what's coming")
+	var recs: Array = [{ "type": "day", "ap": { "talk": 2 }, "won": 2, "lost": 1, "rounds": 12, "cards": 9, "seconds": 60.0 }]
+	var s := Demo.log_summary(recs, run, { "week": 1 })
+	check(is_equal_approx(float(s["avgRoundsPerFight"]), 4.0) and int(s["cardsPlayed"]) == 9 and s["combos"] == ["slingshot"] and int(s["where"]["week"]) == 1, "the feedback summary has fights, cards, combos and where")

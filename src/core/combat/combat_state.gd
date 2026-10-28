@@ -70,6 +70,7 @@ var last_party_card: Dictionary = {}  # the last card a party member played (Mir
 var reinforcements: Dictionary = {}   # { "round", "enemies": [records], "cells": [telegraphed spawn tiles] }
 var mutators: Array = []              # arena mutator records (data/arena/mutators.json) active in this fight
 var multi_vector_casts := 0           # party spells with two or more Vectors (arena score)
+var cards_played := 0                 # party cards played (gameplay log, VD Part 6)
 var highest_hit := 0                  # the biggest single party hit (arena score screen, PT Part 6)
 
 
@@ -1105,6 +1106,8 @@ func play_card(u: UnitScript, hand_index: int, target: Vector2i) -> bool:
 	_push_undo(u)
 	_use_slot(u, card)
 	u.mp -= cost
+	if u.team == "party":
+		cards_played += 1
 	if u.team == "party" and CardRules.is_spell(card):
 		last_party_card = card
 	u.deck.play(hand_index, bool(card.get("consumable", false)) or bool(card.get("oncePerFight", false)))
@@ -3473,7 +3476,7 @@ func finish() -> Dictionary:
 	return {
 		"result": result, "xp": xp_total, "money": money_total, "party": party, "kills": kills,
 		"remaining": remaining, "wildSurges": wild_surges, "support": support_log,
-		"helpAnswered": answered, "helpIgnored": ignored, "rounds": round_num, "multiVector": multi_vector_casts, "combos": combos_cast, "highestHit": highest_hit,
+		"helpAnswered": answered, "helpIgnored": ignored, "rounds": round_num, "multiVector": multi_vector_casts, "combos": combos_cast, "cardsPlayed": cards_played, "highestHit": highest_hit,
 	}
 
 

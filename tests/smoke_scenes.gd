@@ -75,6 +75,26 @@ func _press(modal: Node, needle: String = "") -> bool:
 	return false
 
 
+## VD Part 5: in demo mode the run ends with the thanks screen and the survey,
+## saved as a feedback zip, then the title.
+func smoke_demo_end() -> void:
+	var gs := _root_node("GameState")
+	var fb := _root_node("Feedback")
+	gs.call("new_run", 9, "mage")
+	fb.set("force_demo", true)
+	fb.set("last_zip", "")
+	# Not awaited: _drive presses through the thanks screen, the survey and the run's end.
+	fb.call("end_demo")
+	await _drive(func() -> bool: return str(fb.get("last_zip")) != "" and current_scene != null and current_scene.name == "Title" and _top_modal() == null, [], 60.0)
+	fb.set("force_demo", false)
+	check(str(fb.get("last_zip")) != "" and FileAccess.file_exists(str(fb.get("last_zip"))), "the demo survey is saved as a feedback zip")
+	check(current_scene != null and current_scene.name == "Title", "the demo ends at the title")
+	var z := ZIPReader.new()
+	if z.open(str(fb.get("last_zip"))) == OK:
+		check(z.get_files().has("survey.json") and z.get_files().has("summary.json"), "the zip has the survey and the summary: %s" % str(z.get_files()))
+		z.close()
+
+
 func smoke_week_of_school() -> void:
 	var gs: Node = _root_node("GameState")
 	var cal: Node = _root_node("Calendar")

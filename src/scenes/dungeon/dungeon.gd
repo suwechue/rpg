@@ -401,6 +401,10 @@ func _after_fight(room_id: int) -> void:
 		lines.append_array(Night.boss_reward(db, GameState.run, _week, Rng.stream("dungeon")))
 		Audio.play_sfx("win")
 		await Flow.show_event({ "title": Strings.t("dungeon.week_cleared") % _week, "text": "\n".join(PackedStringArray(lines)) })
+		# VD Part 5: the demo ends after the week 1 boss (thanks, then the survey).
+		if Feedback.demo_active() and preload("res://src/core/demo.gd").ends_after(db, _week):
+			await Feedback.end_demo()
+			return
 	elif not lines.is_empty():
 		Narrator.say(" ".join(PackedStringArray(lines)))
 	if _sprites.has(room_id) and bool(room.get("cleared", false)):

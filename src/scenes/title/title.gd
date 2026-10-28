@@ -17,7 +17,14 @@ func _ready() -> void:
 	GameState.combat_turn_mode = ""
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	Flow.set_hud(false)
+	# VD Part 5: a logo slot (assets/custom/ui/art_logo.png replaces the text title).
+	if Assets.custom_file("art_logo") != "" or Assets.source("art_logo") == "pack":
+		var logo := TextureRect.new()
+		logo.texture = Assets.texture("art_logo")
+		logo.position = Vector2((Display.base.x - logo.texture.get_width()) / 2.0, 70 - logo.texture.get_height())
+		add_child(logo)
 	var title := UiTheme.role_label(Strings.t("title.project_vector"), "title", UiTheme.ACCENT)
+	title.visible = Assets.custom_file("art_logo") == "" and Assets.source("art_logo") != "pack"
 	title.position = Vector2((Display.base.x - 180) / 2.0, 50)
 	title.size = Vector2(180, 24)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -40,10 +47,15 @@ func _ready() -> void:
 		_menu.add_child(UiTheme.button(str(e["label"]), func() -> void: e["run"].call()))
 	_menu.add_child(UiTheme.button(Strings.t("title.endless_arena"), _arena))
 	_menu.add_child(UiTheme.button(Strings.t("title.narrator_s_journal"), _show_journal))
+	_menu.add_child(UiTheme.button(Strings.t("title.options"), func() -> void:
+		await Flow.show_modal(preload("res://src/scenes/ui/options_modal.gd").new())))
 	_menu.add_child(UiTheme.button(Strings.t("title.quit"), func() -> void: get_tree().quit()))
 	(_menu.get_child(1 if not cont.disabled else 0) as Button).grab_focus()
 	Audio.play_music("title")
 	Audio.play_ambience("")
+	var ver := UiTheme.label(Strings.t("title.version") % [Feedback.version(), Strings.t("title.demo_tag") if Feedback.demo_active() else ""], UiTheme.DIM)
+	ver.position = Vector2(4, Display.base.y - UiTheme.FONT_SIZE - 6)
+	add_child(ver)
 
 
 func _process(delta: float) -> void:
