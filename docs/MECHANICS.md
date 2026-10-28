@@ -363,7 +363,27 @@ Change these in `data/leveling.json`, `data/stats.json` and `data/classes.json`.
 - **Performance** sets how many **Properties** (bonuses from a bank of 15) the card rolls: below 0.35 gives none, below 0.8 gives one, otherwise two. A score of 0.95+ adds a Magnitude step.
 - The card collection is shared. Each deck can use up to the copies you own (max 3).
 
-Change these in `data/minigames.json`, `data/properties.json` and `src/core/progression/crafting.gd`.
+- Minigame timing windows and time limits are **x1.5** (PT Part 5); the **Easy** minigame setting (pause > Options) multiplies them by 1.5 again.
+- Crafted cards go straight into the crafter's deck.
+
+**The Card Forge** (PT Part 5, at the workbench and arena checkpoints; each action costs 1 AP or 1 Arena AP):
+- **Fuse** two cards: an **element** (Weapon Infusion or a one-Vector spell) with a **technique** (Lunge, Strike-type cards, Throw, Shove, Dash) makes the technique carry that Vector (Frost Bolt + Lunge = Cold Lunge, which applies Cold's effect on the hit). Two spells make a **hybrid** with a combo name where one exists (Heat + Cold = Thermal Shock). Cost = the higher cost + 1. Both sources are used up.
+- **Salvage** a card for **Scraps**: 2 of each of its Vectors, plus 1/2/4 generic by rarity.
+- **Upgrade** with Scraps (3/5/8 generic by rarity + 1 per Vector): named cards become their "+" version, spell designs go up one Magnitude.
+- **Riders** cost Scraps (1st at its listed cost, 2nd +1, 3rd +2) and raise the card's MP cost. Slots: 1 common, 2 uncommon, 3 rare. Widen and Twin can't share a card; Twin is single-target only.
+
+| Rider | Effect | MP |
+| --- | --- | --- |
+| Slow | Target -2 Movement next turn | +1 |
+| Push/Pull | Move the target 1 tile | +1 |
+| Daze | Target loses its Quick and has -20% hit chance next turn | +1 |
+| Lingering | Target takes 30% of the hit again at the start of its next turn | +1 |
+| Weaken | Target deals -25% damage next turn | +1 |
+| Widen | Plus becomes 3x3, a Line gets +2 | +2 |
+| Twin | Also hits a second target within 2 tiles | +2 |
+| Extended | Burn, auras and glyphs last 1 round longer | +1 |
+
+Change these in `data/minigames.json`, `data/properties.json`, `data/forge.json`, `data/riders.json`, `src/core/progression/crafting.gd` and `src/core/progression/forge.gd`.
 
 ## C5. Talking, Bonds and recruiting
 
@@ -448,7 +468,6 @@ Change these in `data/story/*.json`, `data/journal.json` and `data/endings.json`
 
 CT is done, with PT Parts 1 and 2 (2 Actions, Quicks, Cantrip, Hold, undo, deck rules) adopted inside it. Next, from `docs/PATCH_1.md`:
 
-- Part 5: the Card Forge (fuse, salvage, upgrade, riders).
 - Part 6: arena progression (a card every wave, a Technique every 5).
 - Part 7: status synergies, 80 more cards, 24 more enemies, the Cone Form.
 - Part 8: the Vector expansion, fusion synergy and antagonism, Instability by Magnitude, Techniques.

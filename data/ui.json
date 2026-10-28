@@ -274,6 +274,18 @@
       "text": "A bonus turn at half effect.",
       "icon": "icon_status_rally",
       "color": "#e87cc9"
+    },
+    "dazed": {
+      "name": "Dazed",
+      "text": "Loses its Quick; -20% hit chance.",
+      "icon": "icon_status_blind",
+      "color": "#c9a0e8"
+    },
+    "weakened": {
+      "name": "Weakened",
+      "text": "Deals -25% damage.",
+      "icon": "icon_status_slow",
+      "color": "#a0a0a0"
     }
   },
   "affixes": {

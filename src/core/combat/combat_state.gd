@@ -51,6 +51,7 @@ var party_turns := 0                # party turns started this fight (enemies be
 var party_first := false            # arena: the party acts before every enemy in round 1 (PT Part 1)
 var _rubble_marker := UnitScript.make_prop("rubble", 1)  # stands in for rubble when a cover piece is asked for
 var _breaker := false               # the current Strike is a wall breaker (Heavy Swing)
+var _card_infuse: Dictionary = {}   # PT Part 5: the Vector a forged technique carries while its effects run
 var fair := false                   # tutorial: no crits until the lesson that teaches them (CT Part 7)
 var hp_floor := false               # tutorial: the party can't drop below 1 HP
 var guarantee_improvise := false    # tutorial room 9: the first improvise always works
@@ -542,11 +543,15 @@ func _start_turn(u: UnitScript) -> void:
 	u.turns_taken += 1
 	u.last_turn_round = round_num
 	u.actions_left = 1 if u.statuses.has("encore") else actions_per_turn()
+	if u.statuses.has("lingering") and u.links.has("linger"):
+		_damage(u, int(str(u.links["linger"])), null, "", "lingering")
+		u.links.erase("linger")
+		u.statuses.erase("lingering")
 	_undo.clear()
 	undo_lock = ""
 	u.guard_active = false
 	u.action_used = false
-	u.quick_used = false
+	u.quick_used = u.statuses.has("dazed")    # Daze (PT Part 5): no Quick this turn
 	u.moved_steps = 0
 	u.undo_ok = true
 	_emit({ "t": "turn", "unit": u.id })
@@ -625,7 +630,7 @@ func _end_cleanup(u: UnitScript) -> void:
 	u.statuses.erase("encore")
 	u.links.erase("taunted_by")
 	u.statuses.erase("free_move")
-	for s in ["slow", "root", "blind", "haste", "rally", "rime", "tether", "pact", "regen", "taunting", "haste_full", "sanctuary", "intercept"]:
+	for s in ["slow", "root", "blind", "haste", "rally", "rime", "tether", "pact", "regen", "taunting", "haste_full", "sanctuary", "intercept", "slowed2", "dazed", "weakened"]:
 		if u.statuses.has(s):
 			u.statuses[s] = int(u.statuses[s]) - 1
 			if int(u.statuses[s]) <= 0:
@@ -1069,10 +1074,78 @@ func play_card(u: UnitScript, hand_index: int, target: Vector2i) -> bool:
 	else:
 		_emit({ "t": "cast", "unit": u.id, "name": str(card.get("name", "")), "target": target, "improvised": false })
 	if card.has("effects") and result == "":
+		_card_infuse = card.get("infuse", {})
 		_effects_script().run(self, u, card, target, cells)
+		_card_infuse = {}
+	if not card.get("riders", []).is_empty() and result == "":
+		_apply_riders(u, card, target, cells)
 	_check_end()
 	_after_step(u)
 	return true
+
+
+## Riders (PT Part 5) on whoever the card hit: Slow, Push, Daze, Lingering,
+## Weaken, Twin and Extended. Widen changes the footprint (see _widen).
+func _apply_riders(u: UnitScript, card: Dictionary, target: Vector2i, cells: Array) -> void:
+	var hit: Array = []
+	for c in (cells if not cells.is_empty() else [target]):
+		var t := unit_at(c)
+		if t != null and t.alive() and is_hostile(u, t):
+			hit.append(t)
+	var rs: Array = card.get("riders", [])
+	if rs.has("twin") and not hit.is_empty():
+		var first: UnitScript = hit[0]
+		for o in opponents_of(u):
+			if o != first and o.alive() and GridScript.manhattan(o.cell, first.cell) <= 2:
+				var spec := _spell_spec(u, card) if CardRules.is_spell(card) else { "name": card.get("name", ""), "vectors": card.get("infuse", {}), "form": form_rec("touch"), "power": 0.0, "mult": 1.0, "heal": false, "ranged": false, "kind": "strike", "base": float(u.stats.get("str", 5)) }
+				_hit_unit(u, o, spec, true)
+				hit.append(o)
+				break
+	for t in hit:
+		if not t.alive():
+			continue
+		if rs.has("slow"):
+			t.statuses["slowed2"] = 2
+			_emit({ "t": "status", "unit": t.id, "status": "slow" })
+		if rs.has("push"):
+			_push(u, t, Forms.direction_to(u.cell, t.cell) if u.cell != t.cell else Vector2i(u.facing, 0), 1)
+		if rs.has("daze"):
+			t.statuses["dazed"] = 2
+			_emit({ "t": "status", "unit": t.id, "status": "dazed" })
+		if rs.has("weaken"):
+			t.statuses["weakened"] = 2
+			_emit({ "t": "status", "unit": t.id, "status": "weakened" })
+		if rs.has("lingering"):
+			var est := _spell_spec(u, card) if CardRules.is_spell(card) else {}
+			var again := roundi((_expected_hit(u, t, est) if not est.is_empty() else float(u.stats.get("str", 5))) * float(Res.combat_cfg(db).get("lingeringPct", 0.3)))
+			t.links["linger"] = str(maxi(1, again))
+			t.statuses["lingering"] = 2
+	if rs.has("extended"):
+		for c in cells:
+			if grid.burning.has(c):
+				grid.burning[c] = int(grid.burning[c]) + 1
+		for g in glyphs:
+			if g.get("caster", null) == u:
+				g["turns"] = int(g["turns"]) + 1
+		for a in u.auras:
+			a["turns"] = int(a["turns"]) + 1
+
+
+## Widen (PT Part 5): plus shapes become 3x3, Lines get +2 range.
+func _widen(card: Dictionary, form: Dictionary) -> Dictionary:
+	if not card.get("riders", []).has("widen"):
+		return form
+	var f := form.duplicate()
+	var fp := str(f.get("footprint", ""))
+	if fp == "plus":
+		f["footprint"] = "square_3x3"
+	elif fp == "plus_self":
+		f["footprint"] = "zone_r1_self_3_turns"
+	elif fp == "line":
+		f["range"] = int(f.get("range", 4)) + 2
+	elif fp == "diamond_r1_self":
+		f["footprint"] = "diamond_r2_self"
+	return f
 
 
 func _effects_script() -> GDScript:
@@ -1195,7 +1268,7 @@ func preview(u: UnitScript, card: Dictionary, target: Vector2i, improvised: bool
 	if card.is_empty():
 		return out
 	if CardRules.is_spell(card):
-		var form := Forms.at_magnitude(form_rec(str(card.get("form", ""))), str(card.get("magnitude", "")))
+		var form := _widen(card, Forms.at_magnitude(form_rec(str(card.get("form", ""))), str(card.get("magnitude", ""))))
 		var cells := Forms.footprint(grid, form, u.cell, target, occupied())
 		out["cells"] = cells
 		var cost := improvise_cost(u, card) if improvised else card_cost(u, card, target)
@@ -1302,7 +1375,7 @@ func push_landing(u: UnitScript, t: UnitScript, dir: Vector2i, steps: int, colli
 
 ## A spell as a resolution spec (shared by cards and enemy actions).
 func _spell_spec(u: UnitScript, card: Dictionary) -> Dictionary:
-	var form := Forms.at_magnitude(form_rec(str(card.get("form", ""))), str(card.get("magnitude", "")))
+	var form := _widen(card, Forms.at_magnitude(form_rec(str(card.get("form", ""))), str(card.get("magnitude", ""))))
 	# Flashover: a bigger area while standing in fire.
 	if card.has("footprintIfBurning") and grid.burning.has(u.cell):
 		form = form.duplicate()
@@ -1329,6 +1402,8 @@ func _expected_hit(u: UnitScript, t: UnitScript, spec: Dictionary) -> float:
 	var area := float(spec.get("areaMul", 1.0))
 	if u.statuses.has("encore"):
 		area *= float(Res.combat_cfg(db).get("encoreMul", 0.5))
+	if u.statuses.has("weakened"):
+		area *= 1.0 - float(Res.combat_cfg(db).get("weakenPct", 0.25))
 	# Arena mutators: "Cold is stronger" and friends.
 	for axis in spec.get("vectors", {}):
 		area *= float(mutator_rules().get("vectorDamage", {}).get(str(axis), 1.0))
@@ -1569,7 +1644,8 @@ func _hit_unit(u: UnitScript, t: UnitScript, spec: Dictionary, can_miss: bool) -
 		guard_ally.statuses.erase("intercept")
 		_emit({ "t": "log", "text": Str.t(db, "combat_state.intercepts") % [guard_ally.name, t.name] })
 		t = guard_ally
-	if can_miss and u.statuses.has("blind") and rng.randf() < float(Res.combat_cfg(db).get("blindMissChance", 0.35)):
+	var miss := (float(Res.combat_cfg(db).get("blindMissChance", 0.35)) if u.statuses.has("blind") else 0.0) + (float(Res.combat_cfg(db).get("dazeMissChance", 0.2)) if u.statuses.has("dazed") else 0.0)
+	if can_miss and miss > 0.0 and rng.randf() < miss:
 		_emit({ "t": "miss", "unit": t.id })
 		return false
 	var dmg := Res.finalize(db, _expected_hit(u, t, spec), u, rng, float(spec.get("critBonus", 0.0)))
@@ -1593,6 +1669,9 @@ func _after_hit(u: UnitScript, t: UnitScript, amount: int) -> void:
 
 
 func _basic(u: UnitScript, card: Dictionary, target: Vector2i) -> void:
+	if card.get("infuse", {}).is_empty() and not _card_infuse.is_empty():
+		card = card.duplicate()
+		card["infuse"] = _card_infuse
 	_breaker = bool(card.get("breaker", false))
 	if str(card.get("action", "")) == "strike" and unit_at(target) == null and grid.wall_hp.has(target):
 		damage_wall(target, roundi(float(u.stats.get(str(card.get("stat", "str")), 5)) * float(card.get("mult", 1.0))), "", _breaker)
@@ -1624,6 +1703,10 @@ func _basic(u: UnitScript, card: Dictionary, target: Vector2i) -> void:
 				u.infusion["strikes"] = int(u.infusion["strikes"]) - 1
 				if int(u.infusion["strikes"]) <= 0:
 					u.infusion = {}
+			if not card.get("infuse", {}).is_empty() and t.alive():
+				# A forged technique (Heat Lunge...) carries its Vector's effect (PT Part 5).
+				var fspec := { "vectors": card["infuse"], "power": float(db.get("vectors", {}).get("magnitudes", {}).get("standard", {}).get("power", 7)), "form": form_rec("touch"), "heal": false, "mult": 1.0, "ranged": false, "name": str(card.get("name", "")) }
+				_apply_vector_effects(u, fspec, [t.cell], [t])
 		"guard":
 			u.guard_active = true
 			_emit({ "t": "guard", "unit": u.id })
@@ -2136,7 +2219,7 @@ func spend_action(u: UnitScript) -> void:
 func move_budget(u: UnitScript) -> int:
 	if u.statuses.has("root"):
 		return 0
-	var b := u.movement + int(u.statuses.get("haste_amount", 0)) - (1 if u.statuses.has("slow") else 0)
+	var b := u.movement + int(u.statuses.get("haste_amount", 0)) - (1 if u.statuses.has("slow") else 0) - (2 if u.statuses.has("slowed2") else 0)
 	if u.statuses.has("haste_full"):
 		b += int(Res.combat_cfg(db).get("hasteMoveBonus", 2))
 	return maxi(0, b)

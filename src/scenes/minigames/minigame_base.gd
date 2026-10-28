@@ -11,6 +11,19 @@ var done := false
 var box := Rect2(80, 60, 320, 150)
 
 
+## Timing from data/minigames.json "timing": windows and limits x windowMul,
+## and again x easyMul with the Easy minigame setting (PT Part 5).
+static func timing(key: String, fallback: Variant) -> Variant:
+	return DataDB.table("minigames").get("timing", {}).get(key, fallback)
+
+
+static func time_mul() -> float:
+	var t: Dictionary = DataDB.table("minigames").get("timing", {})
+	var cfg := ConfigFile.new()
+	var easy := cfg.load("user://settings.cfg") == OK and bool(cfg.get_value("minigames", "easy", false))
+	return float(t.get("windowMul", 1.5)) * (float(t.get("easyMul", 1.5)) if easy else 1.0)
+
+
 func _ready() -> void:
 	box.position = (Display.size_f() - box.size) / 2.0
 	set_anchors_preset(Control.PRESET_FULL_RECT)

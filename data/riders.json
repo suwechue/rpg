@@ -1,0 +1,62 @@
+{
+  "comment": "PT Part 5: riders (modifiers from the user's Arcanist homebrew). mp raises the card's MP cost; scraps is the generic Scrap cost of the first rider on a card.",
+  "riders": [
+    {
+      "id": "slow",
+      "name": "Slow",
+      "text": "Target -2 Movement next turn.",
+      "mp": 1,
+      "scraps": 2
+    },
+    {
+      "id": "push",
+      "name": "Push/Pull",
+      "text": "Move the target 1 tile away from you.",
+      "mp": 1,
+      "scraps": 2
+    },
+    {
+      "id": "daze",
+      "name": "Daze",
+      "text": "Target loses its Quick and has -20% hit chance next turn.",
+      "mp": 1,
+      "scraps": 2
+    },
+    {
+      "id": "lingering",
+      "name": "Lingering",
+      "text": "Target takes 30% of the hit again at the start of its next turn.",
+      "mp": 1,
+      "scraps": 2
+    },
+    {
+      "id": "weaken",
+      "name": "Weaken",
+      "text": "Target deals -25% damage next turn.",
+      "mp": 1,
+      "scraps": 2
+    },
+    {
+      "id": "widen",
+      "name": "Widen",
+      "text": "The area grows one step (plus becomes 3x3, a Line gets +2).",
+      "mp": 2,
+      "scraps": 3
+    },
+    {
+      "id": "twin",
+      "name": "Twin",
+      "text": "Single target only: also hits a second target within 2 tiles of the first.",
+      "mp": 2,
+      "scraps": 3,
+      "singleTargetOnly": true
+    },
+    {
+      "id": "extended",
+      "name": "Extended",
+      "text": "Lasting effects (burn, auras, constructs, glyphs) last 1 round longer.",
+      "mp": 1,
+      "scraps": 2
+    }
+  ]
+}

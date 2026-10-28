@@ -3,7 +3,7 @@
 ## for time and mistakes.
 extends "res://src/scenes/minigames/minigame_base.gd"
 
-const LIMIT := 6.0
+var LIMIT := float(timing("chemicalLimit", 6.0)) * time_mul()
 const KEYS := ["move_up", "move_right", "move_down", "move_left"]
 const NAMES := ["Up", "Right", "Down", "Left"]
 const COLORS := ["#e87cc9", "#5fd98a", "#8a9b3c", "#7cc7e8"]

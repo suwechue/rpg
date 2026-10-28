@@ -599,7 +599,7 @@ func _pause_menu() -> void:
 		"party":
 			await _open_party_panel()
 		"options":
-			Narrator.say(Strings.t("pause.options_soon"))
+			await Flow.show_modal(preload("res://src/scenes/ui/options_modal.gd").new())
 		"save":
 			GameState.save_arena_and_quit()
 		"abandon":

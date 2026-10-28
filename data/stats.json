@@ -122,7 +122,10 @@
       "comment": "PT Part 4: '#' walls are breakable (HP below), 'B' is the unbreakable boundary, 'c' low walls are climbable cover props. A broken wall or low wall becomes rubble: floor that gives half cover to units next to it. Force, Corrosion and Heavy Swing deal x2 to walls and cover.",
       "wallHp": 25,
       "climbCost": 1
-    }
+    },
+    "lingeringPct": 0.3,
+    "weakenPct": 0.25,
+    "dazeMissChance": 0.2
   },
   "training": {
     "barsBase": 3,

@@ -101,6 +101,7 @@ func _validate() -> void:
 			if entry.has("basic") and CardRules.resolve(_tables, str(entry["basic"])).is_empty():
 				errors.append("class %s: unknown starter card '%s'" % [id, entry["basic"]])
 	_validate_combat(arcane)
+	_validate_forge()
 	_validate_events()
 	_validate_town()
 	for t in records_under("traits", "traits"):
@@ -275,3 +276,20 @@ func _enemy_ids() -> Dictionary:
 	for e in records_under("enemies/", "enemies"):
 		out[str(e["id"])] = true
 	return out
+
+
+## PT Part 5: riders have unique ids; exclusive pairs and rarities in the forge rules exist.
+func _validate_forge() -> void:
+	var ids := {}
+	for r in _tables.get("riders", {}).get("riders", []):
+		var id := str(r.get("id", ""))
+		if ids.has(id):
+			errors.append("riders: duplicate id '%s'" % id)
+		ids[id] = true
+	for pair in _tables.get("forge", {}).get("exclusiveRiders", []):
+		for id in pair:
+			if not ids.has(str(id)):
+				errors.append("forge: exclusive rider '%s' is not in data/riders.json" % id)
+	for rarity in _tables.get("forge", {}).get("riderSlots", {}):
+		if not _tables.get("forge", {}).get("rarityOrder", []).has(rarity):
+			errors.append("forge: riderSlots rarity '%s' is not in rarityOrder" % rarity)

@@ -2,7 +2,7 @@
 ## to cool; keep it inside the band. Performance = share of time in the band.
 extends "res://src/scenes/minigames/minigame_base.gd"
 
-const DURATION := 5.0
+var DURATION := float(timing("thermalDuration", 5.0)) * time_mul()
 
 var _temp := 0.3
 var _heating := false
@@ -29,7 +29,7 @@ func _process(delta: float) -> void:
 	_temp += (0.55 if _heating else -0.45) * delta
 	_temp += 0.12 * sin(_t * 3.1) * delta
 	_temp = clampf(_temp, 0.0, 1.0)
-	if absf(_temp - _band_center()) <= 0.1:
+	if absf(_temp - _band_center()) <= float(timing("thermalBand", 0.1)) * time_mul():
 		_in_band += delta
 	if _t >= DURATION:
 		finish(_in_band / DURATION)

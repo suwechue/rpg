@@ -11,7 +11,7 @@ var _flash := 0.0
 
 
 func _marker() -> float:
-	return 0.5 + 0.5 * sin(_t * 1.3 * TAU * 0.5)
+	return 0.5 + 0.5 * sin(_t * float(timing("precisionSpeed", 1.3)) / time_mul() * TAU * 0.5)
 
 
 func _process(delta: float) -> void:

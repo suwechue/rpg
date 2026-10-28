@@ -9,7 +9,7 @@ const Char := preload("res://src/core/character.gd")
 var craft_ap := 1
 var place := "home"
 ## Where AP comes from: the day's AP by default; the arena passes its Arena AP.
-var ap_left: Callable = func() -> int: return int(ap_left.call())
+var ap_left: Callable = func() -> int: return Calendar.ap()
 var spend_ap: Callable = func(n: int, kind: String) -> bool: return Calendar.spend_ap(n, kind)
 var deck_save_cost := -1  # AP per removed card; -1 = data/leveling.json removeCardCost (the arena sets its own)
 var _filter := ""         # deck editor filter: "" or a Vector id or "quick"
@@ -30,6 +30,14 @@ func _menu() -> void:
 	text(Strings.t("workbench.ap_left_a_new_design") % [int(ap_left.call()), craft_ap, int(DataDB.table("minigames").get("copyAp", 1))], UiTheme.DIM)
 	add_button(Strings.t("workbench.design_a_new_card"), _design, int(ap_left.call()) < craft_ap)
 	add_button(Strings.t("workbench.copy_a_design_you_own"), _copy_menu, int(ap_left.call()) < int(DataDB.table("minigames").get("copyAp", 1)))
+	add_button(Strings.t("forge.title"), func() -> void:
+		var fs := preload("res://src/scenes/ui/forge_screen.gd").new()
+		fs.spend_ap = spend_ap
+		fs.ap_left = ap_left
+		visible = false
+		await Flow.show_modal(fs)
+		visible = true
+		_menu())
 	add_button(Strings.t("workbench.edit_decks_free"), func() -> void:
 		_deck_owner = "player"
 		_deck = GameState.player.get("deck", []).duplicate()

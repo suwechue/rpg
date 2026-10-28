@@ -1,0 +1,51 @@
+{
+  "comment": "PT Part 5: the Card Forge. Fuse an element (Weapon Infusion or a single-Vector spell) with a technique (Lunge, Strike-type cards, Throw, Shove, Dash) so the technique carries that Vector, or two spells into a hybrid. The fused card costs the higher cost plus fusionSurcharge; both sources are used up. Salvage gives Scraps of the card's Vectors plus generic Scraps by rarity. Upgrades and riders cost Scraps; each extra rider on a card costs more (riderEscalation).",
+  "fusionSurcharge": 1,
+  "maxVectors": 3,
+  "rarityOrder": [
+    "common",
+    "uncommon",
+    "rare"
+  ],
+  "salvage": {
+    "perVector": 2,
+    "generic": {
+      "common": 1,
+      "uncommon": 2,
+      "rare": 4
+    }
+  },
+  "upgradeCost": {
+    "common": 3,
+    "uncommon": 5,
+    "rare": 8
+  },
+  "upgradeVectorScraps": 1,
+  "riderSlots": {
+    "common": 1,
+    "uncommon": 2,
+    "rare": 3
+  },
+  "riderEscalation": [
+    0,
+    1,
+    2
+  ],
+  "exclusiveRiders": [
+    [
+      "widen",
+      "twin"
+    ]
+  ],
+  "forgeAp": 1,
+  "comboNames": {
+    "cold+heat": "Thermal Shock",
+    "force+motion": "Momentum",
+    "binding+cold": "Deep Freeze",
+    "heat+motion": "Wildfire",
+    "light+motion": "Flash Step",
+    "binding+light": "Halo Lock",
+    "force+heat": "Blast",
+    "cold+force": "Shatter"
+  }
+}

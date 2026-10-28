@@ -29,7 +29,7 @@ func _process(delta: float) -> void:
 	if done:
 		return
 	for i in range(_locked, 3):
-		_angles[i] = float(_angles[i]) + float(SPEEDS[i]) * delta
+		_angles[i] = float(_angles[i]) + float(timing("alignmentSpeeds", SPEEDS)[i]) / time_mul() * delta
 	queue_redraw()
 
 

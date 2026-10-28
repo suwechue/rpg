@@ -83,6 +83,9 @@ static func property_mods(db: Dictionary, card: Dictionary) -> Dictionary:
 
 
 static func cost(db: Dictionary, card: Dictionary) -> int:
+	if card.has("costOverride"):
+		# Forged cards (fused, riders) carry their own cost (PT Part 5).
+		return int(card["costOverride"])
 	if str(card.get("kind", "")) == "spell":
 		return spell_cost(db, card)
 	return int(card.get("cost", 0))
