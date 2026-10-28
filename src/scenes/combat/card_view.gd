@@ -11,6 +11,7 @@ var cost := 0
 var selected := false
 var owner_color := Color(0, 0, 0, 0)   # CT Part 2b: thin border in the owner's color
 var held := false                     # PT Part 2: kept over from last turn (a small pin)
+var quick_now := true                 # P2 1.1: show the QUICK badge only when the card really is a Quick now
 var _shape: Array = []                # PT Part 3: footprint cells on a 7x5 mini grid
 var _axes: Array = []
 var _frame: Texture2D
@@ -54,7 +55,7 @@ func _pos(key: String) -> Vector2:
 func _draw() -> void:
 	if _frame == null:
 		return
-	var lift := Vector2(0, -3) if (is_hovered() or has_focus() or selected) and not disabled else Vector2.ZERO
+	var lift := Vector2(0, -3) if (is_hovered() or (has_focus() and UiTheme.nav_mode) or selected) and not disabled else Vector2.ZERO
 	var dim := Color(0.55, 0.55, 0.6) if disabled else Color.WHITE
 	draw_texture(_frame, lift, _tint * dim)
 	var art_pos := _pos("artPos") + lift
@@ -79,7 +80,7 @@ func _draw() -> void:
 	draw_string(f, text_pos + Vector2(0, fs - 1), CardRules.summary(DataDB.all(), card), HORIZONTAL_ALIGNMENT_LEFT, box.size.x, fs, UiTheme.TEXT * dim)
 	if owner_color.a > 0.0:
 		draw_rect(Rect2(lift, _frame.get_size()), owner_color * dim, false, 1.0)
-	if bool(card.get("quick", false)):
+	if bool(card.get("quick", false)) and quick_now:
 		# Quick cards: a bright edge and a lightning QUICK badge (PT Part 3).
 		draw_rect(Rect2(lift + Vector2(1, 1), _frame.get_size() - Vector2(2, 2)), Color(UiTheme.GOOD, 0.8) * dim, false, 1.0)
 		var bx := lift + Vector2(3, _frame.get_height() - 4)
@@ -97,7 +98,11 @@ func _draw() -> void:
 	if held:
 		draw_circle(lift + Vector2(_frame.get_width() - 4, 4), 2.5, UiTheme.ACCENT)
 	if selected:
+		# Selected (P2 1.2): raised with a Vector-colored glow, unlike the focus outline.
+		draw_rect(Rect2(lift - Vector2(1, 1), _frame.get_size() + Vector2(2, 2)), Color(_tint, 0.9), false, 2.0)
 		draw_texture(Assets.texture(str(UiTheme.skin("cards").get("select", ""))), lift)
+	elif has_focus() and UiTheme.nav_mode:
+		draw_rect(Rect2(lift, _frame.get_size()), UiTheme.ACCENT, false, 1.0)
 
 
 ## Faint lines or dots behind the effect text, one pattern per Vector.

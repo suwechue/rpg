@@ -160,6 +160,28 @@ static func owned(run: Dictionary, ch: Dictionary, card_id: String) -> int:
 	return n
 
 
+## Why this character can't use a card, or "" (P2 1.3; the deck editing rules):
+## basic cards suit anyone, class pool cards need the class (or one of its
+## advanced classes), spells need every Vector known.
+static func eligibility(db: Dictionary, ch: Dictionary, card: Dictionary) -> String:
+	if card.is_empty():
+		return Str.t(db, "crafting.unknown_card") % "?"
+	var pool := str(card.get("pool", ""))
+	if pool != "":
+		var history: Array = ch.get("classHistory", [ch.get("class", "")])
+		var ok := history.has(pool)
+		for c in db.get("classes", {}).get("classes", []):
+			if history.has(str(c.get("id", ""))) and str(c.get("from", "")) == pool:
+				ok = true
+		if not ok:
+			return Str.t(db, "owner.not_class") % [str(ch.get("name", "?")), pool.capitalize()]
+	if CardRules.is_spell(card):
+		for axis in card.get("vectors", {}):
+			if not ch.get("knownVectors", []).has(axis):
+				return Str.t(db, "owner.not_vector") % [str(ch.get("name", "?")), str(axis).capitalize()]
+	return ""
+
+
 ## Whether one more copy of this card fits the copy limit (0 = no limit).
 static func copies_ok(db: Dictionary, deck: Array, card_id: String) -> bool:
 	var cap := int(db.get("leveling", {}).get("maxCopies", 3))

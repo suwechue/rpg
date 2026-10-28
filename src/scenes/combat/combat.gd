@@ -46,6 +46,8 @@ var _banner: Label
 var _banner_face: Control
 var _hand_owner: Label
 var _pips: HBoxContainer
+var _override_tag: Label
+var _strip: VBoxContainer
 const Tutorial := preload("res://src/core/story/tutorial.gd")
 var _lesson: Tutorial.Lesson = null    # CT Part 7: the tutorial room's lesson, or null
 var _lesson_box: PanelContainer
@@ -313,6 +315,15 @@ func _build_ui() -> void:
 		pip.tooltip_text = Strings.t("combat.uses_action") if i < 2 else Strings.t("combat.uses_quick")
 		_pips.add_child(pip)
 	_ui.add_child(_pips)
+	# F1 turn-rule override: an amber tag so it's never silent (P2 1.1).
+	_override_tag = UiTheme.label("", UiTheme.color("warning", Color("e8a33d")))
+	_override_tag.position = Vector2(view.x - 200, 2)
+	_override_tag.visible = false
+	_ui.add_child(_override_tag)
+	_strip = preload("res://src/scenes/ui/effects_strip.gd").new()
+	_strip.state = state
+	_strip.position = Vector2(2, 150)
+	_ui.add_child(_strip)
 	_lesson_box = PanelContainer.new()
 	_lesson_box.position = Vector2(118, 40)
 	_lesson_box.custom_minimum_size = Vector2(view.x - 248, 0)
@@ -364,7 +375,7 @@ func _build_ui() -> void:
 	for key in ["strike", "guard"]:
 		var qb: Button = _buttons[key]
 		col.remove_child(qb)
-		qb.text = "%s (%s)" % [qb.text, Strings.t("combat.quick_badge")]
+		qb.set_meta("base_text", qb.text)
 		_quick_box.add_child(qb)
 	# Keep the button grid on screen however wide the labels are.
 	col.position.x = view.x - col.get_combined_minimum_size().x - 2
@@ -437,6 +448,19 @@ func _refresh_hud() -> void:
 			inner.theme_type_variation = "CompactBox"
 			var is_now: bool = u == state.current and group[0] == "now"
 			inner.add_child(_portrait(u, int(tl.get("portraitCurrent", 26)) if is_now else int(tl.get("portrait", 20))))
+			if u.team == "party" and group[0] == "now":
+				# Small perk badges (P2 2.2); hover one for its text.
+				var badges := VBoxContainer.new()
+				badges.add_theme_constant_override("separation", 0)
+				for pe in _member_perks(u).slice(0, 3):
+					var bd := TextureRect.new()
+					bd.texture = Assets.texture(str(pe["icon"]))
+					bd.custom_minimum_size = Vector2(6, 6)
+					bd.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+					bd.tooltip_text = "%s: %s" % [pe["name"], pe["text"]]
+					bd.mouse_filter = Control.MOUSE_FILTER_PASS
+					badges.add_child(bd)
+				inner.add_child(badges)
 			if int(r["n"]) > 1:
 				inner.add_child(UiTheme.label("x%d" % int(r["n"])))
 			box.add_child(inner)
@@ -476,6 +500,18 @@ func _refresh_hud() -> void:
 	_buttons["guard"].disabled = not player_turn or quick_block != ""
 	_buttons["wheel"].disabled = not player_turn or act_block != "" or u.known_vectors.is_empty() or not bool(_ui_open.get("wheel", true))
 	_buttons["flee"].disabled = not player_turn or not state.can_flee()
+	for key in ["strike", "guard"]:
+		var qbtn: Button = _buttons[key]
+		var quick := state.is_quick_now(u, { "builtin": true })
+		qbtn.text = "%s (%s)" % [str(qbtn.get_meta("base_text", qbtn.text)), Strings.t("combat.quick_badge") if quick else Strings.t("combat.action_badge")]
+	# The active mode's button is "selected" (a filled look, not the focus outline).
+	for key in _buttons:
+		var mb: Button = _buttons[key]
+		mb.theme_type_variation = "SelectedButton" if (key == mode or (key == "wheel" and mode in ["fuel", "wheel_target"])) else ""
+	if _strip != null and Engine.get_process_frames() % 30 == 0:
+		_strip.refresh()
+	_override_tag.visible = GameState.combat_turn_mode != "" and GameState.combat_turn_mode != str(DataDB.table("combat_rules").get("turnMode", ""))
+	_override_tag.text = Strings.t("combat.override_tag") % GameState.combat_turn_mode
 	_buttons["undo"].disabled = not player_turn or not state.can_undo_move(u)
 	_buttons["undo"].tooltip_text = Strings.t("combat.undo_this_turn_s_move") if u == null or state.can_undo_move(u) else Strings.t("combat.undo_locked") % state.undo_reason(u)
 	_buttons["cantrip"].disabled = not player_turn or act_block != "" or state.cantrip_targets(u).is_empty()
@@ -537,8 +573,9 @@ func _refresh_hand() -> void:
 		var block := state.card_block(u, card)
 		b.disabled = not _player_turn() or (block != "" and mode != "fuel" and mode != "hold") or not bool(_ui_open.get("hand", true))
 		b.held = str(u.deck.hand[i]) == u.held_id
+		b.quick_now = state.is_quick_now(u, card)
 		if state.uses_actions(u):
-			b.tooltip_text += "\n" + (Strings.t("combat.uses_quick") if bool(card.get("quick", false)) and not u.quick_used else Strings.t("combat.uses_action"))
+			b.tooltip_text += "\n" + (Strings.t("combat.uses_quick") if b.quick_now and not u.quick_used else Strings.t("combat.uses_action"))
 		if _player_turn() and block != "":
 			b.tooltip_text += "\n" + block
 		elif bool(card.get("quick", false)):
@@ -606,6 +643,17 @@ func _pause_menu() -> void:
 			_done = true
 			GameState.finish_combat({ "result": "lose", "party": [] })
 			EventBus.run_ended.emit("arena")
+
+
+func _perk_suffix(u: UnitScript) -> String:
+	var names: Array = _member_perks(u).map(func(e: Dictionary) -> String: return str(e["name"]))
+	return "" if names.is_empty() else " - " + ", ".join(PackedStringArray(names.slice(0, 2)))
+
+
+## This unit's perks and Techniques (P2 2.2).
+func _member_perks(u: UnitScript) -> Array:
+	return preload("res://src/core/effects.gd").member_effects(DataDB.all(), GameState.run).filter(func(e: Dictionary) -> bool:
+		return str(e["member"]) == u.id or (u.is_player and str(e["member"]) == "player"))
 
 
 ## Each party member's color (data/ui.json "partyColors", by party order).
@@ -750,6 +798,8 @@ func _preview(card: Dictionary, improvised: bool, guess: bool = false) -> void:
 		if h.has("damage"):
 			hostile += 1
 			tag = "-%d" % int(h["damage"])
+			if str(h.get("mutator", "")) != "":
+				tag += " " + str(h["mutator"])
 			if float(h.get("cover", 1.0)) < 1.0:
 				tag += " " + Strings.t("combat.in_cover") % str(snappedf(float(h["cover"]), 0.01))
 			for s in h.get("status", []):
@@ -899,6 +949,8 @@ func _update_hover_info(at: Vector2) -> void:
 				lines.append(Strings.t("combat.passive") % Strings.t("behavior." + beh))
 			for a in t.source.get("affixes", []):
 				lines.append(Strings.t("combat.affix_line") % str(DataDB.table("ui").get("affixes", {}).get(str(a), {}).get("name", str(a).capitalize())))
+			if state.mutator_hp_note() != "":
+				lines.append(state.mutator_hp_note())
 			lines.append(Strings.t("combat.weak_strong") % [", ".join(PackedStringArray(t.source.get("weakTo", []))) if not t.source.get("weakTo", []).is_empty() else "-",
 				", ".join(PackedStringArray(t.source.get("strongAgainst", []))) if not t.source.get("strongAgainst", []).is_empty() else "-"])
 			if not t.intent.is_empty():
@@ -1016,9 +1068,10 @@ func _on_button(key: String) -> void:
 			state.end_turn()
 			_after_action()
 		"strike":
-			if not u.action_used:
+			if state.quick_block(u) == "":
 				mode = "strike"
 				_refresh_overlays()
+				_refresh_hud()
 		"guard":
 			if state.guard(u):
 				_lesson_event("guarded")
@@ -1285,7 +1338,7 @@ func _play_event(e: Dictionary) -> void:
 					elif next.size() > 1:
 						_say_banner(Strings.t("combat.enemies_act_next") % [u.name, next.size()], u)
 					else:
-						_say_banner(Strings.t("combat.unit_turn") % u.name, u)
+						_say_banner(Strings.t("combat.unit_turn") % u.name + _perk_suffix(u), u)
 				else:
 					Audio.event("turn_start_enemy")
 				if u.team == "party" and not _is_ai(u):
@@ -1427,6 +1480,10 @@ func _play_event(e: Dictionary) -> void:
 			_note(Strings.t("combat.is_down") % _uname(str(e["unit"])))
 		"out":
 			_say_banner(Strings.t("combat_state.is_out") % _uname(str(e["unit"])))
+		"perk":
+			# A perk or Technique working (P2 2.2): its name floats over the unit.
+			_float_text(_view_for_id(str(e["unit"])), str(e["name"]) + "!", UiTheme.GOOD)
+			_note(Strings.t("combat.perk_fired") % [_uname(str(e["unit"])), str(e["name"])])
 		"death", "vanish":
 			var u: UnitScript = null
 			for x in state.units:
@@ -1537,10 +1594,15 @@ func _float_text(v: Node2D, text: String, color: Color) -> void:
 	var tw := create_tween()
 	tw.tween_property(l, "position:y", l.position.y - 12, 0.6)
 	tw.parallel().tween_property(l, "modulate:a", 0.0, 0.6).set_delay(0.3)
-	tw.tween_callback(func() -> void:
-		l.queue_free()
-		if is_instance_valid(v) and _float_slots.has(v):
-			_float_slots[v] = maxi(0, int(_float_slots[v]) - 1))
+	# Bound ids, not captured nodes: the unit's view can be freed first (P2 1.4).
+	tw.tween_callback(l.queue_free)
+	tw.tween_callback(_release_float_slot.bind(v.get_instance_id()))
+
+
+func _release_float_slot(view_id: int) -> void:
+	var v: Object = instance_from_id(view_id)
+	if v != null and is_instance_valid(v) and _float_slots.has(v):
+		_float_slots[v] = maxi(0, int(_float_slots[v]) - 1)
 
 
 func _shake(amount: float) -> void:

@@ -40,7 +40,8 @@
     "heal": "#8fd694",
     "damage": "#ff7a6a",
     "crit": "#ffd966",
-    "cover": "#7cc7e8"
+    "cover": "#7cc7e8",
+    "warning": "#e8a33d"
   },
   "skin": {
     "panel": {

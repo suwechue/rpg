@@ -538,3 +538,35 @@ func smoke_cu_push_and_slide() -> void:
 				waited += 1
 	check(pushes > 0, "CU: a push lands an enemy in a hazard")
 	check(slides > 0, "CU: an enemy slides across ice")
+
+
+## P2 1.1 and 1.2 in the real scene: Strike targeting after both Actions, and
+## clicking card A then card B leaves A neither selected nor outlined.
+func smoke_p2_quick_and_selection() -> void:
+	var gs: Node = _root_node("GameState")
+	gs.call("new_run", 777, "fighter")
+	var setup: Dictionary = gs.call("combat_setup", ["pom_pom_wisp"], "open_field")
+	setup["partyFirst"] = true
+	gs.set("pending_combat", setup)
+	var scene: Node = await _goto("res://src/scenes/combat/combat.tscn")
+	var st: Object = scene.get("state")
+	var guard := 0
+	while not scene.call("_player_turn") and guard < 200:
+		await create_timer(0.05).timeout
+		guard += 1
+	var u: Object = st.get("current")
+	u.get("deck").set("hand", ["card_heavy_swing", "card_lunge", "card_brace"])
+	u.set("mp", 10)
+	scene.call("_refresh_hud")
+	scene.call("_on_card", 0)
+	scene.call("_on_card", 1)
+	var hand_box: Node = scene.get("_hand")
+	var a: Node = hand_box.get_child(0) if hand_box.get_child_count() > 0 else null
+	check(a != null and not bool(a.get("selected")) and not (a as Control).has_focus(), "clicking card B clears card A's selected and focus look")
+	scene.call("_cancel")
+	u.set("actions_left", 0)
+	u.set("action_used", true)
+	u.set("quick_used", false)
+	scene.call("_on_button", "strike")
+	check(str(scene.get("mode")) == "strike", "Strike targeting starts after both Actions are spent (it's a Quick)")
+	scene.call("_cancel")

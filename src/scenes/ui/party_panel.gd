@@ -9,12 +9,46 @@ const CharSheet := preload("res://src/scenes/ui/character_sheet.gd")
 const CardRules := preload("res://src/core/card.gd")
 
 var state: Object = null     # a CombatState during a fight, for hands and discard piles
+var tab := "members"         # "members" or "effects" (P2 2.3)
 var _who := 0
 
 
 func _ready() -> void:
 	build(Strings.t("party_panel.title"), 420)
 	_refresh()
+
+
+## The Effects page (P2 2.3): run-wide effects, then each member's perks,
+## Techniques and lasting effects, each with icon, name, text, source, duration.
+func _effects_page() -> void:
+	var cfg := ConfigFile.new()
+	var easy := cfg.load("user://settings.cfg") == OK and bool(cfg.get_value("minigames", "easy", false))
+	var all := preload("res://src/core/effects.gd").gather(DataDB.all(), GameState.run, { "difficulty": GameState.combat_difficulty, "easyMinigames": easy,
+		"turnOverride": GameState.combat_turn_mode, "dataTurnMode": str(DataDB.table("combat_rules").get("turnMode", "")) })
+	text(Strings.t("party_panel.run_wide"), UiTheme.ACCENT)
+	for e in all:
+		if str(e["member"]) == "" :
+			_effect_row(e)
+	for ch in _members():
+		var mine: Array = all.filter(func(x: Dictionary) -> bool: return str(x["member"]) == str(ch.get("id", "")))
+		if mine.is_empty():
+			continue
+		text(str(ch.get("name", "?")), UiTheme.ACCENT)
+		for e in mine:
+			_effect_row(e)
+
+
+func _effect_row(e: Dictionary) -> void:
+	var r := row()
+	var ic := TextureRect.new()
+	ic.texture = Assets.texture(str(e["icon"]))
+	ic.custom_minimum_size = Vector2(Display.tile / 2.0, Display.tile / 2.0)
+	ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	r.add_child(ic)
+	var l := UiTheme.label("%s: %s (%s%s)" % [e["name"], e["text"], e["source"], (", " + str(e["duration"])) if str(e["duration"]) != "" else ""])
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	l.custom_minimum_size = Vector2(340, 0)
+	r.add_child(l)
 
 
 func _members() -> Array:
@@ -32,6 +66,19 @@ func _members() -> Array:
 func _refresh() -> void:
 	clear_body()
 	var members := _members()
+	var top := row()
+	for t in ["members", "effects"]:
+		var key: String = t
+		var tb := UiTheme.button(Strings.t("party_panel.tab_" + key), func() -> void:
+			tab = key
+			_refresh())
+		tb.theme_type_variation = "SelectedButton" if key == tab else ""
+		top.add_child(tb)
+	if tab == "effects":
+		_effects_page()
+		add_button(Strings.t("party_panel.close"), func() -> void: finish(null))
+		focus_first()
+		return
 	var tabs := row()
 	for i in members.size():
 		var idx := i

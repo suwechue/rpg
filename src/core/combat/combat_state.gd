@@ -723,6 +723,32 @@ func roll_move_and_act(u: UnitScript) -> void:
 	u.both_this_turn = chance >= 1.0 or (chance > 0.0 and rng.randf() < chance)
 
 
+## "+50% (Cold is stronger)" when a mutator changes this hit (P2 2.1), or "".
+func mutator_note(vectors: Dictionary) -> String:
+	var parts: Array = []
+	for m in mutators:
+		for axis in m.get("effects", {}).get("vectorDamage", {}):
+			if vectors.has(axis):
+				var mul := float(m["effects"]["vectorDamage"][axis])
+				parts.append("%+d%% (%s)" % [roundi((mul - 1.0) * 100.0), str(m.get("name", ""))])
+	return " ".join(PackedStringArray(parts))
+
+
+## "+30% HP (Thick Skins)" for the enemy info when a mutator changed enemy HP.
+func mutator_hp_note() -> String:
+	var parts: Array = []
+	for m in mutators:
+		var mul := float(m.get("effects", {}).get("enemyHpMul", 1.0))
+		if mul != 1.0:
+			parts.append("%+d%% HP (%s)" % [roundi((mul - 1.0) * 100.0), str(m.get("name", ""))])
+	return " ".join(PackedStringArray(parts))
+
+
+## A perk or Technique did something: the scene floats its name (P2 2.2).
+func perk_fired(u: UnitScript, perk_name: String) -> void:
+	_emit({ "t": "perk", "unit": u.id, "name": perk_name })
+
+
 ## Merged effects of the active arena mutators (numbers multiply, flags OR).
 func mutator_rules() -> Dictionary:
 	var out := {}
@@ -1445,6 +1471,7 @@ func improvise(u: UnitScript, vectors: Array, form: String, magnitude: String, f
 	var mp_before := u.mp
 	if u.perk == "overchannel" and not u.perk_used:
 		u.perk_used = true
+		perk_fired(u, "Overchannel")
 	_push_undo(u)
 	spend_action(u)
 	u.undo_ok = false
@@ -1479,7 +1506,7 @@ func preview(u: UnitScript, card: Dictionary, target: Vector2i, improvised: bool
 			elif float(spec["mult"]) > 0.0 and (is_hostile(u, t) or t.is_prop()):
 				n += 1
 				out["hits"].append({ "unit": t.id, "damage": roundi(_expected_hit(u, t, _area_spec(spec, n))), "status": _preview_statuses(spec["vectors"], t),
-					"cover": cover_mul(u.cell, t.cell, bool(spec["ranged"])) })
+					"cover": cover_mul(u.cell, t.cell, bool(spec["ranged"])), "mutator": mutator_note(spec["vectors"]) })
 		_preview_motion(u, spec, out)
 	else:
 		out["cells"] = [target]
@@ -2195,6 +2222,7 @@ func _damage(t: UnitScript, amount: int, source: UnitScript, vector: String, cau
 		return
 	if t.perk == "second_wind" and not t.perk_used and t.hp_ratio() < float(Res.combat_cfg(db).get("secondWindBelowPct", 0.3)):
 		t.perk_used = true
+		perk_fired(t, "Second Wind")
 		_heal(t, t, maxi(1, roundi(float(t.max_hp) * float(Res.combat_cfg(db).get("secondWindHpPct", 0.2)))))
 		_emit({ "t": "log", "text": Str.t(db, "combat_state.catches_a_second_wind") % t.name })
 	if t.boss:
@@ -2452,6 +2480,15 @@ func move_budget(u: UnitScript) -> int:
 	if u.statuses.has("haste_full"):
 		b += int(Res.combat_cfg(db).get("hasteMoveBonus", 2))
 	return maxi(0, b)
+
+
+## Whether a card (or the built-in Strike and Guard, card {} with "builtin") is a
+## Quick for this unit under the current turn rule (P2 1.1): labels use this so
+## they never claim QUICK when the rule makes it cost an Action.
+func is_quick_now(u: UnitScript, card: Dictionary) -> bool:
+	if turn_mode != "two_actions" or u == null or u.team != "party":
+		return false
+	return bool(card.get("builtin", false)) or bool(card.get("quick", false))
 
 
 ## Why the Quick can't be used now ("" if it can).

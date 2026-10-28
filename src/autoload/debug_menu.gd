@@ -229,7 +229,16 @@ func _level_text(reports: Array) -> String:
 
 
 func _show_fights(box: VBoxContainer) -> void:
-	box.add_child(UiTheme.label("Turn rule (this fight and the next ones): %s" % GameState.combat_turn_mode, UiTheme.ACCENT))
+	var data_rule := str(DataDB.table("combat_rules").get("turnMode", "two_actions"))
+	var eff := GameState.combat_turn_mode if GameState.combat_turn_mode != "" else data_rule
+	box.add_child(UiTheme.label("Turn rule: %s%s" % [eff, " (F1 override)" if GameState.combat_turn_mode != "" else " (data)"], UiTheme.ACCENT))
+	box.add_child(UiTheme.button("Reset to data", func() -> void:
+		GameState.combat_turn_mode = ""
+		var scene := get_tree().current_scene
+		if scene != null and scene.get("state") != null:
+			scene.get("state").set("turn_mode", data_rule)
+			scene.call("_sync_views")
+		_open(_show_fights)))
 	var mode_row := HBoxContainer.new()
 	box.add_child(mode_row)
 	for m in DataDB.table("combat_rules").get("turnModes", []):

@@ -141,9 +141,31 @@ func show_event(event: Dictionary, extra_ctx: Dictionary = {}) -> Variant:
 	s.extra_ctx = extra_ctx
 	add_child(s)
 	var r: Variant = await s.closed
+	await give_pending_cards()
 	_busy = was_busy
 	_hud.refresh()
 	return r
+
+
+## Cards granted by events, treasure and bosses: ask whose deck each goes into (P2 1.3).
+func give_pending_cards() -> void:
+	if not GameState.has_run():
+		return
+	while not GameState.run.get("pendingCards", []).is_empty():
+		var cid := str(GameState.run["pendingCards"].pop_front())
+		if GameState.dev_autoplay:
+			var auto := preload("res://src/core/arena/arena.gd").auto_owner(DataDB.all(), GameState.run, preload("res://src/core/card.gd").resolve(DataDB.all(), cid, GameState.cards))
+			if auto != "":
+				(GameState.character(auto)["deck"] as Array).append(cid)
+			continue
+		var op := preload("res://src/scenes/ui/owner_pick.gd").new()
+		op.card_id = cid
+		op.active_ids = ["player"] + GameState.party_ids
+		var who: Variant = await show_modal(op)
+		if who != null and str(who) != "":
+			var ch := GameState.character(str(who))
+			if not ch.is_empty():
+				(ch["deck"] as Array).append(cid)
 
 
 ## Show any modal (an instance of src/scenes/ui/modal.gd) and wait for it.

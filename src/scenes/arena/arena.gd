@@ -25,6 +25,7 @@ var _panel: PanelContainer
 var _box: VBoxContainer
 var _t := 0.0
 var _busy := false
+var _strip: VBoxContainer
 
 
 func _ready() -> void:
@@ -41,6 +42,9 @@ func _ready() -> void:
 	_ui.add_child(_panel)
 	_box = VBoxContainer.new()
 	_panel.add_child(_box)
+	_strip = preload("res://src/scenes/ui/effects_strip.gd").new()
+	_strip.position = Vector2(2, 40)
+	_ui.add_child(_strip)
 	Audio.play_music(str(Arena.waves(DataDB.all()).get("music", {}).get("hub", "dungeon")))
 	if bool(arena.get("inFight", false)) and GameState.combat_context == "arena":
 		_after_wave()
@@ -98,6 +102,8 @@ func _center() -> void:
 
 func _refresh() -> void:
 	_clear()
+	if _strip != null:
+		_strip.refresh()
 	var db: Dictionary = DataDB.all()
 	var next := int(arena["wave"]) + 1
 	_text((Strings.t("arena.the_rift") if story else Strings.t("arena.endless_arena")) + Strings.t("arena.score") % int(arena["score"]), UiTheme.ACCENT)
@@ -119,6 +125,10 @@ func _refresh() -> void:
 	var hz := Arena.hazard_set(db, next)
 	var kind := Strings.t("arena.boss_wave") if Arena.is_boss(db, next) else (Strings.t("arena.elite_wave") if Arena.is_elite(db, next) else "Wave")
 	_text(Strings.t("arena.terrain") % [kind, next, hz.get("name", "plain")], UiTheme.TEXT)
+	if not arena.get("lastPick", {}).is_empty():
+		_button(Strings.t("arena.undo_pick"), func() -> void:
+			Arena.undo_pick(arena, GameState.run)
+			_refresh())
 	_button(Strings.t("arena.start_wave") % next, _start_wave)
 	_button(Strings.t("arena.party"), func() -> void:
 		await Flow.show_modal(preload("res://src/scenes/ui/party_panel.gd").new()))
@@ -138,6 +148,7 @@ func _start_wave() -> void:
 	var db: Dictionary = DataDB.all()
 	var wave := int(arena["wave"]) + 1
 	arena["wave"] = wave
+	arena.erase("lastPick")
 	var setup := Arena.setup_for_wave(db, arena, wave)
 	setup["party"] = GameState.combat_party()
 	setup["library"] = GameState.cards
@@ -349,8 +360,15 @@ func _card_pick() -> void:
 		var cv := preload("res://src/scenes/combat/card_view.gd").new()
 		cv.setup(card, preload("res://src/core/card.gd").cost(db, card))
 		cv.pressed.connect(func() -> void:
-			Arena.pick_card(db, arena, GameState.run, cid)
-			Narrator.say(Strings.t("arena.card_taken") % str(card.get("name", cid)))
+			var op := preload("res://src/scenes/ui/owner_pick.gd").new()
+			op.card_id = cid
+			op.active_ids = ["player"] + GameState.party_ids
+			var who: Variant = await Flow.show_modal(op)
+			if who == null:
+				return
+			if Arena.pick_card(db, arena, GameState.run, cid, str(who)):
+				var owner_name := Strings.t("owner.collection") if str(who) == "" else str(GameState.character(str(who)).get("name", who))
+				Narrator.say(Strings.t("arena.card_added") % [str(card.get("name", cid)), owner_name])
 			_refresh())
 		row.add_child(cv)
 	_button(Strings.t("arena.skip_for_scraps"), func() -> void:
@@ -436,10 +454,13 @@ func _equipment() -> void:
 ## --autoplay: keep going on its own (rest when possible, first mutator) up to --waves.
 func _autoplay() -> void:
 	await get_tree().create_timer(0.3).timeout
+	if not is_inside_tree():
+		return
 	var cap := int(GameState.run.get("devArenaWaves", 999))
 	if not arena.get("offer", []).is_empty():
 		# Autoplay takes the first card offered, and a perk at checkpoints (PT Part 6).
-		Arena.pick_card(DataDB.all(), arena, GameState.run, str(arena["offer"][0]))
+		var pick_id := str(arena["offer"][0])
+		Arena.pick_card(DataDB.all(), arena, GameState.run, pick_id, Arena.auto_owner(DataDB.all(), GameState.run, preload("res://src/core/card.gd").resolve(DataDB.all(), pick_id)))
 		_refresh()
 		_autoplay()
 		return

@@ -76,6 +76,8 @@ static func apply(db: Dictionary, run: Dictionary, fx: Dictionary, rng: RandomNu
 	if fx.has("card"):
 		var cid := str(fx["card"])
 		run["collection"][cid] = int(run["collection"].get(cid, 0)) + 1
+		# P2 1.3: whose deck it goes into is asked after the event (Flow).
+		run["pendingCards"] = run.get("pendingCards", []) + [cid]
 		lines.append(Str.t(db, "effects.new_card") % cid)
 	if fx.has("kellyRisk"):
 		run["kelly_risk"] = int(run.get("kelly_risk", 0)) + int(fx["kellyRisk"])

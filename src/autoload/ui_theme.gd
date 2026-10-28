@@ -22,6 +22,9 @@ var BAD := Color.RED
 var LABEL := Color.WHITE
 
 var colorblind := false
+## P2 1.2: true after keyboard or controller input (focus outlines show), false
+## after mouse input (clicks release focus, no outline lingers).
+var nav_mode := false
 var _role_fonts: Dictionary = {}
 var font: Font
 var theme: Theme
@@ -196,6 +199,20 @@ func _fill_theme(t: Theme) -> void:
 	t.set_constant("outline_size", "OutlinedLabel", 3)
 	t.set_type_variation("SelectedButton", "Button")
 	t.set_color("font_color", "SelectedButton", ACCENT)
+	# Selected (P2 1.2): a filled background, not an outline, so it never looks like focus.
+	var sel := skin_box(btn, "pressed")
+	sel.modulate_color = ACCENT
+	for st in ["normal", "hover", "focus"]:
+		t.set_stylebox(st, "SelectedButton", sel)
+	if not nav_mode:
+		t.set_stylebox("focus", "Button", StyleBoxEmpty.new())
+	# Effects strip borders (P2 2.1): risky red, helpful green, overrides amber.
+	for v in [["EffectRisky", BAD], ["EffectGood", GOOD], ["EffectWarning", color("warning", Color("e8a33d"))]]:
+		var eb := skin_box(skin("panel"))
+		eb.modulate_color = v[1]
+		t.set_type_variation(v[0], "Button")
+		for st in ["normal", "hover", "pressed", "focus"]:
+			t.set_stylebox(st, v[0], eb)
 	t.set_type_variation("CompactBox", "HBoxContainer")
 	t.set_constant("separation", "CompactBox", 1)
 	t.set_type_variation("CompactGrid", "GridContainer")
@@ -234,6 +251,31 @@ func world_label(text: String, color_value: Variant = null, role: String = "ui")
 	var l := label(text, color_value) if role == "ui" else role_label(text, role, color_value)
 	l.theme_type_variation = "OutlinedLabel"
 	return l
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseButton or (event is InputEventMouseMotion and (event as InputEventMouseMotion).relative.length() > 2.0):
+		if nav_mode:
+			nav_mode = false
+			_apply_focus_style()
+		if event is InputEventMouseButton and not (event as InputEventMouseButton).pressed:
+			_release_focus.call_deferred()
+	elif (event is InputEventKey and event.pressed) or event is InputEventJoypadButton or (event is InputEventJoypadMotion and absf((event as InputEventJoypadMotion).axis_value) > 0.5):
+		if not nav_mode:
+			nav_mode = true
+			_apply_focus_style()
+
+
+func _release_focus() -> void:
+	if not nav_mode and get_viewport() != null:
+		get_viewport().gui_release_focus()
+
+
+## Focus outline only in nav mode; the empty style in mouse mode.
+func _apply_focus_style() -> void:
+	if theme == null:
+		return
+	theme.set_stylebox("focus", "Button", skin_box(skin("button"), "focus") if nav_mode else StyleBoxEmpty.new())
 
 
 func button(text: String, callback: Callable) -> Button:

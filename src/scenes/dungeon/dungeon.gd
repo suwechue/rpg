@@ -27,6 +27,7 @@ var _overlay: Node2D
 var _camera: Camera2D
 var _moving := false
 var _hud: Label
+var _strip: VBoxContainer
 var _prompt: Label
 var _sprites: Dictionary = {}      # room id -> Node2D
 var _week := 1
@@ -57,6 +58,9 @@ func _ready() -> void:
 	ui.add_child(bar)
 	_hud = UiTheme.label("")
 	bar.add_child(_hud)
+	_strip = preload("res://src/scenes/ui/effects_strip.gd").new()
+	_strip.position = Vector2(2, 40)
+	add_child(_strip)
 	_prompt = UiTheme.world_label("", UiTheme.ACCENT)
 	_prompt.position = Vector2(4, Display.base.y - 18)
 	ui.add_child(_prompt)
@@ -411,6 +415,8 @@ func _after_fight(room_id: int) -> void:
 # --- Display -------------------------------------------------------------------------
 
 func _refresh() -> void:
+	if _strip != null:
+		_strip.refresh()
 	var p: Dictionary = GameState.player
 	var d := Char.derived(DataDB.all(), p)
 	var party: Array = []

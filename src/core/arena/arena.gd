@@ -5,6 +5,7 @@
 ## one Dictionary (in the run as run["arena"] or run["rift"]).
 extends RefCounted
 
+const Crafting := preload("res://src/core/progression/crafting.gd")
 const CardRules := preload("res://src/core/card.gd")
 const Str := preload("res://src/core/strings.gd")
 
@@ -249,13 +250,89 @@ static func card_offer(db: Dictionary, arena: Dictionary, party: Array, wave: in
 	return out
 
 
-## Take an offered card: into the collection (and the picks list for the score).
-static func pick_card(db: Dictionary, arena: Dictionary, run: Dictionary, card_id: String) -> void:
+## Everyone who could take a card (P2 1.3): [{ id, name, ok, reason, deck, hint }],
+## the player first, then the roster.
+static func eligible_owners(db: Dictionary, run: Dictionary, card: Dictionary) -> Array:
+	var out: Array = []
+	for ch in [run.get("player", {})] + run.get("roster", []):
+		if (ch as Dictionary).is_empty():
+			continue
+		var why := Crafting.eligibility(db, ch, card)
+		var hint := ""
+		if str(card.get("pool", "")) != "":
+			hint = Str.t(db, "owner.hint_pool")
+		elif CardRules.is_spell(card):
+			hint = Str.t(db, "owner.hint_knows") % ", ".join(PackedStringArray(card.get("vectors", {}).keys())).capitalize()
+		else:
+			hint = Str.t(db, "owner.hint_basic")
+		out.append({ "id": str(ch.get("id", "")), "name": str(ch.get("name", "?")), "ok": why == "" and Crafting.copies_ok(db, ch.get("deck", []), str(card.get("id", ""))),
+			"reason": why, "deck": ch.get("deck", []).size(), "hint": hint })
+	return out
+
+
+## Take an offered card into the collection (for the score) and, with a member
+## id, straight into that member's deck (P2 1.3). "" keeps it in the collection.
+static func pick_card(db: Dictionary, arena: Dictionary, run: Dictionary, card_id: String, member_id: String = "") -> bool:
+	var card := CardRules.resolve(db, card_id, run.get("cards", {}))
+	var owner: Dictionary = {}
+	if member_id != "":
+		for ch in [run.get("player", {})] + run.get("roster", []):
+			if str(ch.get("id", "")) == member_id:
+				owner = ch
+		if owner.is_empty() or Crafting.eligibility(db, owner, card) != "":
+			return false
 	var coll: Dictionary = run.get("collection", {})
 	coll[card_id] = int(coll.get(card_id, 0)) + 1
 	run["collection"] = coll
+	if not owner.is_empty():
+		var deck: Array = owner.get("deck", [])
+		deck.append(card_id)
+		owner["deck"] = deck
 	arena["picked"] = arena.get("picked", []) + [card_id]
+	arena["lastPick"] = { "card": card_id, "member": member_id, "offer": arena.get("offer", []).duplicate() }
 	arena["offer"] = []
+	return true
+
+
+## Undo the last pick until the next wave starts: the card goes back to the offer.
+static func undo_pick(arena: Dictionary, run: Dictionary) -> bool:
+	var lp: Dictionary = arena.get("lastPick", {})
+	if lp.is_empty():
+		return false
+	var cid := str(lp["card"])
+	run["collection"][cid] = int(run["collection"].get(cid, 1)) - 1
+	if int(run["collection"][cid]) <= 0:
+		run["collection"].erase(cid)
+	for ch in [run.get("player", {})] + run.get("roster", []):
+		if str(ch.get("id", "")) == str(lp["member"]):
+			(ch["deck"] as Array).erase(cid)
+	arena["picked"].erase(cid)
+	arena["offer"] = lp["offer"]
+	arena.erase("lastPick")
+	return true
+
+
+## Autoplay's owner: the eligible member with the smallest deck, ties broken by tag fit.
+static func auto_owner(db: Dictionary, run: Dictionary, card: Dictionary) -> String:
+	var best := ""
+	var best_key := 99999.0
+	var tg := CardRules.tags(db, card)
+	for o in eligible_owners(db, run, card):
+		if not bool(o["ok"]):
+			continue
+		var fit := 0
+		for ch in [run.get("player", {})] + run.get("roster", []):
+			if str(ch.get("id", "")) == str(o["id"]):
+				for id in ch.get("deck", []):
+					var t2 := CardRules.tags(db, CardRules.resolve(db, str(id)))
+					for k in tg["paysOff"] + tg["setsUp"]:
+						if t2["setsUp"].has(k) or t2["paysOff"].has(k):
+							fit += 1
+		var key := float(o["deck"]) - float(fit) * 0.01
+		if key < best_key:
+			best_key = key
+			best = str(o["id"])
+	return best
 
 
 ## Skip the offer for Scraps.
@@ -324,6 +401,7 @@ static func offer_mutators(db: Dictionary, arena: Dictionary, reroll: int) -> vo
 
 
 static func choose_mutator(arena: Dictionary, id: String) -> bool:
+	arena["mutatorWave"] = int(arena.get("wave", 0))
 	for m in arena.get("offered", []):
 		if str(m["id"]) == id:
 			arena["mutators"] = [m]

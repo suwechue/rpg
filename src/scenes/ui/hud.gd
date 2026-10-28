@@ -7,6 +7,7 @@ const Char := preload("res://src/core/character.gd")
 var _top: Label
 var _line: Label
 var _end: Button
+var _strip: VBoxContainer
 
 
 func _init() -> void:
@@ -36,6 +37,10 @@ func _ready() -> void:
 	_line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_line.custom_minimum_size = Vector2(Display.base.x - 10, 0)
 	bottom.add_child(_line)
+	# Effects strip (P2 2.1): what's active today, on the left edge.
+	_strip = preload("res://src/scenes/ui/effects_strip.gd").new()
+	_strip.position = Vector2(2, 24)
+	add_child(_strip)
 	EventBus.ap_changed.connect(func(_a: int) -> void: refresh())
 	EventBus.money_changed.connect(func(_m: int) -> void: refresh())
 	EventBus.stats_changed.connect(func(_id: String) -> void: refresh())
@@ -45,6 +50,8 @@ func _ready() -> void:
 
 
 func refresh() -> void:
+	if _strip != null:
+		_strip.refresh()
 	if _top == null or not GameState.has_run():
 		return
 	var p: Dictionary = GameState.player

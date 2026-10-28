@@ -55,6 +55,7 @@ func new_run(seed_value: int = -1, class_id: String = "mage", player_name: Strin
 	if seed_value < 0:
 		seed_value = absi(hash(Time.get_ticks_usec() + int(Time.get_unix_time_from_system()))) % 2147483647
 	Rng.reseed(seed_value)
+	combat_turn_mode = ""   # the F1 override never carries into a new run (P2 1.1)
 	var o := opts.duplicate()
 	o["name"] = player_name
 	run = RM.new_run(DataDB.all(), seed_value, class_id, Rng.stream("creation"), o)

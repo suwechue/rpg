@@ -6,8 +6,8 @@ The demo (VD Part 5): the intro through the week 1 boss, the Endless Arena from 
 | --- | --- | --- |
 | Town life sim (AP day parts, classes, schedule, dialogue, Charisma gates, misheard lines, Bond, shops) | Have | Interiors still use drawn rectangles for furniture |
 | Dungeon floors, Friday boss, Kelly tutorial floor | Have | Floors use generic rooms with a theme tint |
-| Combat (2 Actions + 1 Quick, telegraphs, cover, statuses, Forge, class pools) | Have | Strike and Guard Quick bug (P2 1.1); Binding tethers and hidden units are stubs |
-| Endless Arena (waves, hazards, checkpoints, mutators, card and perk picks, score) | Have | Owner choice (P2 1.3), effects strip (P2 2), campfire later (AC) |
+| Combat (2 Actions + 1 Quick, telegraphs, cover, statuses, Forge, class pools) | Have | Strike and Guard Quick bug fixed (P2 1.1); Binding tethers and hidden units are stubs |
+| Endless Arena (waves, hazards, checkpoints, mutators, card and perk picks, score) | Have | Owner choice and effects strip done (P2 Parts 1 and 2); campfire later (AC) |
 | Point buy, Party panel, pause menu, options | Have | Check that options open from the title screen (VD Part 5) |
 | Art, audio and UI by asset id | Mostly | VD Part 1: audio situation map, voice blips, `docs/CUSTOMIZE.md`, audit test |
 | Advanced Vectors and Techniques | In progress | PT Part 8 (Vectors, fusion and Instability done; Techniques and content next) |
@@ -20,7 +20,7 @@ The demo (VD Part 5): the intro through the week 1 boss, the Endless Arena from 
 | Title logo slot and animated title background | Missing | `art_logo` asset id with a placeholder (VD Part 5) |
 | Demo mode, thanks screen, export preset | Missing | `data/demo.json`, `export_presets.cfg` "Demo" (VD Part 5) |
 | Feedback (F8, survey, log summary) | Missing | VD Part 6 |
-| Keyboard and controller navigation on every screen | Partial | The focus fix (P2 1.2) is the base; audit each screen |
+| Keyboard and controller navigation on every screen | Partial | The focus fix (P2 1.2) is done (nav vs mouse mode); audit each screen |
 | Juice pass (hit effects, shake, UI sounds, fades, footsteps) | Partial | VD Part 5 |
 | End-to-end demo smoke test, zero errors in the log | Missing | VD Part 5 |
 

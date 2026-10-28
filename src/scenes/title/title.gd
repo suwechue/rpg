@@ -14,6 +14,7 @@ var _t := 0.0
 
 
 func _ready() -> void:
+	GameState.combat_turn_mode = ""
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	Flow.set_hud(false)
 	var title := UiTheme.role_label(Strings.t("title.project_vector"), "title", UiTheme.ACCENT)
