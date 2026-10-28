@@ -1,27 +1,91 @@
 {
   "magnitudes": {
-    "minor":    { "power": 4,  "cost": 1, "minTier": 1, "name": "Minor" },
-    "standard": { "power": 7, "cost": 2, "minTier": 1, "name": "Standard" },
-    "major":    { "power": 14, "cost": 4, "minTier": 2, "name": "Major" },
-    "grand":    { "power": 25, "cost": 7, "minTier": 3, "name": "Grand" }
+    "minor": {
+      "power": 4,
+      "cost": 1,
+      "minTier": 1,
+      "name": "Minor"
+    },
+    "standard": {
+      "power": 7,
+      "cost": 2,
+      "minTier": 1,
+      "name": "Standard"
+    },
+    "major": {
+      "power": 14,
+      "cost": 4,
+      "minTier": 2,
+      "name": "Major"
+    },
+    "grand": {
+      "power": 25,
+      "cost": 7,
+      "minTier": 3,
+      "name": "Grand"
+    }
   },
-  "magnitudeOrder": ["minor", "standard", "major", "grand"],
-  "hybridExtraCost": 1,
-  "improvise": { "costMultiplier": 1.5, "flatExtra": 1, "discardCards": 1, "instabilityBonus": 3 },
-  "failures": { "fizzle": 4, "backlash": 3, "misfire": 2, "wild_surge": 1 },
+  "magnitudeOrder": [
+    "minor",
+    "standard",
+    "major",
+    "grand"
+  ],
+  "improvise": {
+    "costMultiplier": 1.5,
+    "flatExtra": 1,
+    "discardCards": 1,
+    "instabilityBonus": 0
+  },
+  "failures": {
+    "reduced": 4,
+    "backlash": 3,
+    "misfire": 2,
+    "strain": 2,
+    "wild_surge": 1,
+    "collapse": 1
+  },
   "failureText": {
-    "fizzle": "Fizzle: the spell sputters out. MP spent, nothing happens.",
-    "backlash": "Backlash: the spell bites back for half damage.",
-    "misfire": "Misfire: the spell lands somewhere else in range.",
-    "wild_surge": "Wild Surge: a random Vector tears through the spell."
+    "reduced": "Reduced: the spell lands at half strength.",
+    "misfire": "Misfire: it goes somewhere else.",
+    "backlash": "Backlash: it bites you for its MP cost, then lands anyway.",
+    "strain": "Strain: you can't cast that Magnitude next turn.",
+    "wild_surge": "Wild Surge: it lands, plus something nobody planned.",
+    "collapse": "Collapse: nothing happens. The MP is gone."
   },
   "names": {
-    "heat": "Ember", "cold": "Frost", "force": "Force", "motion": "Swift", "binding": "Binding",
-    "light": "Radiant", "transmutation": "Shifting", "vitality": "Living", "corrosion": "Rotting"
+    "heat": "Ember",
+    "cold": "Frost",
+    "force": "Force",
+    "motion": "Swift",
+    "binding": "Binding",
+    "light": "Radiant",
+    "transmutation": "Shifting",
+    "vitality": "Living",
+    "corrosion": "Rotting"
   },
   "display": {
-    "heat": "Heat", "cold": "Cold", "force": "Force", "motion": "Motion", "binding": "Binding",
-    "light": "Light", "transmutation": "Transmutation", "vitality": "Vitality", "corrosion": "Corrosion"
+    "heat": "Heat",
+    "cold": "Cold",
+    "force": "Force",
+    "motion": "Motion",
+    "binding": "Binding",
+    "light": "Light",
+    "transmutation": "Transmutation",
+    "vitality": "Vitality",
+    "corrosion": "Corrosion",
+    "gravity": "Gravity",
+    "lightning": "Lightning",
+    "sound": "Sound",
+    "shadow": "Shadow",
+    "warding": "Warding",
+    "poison": "Poison",
+    "psychic": "Psychic",
+    "cognition": "Cognition",
+    "entropy": "Entropy",
+    "void": "Void",
+    "time": "Time",
+    "probability": "Probability"
   },
   "gridEffects": {
     "heat": "Burning tiles for 2 turns; water becomes sight-blocking steam",
@@ -32,6 +96,250 @@
     "light": "Reveal hidden units and traps, blind, heal with Shield or Aura",
     "transmutation": "Turns hazards and water back into floor",
     "vitality": "Heals the caster for half the damage dealt",
-    "corrosion": "Shreds 2 Physical Defense and 4 Magic Resistance"
+    "corrosion": "Shreds 2 Physical Defense and 4 Magic Resistance",
+    "gravity": "Pulls units 1 tile toward the impact; Crush: +50% against the Rooted",
+    "lightning": "Arcs to a second target within 2 tiles; chains through Wet and Conductive units",
+    "sound": "Dazes; interrupts charges; shatters the Frozen; double damage to walls and constructs",
+    "shadow": "No damage: darkens the tiles and makes allies there Shadowed",
+    "warding": "Shields allies (temporary HP) or Exposes enemies; doesn't stack, refreshes to the better value",
+    "poison": "Stacking Poison; halves healing on the target",
+    "psychic": "Ignores Physical Defense; no effect on mindless enemies (constructs, slimes)",
+    "cognition": "No damage: Marks and reveals the next 2 enemy plans",
+    "entropy": "Big decay damage; +1 to the Instability target",
+    "void": "No damage: removes shields, buffs, hazards, constructs, glyphs and affixes",
+    "time": "Movement and turn-order control (delays an enemy's turn); never grants extra Actions or turns",
+    "probability": "Nudges odds: rerolls a crit or a miss (data only for now)"
+  },
+  "advanced": {
+    "comment": "PT Part 8: Vectors learned once the parents' affinity shares reach these thresholds (and the Knowledge Tier allows). Tier 4 is for Act 2 and arena waves 40+. 'disabled' keeps a Vector as data only.",
+    "gravity": {
+      "tier": 2,
+      "parents": {
+        "force": 0.3
+      }
+    },
+    "lightning": {
+      "tier": 2,
+      "parents": {
+        "heat": 0.2,
+        "motion": 0.2
+      }
+    },
+    "sound": {
+      "tier": 2,
+      "parents": {
+        "motion": 0.3
+      }
+    },
+    "shadow": {
+      "tier": 2,
+      "parents": {
+        "light": 0.3
+      }
+    },
+    "warding": {
+      "tier": 2,
+      "parents": {
+        "binding": 0.3
+      }
+    },
+    "transmutation": {
+      "tier": 3,
+      "parents": {
+        "binding": 0.15,
+        "motion": 0.15
+      }
+    },
+    "vitality": {
+      "tier": 3,
+      "parents": {
+        "light": 0.15,
+        "warding": 0.1
+      }
+    },
+    "corrosion": {
+      "tier": 3,
+      "parents": {
+        "heat": 0.15,
+        "binding": 0.15
+      }
+    },
+    "poison": {
+      "tier": 3,
+      "parents": {
+        "corrosion": 0.15,
+        "binding": 0.15
+      }
+    },
+    "psychic": {
+      "tier": 3,
+      "parents": {
+        "sound": 0.2,
+        "light": 0.15
+      }
+    },
+    "cognition": {
+      "tier": 3,
+      "parents": {
+        "light": 0.2,
+        "shadow": 0.15
+      }
+    },
+    "probability": {
+      "tier": 3,
+      "parents": {
+        "light": 0.15,
+        "sound": 0.15
+      },
+      "disabled": true
+    },
+    "entropy": {
+      "tier": 4,
+      "parents": {
+        "corrosion": 0.15,
+        "heat": 0.15
+      }
+    },
+    "void": {
+      "tier": 4,
+      "parents": {
+        "shadow": 0.15,
+        "warding": 0.15
+      }
+    },
+    "time": {
+      "tier": 4,
+      "parents": {
+        "motion": 0.15,
+        "gravity": 0.15
+      }
+    },
+    "unlockWeight": 0.5
+  },
+  "fusion": {
+    "comment": "PT Part 8: two-Vector cards and improvises pay a surcharge by Magnitude. Synergistic pairs lower it (to half, rounded up) and resonate (+15% effect, -1 Instability target); antagonistic pairs add +1 MP and +2 to the Instability target. Three Vectors pay the surcharge twice.",
+    "surcharge": {
+      "minor": 1,
+      "standard": 1,
+      "major": 2,
+      "grand": 3
+    },
+    "resonanceBonus": 0.15,
+    "antagonistMp": 1,
+    "antagonistInstability": 2,
+    "synergyInstability": -1,
+    "synergy": [
+      [
+        "heat",
+        "motion"
+      ],
+      [
+        "cold",
+        "binding"
+      ],
+      [
+        "light",
+        "sound"
+      ],
+      [
+        "force",
+        "gravity"
+      ],
+      [
+        "corrosion",
+        "vitality"
+      ],
+      [
+        "lightning",
+        "motion"
+      ],
+      [
+        "psychic",
+        "sound"
+      ],
+      [
+        "warding",
+        "vitality"
+      ],
+      [
+        "shadow",
+        "binding"
+      ],
+      [
+        "void",
+        "transmutation"
+      ],
+      [
+        "poison",
+        "corrosion"
+      ],
+      [
+        "cognition",
+        "light"
+      ]
+    ],
+    "antagonism": [
+      [
+        "heat",
+        "cold"
+      ],
+      [
+        "binding",
+        "motion"
+      ],
+      [
+        "vitality",
+        "entropy"
+      ],
+      [
+        "light",
+        "corrosion"
+      ],
+      [
+        "lightning",
+        "corrosion"
+      ],
+      [
+        "psychic",
+        "binding"
+      ],
+      [
+        "warding",
+        "entropy"
+      ],
+      [
+        "shadow",
+        "light"
+      ],
+      [
+        "time",
+        "entropy"
+      ],
+      [
+        "void",
+        "warding"
+      ],
+      [
+        "cognition",
+        "binding"
+      ]
+    ]
+  },
+  "forceRule": {
+    "comment": "PT Part 8: Force is free but weak: Force cards cost 1 less MP (minimum 0) and deal x0.7.",
+    "costDelta": -1,
+    "damageMul": 0.7
+  },
+  "instability": {
+    "comment": "PT Part 8: a cast rolls Stability when its final MP cost reaches its Magnitude's threshold (Minor never; improvised always). Target 10 + (cost - threshold) / 2, +1 Entropy, +2 per antagonistic pair, -1 per synergistic pair (minimum 10). Roll d20 + Stability / 2.",
+    "thresholds": {
+      "minor": 99,
+      "standard": 4,
+      "major": 6,
+      "grand": 9
+    },
+    "base": 10,
+    "entropyBonus": 1,
+    "minTarget": 10
   }
 }

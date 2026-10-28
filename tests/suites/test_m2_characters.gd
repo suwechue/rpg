@@ -54,7 +54,7 @@ func test_card_costs() -> void:
 	var bolt := CardRules.make_spell(db(), { "heat": 1 }, "bolt", "standard")
 	check(bolt["cost"] == 2, "Standard Bolt costs 2")
 	var burst := CardRules.make_spell(db(), { "heat": 1, "cold": 1 }, "burst", "major")
-	check(burst["cost"] == 4 + 2 + 1, "Major hybrid Burst costs 7")
+	check(burst["cost"] == 4 + 2 + 2 + 1, "Major Heat/Cold Burst: 4 + Burst 2 + Major surcharge 2 + antagonism 1 = 9 (PT Part 8)")
 	check_near(burst["vectors"]["heat"], 0.5, "hybrid is an equal Blend")
 	check(CardRules.improvise_cost(db(), bolt) == 4, "improvise ceil(2 x 1.5) + 1 = 4")
 	var glyph := CardRules.make_spell(db(), { "cold": 1 }, "glyph", "grand")
@@ -145,11 +145,11 @@ func test_learning_pity() -> void:
 	var r := Lv.learning_roll(db(), ch, "vectorAffinity", "knownVectors", "dryVectorRolls", seeded(9))
 	check(r["kind"] == "new" and r["pity"], "pity forces something new")
 	check(ch["dryVectorRolls"] == 0, "dry counter resets")
-	ch["knownVectors"] = ["heat", "cold", "force", "motion"]
+	ch["knownVectors"] = ["heat", "cold", "force", "motion", "binding", "light"]
 	ch["dryVectorRolls"] = 5
 	r = Lv.learning_roll(db(), ch, "vectorAffinity", "knownVectors", "dryVectorRolls", seeded(9))
-	check(r["kind"] == "raise", "Tier 1 cap: nothing new left, so a known Vector rises")
-	check(not ch["knownVectors"].has("binding"), "Tier 2 Vectors are not learnable at Tier 1")
+	check(r["kind"] == "raise", "Tier 1 cap: all six base Vectors known, so a known one rises")
+	check(not ch["knownVectors"].has("gravity") and not ch["knownVectors"].has("transmutation"), "Tier 2+ Vectors are not learnable at Tier 1")
 
 
 ## M2 "Done when": a seeded mage levels to 5 identically every time.

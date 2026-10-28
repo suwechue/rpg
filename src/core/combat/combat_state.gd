@@ -377,7 +377,7 @@ func card_of(u: UnitScript, hand_index: int) -> Dictionary:
 func card_cost(u: UnitScript, card: Dictionary, target: Vector2i = Vector2i(-1, -1)) -> int:
 	var c := CardRules.cost(db, card)
 	if u.perk == "prism" and CardRules.is_spell(card) and CardRules.ordered_vectors(db, card.get("vectors", {})).size() > 1:
-		c = maxi(0, c - int(db.get("vectors", {}).get("hybridExtraCost", 1)))
+		c = maxi(0, c - CardRules.fusion_cost(db, card))
 	if (u.perk == "triage" or u.perk == "lifeline") and CardRules.heals(card):
 		var t := unit_at(target)
 		if t != null and t.team == u.team and t.hp_ratio() < 0.5:
@@ -1049,6 +1049,8 @@ func card_block(u: UnitScript, card: Dictionary) -> String:
 	var cost := card_cost(u, card)
 	if cost > u.mp:
 		return Str.t(db, "combat_state.needs_mp") % cost
+	if CardRules.is_spell(card) and u.statuses.has("strain_" + str(card.get("magnitude", ""))):
+		return Str.t(db, "combat_state.strained")
 	return ""
 
 
@@ -1188,6 +1190,92 @@ func _status_setups(u: UnitScript, spec: Dictionary, hit: Array) -> void:
 			add_status(t, "conductive")
 		if v.has("light") and bool(spec.get("marks", false)):
 			add_status(t, "marked")
+
+
+## The Tier 2 to 4 Vectors on the grid (PT Part 8).
+func _new_vector_effects(u: UnitScript, spec: Dictionary, cells: Array, hit: Array) -> void:
+	var v: Dictionary = spec.get("vectors", {})
+	if v.is_empty():
+		return
+	var center: Vector2i = cells[0] if not cells.is_empty() else u.cell
+	if v.has("gravity"):
+		for t in hit:
+			if t.alive() and not t.is_prop() and t.cell != center:
+				_push(u, t, Forms.direction_to(t.cell, center), 1, false)
+	if v.has("lightning"):
+		# Arc to one more unit within 2; Wet and Conductive units chain it on.
+		var arced: Array = hit.duplicate()
+		var queue: Array = hit.duplicate()
+		var jumps := 0
+		while not queue.is_empty() and jumps < 4:
+			var from: UnitScript = queue.pop_front()
+			for o in opponents_of(u):
+				if arced.has(o) or not o.alive() or GridScript.manhattan(o.cell, from.cell) > 2:
+					continue
+				arced.append(o)
+				jumps += 1
+				var arc := spec.duplicate()
+				arc["areaMul"] = float(arc.get("areaMul", 1.0)) * 0.5
+				_emit({ "t": "area", "cells": [o.cell], "vectors": { "lightning": 1.0 } })
+				_hit_unit(u, o, arc, false)
+				if o.statuses.has("wet") or o.statuses.has("conductive"):
+					queue.append(o)
+				break
+	if v.has("sound"):
+		for t in hit:
+			if int(t.intent.get("charge", 0)) > 0:
+				_interrupt(t, "light")
+		for c in cells:
+			if grid.wall_hp.has(c):
+				damage_wall(c, roundi(float(spec.get("power", 5))), "sound", true)
+	if v.has("shadow"):
+		for c in cells:
+			grid.shadow[c] = 2
+			var o := unit_at(c)
+			if o != null and o.team == u.team:
+				add_status(o, "shadowed", 2)
+		_emit({ "t": "tiles", "kind": "shadow", "cells": cells })
+	if v.has("warding"):
+		for c in cells:
+			var o := unit_at(c)
+			if o == null or o.is_prop() or not o.alive():
+				continue
+			if o.team == u.team:
+				# Doesn't stack: refreshes to the better value.
+				o.shield = maxi(o.shield, roundi(float(spec.get("power", 5))))
+				o.shield_turns = maxi(o.shield_turns, 2)
+				_emit({ "t": "shield", "unit": o.id, "amount": o.shield })
+			else:
+				add_status(o, "exposed", 2)
+	if v.has("cognition"):
+		for t in hit:
+			add_status(t, "marked", 1)
+		revealed = maxi(revealed, 2)
+	if v.has("void"):
+		for c in cells:
+			var o := unit_at(c)
+			if o != null and o.alive():
+				if o.is_prop() and _prop_kind(o) == "construct":
+					_damage(o, 999, u, "void", "hit")
+				elif o.team != u.team:
+					o.shield = 0
+					o.rally_bonus = 0.0
+					for s in ["haste", "haste_full", "rally", "regen", "taunting", "sanctuary"]:
+						o.statuses.erase(s)
+					o.source["affixes"] = []
+			grid.burning.erase(c)
+			grid.toxic.erase(c)
+			if grid.get_terrain(c) == GridScript.HAZARD:
+				grid.set_terrain(c, GridScript.FLOOR)
+		glyphs = glyphs.filter(func(g: Dictionary) -> bool: return not cells.has(g["cell"]))
+	if v.has("time"):
+		# Delay: the enemy's turn moves to the end of the round. Never extra turns.
+		for t in hit:
+			var i := order.find(t)
+			if t.team != u.team and i > turn_index:
+				order.remove_at(i)
+				order.append(t)
+				_emit({ "t": "log", "text": Str.t(db, "combat_state.time_delays") % t.name })
 
 
 ## Riders (PT Part 5) on whoever the card hit: Slow, Push, Daze, Lingering,
@@ -1380,7 +1468,7 @@ func preview(u: UnitScript, card: Dictionary, target: Vector2i, improvised: bool
 		var cost := improvise_cost(u, card) if improvised else card_cost(u, card, target)
 		out["cost"] = cost
 		var spec := _spell_spec(u, card)
-		out["chance"] = Res.stability_chance(db, u.stability + int(spec.get("stabilityBonus", 0)), cost, u.mp, improvised and u.perk != "unstable")
+		out["chance"] = Res.stability_chance(db, u.stability + int(spec.get("stabilityBonus", 0)), cost, card, improvised and u.perk != "unstable", int(u.mods.get("combat", {}).get("thresholdBonus", 0)))
 		var n := 0
 		for c in area_order(cells, target):
 			var t := unit_at(c)
@@ -1495,13 +1583,24 @@ func _spell_spec(u: UnitScript, card: Dictionary) -> Dictionary:
 		"vectors": card.get("vectors", {}),
 		"form": form,
 		"power": power,
-		"mult": 0.0 if bool(card.get("noDamage", false)) else float(form.get("multiplier", 1.0)),
+		"mult": 0.0 if bool(card.get("noDamage", false)) or _no_damage(card) else float(form.get("multiplier", 1.0)),
 		"heal": CardRules.heals(card),
 		"ranged": int(form.get("range", 1)) > 1,
 		"kind": "spell",
 		"critBonus": float(CardRules.property_mods(db, card).get("critPct", 0.0)),
 		"stabilityBonus": int(CardRules.property_mods(db, card).get("stability", 0.0)),
 	}
+
+
+## Shadow, Cognition, Void and Time deal no damage (PT Part 8).
+func _no_damage(card: Dictionary) -> bool:
+	var v: Dictionary = card.get("vectors", {})
+	if v.is_empty():
+		return false
+	for axis in v:
+		if not str(axis) in ["shadow", "cognition", "void", "time"]:
+			return false
+	return true
 
 
 func _expected_hit(u: UnitScript, t: UnitScript, spec: Dictionary) -> float:
@@ -1511,6 +1610,9 @@ func _expected_hit(u: UnitScript, t: UnitScript, spec: Dictionary) -> float:
 	if u.statuses.has("weakened"):
 		area *= 1.0 - float(Res.combat_cfg(db).get("weakenPct", 0.25))
 	area *= _status_payoff(t, spec)
+	var vecs: Dictionary = spec.get("vectors", {})
+	if vecs.has("psychic") and bool(t.source.get("mindless", false)):
+		area *= 1.0 - float(VO.normalize_sum(vecs).get("psychic", 0.0))
 	# Arena mutators: "Cold is stronger" and friends.
 	for axis in spec.get("vectors", {}):
 		area *= float(mutator_rules().get("vectorDamage", {}).get(str(axis), 1.0))
@@ -1648,7 +1750,10 @@ func _cast(u: UnitScript, card: Dictionary, target: Vector2i, improvised: bool, 
 	uses[key] = int(uses.get(key, 0)) + 1
 	if u.team == "party":
 		u.source["pairUses"] = uses
-	var roll := Res.roll_stability(db, u.stability + int(spec.get("stabilityBonus", 0)), cost, mp_before, improvised and u.perk != "unstable", rng)
+	var rolls := 2 if (bool(u.mods.get("combat", {}).get("stableRolls", false)) or (bool(u.mods.get("combat", {}).get("stillMind", false)) and not u.links.has("still_used"))) else 1
+	var roll := Res.roll_stability(db, u.stability + int(spec.get("stabilityBonus", 0)), cost, card, improvised and u.perk != "unstable", rng, int(u.mods.get("combat", {}).get("thresholdBonus", 0)), rolls)
+	if int(roll["roll"]) > 0 and rolls > 1:
+		u.links["still_used"] = "1"
 	if improvised and guarantee_improvise:
 		guarantee_improvise = false
 		roll["ok"] = true
@@ -1657,12 +1762,16 @@ func _cast(u: UnitScript, card: Dictionary, target: Vector2i, improvised: bool, 
 		_emit({ "t": "instability", "unit": u.id, "result": failure, "roll": roll["roll"], "need": roll["target"],
 			"text": str(db.get("vectors", {}).get("failureText", {}).get(failure, failure)) })
 		match failure:
-			"fizzle":
+			"collapse", "fizzle":
 				return
+			"reduced":
+				spec["areaMul"] = float(spec.get("areaMul", 1.0)) * 0.5
 			"backlash":
-				var self_dmg := Res.spell_damage(db, float(spec["power"]), maxf(0.5, float(spec["mult"])), spec["vectors"], u, u) * 0.5
-				_damage(u, maxi(1, roundi(self_dmg)), u, "", "backlash")
-				return
+				# PT Part 8: the caster takes damage equal to the MP cost; the card still resolves.
+				_damage(u, maxi(1, cost), u, "", "backlash")
+			"strain":
+				u.statuses["strain_" + str(card.get("magnitude", "minor"))] = 2
+				_emit({ "t": "status", "unit": u.id, "status": "strain" })
 			"misfire":
 				var options := card_targets(u, card)
 				if not options.is_empty():
@@ -1918,6 +2027,7 @@ func _tick_aura(u: UnitScript, aura: Dictionary) -> void:
 ## Positional Vector effects (DESIGN.md Section 9, "Vector effects on the grid").
 func _apply_vector_effects(u: UnitScript, spec: Dictionary, cells: Array, hit: Array) -> void:
 	_status_setups(u, spec, hit)
+	_new_vector_effects(u, spec, cells, hit)
 	var cfg := Res.combat_cfg(db)
 	var v: Dictionary = spec["vectors"]
 	var power := float(spec["power"])

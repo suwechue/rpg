@@ -120,7 +120,7 @@
         3
       ],
       "text": "Small, hot, and everywhere.",
-      "hp": 6,
+      "hp": 5,
       "movement": 3,
       "initiative": 6,
       "physDefense": 1,
@@ -672,7 +672,7 @@
         5
       ],
       "text": "A cloud of angry sparks.",
-      "hp": 6,
+      "hp": 5,
       "movement": 3,
       "initiative": 6,
       "physDefense": 1,

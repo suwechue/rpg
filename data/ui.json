@@ -117,7 +117,19 @@
     "light": "#f5e27a",
     "transmutation": "#e87cc9",
     "vitality": "#5fd98a",
-    "corrosion": "#8a9b3c"
+    "corrosion": "#8a9b3c",
+    "gravity": "#7a5cff",
+    "lightning": "#ffe14d",
+    "sound": "#ff9ad5",
+    "shadow": "#5b4d7a",
+    "warding": "#7fd6c2",
+    "poison": "#8fd14f",
+    "psychic": "#d26bff",
+    "cognition": "#9fd0ff",
+    "entropy": "#b8572e",
+    "void": "#2e2a3a",
+    "time": "#e8c48a",
+    "probability": "#ffd27a"
   },
   "vectorColorsColorblind": {
     "heat": "#d55e00",
@@ -128,7 +140,19 @@
     "light": "#f0e442",
     "transmutation": "#dddddd",
     "vitality": "#0072b2",
-    "corrosion": "#999933"
+    "corrosion": "#999933",
+    "gravity": "#332288",
+    "lightning": "#ddcc77",
+    "sound": "#aa4499",
+    "shadow": "#555555",
+    "warding": "#44aa99",
+    "poison": "#117733",
+    "psychic": "#882255",
+    "cognition": "#88ccee",
+    "entropy": "#661100",
+    "void": "#222222",
+    "time": "#b8860b",
+    "probability": "#ffb000"
   },
   "vectorPatterns": {
     "comment": "Drawn faintly behind card text so color never carries meaning alone: none, stripes, backslash, dots, grid, waves, rings, checks, cross.",
@@ -140,7 +164,19 @@
     "light": "none",
     "transmutation": "checks",
     "vitality": "waves",
-    "corrosion": "cross"
+    "corrosion": "cross",
+    "gravity": "rings",
+    "lightning": "backslash",
+    "sound": "waves",
+    "shadow": "checks",
+    "warding": "grid",
+    "poison": "dots",
+    "psychic": "cross",
+    "cognition": "grid",
+    "entropy": "stripes",
+    "void": "checks",
+    "time": "rings",
+    "probability": "dots"
   },
   "statuses": {
     "root": {

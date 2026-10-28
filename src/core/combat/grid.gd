@@ -37,6 +37,7 @@ var party_spawns: Array = []
 var enemy_spawns: Array = []
 var prop_spawns: Array = []      # [{ "cell": Vector2i, "prop": "crate" }]
 var wall_hp: Dictionary = {}     # breakable '#' walls: cell -> HP (the 'B' boundary isn't here)
+var shadow: Dictionary = {}      # PT Part 8: Shadow tiles, cell -> rounds left
 var theme := ""
 
 
@@ -105,9 +106,9 @@ func walkable_terrain(cell: Vector2i) -> bool:
 	return t != WALL and t != WATER and t != PIT and not fire_walls.has(cell)
 
 
-## Darkness hides a tile unless Light has lit it.
+## Darkness hides a tile unless Light has lit it; Shadow tiles (PT Part 8) hide it too.
 func is_dark(cell: Vector2i) -> bool:
-	return get_terrain(cell) == DARK and not lit.has(cell)
+	return (get_terrain(cell) == DARK or shadow.has(cell)) and not lit.has(cell)
 
 
 func blocks_sight(cell: Vector2i) -> bool:
@@ -193,6 +194,10 @@ func path(a: Vector2i, b: Vector2i, occupied: Dictionary) -> Array:
 
 ## Count down tile effects at the end of a round.
 func tick_round() -> void:
+	for c in shadow.keys():
+		shadow[c] = int(shadow[c]) - 1
+		if int(shadow[c]) <= 0:
+			shadow.erase(c)
 	for table in [burning, steam, fire_walls, toxic, lit]:
 		for cell in table.keys():
 			table[cell] = int(table[cell]) - 1

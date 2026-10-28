@@ -63,10 +63,42 @@ static func spell_cost(db: Dictionary, card: Dictionary) -> int:
 	var mags: Dictionary = db.get("vectors", {}).get("magnitudes", {})
 	var form_rec := DT.record(db, "forms", str(card.get("form", "")))
 	var c := int(mags.get(str(card.get("magnitude", "")), {}).get("cost", 0)) + int(form_rec.get("cost", 0))
-	if ordered_vectors(db, card.get("vectors", {})).size() > 1:
-		c += int(db.get("vectors", {}).get("hybridExtraCost", 1))
+	c += fusion_cost(db, card)
+	if card.get("vectors", {}).has("force"):
+		# Force is free but weak (PT Part 8).
+		c += int(db.get("vectors", {}).get("forceRule", {}).get("costDelta", -1))
 	c += int(property_mods(db, card).get("costDelta", 0))
 	return maxi(0, c)
+
+
+## Synergistic and antagonistic Vector pairs on a card: { "syn": n, "ant": n }.
+static func pairs(db: Dictionary, vectors: Dictionary) -> Dictionary:
+	var fu: Dictionary = db.get("vectors", {}).get("fusion", {})
+	var axes: Array = vectors.keys()
+	var out := { "syn": 0, "ant": 0 }
+	for i in axes.size():
+		for j in range(i + 1, axes.size()):
+			for p in fu.get("synergy", []):
+				if (p as Array).has(axes[i]) and (p as Array).has(axes[j]):
+					out["syn"] = int(out["syn"]) + 1
+			for p in fu.get("antagonism", []):
+				if (p as Array).has(axes[i]) and (p as Array).has(axes[j]):
+					out["ant"] = int(out["ant"]) + 1
+	return out
+
+
+## The fusion surcharge (PT Part 8): by Magnitude for two Vectors, twice for
+## three; synergy halves it (rounded up), antagonism adds +1 MP per pair.
+static func fusion_cost(db: Dictionary, card: Dictionary) -> int:
+	var n := ordered_vectors(db, card.get("vectors", {})).size()
+	if n < 2:
+		return 0
+	var fu: Dictionary = db.get("vectors", {}).get("fusion", {})
+	var base := int(fu.get("surcharge", {}).get(str(card.get("magnitude", "standard")), 1)) * (n - 1)
+	var pr := pairs(db, card.get("vectors", {}))
+	if int(pr["syn"]) > 0:
+		base = ceili(float(base) / 2.0)
+	return base + int(pr["ant"]) * int(fu.get("antagonistMp", 1))
 
 
 ## Merged Property edits on a card: power, powerPct, costDelta, stability, critPct.
@@ -101,7 +133,12 @@ static func power(db: Dictionary, card: Dictionary) -> float:
 	var mags: Dictionary = db.get("vectors", {}).get("magnitudes", {})
 	var pm := property_mods(db, card)
 	var base := float(mags.get(str(card.get("magnitude", "")), {}).get("power", 0)) + float(pm.get("power", 0.0))
-	return base * (1.0 + float(pm.get("powerPct", 0.0)))
+	var mul := 1.0 + float(pm.get("powerPct", 0.0))
+	if card.get("vectors", {}).has("force"):
+		mul *= float(db.get("vectors", {}).get("forceRule", {}).get("damageMul", 0.7))
+	if int(pairs(db, card.get("vectors", {}))["syn"]) > 0:
+		mul *= 1.0 + float(db.get("vectors", {}).get("fusion", {}).get("resonanceBonus", 0.15))
+	return base * mul
 
 
 ## Find a card by id: parseable spell ids first, then the run's library, then data.

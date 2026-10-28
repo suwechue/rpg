@@ -15,7 +15,10 @@
       "name": "Precision",
       "vectors": [
         "force",
-        "motion"
+        "motion",
+        "gravity",
+        "lightning",
+        "time"
       ],
       "script": "res://src/scenes/minigames/precision_minigame.gd",
       "text": "Stop the swinging marker on the target line. Three swings."
@@ -25,7 +28,12 @@
       "name": "Alignment",
       "vectors": [
         "binding",
-        "light"
+        "light",
+        "sound",
+        "shadow",
+        "warding",
+        "cognition",
+        "probability"
       ],
       "script": "res://src/scenes/minigames/alignment_minigame.gd",
       "text": "Line up the rotating rings so the gaps meet."
@@ -36,7 +44,11 @@
       "vectors": [
         "transmutation",
         "vitality",
-        "corrosion"
+        "corrosion",
+        "poison",
+        "psychic",
+        "entropy",
+        "void"
       ],
       "script": "res://src/scenes/minigames/chemical_minigame.gd",
       "text": "Press the arrows in the shown order before the mix turns."

@@ -105,8 +105,15 @@ static func learning_roll(db: Dictionary, ch: Dictionary, table_key: String, kno
 	var allowed := {}
 	for axis in table:
 		var t := Char.vector_tier(db, axis) if is_vectors else Char.form_tier(db, axis)
-		if t <= tier and float(table[axis]) > 0.0:
+		if t <= tier and float(table[axis]) > 0.0 and (not is_vectors or advanced_unlocked(db, ch, str(axis))):
 			allowed[axis] = table[axis]
+	if is_vectors:
+		# PT Part 8: advanced Vectors join the pool once their parents' affinity is high enough.
+		for axis in db.get("vectors", {}).get("advanced", {}):
+			if axis == "comment" or axis == "unlockWeight" or allowed.has(axis) or known.has(axis):
+				continue
+			if Char.vector_tier(db, str(axis)) <= tier and advanced_unlocked(db, ch, str(axis)):
+				allowed[axis] = float(db["vectors"]["advanced"].get("unlockWeight", 0.5))
 	if allowed.is_empty():
 		return {}
 	var unknown := {}
@@ -125,6 +132,36 @@ static func learning_roll(db: Dictionary, ch: Dictionary, table_key: String, kno
 	ch[table_key] = VO.shift(table, { axis: float(cfg(db).get("affinityRaiseOnKnown", 2)) })
 	ch[dry_key] = int(ch.get(dry_key, 0)) + 1
 	return { "kind": "raise", "axis": axis, "pity": false }
+
+
+## Whether an advanced Vector's parent affinity shares are high enough (PT Part 8).
+## Base Vectors (not in the tree) are always open.
+static func advanced_unlocked(db: Dictionary, ch: Dictionary, axis: String) -> bool:
+	var rec: Variant = db.get("vectors", {}).get("advanced", {}).get(axis, null)
+	if not (rec is Dictionary):
+		return true
+	if bool(rec.get("disabled", false)):
+		return false
+	var odds := Char.affinity_odds(db, ch)
+	for p in rec.get("parents", {}):
+		if float(odds.get(str(p), 0.0)) < float(rec["parents"][p]):
+			return false
+	return true
+
+
+## Advanced Vectors this character could learn next and what each still needs (Compendium).
+static func next_unlocks(db: Dictionary, ch: Dictionary) -> Array:
+	var out: Array = []
+	var odds := Char.affinity_odds(db, ch)
+	for axis in db.get("vectors", {}).get("advanced", {}):
+		var rec: Variant = db["vectors"]["advanced"][axis]
+		if not (rec is Dictionary) or ch.get("knownVectors", []).has(axis) or bool(rec.get("disabled", false)):
+			continue
+		var needs := {}
+		for p in rec.get("parents", {}):
+			needs[p] = { "need": float(rec["parents"][p]), "have": float(odds.get(str(p), 0.0)) }
+		out.append({ "axis": axis, "tier": int(rec.get("tier", 2)), "needs": needs, "ready": advanced_unlocked(db, ch, str(axis)) })
+	return out
 
 
 ## Raise the Knowledge Tier when level and INT reach a line. Returns true on a change.

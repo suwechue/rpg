@@ -684,6 +684,8 @@
     "point_buy.over_budget": "That's more points than you have.",
     "point_buy.arena_title": "Party stats",
     "point_buy.use_recommended": "Use recommended for all",
-    "point_buy.each_member": "Point buy for each member"
+    "point_buy.each_member": "Point buy for each member",
+    "combat_state.strained": "Strained: that Magnitude can't be cast this turn",
+    "combat_state.time_delays": "%s is pushed to the back of the round."
   }
 }

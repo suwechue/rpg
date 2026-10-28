@@ -140,7 +140,7 @@
       "upgrade": {
         "magnitude": "major"
       },
-      "cost": 4
+      "cost": 3
     },
     {
       "id": "card_flare_mark",

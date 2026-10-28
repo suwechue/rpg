@@ -5,6 +5,7 @@
 class_name CombatResolver
 extends RefCounted
 
+const CardRules := preload("res://src/core/card.gd")
 const VO := preload("res://src/core/vector_ops.gd")
 const UnitScript := preload("res://src/core/combat/unit.gd")
 
@@ -111,40 +112,53 @@ static func heal_amount(base: float, caster: UnitScript) -> int:
 
 ## Does this cast need an Instability roll? Improvised: always. Prepared cards:
 ## only when they spend more than half the caster's current MP.
-static func needs_roll(cost: int, current_mp: int, improvised: bool) -> bool:
-	return improvised or float(cost) > float(current_mp) / 2.0
+## PT Part 8: Instability by Magnitude. The threshold MP cost for a card's Magnitude.
+static func threshold(db: Dictionary, card: Dictionary, bonus: int = 0) -> int:
+	return int(db.get("vectors", {}).get("instability", {}).get("thresholds", {}).get(str(card.get("magnitude", "minor")), 99)) + bonus
 
 
-## Target number: 10 + 10 x (cost / current MP), +3 for improvised casts.
-static func instability_target(db: Dictionary, cost: int, current_mp: int, improvised: bool) -> float:
-	var t := 10.0 + 10.0 * float(cost) / float(maxi(1, current_mp))
-	if improvised:
-		t += float(db.get("vectors", {}).get("improvise", {}).get("instabilityBonus", 3))
-	return t
+## A cast rolls when its final cost reaches the threshold; improvised casts always roll.
+static func needs_roll(db: Dictionary, card: Dictionary, cost: int, improvised: bool, bonus: int = 0) -> bool:
+	return improvised or cost >= threshold(db, card, bonus)
+
+
+## Target: 10 + (cost - threshold) / 2, +1 Entropy, +2 per antagonistic pair,
+## -1 per synergistic pair, never below 10.
+static func instability_target(db: Dictionary, card: Dictionary, cost: int, bonus: int = 0) -> float:
+	var ins: Dictionary = db.get("vectors", {}).get("instability", {})
+	var fu: Dictionary = db.get("vectors", {}).get("fusion", {})
+	var t := float(ins.get("base", 10)) + floorf(float(maxi(0, cost - threshold(db, card, bonus))) / 2.0)
+	if card.get("vectors", {}).has("entropy"):
+		t += float(ins.get("entropyBonus", 1))
+	var pr := CardRules.pairs(db, card.get("vectors", {}))
+	t += float(pr["ant"]) * float(fu.get("antagonistInstability", 2)) + float(pr["syn"]) * float(fu.get("synergyInstability", -1))
+	return maxf(float(ins.get("minTarget", 10)), t)
 
 
 ## Chance that d20 + Stability / 2 meets the target.
-static func stability_chance(db: Dictionary, stability: int, cost: int, current_mp: int, improvised: bool) -> float:
-	if not needs_roll(cost, current_mp, improvised):
+static func stability_chance(db: Dictionary, stability: int, cost: int, card: Dictionary, improvised: bool, bonus: int = 0) -> float:
+	if not needs_roll(db, card, cost, improvised, bonus):
 		return 1.0
-	var need := ceili(instability_target(db, cost, current_mp, improvised) - float(stability) / 2.0)
+	var need := ceili(instability_target(db, card, cost, bonus) - float(stability) / 2.0)
 	return clampf(float(21 - need) / 20.0, 0.0, 1.0)
 
 
 ## Roll d20 + Stability / 2. Returns { "ok": bool, "roll": n, "target": t }.
-static func roll_stability(db: Dictionary, stability: int, cost: int, current_mp: int, improvised: bool, rng: RandomNumberGenerator) -> Dictionary:
-	if not needs_roll(cost, current_mp, improvised):
+static func roll_stability(db: Dictionary, stability: int, cost: int, card: Dictionary, improvised: bool, rng: RandomNumberGenerator, bonus: int = 0, rolls: int = 1) -> Dictionary:
+	if not needs_roll(db, card, cost, improvised, bonus):
 		return { "ok": true, "roll": 0, "target": 0.0 }
-	var d20 := rng.randi_range(1, 20)
+	var d20 := 0
+	for i in maxi(1, rolls):
+		d20 = maxi(d20, rng.randi_range(1, 20))
 	var total := float(d20) + float(stability) / 2.0
-	var target := instability_target(db, cost, current_mp, improvised)
+	var target := instability_target(db, card, cost, bonus)
 	return { "ok": total >= target, "roll": d20, "target": target }
 
 
 ## Sample the failure table (data/vectors.json "failures").
 static func roll_failure(db: Dictionary, rng: RandomNumberGenerator) -> String:
-	var table: Dictionary = db.get("vectors", {}).get("failures", { "fizzle": 4, "backlash": 3, "misfire": 2, "wild_surge": 1 })
-	return VO.sample(table, rng, ["fizzle", "backlash", "misfire", "wild_surge"])
+	var table: Dictionary = db.get("vectors", {}).get("failures", { "reduced": 4, "backlash": 3, "misfire": 2, "strain": 2, "wild_surge": 1, "collapse": 1 })
+	return VO.sample(table, rng, ["reduced", "backlash", "misfire", "strain", "wild_surge", "collapse"])
 
 
 ## A random Vector from the whole space with equal weights (Wild Surge).

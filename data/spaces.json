@@ -1,28 +1,102 @@
 {
   "arcane": {
-    "axes": ["heat", "cold", "force", "motion", "binding", "light", "transmutation", "vitality", "corrosion"],
-    "tiers": { "heat": 1, "cold": 1, "force": 1, "motion": 1, "binding": 2, "light": 2, "transmutation": 3, "vitality": 3, "corrosion": 3 },
+    "axes": [
+      "heat",
+      "cold",
+      "force",
+      "motion",
+      "binding",
+      "light",
+      "transmutation",
+      "vitality",
+      "corrosion",
+      "gravity",
+      "lightning",
+      "sound",
+      "shadow",
+      "warding",
+      "poison",
+      "psychic",
+      "cognition",
+      "entropy",
+      "void",
+      "time",
+      "probability"
+    ],
+    "tiers": {
+      "heat": 1,
+      "cold": 1,
+      "force": 1,
+      "motion": 1,
+      "binding": 1,
+      "light": 1,
+      "transmutation": 3,
+      "vitality": 3,
+      "corrosion": 3,
+      "gravity": 2,
+      "lightning": 2,
+      "sound": 2,
+      "shadow": 2,
+      "warding": 2,
+      "poison": 3,
+      "psychic": 3,
+      "cognition": 3,
+      "entropy": 4,
+      "void": 4,
+      "time": 4,
+      "probability": 3
+    },
     "signed": false,
     "tieBreak": "axisOrder"
   },
   "forms": {
-    "axes": ["bolt", "burst", "shield", "weapon_infusion", "line", "sphere", "projectile", "touch", "aura", "construct", "glyph", "cone"],
+    "axes": [
+      "bolt",
+      "burst",
+      "shield",
+      "weapon_infusion",
+      "line",
+      "sphere",
+      "projectile",
+      "touch",
+      "aura",
+      "construct",
+      "glyph",
+      "cone"
+    ],
     "signed": false
   },
   "stats": {
-    "axes": ["str", "dex", "con", "int", "per", "wil", "cha"],
+    "axes": [
+      "str",
+      "dex",
+      "con",
+      "int",
+      "per",
+      "wil",
+      "cha"
+    ],
     "signed": false,
     "min": 1,
     "max": 20
   },
   "disposition": {
-    "axes": ["courage", "greed", "curiosity", "loyalty", "kindness", "pride"],
+    "axes": [
+      "courage",
+      "greed",
+      "curiosity",
+      "loyalty",
+      "kindness",
+      "pride"
+    ],
     "signed": true,
     "min": -100,
     "max": 100
   },
   "bond": {
-    "axes": ["bond"],
+    "axes": [
+      "bond"
+    ],
     "signed": true,
     "min": -100,
     "max": 100,

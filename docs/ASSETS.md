@@ -18,7 +18,7 @@ Sizes: tiles 32x32, characters 32x32 (up to 32x48 for tall ones), portraits 64x6
 
 Pack art is a placeholder: the 16x16 packs are scaled up 2x (nearest neighbour) to fit the 32x32 grid until you replace them.
 
-Replaced so far: Characters (walk sheets) 0/39, Portraits 0/35, Enemies and bosses 0/66, Tilesets 0/4, Single tiles 0/120, UI 0/19, Icons 0/26, Card art 0/11, VFX 0/0, Music 0/30, Sound effects 0/38, Ambience 0/9, Voice blips 0/10.
+Replaced so far: Characters (walk sheets) 0/39, Portraits 0/35, Enemies and bosses 0/66, Tilesets 0/4, Single tiles 0/120, UI 0/19, Icons 0/38, Card art 0/23, VFX 0/0, Music 0/30, Sound effects 0/38, Ambience 0/9, Voice blips 0/10.
 
 ## Characters (walk sheets) (39)
 
@@ -345,7 +345,7 @@ Single tiles inside a tileset. Replacing one changes it everywhere it's used. Dr
 | [ ] | `font_title` | - | - | - | skin placeholder | Titles and big headings (drawn at 2x). A pixel font at its native size or a whole multiple. .ttf or .otf. |
 | [ ] | `font_damage_numbers` | - | - | - | skin placeholder | Floating damage and heal numbers in combat. A pixel font at its native size or a whole multiple. .ttf or .otf. |
 
-## Icons (26)
+## Icons (38)
 
 
 
@@ -353,6 +353,18 @@ Single tiles inside a tileset. Replacing one changes it everywhere it's used. Dr
 | --- | --- | --- | --- | --- | --- | --- |
 | [ ] | `icon_vector_heat` | 16x16 | 16x16 white shape with dark outline; tinted with the Vector color | center | skin placeholder |  |
 | [ ] | `icon_vector_cold` | 16x16 | 16x16 white shape with dark outline; tinted with the Vector color | center | skin placeholder |  |
+| [ ] | `icon_vector_gravity` | 16x16 | 16x16 white shape with dark outline; tinted with the Vector color | center | skin placeholder | Palette swap of the Force icon (tint #7a5cff) until you draw your own. |
+| [ ] | `icon_vector_lightning` | 16x16 | 16x16 white shape with dark outline; tinted with the Vector color | center | skin placeholder | Palette swap of the Force icon (tint #ffe14d) until you draw your own. |
+| [ ] | `icon_vector_sound` | 16x16 | 16x16 white shape with dark outline; tinted with the Vector color | center | skin placeholder | Palette swap of the Force icon (tint #ff9ad5) until you draw your own. |
+| [ ] | `icon_vector_shadow` | 16x16 | 16x16 white shape with dark outline; tinted with the Vector color | center | skin placeholder | Palette swap of the Force icon (tint #5b4d7a) until you draw your own. |
+| [ ] | `icon_vector_warding` | 16x16 | 16x16 white shape with dark outline; tinted with the Vector color | center | skin placeholder | Palette swap of the Force icon (tint #7fd6c2) until you draw your own. |
+| [ ] | `icon_vector_poison` | 16x16 | 16x16 white shape with dark outline; tinted with the Vector color | center | skin placeholder | Palette swap of the Force icon (tint #8fd14f) until you draw your own. |
+| [ ] | `icon_vector_psychic` | 16x16 | 16x16 white shape with dark outline; tinted with the Vector color | center | skin placeholder | Palette swap of the Force icon (tint #d26bff) until you draw your own. |
+| [ ] | `icon_vector_cognition` | 16x16 | 16x16 white shape with dark outline; tinted with the Vector color | center | skin placeholder | Palette swap of the Force icon (tint #9fd0ff) until you draw your own. |
+| [ ] | `icon_vector_entropy` | 16x16 | 16x16 white shape with dark outline; tinted with the Vector color | center | skin placeholder | Palette swap of the Force icon (tint #b8572e) until you draw your own. |
+| [ ] | `icon_vector_void` | 16x16 | 16x16 white shape with dark outline; tinted with the Vector color | center | skin placeholder | Palette swap of the Force icon (tint #2e2a3a) until you draw your own. |
+| [ ] | `icon_vector_time` | 16x16 | 16x16 white shape with dark outline; tinted with the Vector color | center | skin placeholder | Palette swap of the Force icon (tint #e8c48a) until you draw your own. |
+| [ ] | `icon_vector_probability` | 16x16 | 16x16 white shape with dark outline; tinted with the Vector color | center | skin placeholder | Palette swap of the Force icon (tint #ffd27a) until you draw your own. |
 | [ ] | `icon_vector_force` | 16x16 | 16x16 white shape with dark outline; tinted with the Vector color | center | skin placeholder |  |
 | [ ] | `icon_vector_motion` | 16x16 | 16x16 white shape with dark outline; tinted with the Vector color | center | skin placeholder |  |
 | [ ] | `icon_vector_binding` | 16x16 | 16x16 white shape with dark outline; tinted with the Vector color | center | skin placeholder |  |
@@ -378,7 +390,7 @@ Single tiles inside a tileset. Replacing one changes it everywhere it's used. Dr
 | [ ] | `icon_intent_move` | 16x16 | 16x16 white shape with dark outline; drawn over an enemy's head | center | skin placeholder |  |
 | [ ] | `icon_intent_tracking` | 16x16 | 16x16 white shape with dark outline; drawn over an enemy's head | center | skin placeholder |  |
 
-## Card art (11)
+## Card art (23)
 
 
 
@@ -386,6 +398,18 @@ Single tiles inside a tileset. Replacing one changes it everywhere it's used. Dr
 | --- | --- | --- | --- | --- | --- | --- |
 | [ ] | `card_art_heat` | 48x48 | 48x48 card illustration | top left | skin placeholder | Default art for heat cards. Give one card its own art with assets/custom/cards/card_art_<card id>.png. |
 | [ ] | `card_art_cold` | 48x48 | 48x48 card illustration | top left | skin placeholder | Default art for cold cards. Give one card its own art with assets/custom/cards/card_art_<card id>.png. |
+| [ ] | `card_art_gravity` | 48x48 | 48x48 card illustration | top left | skin placeholder | Default art for gravity cards (a tinted copy of the Force art until you draw your own). |
+| [ ] | `card_art_lightning` | 48x48 | 48x48 card illustration | top left | skin placeholder | Default art for lightning cards (a tinted copy of the Force art until you draw your own). |
+| [ ] | `card_art_sound` | 48x48 | 48x48 card illustration | top left | skin placeholder | Default art for sound cards (a tinted copy of the Force art until you draw your own). |
+| [ ] | `card_art_shadow` | 48x48 | 48x48 card illustration | top left | skin placeholder | Default art for shadow cards (a tinted copy of the Force art until you draw your own). |
+| [ ] | `card_art_warding` | 48x48 | 48x48 card illustration | top left | skin placeholder | Default art for warding cards (a tinted copy of the Force art until you draw your own). |
+| [ ] | `card_art_poison` | 48x48 | 48x48 card illustration | top left | skin placeholder | Default art for poison cards (a tinted copy of the Force art until you draw your own). |
+| [ ] | `card_art_psychic` | 48x48 | 48x48 card illustration | top left | skin placeholder | Default art for psychic cards (a tinted copy of the Force art until you draw your own). |
+| [ ] | `card_art_cognition` | 48x48 | 48x48 card illustration | top left | skin placeholder | Default art for cognition cards (a tinted copy of the Force art until you draw your own). |
+| [ ] | `card_art_entropy` | 48x48 | 48x48 card illustration | top left | skin placeholder | Default art for entropy cards (a tinted copy of the Force art until you draw your own). |
+| [ ] | `card_art_void` | 48x48 | 48x48 card illustration | top left | skin placeholder | Default art for void cards (a tinted copy of the Force art until you draw your own). |
+| [ ] | `card_art_time` | 48x48 | 48x48 card illustration | top left | skin placeholder | Default art for time cards (a tinted copy of the Force art until you draw your own). |
+| [ ] | `card_art_probability` | 48x48 | 48x48 card illustration | top left | skin placeholder | Default art for probability cards (a tinted copy of the Force art until you draw your own). |
 | [ ] | `card_art_force` | 48x48 | 48x48 card illustration | top left | skin placeholder | Default art for force cards. Give one card its own art with assets/custom/cards/card_art_<card id>.png. |
 | [ ] | `card_art_motion` | 48x48 | 48x48 card illustration | top left | skin placeholder | Default art for motion cards. Give one card its own art with assets/custom/cards/card_art_<card id>.png. |
 | [ ] | `card_art_binding` | 48x48 | 48x48 card illustration | top left | skin placeholder | Default art for binding cards. Give one card its own art with assets/custom/cards/card_art_<card id>.png. |

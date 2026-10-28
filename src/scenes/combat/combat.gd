@@ -1170,7 +1170,7 @@ func _open_wheel() -> void:
 	if not card.is_empty():
 		var cost := state.improvise_cost(u, card)
 		box.add_child(UiTheme.label(Strings.t("combat.mp_1_card_as_fuel") % [card["name"], cost,
-			roundi(Res.stability_chance(db, u.stability, cost, u.mp, true) * 100.0)]))
+			roundi(Res.stability_chance(db, u.stability, cost, card, true) * 100.0)]))
 	if err != "":
 		box.add_child(UiTheme.label(err, UiTheme.BAD))
 	var brow := HBoxContainer.new()

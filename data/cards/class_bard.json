@@ -188,7 +188,7 @@
         "magnitude": "major"
       },
       "pool": "bard",
-      "cost": 3
+      "cost": 2
     },
     {
       "id": "card_ballad",
@@ -261,7 +261,7 @@
         "magnitude": "standard"
       },
       "pool": "bard",
-      "cost": 3
+      "cost": 2
     },
     {
       "id": "card_showstopper",

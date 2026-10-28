@@ -103,12 +103,20 @@ func test_contest_damage() -> void:
 
 
 func test_instability_odds() -> void:
-	check(not Res.needs_roll(2, 10, false), "cheap prepared card skips the roll")
-	check(Res.needs_roll(6, 10, false), "prepared card over half MP rolls")
-	check(Res.needs_roll(1, 30, true), "improvised always rolls")
-	check_near(Res.instability_target(db(), 5, 10, true), 10.0 + 5.0 + 3.0, "target 10 + 10 x cost/MP + 3")
-	check_near(Res.stability_chance(db(), 10, 5, 10, true), float(21 - 13) / 20.0, "chance with stability 10")
-	check_near(Res.stability_chance(db(), 10, 2, 30, false), 1.0, "no roll means certain")
+	# PT Part 8: Instability by Magnitude thresholds (Minor never, Standard 4, Major 6, Grand 9).
+	var minor := CardRules.make_spell(db(), { "heat": 1 }, "burst", "minor")
+	var std := CardRules.make_spell(db(), { "heat": 1 }, "bolt", "standard")
+	var major := CardRules.make_spell(db(), { "heat": 1 }, "bolt", "major")
+	check(not Res.needs_roll(db(), minor, 9, false), "Minor casts never roll")
+	check(not Res.needs_roll(db(), std, 3, false) and Res.needs_roll(db(), std, 4, false), "Standard rolls at 4 MP")
+	check(Res.needs_roll(db(), minor, 1, true), "improvised always rolls")
+	check_near(Res.instability_target(db(), major, 9), 10.0 + 1.0, "target 10 + (9 - 6) / 2 rounded down")
+	var anta := CardRules.make_spell(db(), { "heat": 1, "cold": 1 }, "bolt", "major")
+	check_near(Res.instability_target(db(), anta, 6), 12.0, "+2 per antagonistic pair")
+	var syn := CardRules.make_spell(db(), { "heat": 1, "motion": 1 }, "bolt", "major")
+	check_near(Res.instability_target(db(), syn, 6), 10.0, "-1 per synergistic pair, never below 10")
+	check_near(Res.stability_chance(db(), 10, 9, major, false), float(21 - 6) / 20.0, "chance with stability 10")
+	check_near(Res.stability_chance(db(), 10, 2, std, false), 1.0, "no roll means certain")
 
 
 # --- Turn flow and effects --------------------------------------------------------------
