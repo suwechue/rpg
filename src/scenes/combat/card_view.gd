@@ -11,6 +11,7 @@ var cost := 0
 var selected := false
 var owner_color := Color(0, 0, 0, 0)   # CT Part 2b: thin border in the owner's color
 var held := false                     # PT Part 2: kept over from last turn (a small pin)
+var _shape: Array = []                # PT Part 3: footprint cells on a 7x5 mini grid
 var _axes: Array = []
 var _frame: Texture2D
 var _art: Texture2D
@@ -37,6 +38,11 @@ func setup(p_card: Dictionary, p_cost: int) -> void:
 			_art = Assets.texture(str(id))
 			break
 	tooltip_text = Strings.t("card_view.mp") % [card.get("name", ""), cost, CardRules.describe(db, card)]
+	if CardRules.is_spell(card) and DataDB.record("forms", str(card.get("form", ""))).size() > 0:
+		var dg := preload("res://src/scenes/ui/shape_diagram.gd").new()
+		dg.setup(DataDB.record("forms", str(card.get("form", ""))), str(card.get("magnitude", "standard")))
+		_shape = dg.cells
+		dg.free()
 	queue_redraw()
 
 
@@ -74,8 +80,20 @@ func _draw() -> void:
 	if owner_color.a > 0.0:
 		draw_rect(Rect2(lift, _frame.get_size()), owner_color * dim, false, 1.0)
 	if bool(card.get("quick", false)):
-		# Quick cards: a bright edge and a QUICK badge (PT Part 3 asks for more; this marks them now).
+		# Quick cards: a bright edge and a lightning QUICK badge (PT Part 3).
 		draw_rect(Rect2(lift + Vector2(1, 1), _frame.get_size() - Vector2(2, 2)), Color(UiTheme.GOOD, 0.8) * dim, false, 1.0)
+		var bx := lift + Vector2(3, _frame.get_height() - 4)
+		draw_colored_polygon(PackedVector2Array([bx + Vector2(2, -7), bx + Vector2(0, -3), bx + Vector2(2, -3), bx + Vector2(1, 0), bx + Vector2(4, -5), bx + Vector2(2, -5)]), UiTheme.GOOD)
+		draw_string(UiTheme.font, bx + Vector2(5, 0), Strings.t("combat.quick_badge"), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, UiTheme.GOOD * dim)
+	if not _shape.is_empty():
+		# The footprint on a mini grid in the art corner (caster in yellow).
+		var px := 2
+		var origin := art_pos + Vector2(2, 2)
+		for y in 5:
+			for x in 7:
+				var c := Vector2i(x, y)
+				var col := Color(_tint, 0.95) if _shape.has(c) else (UiTheme.ACCENT if c == Vector2i(1, 2) else Color(0, 0, 0, 0.35))
+				draw_rect(Rect2(origin + Vector2(x * px, y * px), Vector2(px - 0.5, px - 0.5)), col * dim)
 	if held:
 		draw_circle(lift + Vector2(_frame.get_width() - 4, 4), 2.5, UiTheme.ACCENT)
 	if selected:

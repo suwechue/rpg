@@ -363,5 +363,6 @@
     "#bb6bd9",
     "#f2994a"
   ],
-  "coverIcon": "icon_status_guard"
+  "coverIcon": "icon_status_guard",
+  "areaFlashSeconds": 0.6
 }

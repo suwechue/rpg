@@ -1,15 +1,153 @@
 {
   "forms": [
-    { "id": "touch",           "name": "Touch",      "tier": 1, "cost": 0, "range": 1, "multiplier": 1.5, "footprint": "adjacent",             "target": "any" },
-    { "id": "bolt",            "name": "Bolt",       "tier": 1, "cost": 0, "range": 5, "multiplier": 1.0, "footprint": "single_los",           "target": "any" },
-    { "id": "weapon_infusion", "name": "Infusion",   "tier": 1, "cost": 0, "range": 0, "multiplier": 1.0, "footprint": "self_next_2_strikes",  "target": "self", "strikes": 2 },
-    { "id": "projectile",      "name": "Shot",       "tier": 1, "cost": 1, "range": 7, "multiplier": 1.0, "footprint": "first_in_line",        "target": "direction" },
-    { "id": "shield",          "name": "Shield",     "tier": 1, "cost": 1, "range": 3, "multiplier": 0.0, "footprint": "ally_absorb_2_turns",  "target": "ally", "turns": 2 },
-    { "id": "line",            "name": "Line",       "tier": 1, "cost": 1, "range": 4, "multiplier": 0.8, "footprint": "line",                 "target": "direction" },
-    { "id": "burst",           "name": "Burst",      "tier": 1, "cost": 2, "range": 4, "multiplier": 0.7, "footprint": "square_3x3",           "target": "any" , "footprintByMagnitude": { "minor": "plus", "standard": "plus", "major": "square_3x3", "grand": "square_3x3" } },
-    { "id": "aura",            "name": "Aura",       "tier": 1, "cost": 2, "range": 0, "multiplier": 0.4, "footprint": "zone_r1_self_3_turns", "target": "self", "turns": 3 , "footprintByMagnitude": { "minor": "plus_self", "standard": "plus_self", "major": "zone_r1_self_3_turns", "grand": "zone_r1_self_3_turns" } },
-    { "id": "sphere",          "name": "Sphere",     "tier": 2, "cost": 2, "range": 0, "multiplier": 0.7, "footprint": "diamond_r2_self",      "target": "self" , "footprintByMagnitude": { "minor": "diamond_r1_self", "standard": "diamond_r1_self", "major": "diamond_r2_self", "grand": "diamond_r2_self" } },
-    { "id": "construct",       "name": "Construct",  "tier": 2, "cost": 3, "range": 3, "multiplier": 1.0, "footprint": "place_object_3_turns", "target": "empty", "turns": 3 },
-    { "id": "glyph",           "name": "Glyph",      "tier": 2, "cost": 3, "range": 4, "multiplier": 1.2, "footprint": "trap_tile",            "target": "empty", "turns": 6 }
-  ]
+    {
+      "id": "touch",
+      "name": "Touch",
+      "tier": 1,
+      "cost": 0,
+      "range": 1,
+      "multiplier": 1.5,
+      "footprint": "adjacent",
+      "target": "any"
+    },
+    {
+      "id": "bolt",
+      "name": "Bolt",
+      "tier": 1,
+      "cost": 0,
+      "range": 5,
+      "multiplier": 1.0,
+      "footprint": "single_los",
+      "target": "any"
+    },
+    {
+      "id": "weapon_infusion",
+      "name": "Infusion",
+      "tier": 1,
+      "cost": 0,
+      "range": 0,
+      "multiplier": 1.0,
+      "footprint": "self_next_2_strikes",
+      "target": "self",
+      "strikes": 2
+    },
+    {
+      "id": "projectile",
+      "name": "Shot",
+      "tier": 1,
+      "cost": 1,
+      "range": 7,
+      "multiplier": 1.0,
+      "footprint": "first_in_line",
+      "target": "direction"
+    },
+    {
+      "id": "shield",
+      "name": "Shield",
+      "tier": 1,
+      "cost": 1,
+      "range": 3,
+      "multiplier": 0.0,
+      "footprint": "ally_absorb_2_turns",
+      "target": "ally",
+      "turns": 2
+    },
+    {
+      "id": "line",
+      "name": "Line",
+      "tier": 1,
+      "cost": 1,
+      "range": 4,
+      "multiplier": 0.8,
+      "footprint": "line",
+      "target": "direction"
+    },
+    {
+      "id": "burst",
+      "name": "Burst",
+      "tier": 1,
+      "cost": 2,
+      "range": 4,
+      "multiplier": 0.7,
+      "footprint": "square_3x3",
+      "target": "any",
+      "footprintByMagnitude": {
+        "minor": "plus",
+        "standard": "plus",
+        "major": "square_3x3",
+        "grand": "square_3x3"
+      }
+    },
+    {
+      "id": "aura",
+      "name": "Aura",
+      "tier": 1,
+      "cost": 2,
+      "range": 0,
+      "multiplier": 0.4,
+      "footprint": "zone_r1_self_3_turns",
+      "target": "self",
+      "turns": 3,
+      "footprintByMagnitude": {
+        "minor": "plus_self",
+        "standard": "plus_self",
+        "major": "zone_r1_self_3_turns",
+        "grand": "zone_r1_self_3_turns"
+      }
+    },
+    {
+      "id": "sphere",
+      "name": "Sphere",
+      "tier": 2,
+      "cost": 2,
+      "range": 0,
+      "multiplier": 0.7,
+      "footprint": "diamond_r2_self",
+      "target": "self",
+      "footprintByMagnitude": {
+        "minor": "diamond_r1_self",
+        "standard": "diamond_r1_self",
+        "major": "diamond_r2_self",
+        "grand": "diamond_r2_self"
+      }
+    },
+    {
+      "id": "construct",
+      "name": "Construct",
+      "tier": 2,
+      "cost": 3,
+      "range": 3,
+      "multiplier": 1.0,
+      "footprint": "place_object_3_turns",
+      "target": "empty",
+      "turns": 3
+    },
+    {
+      "id": "glyph",
+      "name": "Glyph",
+      "tier": 2,
+      "cost": 3,
+      "range": 4,
+      "multiplier": 1.2,
+      "footprint": "trap_tile",
+      "target": "empty",
+      "turns": 6
+    }
+  ],
+  "shapeNames": {
+    "adjacent": "Single target, next to you",
+    "single_los": "Single target",
+    "first_in_line": "First unit in a line",
+    "line": "Line",
+    "square_3x3": "3x3 square",
+    "plus": "Plus shape",
+    "plus_self": "Plus shape around you",
+    "zone_r1_self_3_turns": "3x3 around you",
+    "diamond_r1_self": "Diamond around you",
+    "diamond_r2_self": "Big diamond around you",
+    "self_next_2_strikes": "Your next 2 Strikes",
+    "ally_absorb_2_turns": "One ally",
+    "place_object_3_turns": "An object on a tile",
+    "trap_tile": "A trap on a tile"
+  }
 }

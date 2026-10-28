@@ -190,6 +190,27 @@ func combat_setup(enemies: Array, layout_id: String, opts: Dictionary = {}) -> D
 	return setup
 
 
+## Arena pause > Save and Quit (PT Part 3): the run is saved at the start of the
+## current wave (party HP and MP as they were, the wave not yet fought), so
+## Continue restarts that wave. Then back to the title.
+func save_arena_and_quit() -> void:
+	var a: Dictionary = run.get("arena", {})
+	if a.is_empty():
+		return
+	if bool(a.get("inFight", false)):
+		a["wave"] = int(a.get("wave", 1)) - 1
+		a["inFight"] = false
+		for ch_state in a.get("partyBefore", []):
+			var ch := character(str(ch_state["id"]))
+			if not ch.is_empty():
+				ch["hp"] = int(ch_state["hp"])
+				ch["mp"] = int(ch_state["mp"])
+	run["resume_scene"] = "res://src/scenes/arena/arena.tscn"
+	SaveSystem.save_run(true)
+	pending_combat = {}
+	SceneRouter.goto("res://src/scenes/title/title.tscn")
+
+
 ## Go to the combat scene; come back to `return_scene` (default: the current one).
 func start_combat(setup: Dictionary, return_scene: String = "") -> void:
 	pending_combat = setup

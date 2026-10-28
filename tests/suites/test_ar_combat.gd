@@ -152,7 +152,7 @@ func test_disabling_cancels_telegraphs() -> void:
 	_lock(e, [p.cell])
 	var spec := { "vectors": { "light": 1.0 }, "power": 5.0, "form": st.form_rec("bolt"), "heal": false, "mult": 1.0, "ranged": true, "name": "Dazzle" }
 	st._apply_vector_effects(p, spec, [e.cell], [e])
-	check(e.intent.is_empty(), "blinding cancels an attack under move_or_act")
+	check(not e.intent.is_empty(), "blinding keeps the telegraph (PT Part 4: it adds a miss chance instead)")
 	e.intent = { "kind": "move", "move": Vector2i(1, 1), "cells": [] }
 	spec["vectors"] = { "binding": 1.0 }
 	st._apply_vector_effects(p, spec, [e.cell], [e])

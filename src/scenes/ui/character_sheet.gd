@@ -44,13 +44,21 @@ func show_character(ch: Dictionary, library: Dictionary = {}) -> void:
 		var base := int(ch.get("stats", {}).get(s, 0))
 		var eff := int(st[s])
 		var extra := "" if eff == base else " (%+d)" % (eff - base)
-		left.add_child(UiTheme.label("%s %2d%s" % [str(s).to_upper(), eff, extra]))
+		var sl := UiTheme.label("%s %2d%s" % [str(s).to_upper(), eff, extra])
+		sl.tooltip_text = Strings.t("stat_tip." + str(s))
+		sl.mouse_filter = Control.MOUSE_FILTER_PASS
+		left.add_child(sl)
 
 	mid.add_child(UiTheme.label(Strings.t("character_sheet.derived"), UiTheme.ACCENT))
-	mid.add_child(UiTheme.label(Strings.t("character_sheet.move_init") % [d["movement"], d["initiative"]]))
-	mid.add_child(UiTheme.label(Strings.t("character_sheet.def_mres") % [d["physDefense"], d["magicResist"]]))
-	mid.add_child(UiTheme.label(Strings.t("character_sheet.stab_crit") % [d["stability"], int(d["critChancePct"])]))
-	mid.add_child(UiTheme.label(Strings.t("character_sheet.mp_regen_turn") % d["mpRegen"]))
+	for pair in [[Strings.t("character_sheet.move_init") % [d["movement"], d["initiative"]], "stat_tip.movement"],
+			[Strings.t("character_sheet.def_mres") % [d["physDefense"], d["magicResist"]], "stat_tip.defense"],
+			[Strings.t("character_sheet.stab_crit") % [d["stability"], int(d["critChancePct"])], "stat_tip.crit"],
+			[Strings.t("character_sheet.high_crit") % float(d.get("highCritChancePct", 1.0)), "stat_tip.crit"],
+			[Strings.t("character_sheet.mp_regen_turn") % d["mpRegen"], "stat_tip.regen"]]:
+		var dl := UiTheme.label(str(pair[0]))
+		dl.tooltip_text = Strings.t(str(pair[1]))
+		dl.mouse_filter = Control.MOUSE_FILTER_PASS
+		mid.add_child(dl)
 	mid.add_child(UiTheme.label(Strings.t("character_sheet.vector_affinity"), UiTheme.ACCENT))
 	var odds := Char.affinity_odds(db, ch)
 	for axis in VO.ordered_axes(odds, Char.arcane_axes(db)):

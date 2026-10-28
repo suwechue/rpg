@@ -8,6 +8,7 @@ extends RefCounted
 
 const FLOOR := "floor"
 const WALL := "wall"
+const RUBBLE := "rubble"       # a broken wall: floor that gives half cover (PT Part 4)
 const COVER := "cover"
 const HAZARD := "hazard"
 const WATER := "water"
@@ -17,7 +18,7 @@ const COLLAPSE := "collapse"      # arena: gives way the second time someone ste
 const DARK := "dark"              # arena: units here can't be targeted unless Light has lit the tile
 const CONVEYORS := { "conv_r": Vector2i(1, 0), "conv_l": Vector2i(-1, 0), "conv_u": Vector2i(0, -1), "conv_d": Vector2i(0, 1) }
 
-const LEGEND := { ".": FLOOR, "#": WALL, "c": FLOOR, "h": HAZARD, "w": WATER, "i": ICE, "p": PIT, "k": COLLAPSE, "d": DARK,
+const LEGEND := { ".": FLOOR, "#": WALL, "B": WALL, "r": RUBBLE, "c": FLOOR, "h": HAZARD, "w": WATER, "i": ICE, "p": PIT, "k": COLLAPSE, "d": DARK,
 	"R": "conv_r", "L": "conv_l", "U": "conv_u", "D": "conv_d", "t": FLOOR, "f": FLOOR, "g": FLOOR }
 const DIRS := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
 
@@ -35,6 +36,7 @@ var exits: Array = []            # Vector2i cells the party can flee from
 var party_spawns: Array = []
 var enemy_spawns: Array = []
 var prop_spawns: Array = []      # [{ "cell": Vector2i, "prop": "crate" }]
+var wall_hp: Dictionary = {}     # breakable '#' walls: cell -> HP (the 'B' boundary isn't here)
 var theme := ""
 
 
@@ -72,6 +74,8 @@ func _init(layout: Dictionary = {}) -> void:
 					burning[cell] = 999
 				"g":
 					trap_spawns.append(cell)
+				"#":
+					wall_hp[cell] = int(layout.get("wallHp", 25))
 			row.append(LEGEND.get(ch, FLOOR))
 		terrain.append(row)
 	if exits.is_empty():

@@ -115,6 +115,10 @@ func _refresh() -> void:
 	var kind := Strings.t("arena.boss_wave") if Arena.is_boss(db, next) else (Strings.t("arena.elite_wave") if Arena.is_elite(db, next) else "Wave")
 	_text(Strings.t("arena.terrain") % [kind, next, hz.get("name", "plain")], UiTheme.TEXT)
 	_button(Strings.t("arena.start_wave") % next, _start_wave)
+	_button(Strings.t("arena.party"), func() -> void:
+		await Flow.show_modal(preload("res://src/scenes/ui/party_panel.gd").new()))
+	if not story:
+		_button(Strings.t("pause.save_quit"), func() -> void: GameState.save_arena_and_quit())
 	if not story:
 		_button(Strings.t("arena.give_up"), func() -> void: _end_run())
 	_center()
@@ -138,6 +142,10 @@ func _start_wave() -> void:
 	for ch in Party.party(GameState.run):
 		hp += int(ch.get("hp", 0))
 	arena["hpBefore"] = hp
+	var before: Array = []
+	for ch in Party.party(GameState.run):
+		before.append({ "id": str(ch.get("id", "")), "hp": int(ch.get("hp", 0)), "mp": int(ch.get("mp", 0)) })
+	arena["partyBefore"] = before
 	arena["inFight"] = true
 	setup["intro"] = Strings.t("arena.wave") % [wave, str(Arena.hazard_set(db, wave).get("name", ""))]
 	GameState.start_combat(setup, SELF)

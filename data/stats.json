@@ -1,18 +1,65 @@
 {
   "statMin": 1,
   "statMax": 20,
-  "order": ["str", "dex", "con", "int", "per", "wil", "cha"],
-  "names": { "str": "Strength", "dex": "Dexterity", "con": "Constitution", "int": "Intelligence", "per": "Perception", "wil": "Willpower", "cha": "Charisma" },
+  "order": [
+    "str",
+    "dex",
+    "con",
+    "int",
+    "per",
+    "wil",
+    "cha"
+  ],
+  "names": {
+    "str": "Strength",
+    "dex": "Dexterity",
+    "con": "Constitution",
+    "int": "Intelligence",
+    "per": "Perception",
+    "wil": "Willpower",
+    "cha": "Charisma"
+  },
   "derived": {
-    "maxHp":        { "base": 20, "con": 4 },
-    "maxMp":        { "base": 4, "int": 0.5, "wil": 0.34, "perLevel": 0.5 },
-    "movement":     { "base": 3, "dexDivisor": 5 },
-    "initiative":   { "dex": 1, "per": 0.5 },
-    "physDefense":  { "con": 0.5 },
-    "magicResist":  { "wil": 0.5 },
-    "stability":    { "wil": 1, "int": 0.5 },
-    "critChancePct":{ "base": 5, "dex": 0.5 },
-    "mpRegen":      { "base": 1, "wilDivisor": 0 }
+    "maxHp": {
+      "base": 20,
+      "con": 4
+    },
+    "maxMp": {
+      "base": 4,
+      "int": 0.5,
+      "wil": 0.34,
+      "perLevel": 0.5
+    },
+    "movement": {
+      "base": 3,
+      "dexDivisor": 5
+    },
+    "initiative": {
+      "dex": 1,
+      "per": 0.5
+    },
+    "physDefense": {
+      "con": 0.5
+    },
+    "magicResist": {
+      "wil": 0.5
+    },
+    "stability": {
+      "wil": 1,
+      "int": 0.5
+    },
+    "critChancePct": {
+      "base": 5,
+      "dex": 0.5
+    },
+    "mpRegen": {
+      "base": 1,
+      "wilDivisor": 0
+    },
+    "highCritChancePct": {
+      "base": 1.0,
+      "dex": 0.1
+    }
   },
   "combat": {
     "magicResistPctPerPoint": 2,
@@ -25,6 +72,7 @@
     "drawUpTo": 3,
     "hasteMoveBonus": 2,
     "encoreMul": 0.5,
+    "bleedOutRounds": 2,
     "sanctuaryMul": 0.5,
     "handLimit": 3,
     "fatigueStart": 1,
@@ -37,7 +85,26 @@
     "blindTurns": 1,
     "blindMissChance": 0.35,
     "collisionDamage": 4,
-    "cover": { "comment": "CT Part 3: directional half cover. A unit next to a cover piece takes less from attacks that come across it (the attacker mostly on the far side); attacks from the side or behind ignore it. Walls block sight entirely.", "rangedMul": 0.5, "meleeMul": 0.75, "pieces": { "crate": { "hp": 8, "burns": true }, "low_wall": { "hp": 15 } }, "breakMul": { "force": 2.0 }, "burnMul": 2.0 },
+    "cover": {
+      "comment": "CT Part 3: directional half cover. A unit next to a cover piece takes less from attacks that come across it (the attacker mostly on the far side); attacks from the side or behind ignore it. Walls block sight entirely.",
+      "rangedMul": 0.5,
+      "meleeMul": 0.75,
+      "pieces": {
+        "crate": {
+          "hp": 8,
+          "burns": true
+        },
+        "low_wall": {
+          "hp": 12
+        }
+      },
+      "breakMul": {
+        "force": 2.0,
+        "corrosion": 2.0
+      },
+      "burnMul": 2.0,
+      "breakerCardMul": 2.0
+    },
     "pushPowerPerStep": 7,
     "hazardDamage": 4,
     "flankMul": 1.5,
@@ -48,8 +115,26 @@
     "corrosionDefense": 2,
     "corrosionResist": 4,
     "vitalityDrainPct": 0.5,
-    "constructHpPerPower": 1
+    "constructHpPerPower": 1,
+    "trackingDamageMul": 0.6,
+    "highCritMultiplier": 2.0,
+    "walls": {
+      "comment": "PT Part 4: '#' walls are breakable (HP below), 'B' is the unbreakable boundary, 'c' low walls are climbable cover props. A broken wall or low wall becomes rubble: floor that gives half cover to units next to it. Force, Corrosion and Heavy Swing deal x2 to walls and cover.",
+      "wallHp": 25,
+      "climbCost": 1
+    }
   },
-  "training": { "barsBase": 3, "barsStatStep": 6, "barsMax": 5, "classBars": 1.0, "repeatMul": 0.5, "activityBars": 1.0 },
-  "misinterpretation": { "chaDivisor": 25, "badMoodMultiplier": 1.5, "minimum": 0.02 }
+  "training": {
+    "barsBase": 3,
+    "barsStatStep": 6,
+    "barsMax": 5,
+    "classBars": 1.0,
+    "repeatMul": 0.5,
+    "activityBars": 1.0
+  },
+  "misinterpretation": {
+    "chaDivisor": 25,
+    "badMoodMultiplier": 1.5,
+    "minimum": 0.02
+  }
 }

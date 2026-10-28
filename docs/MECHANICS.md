@@ -76,6 +76,7 @@ Most numbers live in `data/` (JSON). The main files:
 | Selection | Idle → card selected (targets shown) → hover a target (preview) → confirm. Click the card again, right-click or Esc to cancel | — |
 | Previews | Hovering a card or target shows range, area (in the Vector's color), damage, cover ("in cover: x0.5"), statuses, push landings, collisions, hazards, slides and whether it interrupts a telegraph | — |
 | Whose turn | The active unit is in full color with a pulsing ring and a small bob; everyone else is dimmed and desaturated (HP bars, icons, telegraphs and cover icons stay bright). Units that already acted this round get a check mark. The banner shows the portrait and "Quill's turn: 2 enemies act next". The hand shows whose cards they are, each card with a border in that character's color. Sounds: turn_start_party, turn_start_enemy | `data/ui.json` spotlight, partyColors; `data/audio_events.json` |
+| Clarity (PT Part 3) | **Party panel** (Party button in combat and the arena, pause menu): every member's sheet, hand, draw pile and discard. **Character sheet** stats explain themselves on hover. **Shields** show their number and a segment on the HP bar. **Duplicate enemies** are numbered (Wisp 1, Wisp 2) on their HP bars and telegraph tiles; each enemy's telegraph has its own tint, an outline around the whole shape, a line from the attacker, and a pulse when it appears. Hovering a red tile highlights its attacker; hovering an enemy lists every action (name, shape diagram, range, damage, riders), its passive, affixes, matchups and its plan in words. Units in front of the hovered tile fade to 30%; the threat view ghosts everyone. **Quick cards** have a green edge and a QUICK badge; Strike and Guard sit beside the hand. **Cards** show a mini shape diagram and name their shape ("Plus shape, range 4"). Area flashes linger 0.6 s; burning, toxic and glyph tiles show turn counters. **Pause** (P): Resume, Party, Options, and in the arena Save and Quit (restarts the current wave on Continue) or Abandon | `data/ui.json` areaFlashSeconds |
 | Enemy turns | Played one beat at a time: banner, highlight, move, wind-up, hit, log line. Combat speed setting; hold a key to fast-forward | — |
 | Fleeing | Allowed in non-boss fights (not boss floors). The room stays uncleared | fight setup fleeAllowed |
 | Combat difficulty | Chosen at new run. Enemies get **2 Actions** like you: move + attack, or move + move when nothing is in reach. **Double attack chance** (an enemy already in reach attacks twice): Normal minion 40%, normal 50%, elite 35%, boss 50%; Hard 75%. **Hard** also gives enemies x1.2 HP and x1.25 damage | `data/combat_rules.json` difficulties.enemyDoubleAttackChance |
@@ -104,7 +105,7 @@ Most numbers live in `data/` (JSON). The main files:
 | Spell damage | Power x Form multiplier x (1 + Vector affinity bonus) x **matchup** x (1 − target Magic Resistance %) x other bonuses | `src/core/combat/resolver.gd` spell_damage |
 | Strike damage | Stat x card multiplier (+ infusion), minus target **Physical Defense** (CON/2 + armor). Always at least 1 | resolver strike_damage |
 | Magic Resistance | WIL/2 points x 2% each, max 60% | combat.magicResistPctPerPoint, maxMagicResistPct |
-| Crit | 5% + DEX/2 %, x1.5 damage | derived.critChancePct; combat.critMultiplier |
+| Crit | Every hit rolls: **high crit** (x2.0) at 1% + DEX/10 %, otherwise **crit** (x1.5) at 5% + DEX/2 %, otherwise normal. Both on the character sheet; high crits get their own popup and sound | derived.critChancePct, highCritChancePct; combat.critMultiplier, highCritMultiplier |
 | **Typing (matchups)** | Each enemy is **weak to** some Vectors (x1.5) and **strong against** others (x0.6); everything else is x1.0. Shown with icons on the enemy | enemy weakTo, strongAgainst; `data/matchups.json` |
 | Back attack | Hitting a unit from behind (relative to its facing): x1.15, for everyone | combat.backMul |
 | Flank (Backstab) | Rogue perk: x1.5 from behind or from a different row within 1 column | combat.flankMul |
@@ -113,7 +114,7 @@ Most numbers live in `data/` (JSON). The main files:
 | Area falloff | Area attacks hit the first 2 targets in full, then x0.75 to each extra target | `data/combat_rules.json` areaFalloff |
 | Enemy damage | Every damaging enemy action has one **damage** number (before Defense and Magic Resistance), times the week scale and the difficulty multiplier (Normal x1.0, Hard x1.25). Previews, telegraphs, the threat view and the hit all use the same number. Enemy HP x1.0 (bosses x2.0) | enemy action `"damage"`; combat_rules enemyHpMul, bossHpMul, difficulties |
 | Kill-time targets | Week 1, Normal (measured by `tools/sim_balance.gd`): a minion dies to 1 player action, a normal enemy to 2 or 3, an elite to 5 to 7. One normal enemy hit takes 20 to 30% of a party member's HP, a heavy or charged hit 35 to 50%, a boss's big charged hit 60 to 80% | `data/combat_rules.json` balanceTargets |
-| Downed | A party member at 0 HP is **downed**: they stay on the grid and any heal revives them. Still down when the fight ends = **injured** (misses the next dungeon) | `data/leveling.json` injuryDays |
+| Downed | A party member at 0 HP is **downed**: a heart icon and a **bleed-out counter (2 rounds)**; any heal revives them. Not revived in time, or nobody in the party can heal: **Out** for this fight (banner, removed from the timeline). Down or out when the fight ends = **injured** (misses the next dungeon). Hazards and damage over time can finish anyone (outside the tutorial's training floor) | `data/stats.json` combat.bleedOutRounds; `data/leveling.json` injuryDays |
 | Death | **The player** at 0 HP ends the run (permadeath) | — |
 | Second Wind | Fighter perk: heal 20% once per fight below 30% HP | combat.secondWind* |
 
@@ -173,9 +174,9 @@ Change these in `data/vectors.json` improvise and failures; `src/core/combat/res
 | Intent icons | Attack, special, buff, defend, move, tracking, over the enemy's head |
 | Locked tiles | The default. The attack hits **whoever stands there** when it resolves, including other enemies. Dodge by leaving the red, or hide behind cover |
 | Blocking | If its planned tile is taken or it's rooted, it gets as close as it can and re-aims at the same target if still in reach, otherwise it **loses the attack**. A party member standing on the planned tile gets an opportunity strike |
-| Tracking | Rare (3 enemies, marked in data): the attack follows its target and can't be dodged by moving. Guard, cover and getting out of reach are the answers. The party AI knows moving doesn't dodge these |
+| Tracking | Rare (3 enemies, marked in data): the attack follows its target and can't be dodged by moving, so it deals **60%** of a locked attack. Guard, cover, getting out of reach, and an **Afterimage decoy** (it takes the next tracking hit aimed at its caster) are the answers. The party AI knows moving doesn't dodge these |
 | Charge-ups | Big attacks charge for a turn first, with a stronger pulse. Bosses use patterns (cross, ring, rows, checkerboard, line) |
-| Interrupts | Light cancels a charge, Cold delays it, pushes move it with the enemy, killing the enemy cancels it. The preview tells you when your card will interrupt |
+| Interrupts | Light cancels a charge, Cold delays it, killing the enemy cancels it. **Blind never removes a telegraph**: it adds a 35% miss chance, shown on the telegraph. **Taunt** makes every enemy in range that can reach the taunter re-plan at it, at once. **Pushed before acting:** areas centered on the enemy move with it; attacks aimed at a tile still happen if it's still in range and sight, otherwise they're skipped ("Off balance!") |
 | Overlaps | Tiles hit by several telegraphs show combined damage. Hold the threat key for the **threat view** (every tile shaded by incoming damage). Enemies planning in a row stagger their targets and avoid each other's red tiles |
 | Damage | The telegraph shows the attack's real damage (from the enemy's planned spot, so cover counts) |
 
@@ -203,12 +204,16 @@ Statuses last through the unit's next turn. Change them in `data/stats.json` com
 | Letter | Terrain | Effect |
 | --- | --- | --- |
 | `.` | Floor | — |
-| `#` | Wall | Blocks movement and line of sight |
-| `c` | Cover | x0.75 ranged damage to a unit standing on it |
+| `#` | Wall | Blocks movement and line of sight. **Breakable:** 25 HP; Strike can hit it; Force, Corrosion and Heavy Swing deal x2. Breaks into rubble |
+| `B` | Boundary | An unbreakable wall (arena edges) |
+| `r` | Rubble | Floor that gives half cover to units next to it |
+| `c` | Low wall | A cover prop (12 HP). **Climb** over it into the free tile beyond for 1 Action; breaks into rubble |
 | `h` | Hazard | 4 damage on entry |
 | `w` | Water | Impassable until frozen |
 | `i` | Ice | Slide until you hit something |
-| `x` | Crate | Pushable, breakable prop |
+| `x` | Crate | Cover prop (8 HP), Heat burns it |
+
+Lunge and other lunge cards pass **over** hazards and gaps without triggering them (not through walls or units); only the landing tile counts.
 
 **Arena hazards:**
 
@@ -230,7 +235,7 @@ Strike and Guard are built-in Quicks for everyone, so no deck carries them (PT P
 
 | Class (arena name) | Role | How it plays | Starting deck | Perk |
 | --- | --- | --- | --- | --- |
-| Mage (Ash) | Area and control, glass cannon | Shapes the field with areas and pushes; fragile, so cover matters most | 2+2 Standard Bolts (two Vectors), Minor Burst, Minor Line, Minor Shield, Blink, Shove | Overchannel |
+| Mage (Ash) | Area and control, glass cannon | Shapes the field with areas and pushes; fragile, so cover matters most | 2+2 Standard Bolts (two Vectors), Minor Burst, Minor Line, Minor Shield, Blink (a Quick), Shove | Overchannel |
 | Fighter (Brick) | Front line: holds space and soaks | Stands in enemy paths (opportunity strikes), takes hits for allies, breaks cover | **Intercept**, 2 Heavy Swing, Shoulder Shove, 2 Lunge, Brace, Parry, Taunt, Standard Weapon Infusion | Second Wind |
 | Rogue (**Quill**) | Skirmisher and assassin: moves **and** hits | Attacks carry movement; flanking ignores cover and triggers Backstab | 2 **Hit and Run** (strike, then a free move 2), **Shadow Step** (teleport behind and strike), 2 Quick Stab (quick), Lunge, Throw, **Smoke Bomb** (blind adjacent, free move 1), Dash, 1 Bolt | Backstab |
 | Healer (**Sage**) | Protector: stops damage before it lands, then heals | Reads telegraphs: shields the target, pulls allies out of the red, makes a safe zone | 2 **Ward** (shield 8, doubled against a telegraph), 2 Mend (heal 14), **Guiding Light** (pull an ally 3), **Sanctuary** (telegraphed hits x0.5 nearby), Beacon (taunt), 2 Sunbeam, **Cleanse** (quick) | Triage |
@@ -443,8 +448,6 @@ Change these in `data/story/*.json`, `data/journal.json` and `data/endings.json`
 
 CT is done, with PT Parts 1 and 2 (2 Actions, Quicks, Cantrip, Hold, undo, deck rules) adopted inside it. Next, from `docs/PATCH_1.md`:
 
-- Part 3: clarity fixes (party panel and character sheet, shield numbers, see-through units, full enemy info, numbered duplicate enemies, quick badges, shape diagrams, bleed-out, arena pause and save).
-- Part 4: rules fixes (Afterimage absorbs tracking hits, Taunt re-plans, Blind keeps telegraphs, push rules, Blink as a Quick, hazards can kill, tracking at 60% damage, Lunge over hazards, wall types, high crits).
 - Part 5: the Card Forge (fuse, salvage, upgrade, riders).
 - Part 6: arena progression (a card every wave, a Technique every 5).
 - Part 7: status synergies, 80 more cards, 24 more enemies, the Cone Form.

@@ -205,6 +205,7 @@ static func derived(db: Dictionary, ch: Dictionary) -> Dictionary:
 	out["magicResist"] = int(floor(_lin(f.get("magicResist", {}), st))) + int(mod(mods, "derived", "magicResist"))
 	out["stability"] = int(floor(_lin(f.get("stability", {}), st))) + int(mod(mods, "derived", "stability"))
 	out["critChancePct"] = _lin(f.get("critChancePct", {}), st) + mod(mods, "derived", "critChancePct")
+	out["highCritChancePct"] = _lin(f.get("highCritChancePct", { "base": 1.0, "dex": 0.1 }), st) + mod(mods, "derived", "highCritChancePct")
 	var rg: Dictionary = f.get("mpRegen", {})
 	var wil_div := float(rg.get("wilDivisor", 0))
 	out["mpRegen"] = int(rg.get("base", 1)) + (floori(float(st["wil"]) / wil_div) if wil_div > 0.0 else 0) + int(mod(mods, "derived", "mpRegen"))

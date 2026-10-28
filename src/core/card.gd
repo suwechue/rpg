@@ -198,12 +198,21 @@ static func describe(db: Dictionary, card: Dictionary) -> String:
 	for axis in ordered_vectors(db, card.get("vectors", {})):
 		parts.append(str(db.get("vectors", {}).get("display", {}).get(axis, axis)))
 	var text := "%s %s, %s (%d). " % ["/".join(PackedStringArray(parts)), str(form_rec.get("name", "")), str(mag.get("name", "")), int(mag.get("power", 0))]
+	text += shape_text(db, form_rec, str(card.get("magnitude", "")))
 	var effects: Dictionary = db.get("vectors", {}).get("gridEffects", {})
 	for axis in ordered_vectors(db, card.get("vectors", {})):
 		text += str(effects.get(axis, "")).split(";")[0] + ". "
 	if not card.get("properties", []).is_empty():
 		text += Str.t(db, "card.properties") % ", ".join(PackedStringArray(card["properties"]))
 	return text.strip_edges()
+
+
+## "Plus shape, range 4." for a Form at a Magnitude (PT Part 3).
+static func shape_text(db: Dictionary, form_rec: Dictionary, magnitude: String) -> String:
+	var fp := str(form_rec.get("footprintByMagnitude", {}).get(magnitude, form_rec.get("footprint", "")))
+	var shape := str(db.get("forms", {}).get("shapeNames", {}).get(fp, fp.capitalize()))
+	var r := int(form_rec.get("range", 0))
+	return Str.t(db, "card.shape_range") % [shape, r] if r > 0 else Str.t(db, "card.shape_self") % shape
 
 
 ## A one-line effect for the card face ("Bolt 10", "Heal 12"): short enough

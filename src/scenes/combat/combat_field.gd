@@ -22,6 +22,9 @@ var preview_labels: Dictionary = {}  # cell -> text drawn above the unit there
 var support_cells: Array = []        # enemy heals and summons (green)
 var threat_view := false             # held: every tile shaded by incoming damage
 var cover_cells: Array = []          # reachable tiles next to cover (outlined while moving)
+var telegraphs: Array = []           # PT Part 3: [{ "unit", "from", "cells", "tag", "tint", "since" }] one per planning enemy
+var focus_cells: Array = []          # the hovered enemy's tiles (or the hovered red tile's attackers' tiles)
+var lingering: Dictionary = {}       # cell -> rounds left (burning, toxic, glyphs), drawn as small counters
 var move_marks: Array = []           # enemy plans: [{ "from", "to" }] where they'll walk first
 var hover_cell := Vector2i(-1, -1)
 var cursor_cell := Vector2i(-1, -1)
@@ -33,7 +36,7 @@ var _time := 0.0
 
 func _process(delta: float) -> void:
 	_time += delta
-	if not grid.burning.is_empty() or not flash_cells.is_empty() or not threat_cells.is_empty():
+	if not grid.burning.is_empty() or not flash_cells.is_empty() or not threat_cells.is_empty() or not telegraphs.is_empty():
 		queue_redraw()
 
 
@@ -55,6 +58,7 @@ func _draw() -> void:
 	for c in cover_cells:
 		draw_polyline(_closed(proj.cell_polygon(c)), Color(0.5, 0.8, 1.0, 0.9), 1.0)
 	_draw_threats()
+	_draw_telegraph_shapes()
 	_draw_overlay(support_cells, Color(UiTheme.GOOD, 0.3))
 	for m in move_marks:
 		var a := proj.cell_center(m["from"])
@@ -121,6 +125,51 @@ func _draw_threats() -> void:
 			draw_string(UiTheme.font, at, str(dmg), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, UiTheme.color("damage"))
 
 
+## Each enemy's telegraph as one shape (PT Part 3): its own tint, an outline
+## around the whole footprint, a line from the attacker, the enemy's number on
+## its tiles, and a short pulse when it first appears. Hovered ones stand out.
+func _draw_telegraph_shapes() -> void:
+	for t in telegraphs:
+		var cells: Array = t["cells"]
+		if cells.is_empty():
+			continue
+		var tint: Color = t["tint"]
+		var age := _time - float(t.get("since", 0.0))
+		var pulse := clampf(1.0 - age / 0.6, 0.0, 1.0)
+		var focused := focus_cells.has(cells[0])
+		var w := 2.0 if focused else 1.0
+		var set := {}
+		for c in cells:
+			set[c] = true
+		for c in cells:
+			var poly := proj.cell_polygon(c)
+			if pulse > 0.0 or focused:
+				draw_colored_polygon(poly, Color(tint, 0.25 * pulse + (0.25 if focused else 0.0)))
+			# Outline only the shape's outer edges.
+			var edges := [[Vector2i(0, -1), 0, 1], [Vector2i(1, 0), 1, 2], [Vector2i(0, 1), 2, 3], [Vector2i(-1, 0), 3, 0]]
+			for e in edges:
+				if not set.has(c + e[0]):
+					draw_line(poly[e[1]], poly[e[2]], Color(tint, 0.95), w)
+		var center := Vector2.ZERO
+		for c in cells:
+			center += proj.cell_center(c)
+		center /= float(cells.size())
+		var from := proj.cell_center(t["from"])
+		draw_line(from, center, Color(tint, 0.5 if not focused else 0.9), 1.0)
+		if str(t.get("badge", "")) != "":
+			var bat := proj.cell_center(cells[0]) + Vector2(-10, -10)
+			draw_string_outline(UiTheme.font, bat, str(t["badge"]), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, 2, UiTheme.color("outline"))
+			draw_string(UiTheme.font, bat, str(t["badge"]), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, UiTheme.ACCENT)
+		if int(t.get("tag", 0)) > 0:
+			var at := proj.cell_center(cells[0]) + Vector2(4, -2)
+			draw_string_outline(UiTheme.font, at, str(t["tag"]), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, 2, UiTheme.color("outline"))
+			draw_string(UiTheme.font, at, str(t["tag"]), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, tint.lightened(0.4))
+	for c in lingering:
+		var at := proj.cell_center(c) + Vector2(-9, 2)
+		draw_string_outline(UiTheme.font, at, str(lingering[c]), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, 2, UiTheme.color("outline"))
+		draw_string(UiTheme.font, at, str(lingering[c]), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, UiTheme.ACCENT)
+
+
 ## Where pushed or pulled units would land: an arrow and a ring, "!" on a collision or hazard.
 func _draw_pushes() -> void:
 	for m in push_marks:
@@ -182,7 +231,9 @@ func _draw_cell(cell: Vector2i) -> void:
 		GridScript.COVER:
 			base = base.lightened(0.08)
 		GridScript.WALL:
-			base = base.darkened(0.5)
+			base = base.darkened(0.5) if grid.wall_hp.has(cell) else base.darkened(0.7)
+		GridScript.RUBBLE:
+			base = base.lerp(Color("6e6a62"), 0.4)
 		GridScript.PIT:
 			base = Color("050308")
 		GridScript.COLLAPSE:
@@ -194,6 +245,13 @@ func _draw_cell(cell: Vector2i) -> void:
 	draw_colored_polygon(poly, base * Color(depth, depth, depth, 1.0))
 	draw_polyline(_closed(poly), col("line", "#6d6391") * Color(1, 1, 1, 0.45), 1.0)
 	var ctr := proj.cell_center(cell)
+	if t == GridScript.RUBBLE:
+		for i in 3:
+			draw_rect(Rect2(ctr + Vector2(-6 + i * 4, -2 + (i % 2) * 2), Vector2(3, 2)), Color("9a958a"))
+	if grid.wall_hp.has(cell) and int(grid.wall_hp[cell]) < int(DataDB.table("stats").get("combat", {}).get("walls", {}).get("wallHp", 25)):
+		# A cracked wall: it has taken damage.
+		draw_line(ctr + Vector2(-5, -3), ctr + Vector2(0, 1), Color("1d140c"), 1.0)
+		draw_line(ctr + Vector2(0, 1), ctr + Vector2(4, -2), Color("1d140c"), 1.0)
 	if t == GridScript.HAZARD:
 		draw_line(ctr + Vector2(-5, -2), ctr + Vector2(5, 2), Color("e8b04a"), 1.0)
 		draw_line(ctr + Vector2(-5, 2), ctr + Vector2(5, -2), Color("e8b04a"), 1.0)

@@ -9,8 +9,9 @@ func has_save() -> bool:
 	return FileAccess.file_exists(SAVE_PATH)
 
 
-func save_run() -> bool:
-	if str(GameState.run.get("mode", "")) == "arena":
+func save_run(allow_arena: bool = false) -> bool:
+	# Arena runs are saved only from the pause menu (PT Part 3), at the start of the current wave.
+	if str(GameState.run.get("mode", "")) == "arena" and not allow_arena:
 		return false
 	var data: Dictionary = GameState.to_dict()
 	var tmp_path := SAVE_PATH + ".tmp"

@@ -22,7 +22,12 @@ var burrowed := false
 var active := false        # CT Part 2b: the unit whose turn it is (ring, bob, full color)
 var acted := false         # already took its turn this round (check mark, a bit darker)
 var spotlight := false
-var covered := false       # in cover against the relevant attacker (CT Part 3)     # someone else's turn: dim and desaturate the sprite only
+var covered := false       # in cover against the relevant attacker (CT Part 3)
+var tag := 0               # PT Part 3: number on duplicate enemies ("Wisp 2")
+var max_hp := 1
+var bleed := 0             # downed: rounds before they're out
+var fade := 1.0            # see-through: units in front of the hovered tile fade
+var focus := false         # the attacker behind a hovered red tile     # someone else's turn: dim and desaturate the sprite only
 var _dim := 0.0            # 0 = full color, 1 = fully dimmed (tweened)
 var _frame := Vector2i.ONE
 var _walker := false
@@ -154,7 +159,24 @@ func _draw() -> void:
 		col = Color("c9a66b")
 	draw_rect(Rect2(-bar_w / 2.0, top, bar_w * clampf(hp_ratio, 0.0, 1.0), 3), col)
 	if shield > 0:
-		draw_rect(Rect2(-bar_w / 2.0, top - 2, bar_w, 1), Color("7cc7e8"))
+		# The shield as a segment on the HP bar, and its number (PT Part 3).
+		var sw := bar_w * clampf(float(shield) / float(maxi(1, max_hp)), 0.0, 1.0)
+		var start := bar_w * clampf(hp_ratio, 0.0, 1.0)
+		draw_rect(Rect2(-bar_w / 2.0 + minf(start, bar_w - sw), top, sw, 3), Color("7cc7e8"))
+		draw_string_outline(UiTheme.font, Vector2(bar_w / 2.0 + 1, top + 4), str(shield), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, 2, UiTheme.color("outline"))
+		draw_string(UiTheme.font, Vector2(bar_w / 2.0 + 1, top + 4), str(shield), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, Color("7cc7e8"))
+	if tag > 0:
+		draw_string_outline(UiTheme.font, Vector2(-bar_w / 2.0 - 7, top + 4), str(tag), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, 2, UiTheme.color("outline"))
+		draw_string(UiTheme.font, Vector2(-bar_w / 2.0 - 7, top + 4), str(tag), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, UiTheme.TEXT)
+	if focus:
+		draw_arc(Vector2.ZERO, w + 4.0, 0, TAU, 20, UiTheme.color("bad"), 2.0)
+	if downed and not is_prop:
+		# A heart and the bleed-out counter: revive with any heal.
+		var hx := Vector2(-4, top - 10)
+		draw_circle(hx + Vector2(-1.5, 0), 2.0, UiTheme.color("bad"))
+		draw_circle(hx + Vector2(1.5, 0), 2.0, UiTheme.color("bad"))
+		draw_colored_polygon(PackedVector2Array([hx + Vector2(-3.5, 0.5), hx + Vector2(3.5, 0.5), hx + Vector2(0, 4)]), UiTheme.color("bad"))
+		draw_string(UiTheme.font, hx + Vector2(6, 4), str(bleed), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, UiTheme.TEXT)
 	# Status icons sit in one row under the feet, clear of floating texts above.
 	# Hovering the unit names them (combat.gd hover info).
 	var icon_w := Display.tile / 2.0
@@ -194,8 +216,8 @@ func _draw() -> void:
 			draw_string_outline(f, p, str(charge), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, 3, UiTheme.color("outline"))
 			draw_string(f, p, str(charge), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, UiTheme.ACCENT)
 	if downed and sprite != null:
-		sprite.modulate = Color(0.5, 0.5, 0.6, 0.6)
+		sprite.modulate = Color(0.5, 0.5, 0.6, 0.6 * fade)
 		sprite.rotation = PI / 2.0 if team == "party" else -PI / 2.0
 	elif sprite != null:
-		sprite.modulate = Color.WHITE
+		sprite.modulate = Color(1, 1, 1, (0.25 if burrowed else 1.0) * fade)
 		sprite.rotation = 0.0

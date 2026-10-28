@@ -49,6 +49,8 @@ var _ai: GDScript = null           # enemy_ai.gd, loaded lazily (it preloads thi
 var _note := ""                    # why the next hit did what it did ("Cold, resisted"), for the log
 var party_turns := 0                # party turns started this fight (enemies before the first one only move)
 var party_first := false            # arena: the party acts before every enemy in round 1 (PT Part 1)
+var _rubble_marker := UnitScript.make_prop("rubble", 1)  # stands in for rubble when a cover piece is asked for
+var _breaker := false               # the current Strike is a wall breaker (Heavy Swing)
 var fair := false                   # tutorial: no crits until the lesson that teaches them (CT Part 7)
 var hp_floor := false               # tutorial: the party can't drop below 1 HP
 var guarantee_improvise := false    # tutorial room 9: the first improvise always works
@@ -111,6 +113,8 @@ func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) ->
 		reinforcements["cells"] = []
 	for c in grid.trap_spawns:
 		glyphs.append({ "cell": c, "spec": {}, "team": "trap", "caster": null, "turns": 999 })
+	for c in grid.wall_hp:
+		grid.wall_hp[c] = int(Res.combat_cfg(db).get("walls", {}).get("wallHp", 25))
 	for p in grid.prop_spawns:
 		var kind := str(p.get("prop", "crate"))
 		var piece := UnitScript.make_prop(kind, int(cover_cfg().get("pieces", {}).get(kind, {}).get("hp", 8)))
@@ -135,6 +139,7 @@ func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) ->
 	if fair:
 		for u in units:
 			u.crit_pct = 0.0
+			u.high_crit_pct = 0.0
 	var opening := int(Res.combat_cfg(db).get("openingHand", 3))
 	for u in units:
 		if u.deck != null:
@@ -499,6 +504,11 @@ func _advance() -> void:
 
 func _end_round() -> void:
 	round_num += 1
+	for u in units:
+		if u.team == "party" and u.downed and not u.dead:
+			u.bleed -= 1
+			if u.bleed <= 0:
+				_go_out(u)
 	for d in delayed.duplicate():
 		d["turns"] = int(d["turns"]) - 1
 		if int(d["turns"]) <= 0:
@@ -613,6 +623,7 @@ func _start_turn(u: UnitScript) -> void:
 
 func _end_cleanup(u: UnitScript) -> void:
 	u.statuses.erase("encore")
+	u.links.erase("taunted_by")
 	u.statuses.erase("free_move")
 	for s in ["slow", "root", "blind", "haste", "rally", "rime", "tether", "pact", "regen", "taunting", "haste_full", "sanctuary", "intercept"]:
 		if u.statuses.has(s):
@@ -1084,6 +1095,12 @@ func effect_cells(u: UnitScript, card: Dictionary, target: Vector2i) -> Array:
 func strike(u: UnitScript, target: Vector2i) -> bool:
 	if result != "" or u != current or quick_block(u) != "" or not u.alive():
 		return false
+	if grid.wall_hp.has(target) and adjacent_walls(u).has(target):
+		_push_undo(u)
+		_use_quick_builtin(u)
+		damage_wall(target, roundi(float(u.stats.get("str", 5))))
+		_after_step(u)
+		return true
 	if not _adjacent_hostiles(u, 1).has(target):
 		return false
 	_push_undo(u)
@@ -1404,6 +1421,8 @@ func cover_piece(from: Vector2i, cell: Vector2i) -> UnitScript:
 		var p := unit_at(cell + dir)
 		if is_cover(p):
 			return p
+		if grid.get_terrain(cell + dir) == GridScript.RUBBLE:
+			return _rubble_marker
 	return null
 
 
@@ -1555,7 +1574,7 @@ func _hit_unit(u: UnitScript, t: UnitScript, spec: Dictionary, can_miss: bool) -
 		return false
 	var dmg := Res.finalize(db, _expected_hit(u, t, spec), u, rng, float(spec.get("critBonus", 0.0)))
 	_note = hit_note(u, t, spec["vectors"])
-	_damage(t, int(dmg["amount"]), u, VO.dominant_axis(spec["vectors"], CardRules.arcane_axes(db)), "hit", bool(dmg["crit"]))
+	_damage(t, int(dmg["amount"]), u, VO.dominant_axis(spec["vectors"], CardRules.arcane_axes(db)), "hit", bool(dmg["crit"]), bool(dmg.get("high", false)))
 	_after_hit(u, t, int(dmg["amount"]))
 	if spec["vectors"].has("vitality") and u.alive():
 		_heal(u, u, maxi(1, roundi(float(dmg["amount"]) * float(Res.combat_cfg(db).get("vitalityDrainPct", 0.5)))))
@@ -1574,6 +1593,11 @@ func _after_hit(u: UnitScript, t: UnitScript, amount: int) -> void:
 
 
 func _basic(u: UnitScript, card: Dictionary, target: Vector2i) -> void:
+	_breaker = bool(card.get("breaker", false))
+	if str(card.get("action", "")) == "strike" and unit_at(target) == null and grid.wall_hp.has(target):
+		damage_wall(target, roundi(float(u.stats.get(str(card.get("stat", "str")), 5)) * float(card.get("mult", 1.0))), "", _breaker)
+		_breaker = false
+		return
 	var cfg := Res.combat_cfg(db)
 	match str(card.get("action", "")):
 		"strike":
@@ -1592,7 +1616,7 @@ func _basic(u: UnitScript, card: Dictionary, target: Vector2i) -> void:
 			if not u.infusion.is_empty():
 				axis = VO.dominant_axis(u.infusion["vectors"], CardRules.arcane_axes(db))
 			_note = hit_note(u, t, u.infusion.get("vectors", {}))
-			_damage(t, int(dmg["amount"]), u, axis, "hit", bool(dmg["crit"]))
+			_damage(t, int(dmg["amount"]), u, axis, "hit", bool(dmg["crit"]), bool(dmg.get("high", false)))
 			_note_support_attack(u, t)
 			if not u.infusion.is_empty():
 				var spec := { "vectors": u.infusion["vectors"], "power": float(u.infusion["power"]), "form": form_rec("touch"), "heal": false, "mult": 1.0, "ranged": false, "name": "Infusion" }
@@ -1651,7 +1675,7 @@ func parried(u: UnitScript, t: UnitScript) -> bool:
 	t.statuses.erase("parry")
 	_emit({ "t": "log", "text": Str.t(db, "combat_state.parries_and_strikes_back") % t.name })
 	var dmg := Res.finalize(db, _expected_strike(t, u, { "stat": "str", "mult": 1.0 }), t, rng)
-	_damage(u, int(dmg["amount"]), t, "", "hit", bool(dmg["crit"]))
+	_damage(u, int(dmg["amount"]), t, "", "hit", bool(dmg["crit"]), bool(dmg.get("high", false)))
 	return true
 
 
@@ -1743,7 +1767,7 @@ func _apply_vector_effects(u: UnitScript, spec: Dictionary, cells: Array, hit: A
 			if t.alive() and not t.is_prop():
 				t.statuses["blind"] = int(cfg.get("blindTurns", 1))
 				_emit({ "t": "status", "unit": t.id, "status": "blind" })
-				_interrupt(t, "blind")
+				_interrupt(t, "light")
 	if v.has("corrosion"):
 		for t in hit:
 			t.defense_shred += int(cfg.get("corrosionDefense", 2))
@@ -1819,7 +1843,7 @@ func _note_support_attack(u: UnitScript, t: UnitScript) -> void:
 
 # --- Damage, healing, death ------------------------------------------------------
 
-func _damage(t: UnitScript, amount: int, source: UnitScript, vector: String, cause: String, crit: bool = false) -> void:
+func _damage(t: UnitScript, amount: int, source: UnitScript, vector: String, cause: String, crit: bool = false, high: bool = false) -> void:
 	if t.dead or amount <= 0:
 		return
 	if t.downed or t.statuses.has("burrowed"):
@@ -1832,7 +1856,7 @@ func _damage(t: UnitScript, amount: int, source: UnitScript, vector: String, cau
 	if is_cover(t) and cause in ["hit", "collision"]:
 		# Force breaks cover faster; Heat burns crates (CT Part 3).
 		var cc := cover_cfg()
-		var mul := float(cc.get("breakMul", {}).get(vector, 1.0))
+		var mul := float(cc.get("breakMul", {}).get(vector, 1.0)) * (float(cc.get("breakerCardMul", 2.0)) if _breaker else 1.0)
 		if vector == "heat" and bool(cc.get("pieces", {}).get(_prop_kind(t), {}).get("burns", false)):
 			mul *= float(cc.get("burnMul", 2.0))
 		amount = roundi(float(amount) * mul)
@@ -1853,7 +1877,7 @@ func _damage(t: UnitScript, amount: int, source: UnitScript, vector: String, cau
 	t.shield -= absorbed
 	var rest := amount - absorbed
 	t.hp = maxi(0, t.hp - rest)
-	_emit({ "t": "damage", "unit": t.id, "amount": rest, "absorbed": absorbed, "crit": crit, "vector": vector, "cause": cause,
+	_emit({ "t": "damage", "unit": t.id, "amount": rest, "absorbed": absorbed, "crit": crit, "high": high, "vector": vector, "cause": cause,
 		"source": source.id if source != null else "", "note": _note })
 	_note = ""
 	if t.hp <= 0:
@@ -1871,6 +1895,9 @@ func _on_zero_hp(t: UnitScript, source: UnitScript) -> void:
 	if t.is_prop():
 		t.dead = true
 		_emit({ "t": "vanish", "unit": t.id, "cell": t.cell })
+		if _prop_kind(t) == "low_wall":
+			grid.set_terrain(t.cell, GridScript.RUBBLE)
+			_emit({ "t": "tiles", "kind": "rubble", "cells": [t.cell] })
 		return
 	if t.team == "party":
 		t.downed = true
@@ -1879,6 +1906,11 @@ func _on_zero_hp(t: UnitScript, source: UnitScript) -> void:
 		if t.is_player:
 			result = "lose"
 			_emit({ "t": "end", "result": "lose" })
+			return
+		# PT Part 3: a downed ally bleeds out after a few rounds, or at once if nobody can heal.
+		t.bleed = int(Res.combat_cfg(db).get("bleedOutRounds", 2))
+		if not party_can_heal():
+			_go_out(t)
 		return
 	t.dead = true
 	kills.append(str(t.source.get("id", t.id)))
@@ -1990,6 +2022,9 @@ func _build_order_keep_current() -> void:
 ## hit all use it. Heals and shields use "power".
 func action_spec(u: UnitScript, action: Dictionary) -> Dictionary:
 	var dmg_mul := float(difficulty_rules().get("enemyDamageMul", 1.0)) if u.team == "enemy" else 1.0
+	if u.team == "enemy" and str(action.get("intent", u.source.get("intent", "locked"))) == "tracking":
+		# Tracking attacks can't be dodged by moving, so they hit softer (PT Part 4).
+		dmg_mul *= float(Res.combat_cfg(db).get("trackingDamageMul", 0.6))
 	if str(action.get("kind", "attack")) == "strike":
 		var base := float(action["damage"]) if action.has("damage") else \
 			float(u.stats.get(str(action.get("stat", "str")), 5)) * float(action.get("mult", 1.0)) + float(action.get("power", 0))
@@ -2034,7 +2069,7 @@ func perform_action(u: UnitScript, action: Dictionary, target: Vector2i) -> bool
 				_emit({ "t": "miss", "unit": t.id })
 			else:
 				var dmg := Res.finalize(db, Res.strike_damage(db, float(spec["base"]), u, t, _shared(u, t, false)), u, rng)
-				_damage(t, int(dmg["amount"]), u, VO.dominant_axis(spec["vectors"], CardRules.arcane_axes(db)), "hit", bool(dmg["crit"]))
+				_damage(t, int(dmg["amount"]), u, VO.dominant_axis(spec["vectors"], CardRules.arcane_axes(db)), "hit", bool(dmg["crit"]), bool(dmg.get("high", false)))
 				if not spec["vectors"].is_empty() and t.alive():
 					_apply_vector_effects(u, spec, [t.cell], [t])
 	else:
@@ -2356,6 +2391,98 @@ func move_applies_now(u: UnitScript) -> bool:
 	return u.moved_steps == 0 and not u.action_used
 
 
+## Out for this fight: a downed ally nobody revived in time (or nobody could).
+func _go_out(u: UnitScript) -> void:
+	if u.dead:
+		return
+	u.dead = true
+	u.out = true
+	_emit({ "t": "out", "unit": u.id })
+	_emit({ "t": "log", "text": Str.t(db, "combat_state.is_out") % u.name })
+
+
+## Whether anyone standing in the party has a heal in their deck.
+func party_can_heal() -> bool:
+	for u in units:
+		if u.team != "party" or not u.alive() or u.deck == null:
+			continue
+		for id in u.deck.hand + u.deck.draw_pile + u.deck.discard:
+			var card := CardRules.resolve(db, str(id), library)
+			if CardRules.heals(card) or str(card.get("action", "")) == "heal":
+				return true
+			for e in card.get("effects", []):
+				if str(e.get("op", "")) in ["heal", "regen", "once_heal_pct"]:
+					return true
+	return false
+
+
+## The number on a duplicate enemy ("Wisp 2"), or 0 when it's the only one of its kind.
+func dup_index(u: UnitScript) -> int:
+	if u.team != "enemy":
+		return 0
+	var same: Array = []
+	for o in units:
+		if o.team == "enemy" and str(o.source.get("id", o.id)) == str(u.source.get("id", u.id)):
+			same.append(o)
+	if same.size() < 2:
+		return 0
+	same.sort_custom(func(a: UnitScript, b: UnitScript) -> bool: return a.spawn_index < b.spawn_index)
+	return same.find(u) + 1
+
+
+func display_name(u: UnitScript) -> String:
+	var n := dup_index(u)
+	return u.name if n == 0 else "%s %d" % [u.name, n]
+
+
+## Everything about one enemy action for the hover panel: name, shape, range,
+## damage against the player, and riders (Vector effects).
+func action_summary(u: UnitScript, act: Dictionary) -> Dictionary:
+	var spec := action_spec(u, act)
+	var form: Dictionary = spec.get("form", {})
+	var fp := str(form.get("footprint", "adjacent"))
+	if act.has("pattern"):
+		fp = str(act["pattern"])
+	var shape := str(db.get("forms", {}).get("shapeNames", {}).get(fp, fp.capitalize()))
+	var dmg := 0
+	for p in units:
+		if p.is_player and not bool(spec.get("heal", false)):
+			dmg = roundi(_expected_hit(u, p, spec))
+	var riders: Array = []
+	var effects: Dictionary = db.get("vectors", {}).get("gridEffects", {})
+	for axis in spec.get("vectors", {}):
+		var e := str(effects.get(axis, "")).split(";")[0]
+		if e != "":
+			riders.append(e)
+	if int(act.get("charge", 0)) > 0:
+		riders.append("charges for %d turn" % int(act["charge"]))
+	if str(act.get("intent", "")) == "tracking":
+		riders.append("tracking")
+	return { "name": str(act.get("name", "?")), "shape": shape, "range": 1 if str(spec.get("kind", "")) == "strike" else int(form.get("range", 1)),
+		"damage": dmg, "riders": riders, "form": form, "pattern": str(act.get("pattern", "")), "magnitude": str(act.get("magnitude", "standard")) }
+
+
+## The planned intent in words: "Frost Breath, Cone, 9 damage, hits Quill".
+func intent_words(u: UnitScript) -> String:
+	var it: Dictionary = u.intent
+	if it.is_empty():
+		return ""
+	if str(it.get("kind", "")) == "move":
+		var m: Vector2i = it.get("move", u.cell)
+		return Str.t(db, "combat.plan_move") % [m.x, m.y]
+	var act: Dictionary = it.get("action", {})
+	var sm := action_summary(u, act)
+	var who: Array = []
+	for c in intent_cells(u):
+		var t := unit_at(c)
+		if t != null and t.alive() and t != u and not t.is_prop():
+			who.append(display_name(t))
+	var total := 0
+	for c in intent_cells(u):
+		total = maxi(total, intent_damage(u, c))
+	return Str.t(db, "combat.plan_hits") % [sm["name"], sm["shape"], total * int(it.get("repeat", 1)), ", ".join(PackedStringArray(who)) if not who.is_empty() else "-"]
+
+
 ## Whether this unit already took its turn this round (not counting the current one).
 func acted_this_round(u: UnitScript) -> bool:
 	return u != current and u.last_turn_round == round_num
@@ -2376,6 +2503,92 @@ func acts_next(u: UnitScript) -> Array:
 			break
 		out.append(o)
 	return out
+
+
+## Areas centered on the attacker (Auras, Spheres, self patterns) move with it when it's pushed.
+func self_centered(act: Dictionary) -> bool:
+	var form := form_rec(str(act.get("form", "")))
+	return str(form.get("target", "")) == "self" or str(form.get("footprint", "")).ends_with("_self") or str(act.get("pattern", "")) == "ring"
+
+
+## Afterimage (PT Part 4): a decoy of this unit that takes the next tracking attack aimed at it.
+func decoy_for(t: UnitScript) -> UnitScript:
+	var id := str(t.links.get("decoy", ""))
+	if id == "":
+		return null
+	var d := unit_by_id(id)
+	return d if d != null and not d.dead else null
+
+
+## Taunt (PT Part 4): every enemy in range that can reach the taunter re-plans at it.
+func taunt_replan(taunter: UnitScript, radius: int) -> void:
+	for e in units:
+		if e.team == taunter.team or e.is_prop() or not e.alive() or GridScript.manhattan(e.cell, taunter.cell) > radius:
+			continue
+		if int(e.intent.get("charge", 0)) > 0:
+			continue
+		e.links["taunted_by"] = taunter.id
+		var old: Dictionary = e.intent
+		roll_move_and_act(e)
+		e.intent = _ai_script().plan_intent(self, e)
+		if e.intent.is_empty():
+			e.intent = old
+		elif str(e.intent.get("unit", "")) == taunter.id or e.intent.get("target", Vector2i(-9, -9)) == taunter.cell:
+			_emit({ "t": "interrupt", "unit": e.id, "text": Str.t(db, "combat_state.taunt_replans") % [e.name, taunter.name] })
+
+
+## Breakable walls (PT Part 4): damage a '#' wall; at 0 HP it becomes rubble.
+func damage_wall(cell: Vector2i, amount: int, vector: String = "", breaker: bool = false) -> void:
+	if not grid.wall_hp.has(cell):
+		return
+	var cc := cover_cfg()
+	var mul := float(cc.get("breakMul", {}).get(vector, 1.0)) * (float(cc.get("breakerCardMul", 2.0)) if breaker else 1.0)
+	grid.wall_hp[cell] = int(grid.wall_hp[cell]) - maxi(1, roundi(float(amount) * mul))
+	_emit({ "t": "wall_hit", "cell": cell, "hp": maxi(0, int(grid.wall_hp[cell])) })
+	if int(grid.wall_hp[cell]) <= 0:
+		grid.wall_hp.erase(cell)
+		grid.set_terrain(cell, GridScript.RUBBLE)
+		_emit({ "t": "tiles", "kind": "rubble", "cells": [cell] })
+		_emit({ "t": "log", "text": Str.t(db, "combat_state.wall_breaks") })
+
+
+## Breakable walls next to a unit (Strike can hit them).
+func adjacent_walls(u: UnitScript) -> Array:
+	var out: Array = []
+	for d in GridScript.DIRS:
+		if grid.wall_hp.has(u.cell + d):
+			out.append(u.cell + d)
+	return out
+
+
+## Climb (PT Part 4): 1 Action to step over an adjacent low wall into the free tile beyond.
+func climb_targets(u: UnitScript) -> Array:
+	var out: Array = []
+	if not uses_actions(u) or u.actions_left <= 0 or u.statuses.has("root"):
+		return out
+	for d in GridScript.DIRS:
+		var w := unit_at(u.cell + d)
+		var beyond: Vector2i = u.cell + d * 2
+		if w != null and w.is_prop() and _prop_kind(w) == "low_wall" and not w.dead and grid.in_bounds(beyond) \
+				and grid.walkable_terrain(beyond) and unit_at(beyond) == null:
+			out.append(beyond)
+	return out
+
+
+func climb(u: UnitScript, dest: Vector2i) -> bool:
+	if u != current or result != "" or not climb_targets(u).has(dest):
+		return false
+	_push_undo(u)
+	spend_action(u)
+	var from := u.cell
+	u.cell = dest
+	_emit({ "t": "move", "unit": u.id, "path": [from + (dest - from) / 2, dest] })
+	_emit({ "t": "log", "text": Str.t(db, "combat_state.climbs") % u.name })
+	_enter_cell(u, dest)
+	u.move_left = move_budget(u) if u.actions_left > 0 else 0
+	_check_end()
+	_after_step(u)
+	return true
 
 
 ## The party unit whose turn is the last chance before this enemy acts, or null.
@@ -2534,12 +2747,27 @@ func _shift_intent(u: UnitScript, delta: Vector2i) -> void:
 	if u.intent.is_empty() or delta == Vector2i.ZERO:
 		return
 	if int(u.intent.get("charge", 0)) <= 0:
-		# A normal attack pushed out of range is cancelled.
-		if str(u.intent.get("kind", "")) == "attack" and str(u.intent.get("mode", "locked")) == "locked":
+		# PT Part 4: moved before acting. Self-centered areas move with it; attacks
+		# aimed at a tile still happen if it's still in range and sight, otherwise
+		# the attack is skipped ("Off balance!").
+		var old := u.cell - delta
+		if u.intent.get("move", old) == old:
+			u.intent["move"] = u.cell
+		if not str(u.intent.get("kind", "")) in ["attack", "special"]:
+			return
+		if self_centered(u.intent.get("action", {})):
+			var shifted: Array = []
+			for c in u.intent.get("cells", []):
+				if grid.in_bounds(c + delta):
+					shifted.append(c + delta)
+			u.intent["cells"] = shifted
+			u.intent["target"] = u.intent.get("target", old) + delta
+			return
+		if str(u.intent.get("mode", "locked")) == "locked":
 			var tgt: Vector2i = u.intent.get("target", u.cell)
-			if not action_targets(u, u.intent.get("action", {}), u.cell).has(tgt):
+			if not action_targets(u, u.intent.get("action", {}), u.intent.get("move", u.cell)).has(tgt):
 				u.intent = {}
-				_emit({ "t": "interrupt", "unit": u.id, "text": Str.t(db, "combat_state.is_knocked_out_of_range") % u.name })
+				_emit({ "t": "interrupt", "unit": u.id, "text": Str.t(db, "combat_state.off_balance") % u.name })
 		return
 	var moved: Array = []
 	for c in u.intent.get("cells", []):
@@ -2560,13 +2788,12 @@ func _interrupt(t: UnitScript, status: String) -> void:
 		t.intent = {}
 		_emit({ "t": "interrupt", "unit": t.id, "text": Str.t(db, "combat_state.is_rooted_and_can_t") % t.name })
 		return
-	if status == "blind" and kind in ["attack", "special"] and turn_mode == "move_or_act":
-		t.intent = {}
-		_emit({ "t": "interrupt", "unit": t.id, "text": Str.t(db, "combat_state.is_blinded_and_loses_its") % t.name })
-		return
+
 	if int(t.intent.get("charge", 0)) <= 0:
 		return
-	if status == "blind":
+	# Blind never removes a telegraph (PT Part 4): it adds a miss chance. Only
+	# Light landing on a charge-up cancels it.
+	if status == "light":
 		t.intent = {}
 		_emit({ "t": "interrupt", "unit": t.id, "text": Str.t(db, "combat_state.loses_focus_the_charge_fizzles") % t.name })
 	elif status == "slow":
@@ -2592,6 +2819,14 @@ func execute_intent(u: UnitScript) -> bool:
 		var t := unit_by_id(str(it.get("unit", "")))
 		if t == null or not t.alive():
 			return false
+		var decoy := decoy_for(t)
+		if decoy != null:
+			# The afterimage takes it (PT Part 4).
+			t.links.erase("decoy")
+			u.action_used = true
+			_emit({ "t": "log", "text": Str.t(db, "combat_state.decoy_takes") % u.name })
+			_hit_unit(u, decoy, intent_spec(u, it.get("action", {})), false)
+			return true
 		var step: Vector2i = it.get("move", u.cell)
 		if step != u.cell and can_move(u) and reachable_cells(u).has(step):
 			move(u, step)

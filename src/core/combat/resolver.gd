@@ -89,11 +89,17 @@ static func strike_damage(db: Dictionary, base: float, attacker: UnitScript, tar
 
 
 ## Roll crit and round. Damaging hits deal at least 1.
+## Every hit rolls (PT Part 4): a high crit (x2.0) at the high crit chance,
+## otherwise a crit (x1.5) at the crit chance, otherwise normal.
 static func finalize(db: Dictionary, dmg: float, attacker: UnitScript, rng: RandomNumberGenerator, crit_bonus: float = 0.0) -> Dictionary:
-	var crit := rng.randf() * 100.0 < attacker.crit_pct + crit_bonus
-	if crit:
+	var roll := rng.randf() * 100.0
+	var high := roll < attacker.high_crit_pct
+	var crit := high or roll < attacker.high_crit_pct + attacker.crit_pct + crit_bonus
+	if high:
+		dmg *= float(combat_cfg(db).get("highCritMultiplier", 2.0))
+	elif crit:
 		dmg *= float(combat_cfg(db).get("critMultiplier", 1.5))
-	return { "amount": maxi(1, roundi(dmg)), "crit": crit }
+	return { "amount": maxi(1, roundi(dmg)), "crit": crit, "high": high }
 
 
 ## Healing amount for Light/Vitality Shield and Aura and heal items.

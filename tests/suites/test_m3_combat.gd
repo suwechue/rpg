@@ -131,6 +131,7 @@ func test_shield_and_downed_vs_player_death() -> void:
 	var ally := Char.create(db(), "fighter", seeded(2), { "id": "ally" })
 	var st := fight(["P..E", "P..E"], [mage(), ally], [enemy("locker_lurker")])
 	var a: UnitScript = st.unit_by_id("ally")
+	st.unit_by_id("player").deck.draw_pile.append("card_mend")
 	a.shield = 5
 	a.shield_turns = 2
 	st._damage(a, 8, null, "", "test")

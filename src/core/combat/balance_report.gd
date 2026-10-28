@@ -80,6 +80,9 @@ static func measure(db: Dictionary, week: int, level: int, diff: String) -> Dict
 				if bool(spec.get("heal", false)):
 					continue
 				var kind := "%s_heavy" % tier if (int(a.get("charge", 0)) > 0 or a.has("pattern")) else tier
+				if str(a.get("intent", e.get("intent", "locked"))) == "tracking":
+					# Tracking hits are 60% by design (PT Part 4); reported on their own.
+					kind = "%s_tracking" % tier
 				var pct := st._expected_hit(st.units[1], st.units[0], spec) / float(st.units[0].max_hp)
 				var h: Dictionary = hits.get(kind, { "pct": 0.0, "n": 0 })
 				h["pct"] = float(h["pct"]) + pct

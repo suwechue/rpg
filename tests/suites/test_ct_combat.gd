@@ -26,11 +26,11 @@ func test_cover_pieces_are_props_with_hp() -> void:
 	var st := fight(["P.c.x...E"], [enemy("pom_pom_wisp")])
 	var wall = st.unit_at(Vector2i(2, 0))
 	var crate = st.unit_at(Vector2i(4, 0))
-	check(wall != null and st.is_cover(wall) and wall.max_hp == 15, "a 'c' tile is a low wall with 15 HP")
+	check(wall != null and st.is_cover(wall) and wall.max_hp == 12, "a 'c' tile is a low wall with 12 HP")
 	check(crate != null and st.is_cover(crate) and crate.max_hp == 8, "an 'x' tile is a crate with 8 HP")
 	check(st.grid.walkable_terrain(Vector2i(2, 0)), "the floor under cover is plain floor")
 	st._damage(wall, 3, null, "force", "hit")
-	check(wall.hp == 9, "Force breaks cover twice as fast (15 - 3x2 = %d)" % wall.hp)
+	check(wall.hp == 6, "Force breaks cover twice as fast (12 - 3x2 = %d)" % wall.hp)
 	st._damage(crate, 2, null, "heat", "hit")
 	check(crate.hp == 4, "Heat burns crates (8 - 2x2 = %d)" % crate.hp)
 

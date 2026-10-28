@@ -50,6 +50,9 @@ static func options(state: StateScript, u: UnitScript) -> Array:
 	if state.act_block(u) != "":
 		act_reach = {}
 	var opponents := state.opponents_of(u)
+	var taunter := state.unit_by_id(str(u.links.get("taunted_by", "")))
+	if taunter != null and taunter.alive():
+		opponents = [taunter]
 	if opponents.is_empty():
 		return out
 	var acts := _actions(state, u)

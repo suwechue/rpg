@@ -194,19 +194,25 @@ static func _op(st, u: UnitScript, card: Dictionary, fx: Dictionary, target: Vec
 		"lunge":
 			var t: UnitScript = st.unit_at(target)
 			var dir := Forms.direction_to(u.cell, target)
-			var steps := 0
-			while steps < int(fx.get("tiles", 2)) and GridScript.manhattan(u.cell, target) > 1:
-				var next := u.cell + dir
-				if not grid.walkable_terrain(next) or st.unit_at(next) != null:
+			# PT Part 4: the lunge passes over hazards and gaps without triggering them
+			# (not through walls or units); only the landing tile counts.
+			var path: Array = []
+			var land := u.cell
+			var probe := u.cell
+			for i in int(fx.get("tiles", 2)):
+				if GridScript.manhattan(probe, target) <= 1:
 					break
-				var from := u.cell
-				u.cell = next
-				st._emit({ "t": "move", "unit": u.id, "path": [next] })
-				steps += 1
-				if st._enter_cell(u, next):
+				var next := probe + dir
+				if not grid.in_bounds(next) or grid.get_terrain(next) == GridScript.WALL or st.unit_at(next) != null:
 					break
-				if from == u.cell:
-					break
+				probe = next
+				path.append(next)
+				if grid.walkable_terrain(next) and grid.get_terrain(next) != GridScript.HAZARD:
+					land = next
+			if land != u.cell:
+				u.cell = land
+				st._emit({ "t": "move", "unit": u.id, "path": path.slice(0, path.find(land) + 1) })
+				st._enter_cell(u, land)
 			if t != null and t.alive() and GridScript.manhattan(u.cell, t.cell) == 1:
 				st._basic(u, { "action": "strike", "stat": str(fx.get("stat", "str")), "mult": float(fx.get("mult", 1.0)), "name": str(card.get("name", "Lunge")) }, t.cell)
 		"decoy":
@@ -223,6 +229,8 @@ static func _op(st, u: UnitScript, card: Dictionary, fx: Dictionary, target: Vec
 					d.cell = at
 					st._add_unit(d)
 					st._emit({ "t": "spawn", "unit": d.id, "cell": at, "prop": true })
+				# PT Part 4: the decoy takes the next tracking attack aimed at its caster.
+				u.links["decoy"] = d.id
 				st.draw_telegraphs(at, int(fx.get("draw", 2)))
 		"tailwind":
 			for a in st.allies_of(u):
@@ -278,6 +286,7 @@ static func _op(st, u: UnitScript, card: Dictionary, fx: Dictionary, target: Vec
 			u.statuses["taunting"] = turns
 			st._emit({ "t": "status", "unit": u.id, "status": "taunting" })
 			st.draw_telegraphs(u.cell, int(fx.get("radius", 4)))
+			st.taunt_replan(u, int(fx.get("radius", 4)))
 		"reveal":
 			st.revealed = turns
 			for o in st.units:

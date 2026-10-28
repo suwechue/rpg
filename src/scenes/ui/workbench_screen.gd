@@ -208,6 +208,10 @@ func _deck_editor() -> void:
 			Strings.t("workbench.quick_yes") if bool(card.get("quick", false)) else ""]
 		l.mouse_filter = Control.MOUSE_FILTER_PASS
 		r.add_child(l)
+		if CardRules.is_spell(card):
+			var dg := preload("res://src/scenes/ui/shape_diagram.gd").new()
+			dg.setup(DataDB.record("forms", str(card.get("form", ""))), str(card.get("magnitude", "standard")), UiTheme.vector_color(str(card.get("vectors", {}).keys()[0]) if not card.get("vectors", {}).is_empty() else "force"))
+			r.add_child(dg)
 		var cid := id
 		r.add_child(UiTheme.button("-", func() -> void:
 			_deck.erase(cid)
