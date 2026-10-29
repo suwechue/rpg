@@ -1,0 +1,9 @@
+{
+  "comment": "M19 unlock waves: week 1 is small on purpose; each Monday the narrator announces what's new (locations open by openFromWeek in data/town/locations.json; recruits by their own week).",
+  "weeks": {
+    "2": "Week 2. The buses run again, the arcade's lights are on, clubs are recruiting, and the deli, forge, hospital and library are hiring. Some of the quieter kids might talk to you now.",
+    "3": "Week 3. The library's back room is open, the corner store and the museum are back, and more people are willing to stand next to you.",
+    "4": "Week 4. Test week. The hospital's closed wing has a light on. More recruits, if you've earned them.",
+    "5": "Week 5. The dance is Friday. The fountain has been dry for thirty years. Make sure everyone you care about knows where you'll be."
+  }
+}

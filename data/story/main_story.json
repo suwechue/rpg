@@ -19,7 +19,8 @@
               {
                 "label": "Look away",
                 "effects": {
-                  "flag": "mr_b_seen"
+                  "flag": "mr_b_seen",
+                  "clue": "mr_b_window"
                 }
               },
               {
@@ -28,7 +29,8 @@
                   "flag": "mr_b_seen",
                   "bond": {
                     "mr_b": -2
-                  }
+                  },
+                  "clue": "mr_b_window"
                 },
                 "result": "He doesn't wave back. He writes something else down."
               }
@@ -105,7 +107,8 @@
                   "flag": "mr_b_warned",
                   "bond": {
                     "mr_b": 3
-                  }
+                  },
+                  "clue": "your_file"
                 },
                 "result": "\"Good.\" The file goes back in the drawer. Not the trash. The drawer."
               },
@@ -124,7 +127,8 @@
                   ],
                   "bond": {
                     "mr_b": -8
-                  }
+                  },
+                  "clue": "your_file"
                 },
                 "result": "He stops writing. \"Fewer every year.\""
               }
@@ -165,7 +169,8 @@
                   },
                   "signature": {
                     "binding": 3
-                  }
+                  },
+                  "clue": "transfer_signatures"
                 },
                 "result": "By the end of the day it's on the town square notice board. By morning it's gone. But people saw it. Mr. B saw that people saw it."
               },
@@ -178,7 +183,8 @@
                   ],
                   "bond": {
                     "diane": 3
-                  }
+                  },
+                  "clue": "transfer_signatures"
                 },
                 "result": "Diane closes the notebook. \"Agreed. For now.\" The announcements keep coming."
               },
@@ -192,9 +198,29 @@
                   "bond": {
                     "mayor": -4,
                     "diane": 5
-                  }
+                  },
+                  "clue": "transfer_signatures"
                 },
                 "result": "The Mayor reads it, goes pale, and puts it in a drawer. 'I'll look into it.' He won't. He can't."
+              },
+              {
+                "label": "\"He's not hiding them. He's choosing them.\" (Deduction)",
+                "cond": {
+                  "flag": "deduction_mr_b_selects"
+                },
+                "effects": {
+                  "flag": [
+                    "mr_b_evidence",
+                    "named_the_pattern"
+                  ],
+                  "bond": {
+                    "diane": 10
+                  },
+                  "signature": {
+                    "light": 2
+                  }
+                },
+                "result": "Diane stops writing. \"Say that again.\" You do. She circles three names, then a fourth: yours."
               }
             ]
           }
@@ -287,6 +313,24 @@
                   "flag": "trusted_nobody"
                 },
                 "result": "You carry it. It's heavy. The narrator says nothing, which is new."
+              },
+              {
+                "label": "\"It comes back every thirty years. We stop the cycle, not the man.\" (Deduction)",
+                "cond": {
+                  "flag": "deduction_thirty_years"
+                },
+                "effects": {
+                  "flag": [
+                    "trusted_party",
+                    "cycle_known"
+                  ],
+                  "bond": {
+                    "dr_reyes": 5,
+                    "ms_nonsense": 5,
+                    "theo": 3
+                  }
+                },
+                "result": "Dr. Reyes and Ms. Nonsense look at each other for the first time in years. \"They know,\" says Reyes. \"Then they're ready,\" says Nonsense."
               }
             ]
           }

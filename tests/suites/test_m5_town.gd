@@ -99,7 +99,7 @@ func test_doors() -> void:
 	check(Locs.door(db(), run, "garys_deli", 1, "mon", "after_school", 0)["kind"] == "enter", "the deli is open after school")
 	check(Locs.door(db(), run, "garys_deli", 1, "mon", "night", 0)["kind"] == "line", "and shut at night")
 	check(Locs.door(db(), run, "movie_theater", 1, "mon", "after_school", 0)["kind"] == "line", "CLOSED gives a door line")
-	check(Locs.door(db(), run, "corner_store", 1, "mon", "after_school", 0)["kind"] == "walkup", "the corner store serves from its window")
+	check(Locs.door(db(), run, "corner_store", 3, "mon", "after_school", 0)["kind"] == "walkup", "the corner store serves from its window (from week 3)")
 	var kelly := Locs.door(db(), run, "kelly_house", 1, "sat", "morning", 5)
 	check(kelly["kind"] == "doorstep" and kelly["npcs"] == ["kelly"], "Kelly answers her door on a Saturday morning")
 	check(Locs.door(db(), run, "kelly_house", 1, "mon", "after_school", 0)["kind"] == "line", "nobody home after school")

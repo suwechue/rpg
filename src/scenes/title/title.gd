@@ -136,6 +136,23 @@ func _new_run() -> void:
 		b.tooltip_text = Strings.t("title.enemies_show_what_they_ll") % (Strings.t("title.move_and_attack_chance") % roundi(100.0 * _chance(diffs[d].get("enemyMoveAndActChance", 0.0))))
 		diff_buttons.append(b)
 		diff_row.add_child(b)
+	# M19 difficulty modes: Permadeath, Narrator's Mercy, Story.
+	var mode := { "id": str(db.get("run_modes", {}).get("default", "permadeath")) }
+	var mode_row := m.row()
+	mode_row.add_child(UiTheme.label(Strings.t("title.mode")))
+	var mode_buttons: Array = []
+	var modes: Dictionary = db.get("run_modes", {}).get("modes", {})
+	for mid in modes:
+		var md := str(mid)
+		var mb := UiTheme.button(str(modes[mid].get("name", md)), func() -> void:
+			mode["id"] = md
+			for x in mode_buttons:
+				(x as Button).theme_type_variation = "SelectedButton" if x.get_meta("id") == md else "")
+		mb.set_meta("id", md)
+		mb.theme_type_variation = "SelectedButton" if md == mode["id"] else ""
+		mb.tooltip_text = str(modes[mid].get("text", ""))
+		mode_buttons.append(mb)
+		mode_row.add_child(mb)
 	for cls in db.get("classes", {}).get("classes", []):
 		if int(cls.get("tier", 1)) != 1:
 			continue
@@ -150,7 +167,7 @@ func _new_run() -> void:
 			if seed_edit.text.strip_edges().is_valid_int():
 				s = int(seed_edit.text.strip_edges())
 			# Read the name now: the creation screen is freed when it closes.
-			m.finish({ "class": cid, "seed": s, "name": name_edit.text.strip_edges() }), false, tip)
+			m.finish({ "class": cid, "seed": s, "name": name_edit.text.strip_edges(), "mode": str(mode["id"]) }), false, tip)
 	var unlocked: Array = Journal.unlocked_traits()
 	var trait_pick := { "id": "" }
 	if not unlocked.is_empty():
@@ -181,6 +198,14 @@ func _new_run() -> void:
 	GameState.new_run(int(pick["seed"]), str(pick["class"]), chosen_name, { "traits": traits,
 		"stats": PointBuy.final_stats(DataDB.all(), str(pick["class"]), alloc) })
 	GameState.combat_difficulty = str(diff["id"])
+	GameState.run["mode"] = str(pick.get("mode", "permadeath"))
+	var mode_rec: Dictionary = db.get("run_modes", {}).get("modes", {}).get(GameState.run["mode"], {})
+	if mode_rec.has("combat"):
+		GameState.combat_difficulty = str(mode_rec["combat"])
+	var modes_log: Array = Journal.data.get("modes", [])
+	modes_log.append(GameState.run["mode"])
+	Journal.data["modes"] = modes_log
+	Journal.save_journal()
 	Narrator.say(Strings.t("title.new_kid_in_a_small"))
 	# Later runs may skip the tutorial day (unlocked in the Narrator's Journal).
 	if bool(Journal.data.get("tutorial_cleared", false)):

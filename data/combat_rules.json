@@ -121,6 +121,13 @@
         "isolatedBonus": 0.2
       },
       "enemyExtra": 3
+    },
+    "story": {
+      "name": "Story",
+      "enemyDoubleAttackChance": 0.15,
+      "enemyHpMul": 0.8,
+      "enemyDamageMul": 0.6,
+      "rangedBuiltinsCostAction": false
     }
   },
   "areaFalloff": {

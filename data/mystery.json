@@ -1,0 +1,102 @@
+{
+  "comment": "M18 mystery board: clues come from events (effect 'clue'), the library and the Upside-Down. Linking the two clues of a deduction unlocks it (flag deduction_<id>), which opens extra choices in the week 3 cover-up and week 4 trust scenes and some dialogue.",
+  "clues": [
+    {
+      "id": "mr_b_window",
+      "text": "Mr. B watches the cafeteria and writes something down whenever Kelly laughs.",
+      "category": "Mr. B"
+    },
+    {
+      "id": "your_file",
+      "text": "Mr. B already has a file with your name on it.",
+      "category": "Mr. B"
+    },
+    {
+      "id": "transfer_signatures",
+      "text": "Every 'transfer' form has the same signature: Mr. B's.",
+      "category": "Disappearances"
+    },
+    {
+      "id": "woods_last_seen",
+      "text": "The missing students were all last seen near the woods.",
+      "category": "Disappearances"
+    },
+    {
+      "id": "forge_went_cold",
+      "text": "The forge went cold once before, thirty years ago.",
+      "category": "Upside-Down"
+    },
+    {
+      "id": "founder_fountain",
+      "text": "The town founder built the fountain. Ms. Nonsense hates him for it.",
+      "category": "Upside-Down"
+    },
+    {
+      "id": "closed_wing_chart",
+      "text": "A chart in the hospital's closed wing tracks 'episodes' every thirty years.",
+      "category": "Upside-Down"
+    },
+    {
+      "id": "narrator_knows",
+      "text": "The narrator always knows how the story ends.",
+      "category": "The narrator"
+    },
+    {
+      "id": "feather_hangs",
+      "text": "In Ms. G's vacuum tube, the feather didn't fall. Something holds things up here.",
+      "category": "Upside-Down"
+    },
+    {
+      "id": "mayor_meetings",
+      "text": "The Mayor meets Mr. B after hours, every week.",
+      "category": "Mr. B"
+    }
+  ],
+  "deductions": [
+    {
+      "id": "mr_b_selects",
+      "clues": [
+        "mr_b_window",
+        "transfer_signatures"
+      ],
+      "text": "Mr. B isn't covering up disappearances. He's choosing who disappears.",
+      "flag": "deduction_mr_b_selects"
+    },
+    {
+      "id": "thirty_years",
+      "clues": [
+        "forge_went_cold",
+        "closed_wing_chart"
+      ],
+      "text": "It happens every thirty years. This is the cycle coming back.",
+      "flag": "deduction_thirty_years"
+    },
+    {
+      "id": "fountain_heart",
+      "clues": [
+        "founder_fountain",
+        "closed_wing_chart"
+      ],
+      "text": "The fountain is the heart of it. It runs when the cycle peaks.",
+      "flag": "deduction_fountain_heart"
+    },
+    {
+      "id": "mayor_owned",
+      "clues": [
+        "mayor_meetings",
+        "transfer_signatures"
+      ],
+      "text": "The Mayor signs off on the transfers. He's not in charge; he's owned.",
+      "flag": "deduction_mayor_owned"
+    },
+    {
+      "id": "woods_door",
+      "clues": [
+        "woods_last_seen",
+        "feather_hangs"
+      ],
+      "text": "The woods are where the two towns touch. Things don't fall there; they cross.",
+      "flag": "deduction_woods_door"
+    }
+  ]
+}

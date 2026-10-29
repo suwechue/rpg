@@ -1,0 +1,104 @@
+{
+  "comment": "M18: each core friend's unique card, given at Unbreakable.",
+  "cards": [
+    {
+      "id": "card_bond_kelly",
+      "name": "Squad Formation",
+      "kind": "spell",
+      "rarity": "rare",
+      "vectors": {
+        "force": 1.0
+      },
+      "form": "burst",
+      "magnitude": "major",
+      "text": "Kelly's signature: a Force Burst that leaves allies in it Hasted.",
+      "effects": [
+        {
+          "op": "status_area",
+          "status": "dazed",
+          "turns": 1
+        }
+      ],
+      "cost": 5
+    },
+    {
+      "id": "card_bond_theo",
+      "name": "Constant",
+      "kind": "spell",
+      "rarity": "rare",
+      "vectors": {
+        "motion": 1.0
+      },
+      "form": "line",
+      "magnitude": "major",
+      "text": "Theo's signature: a Motion Line that pushes everything to the end.",
+      "effects": [
+        {
+          "op": "status_area",
+          "status": "dazed",
+          "turns": 1
+        }
+      ],
+      "cost": 5
+    },
+    {
+      "id": "card_bond_mara",
+      "name": "Painted Door",
+      "kind": "spell",
+      "rarity": "rare",
+      "vectors": {
+        "light": 1.0
+      },
+      "form": "shield",
+      "magnitude": "major",
+      "text": "Mara's signature: a Light Shield that heals as it protects.",
+      "effects": [
+        {
+          "op": "heal",
+          "amount": 6
+        }
+      ],
+      "cost": 5
+    },
+    {
+      "id": "card_bond_dex",
+      "name": "Lucky Token",
+      "kind": "spell",
+      "rarity": "rare",
+      "vectors": {
+        "force": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "major",
+      "text": "Dex's signature: a Force Bolt that always crits the first time.",
+      "effects": [
+        {
+          "op": "status_area",
+          "status": "dazed",
+          "turns": 1
+        }
+      ],
+      "cost": 3
+    },
+    {
+      "id": "card_bond_priya",
+      "name": "Closing Argument",
+      "kind": "spell",
+      "rarity": "rare",
+      "vectors": {
+        "light": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "major",
+      "text": "Priya's signature: a Light Bolt that marks the target.",
+      "effects": [
+        {
+          "op": "status_target",
+          "status": "marked",
+          "turns": 2
+        }
+      ],
+      "cost": 4
+    }
+  ]
+}

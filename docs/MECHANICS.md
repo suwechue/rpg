@@ -345,6 +345,10 @@ Change these in `data/arena/waves.json` cardReward and checkpointPick.
 
 ## C1. Days, time and AP
 
+- **Unlock waves** (M19): week 1 is small. Week 2 opens the buses, the arcade, clubs and the part-time jobs; week 3 the corner store and museum; week 4 the hospital's closed wing; week 5 the dance. The narrator announces it each Monday. `data/unlocks.json`, locations' openFromWeek.
+- **Part-time jobs:** the deli ($14), forge ($12), hospital ($8) and library ($10), 2 AP a shift (forge, hospital and library from week 2). 60% of shifts have a small event with a choice. `data/jobs.json`.
+- **Modes** (chosen at a new run): Permadeath (as designed); Narrator's Mercy (dying rewinds to the start of that day with a quip); Story (permadeath, with easier fights: 0.6x enemy damage, 0.8x HP). The Journal records each run's mode. `data/run_modes.json`.
+
 | Day part | AP |
 | --- | --- |
 | Before School | 2 |
@@ -470,6 +474,10 @@ Reactions use Options "reactions" (auto by default; "ask" acts like auto until t
 Change these in `data/minigames.json`, `data/properties.json`, `data/forge.json`, `data/riders.json`, `src/core/progression/crafting.gd` and `src/core/progression/forge.gd`.
 
 ## C5. Talking, Bonds and recruiting
+
+- **The phone** (HUD button, M18): at Night up to 3 friends with Bond 11+ text you (60% each); at Bond 41+ a text may invite you to hang out tomorrow after school (35%). Accept, and that After School opens with the plan: hanging out costs the usual hangout AP; cancelling costs 5 Bond. Story reactions text you once. The feed shows two rumors about the week and a school post; contacts list everyone you've met, their tier and where they are now; the calendar lists the set pieces. `data/phone.json`.
+- **Friendship scenes:** the first time Bond reaches a tier with a scene, it plays (right after a hangout, or at the start of the next part). Kelly, Theo, Mara, Dex and Priya have Acquaintance, Friend, Close and Unbreakable; the other recruitables have Friend and Close. Unbreakable starts the character's arc (flag arc_<id>) and gives their unique card. `data/cutscenes/friendship.json`, `data/cards/bond_cards.json`.
+- **The mystery board** (Phone > Board): clues come from story events, class events and the Upside-Down. Link two related clues to make a deduction (5 in act 1). Deductions open new choices: "He's choosing them" in the week 3 cover-up, "Stop the cycle" in the week 4 trust scene. `data/mystery.json`.
 
 - **Topics** cost 1 AP; each can be used once a week (some once ever). Some are locked behind **CHA** or a Bond level.
 - **Reception:** how well your line's tone matches the person's personality, plus their mood today (good +0.15, bad −0.15), plus Bond/400. A score of 0.2+ is good, −0.05 or below is bad. Bond changes by score x10 (risky lines can earn up to x1.45 when they land).

@@ -123,12 +123,12 @@ func _process(_delta: float) -> void:
 
 
 ## Play steps built at runtime (M13 class scenes), not from data.
-func play_steps(steps: Array, host: Node = null, tag: String = "generated") -> void:
+func play_steps(steps: Array, host: Variant = null, tag: String = "generated") -> void:
 	await _run({ "id": tag, "steps": steps }, host)
 
 
 ## Play a cutscene by id. Returns when it ends (or is skipped). Unknown ids return at once.
-func play(id: String, host: Node = null) -> void:
+func play(id: String, host: Variant = null) -> void:
 	var c := CS.find(DataDB.all(), id)
 	if c.is_empty():
 		push_warning("Cutscenes: no cutscene '%s'" % id)
@@ -136,11 +136,13 @@ func play(id: String, host: Node = null) -> void:
 	await _run(c, host)
 
 
-func _run(c: Dictionary, host: Node) -> void:
+func _run(c: Dictionary, host_ref: Variant) -> void:
 	var id := str(c.get("id", ""))
 	# One at a time: a cutscene asked for while another plays waits its turn.
 	while playing != "":
 		await finished
+	# The scene that asked may be gone by now (a scene change while waiting).
+	var host: Node = host_ref as Node if is_instance_valid(host_ref) else null
 	playing = id
 	_skip = false
 	_skip_btn.visible = true

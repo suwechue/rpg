@@ -1519,7 +1519,8 @@
             "statXp": {
               "int": 1
             },
-            "narratorBond": 1
+            "narratorBond": 1,
+            "clue": "founder_fountain"
           },
           "result": "\"He built the fountain.\" She says it like a crime."
         },
@@ -1578,7 +1579,8 @@
             "statXp": {
               "per": 2
             },
-            "narratorBond": 1
+            "narratorBond": 1,
+            "clue": "feather_hangs"
           },
           "result": "\"Huh,\" says Ms. G. She writes something down and doesn't say what."
         },

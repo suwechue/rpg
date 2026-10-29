@@ -17,7 +17,8 @@
           "type": "cutscene",
           "id": "cal_pep_rally"
         }
-      ]
+      ],
+      "calendar": "Week 2, Monday: Pep rally"
     },
     {
       "id": "cal_w3_club_fair",
@@ -35,7 +36,8 @@
         {
           "type": "clubFair"
         }
-      ]
+      ],
+      "calendar": "Week 3, Monday: Club fair"
     },
     {
       "id": "cal_w4_test_week",
@@ -53,7 +55,8 @@
         {
           "type": "testWeek"
         }
-      ]
+      ],
+      "calendar": "Week 4: Test week"
     },
     {
       "id": "cal_w4_report_card",
@@ -71,7 +74,8 @@
         {
           "type": "reportCard"
         }
-      ]
+      ],
+      "calendar": "Week 4, Friday: Report card"
     },
     {
       "id": "cal_w5_dance",
@@ -86,7 +90,8 @@
           "type": "cutscene",
           "id": "cal_school_dance"
         }
-      ]
+      ],
+      "calendar": "Week 5, Friday: The dance"
     }
   ]
 }

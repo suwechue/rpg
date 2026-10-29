@@ -191,7 +191,8 @@
                   "flag": [
                     "lore_forge",
                     "forge_cold"
-                  ]
+                  ],
+                  "clue": "forge_went_cold"
                 },
                 "result": "\"It went cold for a reason once. Now it's remembering.\""
               }
@@ -227,7 +228,8 @@
                   },
                   "signature": {
                     "light": 2
-                  }
+                  },
+                  "clue": "closed_wing_chart"
                 },
                 "result": "The door opens. The hall beyond is full of empty beds made with hospital corners. Somebody has kept them made."
               },
@@ -237,7 +239,8 @@
                   "flag": "week4_closed_wing_open",
                   "signature": {
                     "binding": 2
-                  }
+                  },
+                  "clue": "closed_wing_chart"
                 },
                 "result": "She opens it anyway, later, alone. You hear about it from Patti."
               }

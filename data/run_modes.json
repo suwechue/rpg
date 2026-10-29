@@ -1,0 +1,25 @@
+{
+  "comment": "M19 difficulty modes, chosen at a new run. permadeath: as designed. mercy: dying rewinds to the start of that day with a narrator quip. story: Permadeath rules but combat uses the 'story' difficulty (easier fights). The Journal records each run's mode.",
+  "default": "permadeath",
+  "modes": {
+    "permadeath": {
+      "name": "Permadeath",
+      "text": "One life. The way the story was written."
+    },
+    "mercy": {
+      "name": "Narrator's Mercy",
+      "text": "Die, and the narrator rewinds the day. Once in a while.",
+      "rewind": true
+    },
+    "story": {
+      "name": "Story",
+      "text": "Easier fights. For the people, not the pain.",
+      "combat": "story"
+    }
+  },
+  "mercyQuips": [
+    "\"No. That's not how this goes.\" The narrator turns the page back.",
+    "\"Let's try that again. I'll pretend I didn't see.\"",
+    "\"Rewinding. Don't make me do this every day.\""
+  ]
+}

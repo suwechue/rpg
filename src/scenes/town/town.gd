@@ -814,6 +814,12 @@ func location_menu(loc: String) -> void:
 			GameState.spend_money(int(act["money"]))
 		var lines := GameState.apply_effects(act.get("effects", {}))
 		Narrator.say(("%s %s" % [str(act.get("say", "")), " ".join(PackedStringArray(lines))]).strip_edges())
+		# M19: part-time jobs sometimes have a small event on the shift.
+		var jobs: Dictionary = DataDB.table("jobs")
+		var evs: Array = jobs.get("events", {}).get(str(act.get("job", "")), [])
+		var rng := Rng.stream("events")
+		if not evs.is_empty() and rng.randf() < float(jobs.get("eventChance", 0.6)):
+			await Flow.show_event(evs[rng.randi_range(0, evs.size() - 1)])
 	elif p.has("shop"):
 		var visit := int(DataDB.table("town/shops").get("rules", {}).get("visitAp", 1))
 		if Calendar.spend_ap(visit, "shop:" + str(p["shop"])):

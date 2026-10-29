@@ -9,6 +9,7 @@ const ClassScreen := preload("res://src/scenes/ui/class_screen.gd")
 const Fx := preload("res://src/core/run/effects.gd")
 const Exams := preload("res://src/core/run/exams.gd")
 const Clubs := preload("res://src/core/run/clubs.gd")
+const Phone := preload("res://src/core/social/phone.gd")
 const NightScreen := preload("res://src/scenes/ui/night_screen.gd")
 const EventScreen := preload("res://src/scenes/ui/event_screen.gd")
 const Hud := preload("res://src/scenes/ui/hud.gd")
@@ -63,6 +64,25 @@ func _on_part_started() -> void:
 	var screens := GameState.part_screens()
 	for id in StoryRules.due(DataDB.all(), GameState.run, GameState.ctx(), true):
 		screens.push_front("story:" + str(id))
+	# M19: Monday mornings announce what's new this week; the day's start is
+	# remembered for Narrator's Mercy.
+	if Calendar.day_name() == "mon" and Calendar.part_id() == "before_school" and Calendar.week() > 1 and not GameState.flag("unlocks_told_%d" % Calendar.week()):
+		GameState.set_flag("unlocks_told_%d" % Calendar.week())
+		var news := str(DataDB.table("unlocks").get("weeks", {}).get(str(Calendar.week()), ""))
+		if news != "":
+			Narrator.say(news)
+	if Calendar.part_id() in ["before_school", "morning"]:
+		GameState.day_snapshot = GameState.to_dict().duplicate(true)
+	# M18: friendship scenes waiting from Bond gains, tonight's texts, and today's plans.
+	for sid in GameState.run.get("pendingFriendScenes", []):
+		screens.push_front("friend:" + str(sid))
+	GameState.run["pendingFriendScenes"] = []
+	if Calendar.part_id() == "night":
+		var new_texts := Phone.night_texts(DataDB.all(), GameState.run, int(GameState.run.get("day_count", 0)), Rng.stream("npc"))
+		if not new_texts.is_empty():
+			Narrator.say(Strings.t("phone.new_texts") % new_texts.size())
+	if Calendar.part_id() == "after_school" and Phone.invite_today(GameState.run, int(GameState.run.get("day_count", 0))) != "":
+		screens.push_front("invite:" + Phone.invite_today(GameState.run, int(GameState.run.get("day_count", 0))))
 	# M16: a club meeting takes the After School part on its days.
 	if Calendar.part_id() == "after_school" and not Calendar.is_weekend():
 		var club := Clubs.meeting_today(DataDB.all(), GameState.run, Calendar.day_name())
@@ -142,6 +162,12 @@ func _next() -> void:
 			_next()
 		_ when screen.begins_with("story:"):
 			await play_inline_story(screen.substr(6))
+			_next()
+		_ when screen.begins_with("friend:"):
+			await Cutscenes.play(screen.substr(7), get_tree().current_scene)
+			_next()
+		_ when screen.begins_with("invite:"):
+			await _invite(screen.substr(7))
 			_next()
 		_ when screen.begins_with("club:"):
 			await show_event(Clubs.meeting_event(DataDB.all(), GameState.run, screen.substr(5), Rng.stream("events")))
@@ -287,6 +313,29 @@ func play_inline_story(id: String) -> void:
 				await show_event({ "title": Strings.t("flow.the_narrator"), "text": l })
 
 
+## M18: a hangout you planned by text. Going costs the hangout AP; skipping hurts.
+func _invite(id: String) -> void:
+	var db: Dictionary = DataDB.all()
+	var who := str(db.get("npcs/" + id, {}).get("name", id))
+	var ap := int(db.get("social", {}).get("hangoutAp", 2))
+	var r: Variant = await show_event({ "title": Strings.t("phone.invite_title"), "text": Strings.t("phone.invite_text") % who,
+		"choices": [{ "label": Strings.t("phone.invite_go") % ap, "cond": { "minAp": ap }, "effects": { "ap": -ap } },
+			{ "label": Strings.t("phone.invite_skip"), "effects": { "bond": { id: -5 } } }] })
+	Phone.clear_invite(GameState.run, id)
+	if r is Dictionary and (r as Dictionary).get("effects", {}).has("ap"):
+		var lines := preload("res://src/core/social/bonds.gd").hang_out(db, GameState.run, id, Rng.stream("npc"))
+		await show_event({ "title": who, "text": "\n".join(PackedStringArray(lines)) })
+		await play_pending_friend_scenes()
+
+
+## M18: play any friendship scenes that Bond gains have unlocked.
+func play_pending_friend_scenes() -> void:
+	var pend: Array = GameState.run.get("pendingFriendScenes", [])
+	GameState.run["pendingFriendScenes"] = []
+	for sid in pend:
+		await Cutscenes.play(str(sid), get_tree().current_scene)
+
+
 ## M16: the club fair. Join up to maxJoin clubs.
 func _club_fair() -> void:
 	var db: Dictionary = DataDB.all()
@@ -328,7 +377,19 @@ func _report_card() -> void:
 
 
 ## Permadeath: the save goes, the narrator gives the ending, back to the title.
+## Narrator's Mercy (M19) rewinds to the start of the day instead.
 func _on_run_ended(cause: String) -> void:
+	var mode: Dictionary = DataDB.table("run_modes").get("modes", {}).get(str(GameState.run.get("mode", "permadeath")), {})
+	if bool(mode.get("rewind", false)) and cause != "demo_end" and not GameState.day_snapshot.is_empty():
+		_queue.clear()
+		_busy = false
+		GameState.load_dict(GameState.day_snapshot.duplicate(true))
+		var quips: Array = DataDB.table("run_modes").get("mercyQuips", [""])
+		await show_event({ "title": Strings.t("flow.rewound_title"), "text": str(quips[Rng.stream("events").randi_range(0, quips.size() - 1)]) })
+		GameState.run["rewinds"] = int(GameState.run.get("rewinds", 0)) + 1
+		SaveSystem.save_run()
+		SceneRouter.goto("res://src/scenes/town/town.tscn")
+		return
 	_active = false
 	_queue.clear()
 	set_hud(false)

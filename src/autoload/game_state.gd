@@ -14,6 +14,8 @@ const BondRules := preload("res://src/core/social/bonds.gd")
 
 const COMBAT_SCENE := "res://src/scenes/combat/combat.tscn"
 
+## The run as it was when today started (M19 Narrator's Mercy rewinds to it).
+var day_snapshot: Dictionary = {}
 var run: Dictionary = {}
 var combat_turn_mode := ""   # F1 > Fights override of data/combat_rules.json "turnMode" ("" = data)
 ## Combat difficulty for this run ("normal" or "hard"), chosen at new run; F1 > Fights can switch it.

@@ -1,64 +1,275 @@
 {
   "events": [
-    { "id": "dun_mirror_desk", "title": "Your desk", "speaker": "The narrator",
+    {
+      "id": "dun_mirror_desk",
+      "title": "Your desk",
+      "speaker": "The narrator",
       "text": "In the middle of the room is your desk from Physics. Your name is carved into it in handwriting that is almost yours.",
       "choices": [
-        { "label": "Look inside", "effects": { "card": "card_first_aid", "narrate": "A first aid kit, and a note: 'you'll need this more than me.' It's signed with your initials." } },
-        { "label": "Leave it", "effects": { "narratorBond": 3 }, "result": "\"Wise,\" says the narrator, sounding surprised." }
-      ] },
-    { "id": "dun_trophy_case", "title": "The trophy case",
+        {
+          "label": "Look inside",
+          "effects": {
+            "card": "card_first_aid",
+            "narrate": "A first aid kit, and a note: 'you'll need this more than me.' It's signed with your initials.",
+            "clue": "woods_last_seen"
+          }
+        },
+        {
+          "label": "Leave it",
+          "effects": {
+            "narratorBond": 3
+          },
+          "result": "\"Wise,\" says the narrator, sounding surprised."
+        }
+      ]
+    },
+    {
+      "id": "dun_trophy_case",
+      "title": "The trophy case",
       "text": "A trophy case full of trophies for things nobody has done yet. One of them has your name. It's for 'Most Likely to Disappear'.",
       "choices": [
-        { "label": "Smash the glass", "effects": { "hp": -3, "money": 15 }, "result": "Glass cuts, coins spill. The trophies keep smiling." },
-        { "label": "Take the plaque with your name", "cond": { "minStat": { "wil": 7 } }, "lockedHint": "WIL 7", "effects": { "stats": { "wil": 1 } }, "result": "You pry it off and pocket it. Whatever it predicted, it can't now." }
-      ] },
-    { "id": "dun_lunch_line", "title": "The lunch line", "weeks": [1, 2],
+        {
+          "label": "Smash the glass",
+          "effects": {
+            "hp": -3,
+            "money": 15
+          },
+          "result": "Glass cuts, coins spill. The trophies keep smiling."
+        },
+        {
+          "label": "Take the plaque with your name",
+          "cond": {
+            "minStat": {
+              "wil": 7
+            }
+          },
+          "lockedHint": "WIL 7",
+          "effects": {
+            "stats": {
+              "wil": 1
+            }
+          },
+          "result": "You pry it off and pocket it. Whatever it predicted, it can't now."
+        }
+      ]
+    },
+    {
+      "id": "dun_lunch_line",
+      "title": "The lunch line",
+      "weeks": [
+        1,
+        2
+      ],
       "text": "A lunch line with no students, just trays sliding along by themselves. The lunch lady behind the counter is a hairnet with nobody in it.",
       "choices": [
-        { "label": "Take a tray", "effects": { "hp": 10, "mp": 6 }, "result": "Mystery meat. Somehow restorative. Patti would be proud." },
-        { "label": "Ask the hairnet about Todd", "effects": { "narrate": "The hairnet bobs. On the tray: a hall pass with Todd's name and tomorrow's date." } }
-      ] },
-    { "id": "dun_frozen_aisle", "title": "The frozen aisle", "weeks": [2],
+        {
+          "label": "Take a tray",
+          "effects": {
+            "hp": 10,
+            "mp": 6
+          },
+          "result": "Mystery meat. Somehow restorative. Patti would be proud."
+        },
+        {
+          "label": "Ask the hairnet about Todd",
+          "effects": {
+            "narrate": "The hairnet bobs. On the tray: a hall pass with Todd's name and tomorrow's date."
+          }
+        }
+      ]
+    },
+    {
+      "id": "dun_frozen_aisle",
+      "title": "The frozen aisle",
+      "weeks": [
+        2
+      ],
       "text": "Rows of frozen sandwiches, each labeled with somebody's name. One is labeled GARY. It's still warm.",
       "choices": [
-        { "label": "Take Gary's sandwich", "effects": { "card": "card_deli_sandwich" }, "result": "You'll give it back. Probably." },
-        { "label": "Smash the freezer", "cond": { "minStat": { "str": 7 } }, "lockedHint": "STR 7", "effects": { "signature": { "cold": -2 }, "xp": 10 }, "result": "The cold in the room drops a notch. The week feels lighter." }
-      ] },
-    { "id": "dun_forge_whisper", "title": "The cold anvil", "weeks": [3],
+        {
+          "label": "Take Gary's sandwich",
+          "effects": {
+            "card": "card_deli_sandwich"
+          },
+          "result": "You'll give it back. Probably."
+        },
+        {
+          "label": "Smash the freezer",
+          "cond": {
+            "minStat": {
+              "str": 7
+            }
+          },
+          "lockedHint": "STR 7",
+          "effects": {
+            "signature": {
+              "cold": -2
+            },
+            "xp": 10
+          },
+          "result": "The cold in the room drops a notch. The week feels lighter."
+        }
+      ]
+    },
+    {
+      "id": "dun_forge_whisper",
+      "title": "The cold anvil",
+      "weeks": [
+        3
+      ],
       "text": "An anvil sits in the dark, frosted over. When you touch it, you hear the blacksmith's voice, younger: 'I'm sorry. I couldn't keep it lit.'",
       "choices": [
-        { "label": "Warm it with your hands", "effects": { "affinity": { "heat": 3 }, "flag": "lore_forge_apology" }, "result": "It warms. So do you, a little." },
-        { "label": "Walk on", "effects": {} }
-      ] },
-    { "id": "dun_ward_bed", "title": "The empty bed", "weeks": [4],
+        {
+          "label": "Warm it with your hands",
+          "effects": {
+            "affinity": {
+              "heat": 3
+            },
+            "flag": "lore_forge_apology"
+          },
+          "result": "It warms. So do you, a little."
+        },
+        {
+          "label": "Walk on",
+          "effects": {}
+        }
+      ]
+    },
+    {
+      "id": "dun_ward_bed",
+      "title": "The empty bed",
+      "weeks": [
+        4
+      ],
       "text": "A hospital bed with a chart clipped to the end. The patient name is blank. The admitting signature is very clear: Mr. B.",
       "choices": [
-        { "label": "Take the chart", "effects": { "flag": "mr_b_evidence", "narrate": "Evidence. Real, signed, dated evidence." } },
-        { "label": "Lie down for a second", "effects": { "hp": 15 }, "result": "You wake up a minute later, rested, and very sure you shouldn't have done that." }
-      ] },
-    { "id": "dun_narrator_chair", "title": "A comfortable chair", "speaker": "The narrator",
+        {
+          "label": "Take the chart",
+          "effects": {
+            "flag": "mr_b_evidence",
+            "narrate": "Evidence. Real, signed, dated evidence."
+          }
+        },
+        {
+          "label": "Lie down for a second",
+          "effects": {
+            "hp": 15
+          },
+          "result": "You wake up a minute later, rested, and very sure you shouldn't have done that."
+        }
+      ]
+    },
+    {
+      "id": "dun_narrator_chair",
+      "title": "A comfortable chair",
+      "speaker": "The narrator",
       "text": "A reading chair and a lamp, in the middle of the Upside-Down. A book lies open on the seat. It's the story so far. It's about you.",
       "choices": [
-        { "label": "Read ahead", "cond": { "minStat": { "per": 7 } }, "lockedHint": "PER 7", "effects": { "flag": "read_ahead", "narratorBond": -3 }, "result": "The next page says: 'They read ahead. Rude.' The narrator clears their throat, offended." },
-        { "label": "Close the book politely", "effects": { "narratorBond": 4, "mp": 8 }, "result": "\"Thank you,\" says the narrator, from everywhere. You feel oddly restored." }
-      ] },
-    { "id": "dun_lost_student", "title": "A lost student",
+        {
+          "label": "Read ahead",
+          "cond": {
+            "minStat": {
+              "per": 7
+            }
+          },
+          "lockedHint": "PER 7",
+          "effects": {
+            "flag": "read_ahead",
+            "narratorBond": -3
+          },
+          "result": "The next page says: 'They read ahead. Rude.' The narrator clears their throat, offended."
+        },
+        {
+          "label": "Close the book politely",
+          "effects": {
+            "narratorBond": 4,
+            "mp": 8
+          },
+          "result": "\"Thank you,\" says the narrator, from everywhere. You feel oddly restored."
+        }
+      ]
+    },
+    {
+      "id": "dun_lost_student",
+      "title": "A lost student",
       "text": "A kid in an old-fashioned letterman jacket sits against the wall. \"What year is it?\" You tell him. He laughs, then stops laughing.",
       "choices": [
-        { "label": "Tell him the way out", "effects": { "flag": "lore_lost_student", "xp": 8 }, "result": "He walks toward the exit and gets fainter with every step. He waves." },
-        { "label": "Ask who sent him here", "cond": { "minStat": { "cha": 7 } }, "lockedHint": "CHA 7", "effects": { "flag": ["lore_lost_student", "mr_b_suspicious"] }, "result": "\"The vice principal said I was being transferred.\"" }
-      ] },
-    { "id": "dun_wishing_fountain", "title": "A fountain",
+        {
+          "label": "Tell him the way out",
+          "effects": {
+            "flag": "lore_lost_student",
+            "xp": 8
+          },
+          "result": "He walks toward the exit and gets fainter with every step. He waves."
+        },
+        {
+          "label": "Ask who sent him here",
+          "cond": {
+            "minStat": {
+              "cha": 7
+            }
+          },
+          "lockedHint": "CHA 7",
+          "effects": {
+            "flag": [
+              "lore_lost_student",
+              "mr_b_suspicious"
+            ]
+          },
+          "result": "\"The vice principal said I was being transferred.\""
+        }
+      ]
+    },
+    {
+      "id": "dun_wishing_fountain",
+      "title": "A fountain",
       "text": "The town square's fountain, upside down: the water falls up into the dark. Coins float in it.",
       "choices": [
-        { "label": "Make a wish ($5)", "cond": { "minMoney": 5 }, "effects": { "money": -5, "mp": 15 }, "result": "The water turns warm. You feel lucky. You probably are." },
-        { "label": "Take some coins", "effects": { "money": 10, "narratorBond": -2 }, "result": "\"Classy,\" says the narrator." }
-      ] },
-    { "id": "dun_echo", "title": "Your echo",
+        {
+          "label": "Make a wish ($5)",
+          "cond": {
+            "minMoney": 5
+          },
+          "effects": {
+            "money": -5,
+            "mp": 15
+          },
+          "result": "The water turns warm. You feel lucky. You probably are."
+        },
+        {
+          "label": "Take some coins",
+          "effects": {
+            "money": 10,
+            "narratorBond": -2
+          },
+          "result": "\"Classy,\" says the narrator."
+        }
+      ]
+    },
+    {
+      "id": "dun_echo",
+      "title": "Your echo",
       "text": "Somewhere down the hall, someone says your name in your voice. Then they say something you haven't said yet.",
       "choices": [
-        { "label": "Listen", "effects": { "statXp": { "per": 1 }, "sigHint": true } },
-        { "label": "Shout back", "effects": { "statXp": { "cha": 1 } }, "result": "Your echo shuts up. Small victories." }
-      ] }
+        {
+          "label": "Listen",
+          "effects": {
+            "statXp": {
+              "per": 1
+            },
+            "sigHint": true
+          }
+        },
+        {
+          "label": "Shout back",
+          "effects": {
+            "statXp": {
+              "cha": 1
+            }
+          },
+          "result": "Your echo shuts up. Small victories."
+        }
+      ]
+    }
   ]
 }

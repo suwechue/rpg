@@ -414,7 +414,8 @@
               "gary": 2
             }
           },
-          "say": "You slice, you wrap, you learn exactly nothing about the recipe."
+          "say": "You slice, you wrap, you learn exactly nothing about the recipe.",
+          "job": "deli"
         }
       ],
       "doorLine": "The sign says CLOSED. The smell says otherwise.",
@@ -486,9 +487,14 @@
           "effects": {
             "statXp": {
               "int": 1
-            }
+            },
+            "money": 10
           },
-          "say": "Ms. Marlowe sets a book in front of you without being asked. It's the right one."
+          "say": "Ms. Marlowe sets a book in front of you without being asked. It's the right one.",
+          "job": "library",
+          "cond": {
+            "minWeek": 2
+          }
         }
       ],
       "doorLine": "Hours are posted in a very precise font. You are outside them."
@@ -520,7 +526,9 @@
           "say": "High score: DEX. Second place: also DEX, it's the same kid."
         }
       ],
-      "doorLine": "The arcade's shutter is down. A machine inside plays its attract tune to nobody."
+      "doorLine": "The arcade's shutter is down. A machine inside plays its attract tune to nobody.",
+      "openFromWeek": 2,
+      "lockedLine": "Not yet. Come back in week 2."
     },
     {
       "id": "hospital",
@@ -560,9 +568,14 @@
             "bond": {
               "patti": 2,
               "dr_reyes": 1
-            }
+            },
+            "money": 8
           },
-          "say": "\"Oh, you're the new one. I already heard about you.\""
+          "say": "\"Oh, you're the new one. I already heard about you.\"",
+          "job": "hospital",
+          "cond": {
+            "minWeek": 2
+          }
         },
         {
           "label": "Visit injured friends",
@@ -582,7 +595,9 @@
       "storyFlag": "week4_closed_wing_open",
       "interior": "hospital",
       "doorLine": "AUTHORIZED PERSONNEL ONLY. The paint on the door is newer than the door.",
-      "futureHook": "Opens with the week 4 story flag; Night Ward source"
+      "futureHook": "Opens with the week 4 story flag; Night Ward source",
+      "openFromWeek": 4,
+      "lockedLine": "Not yet. Come back in week 4."
     },
     {
       "id": "town_hall",
@@ -626,7 +641,9 @@
         "weekend_evening"
       ],
       "doorLine": "The door is stuck, but the walk-up window is open. A bell on a string. You ring it.",
-      "futureHook": "Planned: second shop for snacks and gifts (interior later)"
+      "futureHook": "Planned: second shop for snacks and gifts (interior later)",
+      "openFromWeek": 3,
+      "lockedLine": "Not yet. Come back in week 3."
     },
     {
       "id": "movie_theater",
@@ -644,7 +661,9 @@
       "status": "CLOSED",
       "kind": "building",
       "doorLine": "\"Reopening soon.\" The sign has been reopening soon since 1994.",
-      "futureHook": "Town history and Upside-Down lore"
+      "futureHook": "Town history and Upside-Down lore",
+      "openFromWeek": 3,
+      "lockedLine": "Not yet. Come back in week 3."
     },
     {
       "id": "post_office",
@@ -1014,9 +1033,14 @@
             },
             "bond": {
               "blacksmith": 1
-            }
+            },
+            "money": 12
           },
-          "say": "\"Took you long enough.\" The forge breathes when you do."
+          "say": "\"Took you long enough.\" The forge breathes when you do.",
+          "job": "forge",
+          "cond": {
+            "minWeek": 2
+          }
         }
       ],
       "doorLine": "The forge is banked for the night. Still warm. Always warm.",

@@ -74,7 +74,8 @@ func _menu() -> void:
 		var hang_ap := int(_social("hangoutAp", 2))
 		add_button(Strings.t("dialogue.hang_out_ap") % hang_ap, func() -> void:
 			if Calendar.spend_ap(hang_ap, "hangout"):
-				show_result(BondRules.hang_out(DataDB.all(), GameState.run, npc_id, Rng.stream("dialogue"))), Calendar.ap() < hang_ap)
+				show_result(BondRules.hang_out(DataDB.all(), GameState.run, npc_id, Rng.stream("dialogue")))
+				Flow.play_pending_friend_scenes(), Calendar.ap() < hang_ap)
 	if bool(rec.get("recruitable", false)) and GameState.character(npc_id).is_empty():
 		var block := BondRules.recruit_block(db, GameState.run, npc_id, Calendar.week())
 		add_button(Strings.t("dialogue.ask_them_to_join_your"), _recruit, block != "" or Calendar.ap() < 1, block)

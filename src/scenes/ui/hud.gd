@@ -4,6 +4,7 @@ extends Control
 
 const Char := preload("res://src/core/character.gd")
 
+var _phone: Button
 var _top: Label
 var _line: Label
 var _end: Button
@@ -27,6 +28,10 @@ func _ready() -> void:
 	_top.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	h.add_child(_top)
 	_end = UiTheme.button(Strings.t("hud.end_part_space"), func() -> void: Flow.end_part())
+	_phone = UiTheme.button(Strings.t("phone.button"), func() -> void:
+		if not Flow.is_busy():
+			Flow.show_modal(preload("res://src/scenes/ui/phone_screen.gd").new()))
+	h.add_child(_phone)
 	h.add_child(_end)
 	var bottom := PanelContainer.new()
 	bottom.position = Vector2(0, Display.base.y - 26)

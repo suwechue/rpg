@@ -1,0 +1,75 @@
+{
+  "comment": "M18 phone: at Night up to maxTexts friends text you (Bond >= textMinBond), sometimes inviting you to hang out tomorrow after school (Bond >= inviteMinBond, inviteChance). Reactions arrive once when their flag is set. The feed posts rumors and these posts.",
+  "maxTexts": 3,
+  "textMinBond": 11,
+  "textChance": 0.6,
+  "inviteMinBond": 41,
+  "inviteChance": 0.35,
+  "texts": {
+    "default": [
+      "hey. weird day huh",
+      "you up?",
+      "did you see the thing at lunch??",
+      "ok I can't stop thinking about the woods"
+    ],
+    "kelly": [
+      "don't text me. ...ok fine. hi",
+      "squad practice ran late. my legs are gone",
+      "if anyone asks we're NOT friends"
+    ],
+    "theo": [
+      "I measured the hallway again. it's longer",
+      "do you think doors remember being opened",
+      "goodnight. probably"
+    ],
+    "mara": [
+      "drew something. not sure what it is yet",
+      "your hands ok? I have bandages",
+      "the art room hummed today"
+    ],
+    "dex": [
+      "BRO. the claw machine. I almost had it",
+      "new bit, you're gonna love it",
+      "lol"
+    ],
+    "priya": [
+      "found more records. we need to talk",
+      "I won debate. obviously",
+      "statistically you should sleep"
+    ]
+  },
+  "invite": "wanna hang out tomorrow after school? {place}",
+  "reactions": [
+    {
+      "flag": "w1_laughed_at_kelly",
+      "from": "kelly",
+      "text": "funny, right? hope you enjoyed it."
+    },
+    {
+      "flag": "survived_w1_monday",
+      "from": "kelly",
+      "text": "we're not talking about last night. ever. ...thanks."
+    },
+    {
+      "flag": "forge_relit",
+      "from": "jake",
+      "text": "THE FORGE IS BACK. you're a legend"
+    },
+    {
+      "flag": "exposed_mr_b",
+      "from": "diane",
+      "text": "it's posted. everyone's reading it. no going back"
+    },
+    {
+      "flag": "dance_interrupted",
+      "from": "priya",
+      "text": "the fountain. you saw it too, right??"
+    }
+  ],
+  "feed": [
+    "Lost: one (1) cat. Answers to 'Mr. Whiskers' or nothing.",
+    "Cafeteria pizza confirmed soup by the debate club.",
+    "Who keeps leaving the gym lights on at night??",
+    "PSA: the vending machine on floor 2 gives two sodas if you kick it."
+  ]
+}

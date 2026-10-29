@@ -1,0 +1,920 @@
+{
+  "comment": "M18 friendship scenes: friend_<npc>_<tier> plays the first time Bond reaches that tier (Acquaintance 11, Friend 41, Close 71, Unbreakable 86). Kelly and the Core Four have all four; side students Friend and Close. Unbreakable starts their personal arc (arc_<npc>) and gives their unique card.",
+  "cutscenes": [
+    {
+      "id": "friend_kelly_acquaintance",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Acquaintance",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Kelly catches you outside the gym, arms crossed."
+        },
+        {
+          "type": "say",
+          "speaker": "kelly",
+          "text": "You saw me freak out down there. If you tell anyone, I'll end you. Socially.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "kelly",
+          "text": "...Thanks for not leaving, though.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_kelly_friend",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Friend",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Kelly runs a routine alone on the empty field and lets you watch."
+        },
+        {
+          "type": "say",
+          "speaker": "kelly",
+          "text": "Everyone thinks it's easy. It's not easy. It's just practice until nobody can see the practice.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "kelly",
+          "text": "Don't clap. ...Fine. You can clap.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_kelly_close",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Close",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "She shows you the lantern. She sleeps with it on now."
+        },
+        {
+          "type": "say",
+          "speaker": "kelly",
+          "text": "I used to be the scariest thing in this school. Now I know what's under it.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "kelly",
+          "text": "If I panic again, you're the one I want next to me. That's not a compliment. It's a fact.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_kelly_unbreakable",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Unbreakable",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "The squad is gone for the night. It's just Kelly, the bleachers, and the stars."
+        },
+        {
+          "type": "say",
+          "speaker": "kelly",
+          "text": "I'm done pretending I'm fine. I'm not fine. But I'm not alone, either.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "kelly",
+          "text": "Whatever's down there, we go together. Deal?",
+          "side": "right"
+        },
+        {
+          "type": "give",
+          "effects": {
+            "flag": "arc_kelly",
+            "card": "card_bond_kelly"
+          }
+        }
+      ]
+    },
+    {
+      "id": "friend_theo_acquaintance",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Acquaintance",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Theo is counting the ceiling tiles in the library. He started over twice."
+        },
+        {
+          "type": "say",
+          "speaker": "theo",
+          "text": "The numbers don't add up. The building's bigger on the inside by three tiles. I measured.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "theo",
+          "text": "You're the first person who didn't laugh.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_theo_friend",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Friend",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Theo shows you a notebook full of diagrams: the Upside-Down, mapped by feel."
+        },
+        {
+          "type": "say",
+          "speaker": "theo",
+          "text": "Force pushes, Motion carries. If you combine them right, nothing can stand still.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "theo",
+          "text": "I've never told anyone this much. It's... nice. Talking.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_theo_close",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Close",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Theo admits he hasn't slept properly since week one."
+        },
+        {
+          "type": "say",
+          "speaker": "theo",
+          "text": "I keep thinking that if I understand it, it can't hurt me. That's not how anything works.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "theo",
+          "text": "But you're here. That's a variable I can count on.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_theo_unbreakable",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Unbreakable",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Theo hands you the notebook. The last page has your name on it, circled."
+        },
+        {
+          "type": "say",
+          "speaker": "theo",
+          "text": "Constant. That's what you are. In every equation I write now.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "theo",
+          "text": "Keep it. I memorized it anyway.",
+          "side": "right"
+        },
+        {
+          "type": "give",
+          "effects": {
+            "flag": "arc_theo",
+            "card": "card_bond_theo"
+          }
+        }
+      ]
+    },
+    {
+      "id": "friend_mara_acquaintance",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Acquaintance",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Mara is sketching on the steps. The drawing is of you, from behind, walking into the woods."
+        },
+        {
+          "type": "say",
+          "speaker": "mara",
+          "text": "I didn't mean to draw you. My hand just did.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "mara",
+          "text": "Do you want it? ...You don't have to.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_mara_friend",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Friend",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Mara takes you to the art room after hours. Every canvas has a door in it."
+        },
+        {
+          "type": "say",
+          "speaker": "mara",
+          "text": "I don't plan them. They just appear. I think they're real somewhere.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "mara",
+          "text": "You're the only one I've shown.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_mara_close",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Close",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Mara patches up your scraped hands without being asked."
+        },
+        {
+          "type": "say",
+          "speaker": "mara",
+          "text": "I'm better at fixing people than talking to them.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "mara",
+          "text": "Stay still. ...There. Good as new. Almost.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_mara_unbreakable",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Unbreakable",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Mara paints a door on your bedroom wall. It's the only one she's ever painted shut."
+        },
+        {
+          "type": "say",
+          "speaker": "mara",
+          "text": "So nothing can come through. Not from there, not ever.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "mara",
+          "text": "I'll always fix you up. Promise.",
+          "side": "right"
+        },
+        {
+          "type": "give",
+          "effects": {
+            "flag": "arc_mara",
+            "card": "card_bond_mara"
+          }
+        }
+      ]
+    },
+    {
+      "id": "friend_dex_acquaintance",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Acquaintance",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Dex ambushes you at the arcade with two tokens."
+        },
+        {
+          "type": "say",
+          "speaker": "dex",
+          "text": "High score's mine but I'll let you lose to me. Generously.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "dex",
+          "text": "...You're actually good. Rude.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_dex_friend",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Friend",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Dex shows you his secret: a catapult made of rulers and rubber bands."
+        },
+        {
+          "type": "say",
+          "speaker": "dex",
+          "text": "Every joke's a plan if you squint. This one launches erasers at Mr. B's window.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "dex",
+          "text": "Kidding. Mostly. Want a turn?",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_dex_close",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Close",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "For once Dex isn't joking. He's sitting very still on the curb."
+        },
+        {
+          "type": "say",
+          "speaker": "dex",
+          "text": "Everyone laughs at me, so nobody looks too hard. That's the point.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "dex",
+          "text": "You looked anyway. Don't make it weird. ...Thanks.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_dex_unbreakable",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Unbreakable",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Dex hands you an arcade token with a hole drilled through it, on a string."
+        },
+        {
+          "type": "say",
+          "speaker": "dex",
+          "text": "Lucky token. I've never lost with it. That's a lie. But it feels true.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "dex",
+          "text": "You're my player two. Forever. No take-backs.",
+          "side": "right"
+        },
+        {
+          "type": "give",
+          "effects": {
+            "flag": "arc_dex",
+            "card": "card_bond_dex"
+          }
+        }
+      ]
+    },
+    {
+      "id": "friend_priya_acquaintance",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Acquaintance",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Priya corners you after debate practice."
+        },
+        {
+          "type": "say",
+          "speaker": "priya",
+          "text": "You argued with me in class and almost won. Almost.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "priya",
+          "text": "Come back when you want to lose properly.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_priya_friend",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Friend",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Priya shows you the library shelf nobody checks out: town records, all signed by the same hand."
+        },
+        {
+          "type": "say",
+          "speaker": "priya",
+          "text": "Facts win arguments. These facts are terrifying.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "priya",
+          "text": "I'm glad you're on my side.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_priya_close",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Close",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Priya practices a speech to an empty hall. Her voice shakes, once."
+        },
+        {
+          "type": "say",
+          "speaker": "priya",
+          "text": "Everyone thinks I'm effortless. I rehearse everything. Even this.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "priya",
+          "text": "I didn't rehearse telling you that. Weird.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_priya_unbreakable",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Unbreakable",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Priya gives you her lucky pen, the one she's never lost a debate with."
+        },
+        {
+          "type": "say",
+          "speaker": "priya",
+          "text": "Closing argument: you're worth it. No rebuttal accepted.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "priya",
+          "text": "Motion carried.",
+          "side": "right"
+        },
+        {
+          "type": "give",
+          "effects": {
+            "flag": "arc_priya",
+            "card": "card_bond_priya"
+          }
+        }
+      ]
+    },
+    {
+      "id": "friend_baxter_friend",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Friend",
+          "seconds": 0.9
+        },
+        {
+          "type": "say",
+          "speaker": "baxter",
+          "text": "Hmph. You fence well. For an amateur. Again, then.",
+          "side": "right"
+        },
+        {
+          "type": "narrator",
+          "text": "Baxter salutes you with his practice foil."
+        }
+      ]
+    },
+    {
+      "id": "friend_baxter_close",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Close",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Baxter breaks his foil on a post and doesn't yell. That's new."
+        },
+        {
+          "type": "say",
+          "speaker": "baxter",
+          "text": "I lose my temper when I'm scared. I'm scared a lot lately. Don't tell anyone.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_diane_friend",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Friend",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Diane opens her notebook to a fresh page and writes your name."
+        },
+        {
+          "type": "say",
+          "speaker": "diane",
+          "text": "You're a source now. Congratulations. It's mostly paperwork.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_diane_close",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Close",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Diane tears a page out and gives it to you."
+        },
+        {
+          "type": "say",
+          "speaker": "diane",
+          "text": "Officially I don't take sides. Unofficially: yours.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_jake_friend",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Friend",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Jake shows you a dagger he forged. It's lopsided and proud."
+        },
+        {
+          "type": "say",
+          "speaker": "jake",
+          "text": "First one that didn't crack! The blacksmith grunted. That's basically a medal.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_jake_close",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Close",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Jake works the bellows with you until the forge glows."
+        },
+        {
+          "type": "say",
+          "speaker": "jake",
+          "text": "Every hobby I start, I quit. Not this one. Not this time.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_jon_friend",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Friend",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Jon explains elemental theory with action figures."
+        },
+        {
+          "type": "say",
+          "speaker": "jon",
+          "text": "Heat beats Cold, obviously, but Cold beats Heat if you're patient! It's all in the lore!",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_jon_close",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Close",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Jon gets quiet for the first time ever."
+        },
+        {
+          "type": "say",
+          "speaker": "jon",
+          "text": "Theo's smarter than me. I'm just louder. ...Is that okay?",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_kris_friend",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Friend",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Kris is napping on the bleachers. He opens one eye."
+        },
+        {
+          "type": "say",
+          "speaker": "kris",
+          "text": "I heard everything you said in class. All of it. I just don't move.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_kris_close",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Close",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Kris hands you a list of everything strange he's noticed this month. It's long."
+        },
+        {
+          "type": "say",
+          "speaker": "kris",
+          "text": "Don't make a thing of it.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_mel_friend",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Friend",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Mel shoots hoops at dusk and sinks nine in a row."
+        },
+        {
+          "type": "say",
+          "speaker": "mel",
+          "text": "Everyone thinks I'm a kid. Good. They never guard me.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_mel_close",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Close",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Mel shows you his report card. All A's. He looks miserable."
+        },
+        {
+          "type": "say",
+          "speaker": "mel",
+          "text": "I'm good at everything they make me do. I just want to play ball.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_penny_friend",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Friend",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Penny re-measures your lab results. Then again."
+        },
+        {
+          "type": "say",
+          "speaker": "penny",
+          "text": "Your error margin is acceptable. That's high praise.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_penny_close",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Close",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Penny makes a mistake on purpose to see what happens. Nothing happens."
+        },
+        {
+          "type": "say",
+          "speaker": "penny",
+          "text": "Huh. The world didn't end. ...Don't tell anyone I did that.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_phase_friend",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Friend",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Phase carries three crates from the deli at once and doesn't notice."
+        },
+        {
+          "type": "say",
+          "speaker": "phase",
+          "text": "Was something happening? I was thinking about sandwiches.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_phase_close",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Close",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Phase stands between you and a falling shelf without thinking."
+        },
+        {
+          "type": "say",
+          "speaker": "phase",
+          "text": "Oh. Were you in danger? Cool. I mean, not cool. You're fine now.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_sam_friend",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Friend",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Sam is asleep against a locker. He wakes up exactly when the bell rings."
+        },
+        {
+          "type": "say",
+          "speaker": "sam",
+          "text": "Five more minutes. ...Fine. Hi.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "friend_sam_close",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Close",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Sam shows up at exactly the right moment, again."
+        },
+        {
+          "type": "say",
+          "speaker": "sam",
+          "text": "Lucky. Or unlucky. Depends on the day. Today's a good one.",
+          "side": "right"
+        }
+      ]
+    }
+  ]
+}

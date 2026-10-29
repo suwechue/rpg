@@ -169,7 +169,7 @@ func _validate_combat(arcane: Array) -> void:
 
 const EFFECT_KEYS := ["statXp", "stats", "affinity", "grade", "gradeFor", "bond", "flag", "unflag", "hp", "mp", "money",
 	"item", "card", "kellyRisk", "learnVector", "learnForm", "xp", "signature", "counter", "disposition", "narrate",
-	"repeatClassGain", "bondPartner", "healInjuries", "sigHint", "ap", "narratorBond", "recruit", "topic", "rumor", "narratorBond", "goto", "combat", "journal", "classChange"]
+	"repeatClassGain", "bondPartner", "healInjuries", "sigHint", "ap", "narratorBond", "recruit", "topic", "rumor", "narratorBond", "goto", "combat", "journal", "classChange", "clue"]
 
 
 ## Every effects Dictionary in event tables must use known keys.

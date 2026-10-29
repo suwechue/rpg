@@ -10,6 +10,7 @@ class_name Effects
 extends RefCounted
 
 const Str := preload("res://src/core/strings.gd")
+const Mystery := preload("res://src/core/story/mystery.gd")
 
 const RM := preload("res://src/core/run/run_model.gd")
 const Char := preload("res://src/core/character.gd")
@@ -109,6 +110,11 @@ static func apply(db: Dictionary, run: Dictionary, fx: Dictionary, rng: RandomNu
 		lines.append(preload("res://src/core/dungeon/signature.gd").hint(db, run, int(ctx.get("week", 1))))
 	if fx.has("narrate"):
 		lines.append(str(fx["narrate"]))
+	# M18: clues for the mystery board.
+	var clues: Variant = fx.get("clue", [])
+	for c in (clues if clues is Array else [clues]):
+		if Mystery.add_clue(run, str(c)):
+			lines.append(Str.t(db, "board.new_clue") % str(Mystery.clue(db, str(c)).get("text", c)))
 	return lines
 
 
@@ -133,9 +139,34 @@ static func change_bond(db: Dictionary, run: Dictionary, npc: String, delta: flo
 	var before := float(run["bonds"].get(npc, float(rec.get("startBond", 0))))
 	var after := clampf(before + delta, -100.0, 100.0)
 	run["bonds"][npc] = after
+	# M18: a friendship scene the first time Bond reaches a tier that has one.
+	var t_before := tier_name(db, before)
+	var t_after := tier_name(db, after)
+	if t_after != t_before and after > before:
+		var sid := "friend_%s_%s" % [npc, t_after.to_lower()]
+		var pend: Array = run.get("pendingFriendScenes", [])
+		if not pend.has(sid) and not run.get("flags", {}).has("cutscene_seen_" + sid) and _has_cutscene(db, sid):
+			pend.append(sid)
+			run["pendingFriendScenes"] = pend
 	if roundi(after - before) != 0:
 		lines.append("%s %+d" % [str(rec.get("name", npc.capitalize())), roundi(after - before)])
 	return after
+
+
+## The Bond tier name for a value (data/bonds.json tiers).
+static func tier_name(db: Dictionary, value: float) -> String:
+	var name := ""
+	for t in db.get("bonds", {}).get("tiers", []):
+		if value >= float(t.get("min", -100)):
+			name = str(t.get("name", ""))
+	return name
+
+
+static func _has_cutscene(db: Dictionary, id: String) -> bool:
+	for c in DT.records_under(db, "cutscenes/", "cutscenes"):
+		if str(c.get("id", "")) == id:
+			return true
+	return false
 
 
 static func _trait_mods(db: Dictionary, rec: Dictionary) -> Array:

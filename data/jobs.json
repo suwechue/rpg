@@ -1,0 +1,151 @@
+{
+  "comment": "M19 part-time jobs: after a shift (a location activity with 'job'), one of these small events may play: a quick choice with a little extra money, stats or Bond.",
+  "eventChance": 0.6,
+  "events": {
+    "deli": [
+      {
+        "title": "The lunch rush",
+        "text": "Six orders at once. Gary throws you an apron and a look.",
+        "choices": [
+          {
+            "label": "Take the orders fast",
+            "effects": {
+              "money": 4,
+              "statXp": {
+                "dex": 1
+              }
+            },
+            "result": "Nobody waits. Gary nods. Tips jar: up."
+          },
+          {
+            "label": "Chat with the regulars",
+            "effects": {
+              "bond": {
+                "gary": 2
+              },
+              "statXp": {
+                "cha": 1
+              }
+            },
+            "result": "You learn who's feuding with who. Gary smirks."
+          }
+        ]
+      },
+      {
+        "title": "The secret recipe",
+        "text": "Gary leaves the recipe book open on the counter. Accidentally. Probably.",
+        "choices": [
+          {
+            "label": "Peek",
+            "effects": {
+              "statXp": {
+                "per": 2
+              },
+              "bond": {
+                "gary": -1
+              }
+            },
+            "result": "It just says 'more salt'. You feel cheated."
+          },
+          {
+            "label": "Close it for him",
+            "effects": {
+              "bond": {
+                "gary": 3
+              }
+            },
+            "result": "\"Good kid,\" he mutters."
+          }
+        ]
+      }
+    ],
+    "forge": [
+      {
+        "title": "Hot iron",
+        "text": "The blacksmith hands you the tongs. The iron is the colour of a sunset.",
+        "choices": [
+          {
+            "label": "Strike it hard",
+            "effects": {
+              "statXp": {
+                "str": 2
+              }
+            },
+            "result": "Sparks everywhere. One lands on your sleeve. Worth it."
+          },
+          {
+            "label": "Strike it carefully",
+            "effects": {
+              "statXp": {
+                "dex": 1,
+                "per": 1
+              },
+              "bond": {
+                "blacksmith": 2
+              }
+            },
+            "result": "\"Better.\" High praise."
+          }
+        ]
+      }
+    ],
+    "hospital": [
+      {
+        "title": "A frightened patient",
+        "text": "A kid in a cast won't stop asking about the woods.",
+        "choices": [
+          {
+            "label": "Tell them it's fine",
+            "effects": {
+              "statXp": {
+                "cha": 1
+              },
+              "bond": {
+                "patti": 1
+              }
+            },
+            "result": "They believe you. You almost do."
+          },
+          {
+            "label": "Ask what they saw",
+            "effects": {
+              "clue": "woods_last_seen",
+              "statXp": {
+                "per": 1
+              }
+            },
+            "result": "\"A door,\" they whisper. \"In a tree.\""
+          }
+        ]
+      }
+    ],
+    "library": [
+      {
+        "title": "The back shelf",
+        "text": "Ms. Marlowe asks you to reshelve a cart. One book has no title and no barcode.",
+        "choices": [
+          {
+            "label": "Read a page",
+            "effects": {
+              "statXp": {
+                "int": 2
+              },
+              "narratorBond": 1
+            },
+            "result": "It's about you. It's about tomorrow. You put it back."
+          },
+          {
+            "label": "Shelve it and move on",
+            "effects": {
+              "bond": {
+                "ms_marlowe": 2
+              },
+              "money": 3
+            },
+            "result": "She notices. She always notices."
+          }
+        ]
+      }
+    ]
+  }
+}
