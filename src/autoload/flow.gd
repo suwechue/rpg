@@ -88,6 +88,9 @@ func _on_part_started() -> void:
 		if pay > 0:
 			GameState.money += pay
 			Narrator.say(Strings.t("truancy.allowance") % pay)
+	# TL Part 3: the morning paper.
+	if Calendar.part_id() == "before_school":
+		screens.push_front("paper")
 	# M18: friendship scenes waiting from Bond gains, tonight's texts, and today's plans.
 	for sid in GameState.run.get("pendingFriendScenes", []):
 		screens.push_front("friend:" + str(sid))
@@ -177,6 +180,9 @@ func _next() -> void:
 			_next()
 		_ when screen.begins_with("story:"):
 			await play_inline_story(screen.substr(6))
+			_next()
+		"paper":
+			await show_event(_morning_paper())
 			_next()
 		_ when screen.begins_with("friend:"):
 			await Cutscenes.play(screen.substr(7), get_tree().current_scene)
@@ -362,6 +368,23 @@ func _end_act(act: int) -> void:
 	_active = false
 	_queue.clear()
 	SceneRouter.goto(TITLE_SCENE)
+
+
+## TL Part 3: a short recap card at Before School.
+func _morning_paper() -> Dictionary:
+	var db: Dictionary = DataDB.all()
+	var run: Dictionary = GameState.run
+	var lines: Array = [Narrator.line("foreshadow")]
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash("paper:%d:%d" % [GameState.run_seed, int(run.get("day_count", 0))])
+	lines.append(Strings.t("paper.favors") % preload("res://src/core/town/favors.gd").board(db, run, Calendar.week(), rng).size())
+	var open: Array = []
+	for l in db.get("town/locations", {}).get("locations", []):
+		if l.get("hours", []) is Array and preload("res://src/core/town/locations.gd").expand_hours(db, l.get("hours", [])).has("period_2") and str(l.get("zone", "")) != "school":
+			open.append(str(l.get("name", "")))
+	lines.append(Strings.t("paper.open") % ", ".join(PackedStringArray(open.slice(0, 6))))
+	lines.append(Strings.t("paper.rumor") % preload("res://src/core/town/crowd.gd").rumor(db, run, Calendar.week(), rng))
+	return { "title": Strings.t("paper.title"), "text": "\n".join(PackedStringArray(lines)) }
 
 
 ## M16: the club fair. Join up to maxJoin clubs.

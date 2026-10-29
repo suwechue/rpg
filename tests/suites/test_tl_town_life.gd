@@ -76,3 +76,37 @@ func test_truancy() -> void:
 	var st0 := int(good["player"]["stats"]["int"])
 	check(Tr.week_end(db(), good) != "", "a perfect week gives a stat")
 	check(Locs.closed_reason(db(), run_(), "hallways", 2, "period_2") == "", "the hallways can be snuck into during class")
+
+
+## Part 3: town events, the favor board, opened places, visitable houses.
+func test_town_content() -> void:
+	const Fav := preload("res://src/core/town/favors.gd")
+	check(db()["story/town_events"]["stories"].size() >= 15, "at least 15 town events (%d)" % db()["story/town_events"]["stories"].size())
+	for s in db()["story/town_events"]["stories"]:
+		var ev: Dictionary = s["steps"][0].get("event", {})
+		check(ev.get("choices", []).size() >= 2, "%s has a choice" % s["id"])
+	check(Fav.all(db()).size() >= 15, "at least 15 favors")
+	var run := run_()
+	var b1 := Fav.board(db(), run, 2, seeded(1))
+	check(b1.size() == int(db()["town/favors"]["perWeek"]) and Fav.board(db(), run, 2, seeded(9)) == b1, "the board is posted once a week")
+	Fav.board(db(), run, 3, seeded(2))
+	check(int(run["favorBoard"]["week"]) == 3 and run["favorBoard"]["done"].is_empty(), "a new week posts a fresh board")
+	var run2 := run_()
+	var board2 := Fav.board(db(), run2, 2, seeded(1))
+	Fav.complete(run2, str(board2[0]))
+	check(not Fav.board(db(), run2, 2, seeded(1)).has(str(board2[0])), "a done favor comes off the board")
+	var opened := 0
+	for id in ["train_station", "town_museum", "movie_theater"]:
+		if str(Locs.rec(db(), id).get("status", "")) == "OPEN":
+			opened += 1
+	check(opened == 3, "the station, museum and theater are open")
+	check(Locs.closed_reason(db(), run_(), "train_station", 2, "after_school") != "" and Locs.closed_reason(db(), run_(), "train_station", 3, "after_school") == "", "the station opens in week 3")
+	var houses := 0
+	for l in db()["town/locations"]["locations"]:
+		if l.has("visitBond"):
+			houses += 1
+	check(houses >= 4, "at least 4 visitable houses (%d)" % houses)
+	var friend := run_()
+	check(Locs.door(db(), friend, "theo_house", 2, "tue", "after_school", 3)["kind"] != "enter", "a stranger's house stays shut")
+	friend["bonds"]["theo"] = 50.0
+	check(Locs.door(db(), friend, "theo_house", 2, "tue", "after_school", 3)["kind"] == "enter", "at Friend Bond you can visit")

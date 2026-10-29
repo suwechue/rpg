@@ -251,6 +251,462 @@
       "at": {
         "loc": "hospital"
       }
+    },
+    {
+      "id": "t1_truck",
+      "inline": true,
+      "trigger": {
+        "week": 1,
+        "day": "thu",
+        "part": "after_school"
+      },
+      "steps": [
+        {
+          "type": "event",
+          "event": {
+            "title": "A broken-down truck",
+            "text": "A produce truck has died in the middle of Main Street. The driver, Mo, is staring at the engine like it owes him money.",
+            "choices": [
+              {
+                "label": "Help push it to the curb (1 AP)",
+                "effects": {
+                  "ap": -1,
+                  "bond": {
+                    "mo": 5
+                  },
+                  "money": 5,
+                  "statXp": {
+                    "str": 1
+                  }
+                },
+                "result": "It moves. Mo pays you in cash and one very bruised apple."
+              },
+              {
+                "label": "Direct traffic around it",
+                "effects": {
+                  "bond": {
+                    "mo": 2
+                  },
+                  "statXp": {
+                    "cha": 1
+                  }
+                },
+                "result": "Three honks, one wave, zero accidents."
+              }
+            ]
+          }
+        }
+      ],
+      "at": {
+        "zone": "downtown"
+      }
+    },
+    {
+      "id": "t1_dog",
+      "inline": true,
+      "trigger": {
+        "week": 1,
+        "day": "sat",
+        "part": "morning"
+      },
+      "steps": [
+        {
+          "type": "event",
+          "event": {
+            "title": "A lost dog",
+            "text": "A scruffy dog with no collar follows you for two blocks, then sits and stares at the woods.",
+            "choices": [
+              {
+                "label": "Take it to the vet at the hospital",
+                "effects": {
+                  "bond": {
+                    "patti": 3
+                  },
+                  "narratorBond": 1
+                },
+                "result": "Patti knows the dog. 'That's Biscuit. He's been missing since Tuesday. Same day as the Hendersons' kid.'"
+              },
+              {
+                "label": "Follow where it's looking",
+                "effects": {
+                  "signature": {
+                    "motion": 2
+                  },
+                  "clue": "woods_last_seen"
+                },
+                "result": "At the treeline the dog whines and won't go further. Neither, you decide, will you."
+              }
+            ]
+          }
+        }
+      ],
+      "at": {
+        "zone": "residential"
+      }
+    },
+    {
+      "id": "t2_arcade",
+      "inline": true,
+      "trigger": {
+        "week": 2,
+        "day": "wed",
+        "part": "after_school"
+      },
+      "steps": [
+        {
+          "type": "event",
+          "event": {
+            "title": "High score battle",
+            "text": "Jon and Dex are locked in a battle for the top score on the old fighting cabinet. They both look at you.",
+            "choices": [
+              {
+                "label": "Back Dex",
+                "effects": {
+                  "bond": {
+                    "dex": 4,
+                    "jon": -2
+                  }
+                },
+                "result": "Dex wins by a frame. He will never let anyone forget it."
+              },
+              {
+                "label": "Back Jon",
+                "effects": {
+                  "bond": {
+                    "jon": 4,
+                    "dex": -2
+                  }
+                },
+                "result": "Jon wins and explains frame data for nine minutes."
+              },
+              {
+                "label": "Challenge the winner (1 AP)",
+                "effects": {
+                  "ap": -1,
+                  "bond": {
+                    "dex": 2,
+                    "jon": 2
+                  },
+                  "statXp": {
+                    "dex": 2
+                  }
+                },
+                "result": "You lose. Respectably. They both respect it."
+              }
+            ]
+          }
+        }
+      ],
+      "at": {
+        "loc": "arcade"
+      }
+    },
+    {
+      "id": "t2_mansion",
+      "inline": true,
+      "trigger": {
+        "week": 2,
+        "day": "fri",
+        "part": "after_school"
+      },
+      "steps": [
+        {
+          "type": "event",
+          "event": {
+            "title": "Something moved",
+            "text": "A curtain in the abandoned mansion's upstairs window moves. There's no wind. It moves again.",
+            "choices": [
+              {
+                "label": "Watch for a while",
+                "effects": {
+                  "signature": {
+                    "light": 2
+                  },
+                  "narratorBond": 1,
+                  "flag": "mansion_watched"
+                },
+                "result": "A shape at the window. It's holding a lantern. Kelly has a lantern like that."
+              },
+              {
+                "label": "Leave. Now.",
+                "effects": {
+                  "statXp": {
+                    "wil": 1
+                  }
+                },
+                "result": "You leave. You don't look back. Mostly."
+              }
+            ]
+          }
+        }
+      ],
+      "at": {
+        "loc": "abandoned_mansion"
+      }
+    },
+    {
+      "id": "t2_market_fire",
+      "inline": true,
+      "trigger": {
+        "week": 2,
+        "day": "sat",
+        "part": "midday"
+      },
+      "steps": [
+        {
+          "type": "event",
+          "event": {
+            "title": "Sparks at the market",
+            "text": "A stall's grill flares up at the farmers market. Flames lick the awning.",
+            "choices": [
+              {
+                "label": "Smother it",
+                "effects": {
+                  "statXp": {
+                    "con": 1
+                  },
+                  "bond": {
+                    "gary": 2
+                  },
+                  "signature": {
+                    "heat": -2
+                  }
+                },
+                "result": "Out. Your sleeve smells like smoke all day."
+              },
+              {
+                "label": "Get the extinguisher from the deli",
+                "effects": {
+                  "bond": {
+                    "gary": 3
+                  },
+                  "statXp": {
+                    "dex": 1
+                  }
+                },
+                "result": "Gary hands it over without a word. Then a sandwich, also without a word."
+              }
+            ]
+          }
+        }
+      ],
+      "at": {
+        "zone": "downtown"
+      }
+    },
+    {
+      "id": "t3_train",
+      "inline": true,
+      "trigger": {
+        "week": 3,
+        "day": "mon",
+        "part": "after_school"
+      },
+      "steps": [
+        {
+          "type": "event",
+          "event": {
+            "title": "The station opens",
+            "text": "The train station's lights are on for the first time in years. A traveling vendor is setting up a table of odd trinkets.",
+            "choices": [
+              {
+                "label": "Browse",
+                "effects": {
+                  "statXp": {
+                    "per": 1
+                  },
+                  "flag": "met_vendor"
+                },
+                "result": "\"Everything here has a story,\" she says. \"Most of them end badly. That's why they're cheap.\""
+              },
+              {
+                "label": "Ask about the trains",
+                "effects": {
+                  "clue": "thirty_year_train",
+                  "flag": "met_vendor"
+                },
+                "result": "\"The last train out ran thirty years ago. Same night the fountain did.\""
+              }
+            ]
+          }
+        }
+      ],
+      "at": {
+        "loc": "train_station"
+      }
+    },
+    {
+      "id": "t3_school_play",
+      "inline": true,
+      "trigger": {
+        "week": 3,
+        "day": "thu",
+        "part": "period_2"
+      },
+      "steps": [
+        {
+          "type": "event",
+          "event": {
+            "title": "Rehearsal in the square",
+            "text": "Mr. Mustard has the drama club rehearsing in the town square during class. He sees you. He does not seem surprised.",
+            "choices": [
+              {
+                "label": "Join in",
+                "effects": {
+                  "bond": {
+                    "priya": 3
+                  },
+                  "statXp": {
+                    "cha": 2
+                  }
+                },
+                "result": "You play a tree. A very good tree. Mr. Mustard nods."
+              },
+              {
+                "label": "Pretend you're on an errand",
+                "effects": {
+                  "statXp": {
+                    "wil": 1
+                  }
+                },
+                "result": "\"Of course you are,\" says Mr. Mustard, to no one."
+              }
+            ]
+          }
+        }
+      ],
+      "at": {
+        "zone": "downtown"
+      }
+    },
+    {
+      "id": "t4_power",
+      "inline": true,
+      "trigger": {
+        "week": 4,
+        "day": "tue",
+        "part": "evening"
+      },
+      "steps": [
+        {
+          "type": "event",
+          "event": {
+            "title": "Power cut",
+            "text": "Every light in town goes out at once. For eleven seconds, the only light is from the woods.",
+            "choices": [
+              {
+                "label": "Count the seconds",
+                "effects": {
+                  "statXp": {
+                    "per": 1
+                  },
+                  "clue": "feather_hangs"
+                },
+                "result": "Eleven. Exactly eleven. Like it was timed."
+              },
+              {
+                "label": "Check on your guardian",
+                "effects": {
+                  "statXp": {
+                    "wil": 1
+                  }
+                },
+                "result": "They're fine, holding a flashlight that doesn't work either."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "t4_museum",
+      "inline": true,
+      "trigger": {
+        "week": 4,
+        "day": "sat",
+        "part": "morning"
+      },
+      "steps": [
+        {
+          "type": "event",
+          "event": {
+            "title": "The founder's exhibit",
+            "text": "The museum's new exhibit: the town founder's desk, his journal behind glass, and a model of the fountain with a crack in it.",
+            "choices": [
+              {
+                "label": "Read the journal page",
+                "effects": {
+                  "clue": "founder_fountain",
+                  "statXp": {
+                    "int": 1
+                  }
+                },
+                "result": "'It must run once every thirty years. If it does not, we pay another way.'"
+              },
+              {
+                "label": "Study the model",
+                "effects": {
+                  "statXp": {
+                    "per": 2
+                  }
+                },
+                "result": "The crack in the model matches the one on the real fountain. Exactly."
+              }
+            ]
+          }
+        }
+      ],
+      "at": {
+        "loc": "town_museum"
+      }
+    },
+    {
+      "id": "t5_curfew_talk",
+      "inline": true,
+      "trigger": {
+        "week": 5,
+        "day": "wed",
+        "part": "after_school"
+      },
+      "steps": [
+        {
+          "type": "event",
+          "event": {
+            "title": "A town meeting",
+            "text": "The Mayor holds an emergency meeting about 'recent events'. Half the town is there. Nobody says the word 'woods'.",
+            "choices": [
+              {
+                "label": "Say the word 'woods'",
+                "effects": {
+                  "bond": {
+                    "mayor": -5
+                  },
+                  "statXp": {
+                    "cha": 2
+                  },
+                  "signature": {
+                    "light": 2
+                  }
+                },
+                "result": "Silence. Then twenty people start talking at once."
+              },
+              {
+                "label": "Listen",
+                "effects": {
+                  "statXp": {
+                    "per": 1
+                  },
+                  "clue": "mayor_meetings"
+                },
+                "result": "The Mayor checks his phone twice. Both times, Mr. B is standing at the back."
+              }
+            ]
+          }
+        }
+      ],
+      "at": {
+        "zone": "downtown"
+      }
     }
   ]
 }

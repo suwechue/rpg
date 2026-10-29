@@ -373,6 +373,24 @@
             }
           },
           "say": "Lost cat. Bake sale. A flyer about the pep rally with one face scratched out."
+        },
+        {
+          "label": "Browse the farmers market (1 AP)",
+          "ap": 1,
+          "parts": [
+            "morning"
+          ],
+          "cond": {
+            "day": "sat"
+          },
+          "weekend": true,
+          "effects": {
+            "item": "good_coffee",
+            "statXp": {
+              "per": 1
+            }
+          },
+          "say": "Honey, jam, and a stall selling 'antique' trinkets that are definitely from the 90s."
         }
       ],
       "futureHook": "Notice board for side quests, weekly town events"
@@ -440,6 +458,13 @@
             }
           },
           "say": "Twelve sandwiches, one Gary, no time. You're the rush now."
+        },
+        {
+          "label": "Check the favor board",
+          "ap": 0,
+          "board": true,
+          "effects": {},
+          "say": ""
         }
       ],
       "doorLine": "The sign says CLOSED. The smell says otherwise.",
@@ -570,6 +595,30 @@
             }
           },
           "say": "High score: DEX. Second place: also DEX, it's the same kid."
+        },
+        {
+          "label": "Enter the arcade tournament (2 AP)",
+          "ap": 2,
+          "parts": [
+            "afternoon"
+          ],
+          "cond": {
+            "day": "sat",
+            "week": 3
+          },
+          "minigame": "precision",
+          "weekend": true,
+          "effects": {
+            "money": 15,
+            "bond": {
+              "jon": 3,
+              "dex": 3
+            },
+            "statXp": {
+              "dex": 2
+            }
+          },
+          "say": "Jon in the semifinal, Dex in the final. The crowd is four people and a mop."
         }
       ],
       "doorLine": "The arcade's shutter is down. A machine inside plays its attract tune to nobody.",
@@ -723,21 +772,65 @@
       "id": "movie_theater",
       "name": "Movie theater",
       "zone": "downtown",
-      "status": "CLOSED",
+      "status": "OPEN",
       "kind": "building",
       "doorLine": "Closed for renovations. The marquee still says the last film's title, but the letters keep changing.",
-      "futureHook": "Future content"
+      "futureHook": "Future content",
+      "hours": [
+        "weekend_evening",
+        "evening"
+      ],
+      "activities": [
+        {
+          "label": "See a movie with friends (2 AP)",
+          "ap": 2,
+          "movie": true,
+          "effects": {},
+          "say": "A horror double feature. Nobody admits they jumped. Everybody jumped."
+        }
+      ]
     },
     {
       "id": "town_museum",
       "name": "Town museum",
       "zone": "downtown",
-      "status": "CLOSED",
+      "status": "OPEN",
       "kind": "building",
       "doorLine": "\"Reopening soon.\" The sign has been reopening soon since 1994.",
       "futureHook": "Town history and Upside-Down lore",
       "openFromWeek": 3,
-      "lockedLine": "Not yet. Come back in week 3."
+      "lockedLine": "Not yet. Come back in week 3.",
+      "hours": [
+        "@schoolHours",
+        "morning",
+        "midday",
+        "afternoon"
+      ],
+      "activities": [
+        {
+          "label": "Study the founder exhibit (1 AP)",
+          "ap": 1,
+          "effects": {
+            "clue": "founder_fountain",
+            "statXp": {
+              "int": 1
+            }
+          },
+          "say": "The founder's journal is behind glass. One line is underlined in pencil: 'once every thirty years'."
+        },
+        {
+          "label": "Solve the exhibit puzzle (2 AP)",
+          "ap": 2,
+          "minigame": "alignment",
+          "effects": {
+            "money": 10,
+            "statXp": {
+              "int": 2
+            }
+          },
+          "say": "A brass lock on the model fountain clicks open. Inside: a tiny key, and a museum gift card."
+        }
+      ]
     },
     {
       "id": "post_office",
@@ -772,6 +865,13 @@
             }
           },
           "say": "Three letters are addressed to people who moved away thirty years ago."
+        },
+        {
+          "label": "Check the favor board",
+          "ap": 0,
+          "board": true,
+          "effects": {},
+          "say": ""
         }
       ]
     },
@@ -814,7 +914,25 @@
       "residents": [
         "theo"
       ],
-      "doorLine": "A telescope in the upstairs window points at the woods, not the sky."
+      "doorLine": "A telescope in the upstairs window points at the woods, not the sky.",
+      "visitBond": 41,
+      "interior": "home",
+      "visit": {
+        "title": "Theo's room",
+        "text": "Every wall is graph paper. In the middle, a map of the town with the woods circled seven times.",
+        "choices": [
+          {
+            "label": "Look around",
+            "effects": {
+              "bond": {
+                "theo": 4
+              },
+              "item": "squad_ribbon"
+            },
+            "result": "They pretend not to watch you look."
+          }
+        ]
+      }
     },
     {
       "id": "mara_house",
@@ -825,7 +943,25 @@
       "residents": [
         "mara"
       ],
-      "doorLine": "The garage door is a mural of the town at night. One window in the mural is lit."
+      "doorLine": "The garage door is a mural of the town at night. One window in the mural is lit.",
+      "visitBond": 41,
+      "interior": "home",
+      "visit": {
+        "title": "Mara's room",
+        "text": "Paintings everywhere. One of them is a door, and it's slightly open.",
+        "choices": [
+          {
+            "label": "Look around",
+            "effects": {
+              "bond": {
+                "mara": 4
+              },
+              "item": "squad_ribbon"
+            },
+            "result": "They pretend not to watch you look."
+          }
+        ]
+      }
     },
     {
       "id": "dex_house",
@@ -836,7 +972,25 @@
       "residents": [
         "dex"
       ],
-      "doorLine": "A whoopee cushion sits on the doormat. You step around it. It was a decoy. There's a second one."
+      "doorLine": "A whoopee cushion sits on the doormat. You step around it. It was a decoy. There's a second one.",
+      "visitBond": 41,
+      "interior": "home",
+      "visit": {
+        "title": "Dex's room",
+        "text": "A pyramid of soda cans, a broken controller shrine, and a photo of Dex with a dad nobody's met.",
+        "choices": [
+          {
+            "label": "Look around",
+            "effects": {
+              "bond": {
+                "dex": 4
+              },
+              "item": "good_coffee"
+            },
+            "result": "They pretend not to watch you look."
+          }
+        ]
+      }
     },
     {
       "id": "jon_house",
@@ -1018,7 +1172,25 @@
         "kelly"
       ],
       "doorLine": "Big, quiet and too clean. The doorbell plays three notes, then stops politely.",
-      "futureHook": "Planned interior (story-heavy)"
+      "futureHook": "Planned interior (story-heavy)",
+      "visitBond": 41,
+      "interior": "home",
+      "visit": {
+        "title": "Kelly's room",
+        "text": "Trophies, a mirror, and under the bed a box of drawings she did as a kid: all of them of the woods.",
+        "choices": [
+          {
+            "label": "Look around",
+            "effects": {
+              "bond": {
+                "kelly": 4
+              },
+              "item": "good_coffee"
+            },
+            "result": "They pretend not to watch you look."
+          }
+        ]
+      }
     },
     {
       "id": "priya_house",
@@ -1029,7 +1201,25 @@
       "residents": [
         "priya"
       ],
-      "doorLine": "Debate trophies in the window, arranged by year and margin of victory."
+      "doorLine": "Debate trophies in the window, arranged by year and margin of victory.",
+      "visitBond": 41,
+      "interior": "home",
+      "visit": {
+        "title": "Priya's room",
+        "text": "Ribbons, trophies, and a whiteboard with the town's records copied out in neat columns.",
+        "choices": [
+          {
+            "label": "Look around",
+            "effects": {
+              "bond": {
+                "priya": 4
+              },
+              "item": "squad_ribbon"
+            },
+            "result": "They pretend not to watch you look."
+          }
+        ]
+      }
     },
     {
       "id": "baxter_house",
@@ -1198,6 +1388,26 @@
             }
           },
           "say": "The woods breathe. Somebody nearby is narrating your every move. Out loud."
+        },
+        {
+          "label": "Pickup game with Coach Byrne's team (2 AP)",
+          "ap": 2,
+          "parts": [
+            "morning",
+            "midday",
+            "afternoon"
+          ],
+          "weekend": true,
+          "effects": {
+            "statXp": {
+              "str": 1,
+              "dex": 1
+            },
+            "bond": {
+              "coach_byrne": 2
+            }
+          },
+          "say": "Coach Byrne referees. Coach Byrne also plays. Coach Byrne wins."
         }
       ],
       "futureHook": "Upside-Down entrance; PER training"
@@ -1248,10 +1458,32 @@
       "id": "train_station",
       "name": "Train station",
       "zone": "outskirts",
-      "status": "CLOSED",
+      "status": "OPEN",
       "kind": "building",
       "doorLine": "Service suspended until further notice. The departures board still flickers.",
-      "futureHook": "Leaving town, new regions, Todd's disappearances (maybe)"
+      "futureHook": "Leaving town, new regions, Todd's disappearances (maybe)",
+      "openFromWeek": 3,
+      "hours": [
+        "after_school",
+        "morning",
+        "midday",
+        "afternoon"
+      ],
+      "lockedLine": "The station's dark. A sign: SERVICE RESUMES SOON. It's been 'soon' for thirty years.",
+      "shop": "train_vendor",
+      "activities": [
+        {
+          "label": "Ask the vendor about the old line (1 AP)",
+          "ap": 1,
+          "effects": {
+            "clue": "thirty_year_train",
+            "statXp": {
+              "per": 1
+            }
+          },
+          "say": "\"Last train out. Same night as the fountain. Nobody came back on it.\""
+        }
+      ]
     },
     {
       "id": "abandoned_mansion",
@@ -1260,7 +1492,7 @@
       "status": "CLOSED",
       "kind": "building",
       "gated": true,
-      "doorLine": "The gate is chained. The mansion watches the town from the hill like it's waiting for its cue.",
+      "doorLine": "Locked. Behind the door, something moves, then stops, like it's listening too.",
       "futureHook": "Deep Upside-Down history and Mr. B's past"
     },
     {

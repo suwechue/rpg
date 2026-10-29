@@ -1,0 +1,323 @@
+{
+  "comment": "TL Part 3: the favor board (post office and Gary's Deli). perWeek favors are posted each week (seeded); each has hours, an AP cost, effects and the person it helps. Doing one takes it off the board.",
+  "perWeek": 6,
+  "favors": [
+    {
+      "id": "fav_deliver_meds",
+      "name": "Deliver medicine",
+      "text": "Patti needs a prescription taken to the Elm apartments.",
+      "hours": [
+        "after_school",
+        "@schoolHours",
+        "morning"
+      ],
+      "ap": 1,
+      "effects": {
+        "money": 6,
+        "bond": {
+          "patti": 3
+        }
+      },
+      "for": "patti"
+    },
+    {
+      "id": "fav_lost_cat",
+      "name": "Find Mr. Whiskers",
+      "text": "A cat answering to nothing is lost near the park.",
+      "hours": [
+        "after_school",
+        "morning",
+        "midday"
+      ],
+      "ap": 2,
+      "effects": {
+        "money": 8,
+        "statXp": {
+          "per": 1
+        }
+      },
+      "for": "walt"
+    },
+    {
+      "id": "fav_fix_bike",
+      "name": "Fix a bike chain",
+      "text": "A kid's bike chain keeps slipping.",
+      "hours": [
+        "after_school",
+        "midday"
+      ],
+      "ap": 1,
+      "effects": {
+        "money": 5,
+        "statXp": {
+          "dex": 1
+        }
+      },
+      "for": ""
+    },
+    {
+      "id": "fav_tutor",
+      "name": "Tutor a freshman",
+      "text": "Someone is failing Physics. Badly.",
+      "hours": [
+        "after_school",
+        "lunch"
+      ],
+      "ap": 2,
+      "effects": {
+        "money": 10,
+        "statXp": {
+          "int": 1
+        }
+      },
+      "for": ""
+    },
+    {
+      "id": "fav_paint_fence",
+      "name": "Paint a fence",
+      "text": "Old Mrs. Abbott's fence, white, today.",
+      "hours": [
+        "morning",
+        "midday",
+        "afternoon"
+      ],
+      "ap": 2,
+      "effects": {
+        "money": 12,
+        "statXp": {
+          "str": 1
+        }
+      },
+      "for": ""
+    },
+    {
+      "id": "fav_forge_coal",
+      "name": "Haul coal to the forge",
+      "text": "The blacksmith's coal delivery is stuck at the station.",
+      "hours": [
+        "@schoolHours",
+        "after_school",
+        "morning"
+      ],
+      "ap": 2,
+      "effects": {
+        "money": 6,
+        "bond": {
+          "blacksmith": 3
+        },
+        "item": "ore_iron"
+      },
+      "for": "blacksmith"
+    },
+    {
+      "id": "fav_mail_run",
+      "name": "Mo's cross-town run",
+      "text": "Mo needs three parcels in three zones before noon.",
+      "hours": [
+        "@schoolHours",
+        "morning"
+      ],
+      "ap": 2,
+      "effects": {
+        "money": 12,
+        "bond": {
+          "mo": 4
+        }
+      },
+      "for": "mo"
+    },
+    {
+      "id": "fav_library_shelve",
+      "name": "Reshelve the returns",
+      "text": "Ms. Marlowe's return cart is overflowing.",
+      "hours": [
+        "@schoolHours",
+        "after_school",
+        "midday"
+      ],
+      "ap": 1,
+      "effects": {
+        "money": 4,
+        "bond": {
+          "ms_marlowe": 3
+        }
+      },
+      "for": "ms_marlowe"
+    },
+    {
+      "id": "fav_store_count",
+      "name": "Count stock at the corner store",
+      "text": "Rae needs help with inventory. She'll pay in snacks.",
+      "hours": [
+        "@schoolHours",
+        "after_school"
+      ],
+      "ap": 1,
+      "effects": {
+        "item": "squad_ribbon",
+        "bond": {
+          "rae": 3
+        }
+      },
+      "for": "rae"
+    },
+    {
+      "id": "fav_pigeons",
+      "name": "Feed the pigeons",
+      "text": "Walt can't make it today. The pigeons have opinions.",
+      "hours": [
+        "@schoolHours",
+        "morning"
+      ],
+      "ap": 1,
+      "effects": {
+        "bond": {
+          "walt": 4
+        },
+        "narratorBond": 1
+      },
+      "for": "walt"
+    },
+    {
+      "id": "fav_poster",
+      "name": "Put up event posters",
+      "text": "The student council needs posters on every block.",
+      "hours": [
+        "after_school",
+        "morning"
+      ],
+      "ap": 1,
+      "effects": {
+        "money": 5,
+        "statXp": {
+          "cha": 1
+        }
+      },
+      "for": ""
+    },
+    {
+      "id": "fav_garden",
+      "name": "Weed a vegetable patch",
+      "text": "The community garden is losing to the weeds.",
+      "hours": [
+        "morning",
+        "midday"
+      ],
+      "ap": 2,
+      "effects": {
+        "money": 8,
+        "statXp": {
+          "con": 1
+        }
+      },
+      "for": ""
+    },
+    {
+      "id": "fav_deli_dishes",
+      "name": "Wash dishes at the deli",
+      "text": "Gary's dishwasher quit. The machine, not a person.",
+      "hours": [
+        "after_school",
+        "evening",
+        "weekend_evening"
+      ],
+      "ap": 1,
+      "effects": {
+        "money": 7,
+        "bond": {
+          "gary": 2
+        }
+      },
+      "for": "gary"
+    },
+    {
+      "id": "fav_hospital_read",
+      "name": "Read to a patient",
+      "text": "A kid in the ward wants someone to read comics aloud.",
+      "hours": [
+        "after_school",
+        "morning",
+        "midday"
+      ],
+      "ap": 1,
+      "effects": {
+        "bond": {
+          "dr_reyes": 2
+        },
+        "statXp": {
+          "cha": 1
+        }
+      },
+      "for": "dr_reyes"
+    },
+    {
+      "id": "fav_museum_label",
+      "name": "Fix museum labels",
+      "text": "Half the exhibit labels are upside down. On purpose?",
+      "hours": [
+        "morning",
+        "midday",
+        "@schoolHours"
+      ],
+      "ap": 1,
+      "effects": {
+        "money": 6,
+        "clue": "founder_fountain"
+      },
+      "for": ""
+    },
+    {
+      "id": "fav_ore_scrap",
+      "name": "Sort the scrap pile",
+      "text": "The forge's scrap pile hides good iron, if you look.",
+      "hours": [
+        "@schoolHours",
+        "after_school"
+      ],
+      "ap": 2,
+      "effects": {
+        "item": "ore_iron",
+        "statXp": {
+          "per": 1
+        }
+      },
+      "for": "blacksmith"
+    },
+    {
+      "id": "fav_officer_errand",
+      "name": "An errand for Officer Pruitt",
+      "text": "She needs a report dropped at the town hall. She won't ask why you're free.",
+      "hours": [
+        "@schoolHours"
+      ],
+      "ap": 1,
+      "effects": {
+        "money": 4,
+        "bond": {
+          "officer_pruitt": 4
+        }
+      },
+      "for": "officer_pruitt"
+    },
+    {
+      "id": "fav_ellis_papers",
+      "name": "Grade papers for Mr. Ellis",
+      "text": "He has a stack of quizzes and no will to live.",
+      "hours": [
+        "@schoolHours",
+        "evening"
+      ],
+      "ap": 1,
+      "effects": {
+        "money": 6,
+        "bond": {
+          "mr_ellis": 3
+        },
+        "statXp": {
+          "int": 1
+        }
+      },
+      "for": "mr_ellis"
+    }
+  ]
+}

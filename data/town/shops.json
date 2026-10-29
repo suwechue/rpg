@@ -1,68 +1,329 @@
 {
   "comment": "Opening a shop costs 1 AP per visit. Entries: service (applied now), card (into your collection and deck), item (inventory; equipment auto-equips if the slot is empty). Price = base x (1 + keeper Greed / 200) x (1 - (CHA - 5) x 0.02).",
-  "rules": { "visitAp": 1, "sellShare": 0.5, "chaStep": 0.02, "chaPivot": 5, "greedDivisor": 200 },
+  "rules": {
+    "visitAp": 1,
+    "sellShare": 0.5,
+    "chaStep": 0.02,
+    "chaPivot": 5,
+    "greedDivisor": 200
+  },
   "shops": [
-    { "id": "deli", "name": "Gary's Deli", "keeper": "gary",
+    {
+      "id": "deli",
+      "name": "Gary's Deli",
+      "keeper": "gary",
       "greeting": "\"You want the good stuff or the MENU stuff?\"",
       "entries": [
-        { "type": "service", "id": "breakfast", "name": "Breakfast special", "price": 4, "effects": { "hp": 8, "mp": 6 }, "say": "Eggs, toast, and a look from Gary that says eat ALL of it." },
-        { "type": "service", "id": "good_stuff", "name": "The Good Stuff (off-menu)", "price": 10, "cond": { "minBond": { "gary": 20 } }, "lockedHint": "Gary Bond 20", "effects": { "hp": 20, "mp": 20, "flag": "fed_good_stuff" }, "say": "Gary slides it over without a word. You feel ready for anything. Even tonight." },
-        { "type": "card", "card": "card_deli_sandwich", "price": 6, "name": "Gary's Sandwich (combat item)" },
-        { "type": "item", "item": "good_coffee", "price": 5 },
-        { "type": "item", "item": "baked_goods", "price": 4 }
-      ] },
-    { "id": "forge", "name": "The Forge", "keeper": "blacksmith",
+        {
+          "type": "service",
+          "id": "breakfast",
+          "name": "Breakfast special",
+          "price": 4,
+          "effects": {
+            "hp": 8,
+            "mp": 6
+          },
+          "say": "Eggs, toast, and a look from Gary that says eat ALL of it."
+        },
+        {
+          "type": "service",
+          "id": "good_stuff",
+          "name": "The Good Stuff (off-menu)",
+          "price": 10,
+          "cond": {
+            "minBond": {
+              "gary": 20
+            }
+          },
+          "lockedHint": "Gary Bond 20",
+          "effects": {
+            "hp": 20,
+            "mp": 20,
+            "flag": "fed_good_stuff"
+          },
+          "say": "Gary slides it over without a word. You feel ready for anything. Even tonight."
+        },
+        {
+          "type": "card",
+          "card": "card_deli_sandwich",
+          "price": 6,
+          "name": "Gary's Sandwich (combat item)"
+        },
+        {
+          "type": "item",
+          "item": "good_coffee",
+          "price": 5
+        },
+        {
+          "type": "item",
+          "item": "baked_goods",
+          "price": 4
+        }
+      ]
+    },
+    {
+      "id": "forge",
+      "name": "The Forge",
+      "keeper": "blacksmith",
       "greeting": "\"Look. Don't touch the hot end.\"",
       "entries": [
-        { "type": "item", "item": "iron_knuckles", "price": 25 },
-        { "type": "item", "item": "forged_baton", "price": 50 },
-        { "type": "item", "item": "smith_hammer", "price": 85 },
-        { "type": "item", "item": "padded_jacket", "price": 20 },
-        { "type": "item", "item": "riveted_vest", "price": 45 },
-        { "type": "item", "item": "chainmail_hoodie", "price": 80 },
-        { "type": "item", "item": "ember_charm", "price": 30 },
-        { "type": "item", "item": "frost_charm", "price": 30 },
-        { "type": "item", "item": "rare_ore", "price": 15 }
-      ] },
-    { "id": "hospital", "name": "Hospital pharmacy", "keeper": "patti",
+        {
+          "type": "item",
+          "item": "iron_knuckles",
+          "price": 25
+        },
+        {
+          "type": "item",
+          "item": "forged_baton",
+          "price": 50
+        },
+        {
+          "type": "item",
+          "item": "smith_hammer",
+          "price": 85
+        },
+        {
+          "type": "item",
+          "item": "padded_jacket",
+          "price": 20
+        },
+        {
+          "type": "item",
+          "item": "riveted_vest",
+          "price": 45
+        },
+        {
+          "type": "item",
+          "item": "chainmail_hoodie",
+          "price": 80
+        },
+        {
+          "type": "item",
+          "item": "ember_charm",
+          "price": 30
+        },
+        {
+          "type": "item",
+          "item": "frost_charm",
+          "price": 30
+        },
+        {
+          "type": "item",
+          "item": "rare_ore",
+          "price": 15
+        }
+      ]
+    },
+    {
+      "id": "hospital",
+      "name": "Hospital pharmacy",
+      "keeper": "patti",
       "greeting": "\"Tell you what, you get me the good tea, I'll get you the good gossip.\"",
       "entries": [
-        { "type": "card", "card": "card_first_aid", "price": 12, "name": "First Aid Kit (combat item)" },
-        { "type": "service", "id": "checkup", "name": "Checkup (restore HP)", "price": 8, "effects": { "hp": 999 }, "say": "Dr. Reyes shines a light in your eyes and says 'hm' in a tone you don't love." },
-        { "type": "service", "id": "treat_injuries", "name": "Treat injured friends", "price": 15, "effects": { "healInjuries": true }, "say": "Patti clucks over everyone and sends them home with lollipops." },
-        { "type": "item", "item": "focus_pendant", "price": 40 },
-        { "type": "item", "item": "good_tea", "price": 4 }
-      ] },
-    { "id": "upside_merchant", "name": "A merchant who shouldn't be here", "keeper": "",
+        {
+          "type": "card",
+          "card": "card_first_aid",
+          "price": 12,
+          "name": "First Aid Kit (combat item)"
+        },
+        {
+          "type": "service",
+          "id": "checkup",
+          "name": "Checkup (restore HP)",
+          "price": 8,
+          "effects": {
+            "hp": 999
+          },
+          "say": "Dr. Reyes shines a light in your eyes and says 'hm' in a tone you don't love."
+        },
+        {
+          "type": "service",
+          "id": "treat_injuries",
+          "name": "Treat injured friends",
+          "price": 15,
+          "effects": {
+            "healInjuries": true
+          },
+          "say": "Patti clucks over everyone and sends them home with lollipops."
+        },
+        {
+          "type": "item",
+          "item": "focus_pendant",
+          "price": 40
+        },
+        {
+          "type": "item",
+          "item": "good_tea",
+          "price": 4
+        }
+      ]
+    },
+    {
+      "id": "upside_merchant",
+      "name": "A merchant who shouldn't be here",
+      "keeper": "",
       "greeting": "A figure in a cardigan made of static. \"Cash only. Your cash, from up there. It works down here. Don't ask.\"",
       "entries": [
-        { "type": "card", "card": "card_first_aid", "price": 10, "name": "First Aid Kit (combat item)" },
-        { "type": "card", "card": "card_deli_sandwich", "price": 7, "name": "A sandwich that might be Gary's" },
-        { "type": "service", "id": "mend", "name": "Mend (restore HP and MP)", "price": 12, "effects": { "hp": 999, "mp": 30 } },
-        { "type": "item", "item": "focus_pendant", "price": 38 },
-        { "type": "item", "item": "frost_charm", "price": 26 },
-        { "type": "item", "item": "ember_charm", "price": 26 }
-      ] },
-    { "id": "corner_store", "name": "Corner store (walk-up window)", "keeper": "innocent_bystander",
+        {
+          "type": "card",
+          "card": "card_first_aid",
+          "price": 10,
+          "name": "First Aid Kit (combat item)"
+        },
+        {
+          "type": "card",
+          "card": "card_deli_sandwich",
+          "price": 7,
+          "name": "A sandwich that might be Gary's"
+        },
+        {
+          "type": "service",
+          "id": "mend",
+          "name": "Mend (restore HP and MP)",
+          "price": 12,
+          "effects": {
+            "hp": 999,
+            "mp": 30
+          }
+        },
+        {
+          "type": "item",
+          "item": "focus_pendant",
+          "price": 38
+        },
+        {
+          "type": "item",
+          "item": "frost_charm",
+          "price": 26
+        },
+        {
+          "type": "item",
+          "item": "ember_charm",
+          "price": 26
+        }
+      ]
+    },
+    {
+      "id": "corner_store",
+      "name": "Corner store (walk-up window)",
+      "keeper": "innocent_bystander",
       "greeting": "A tired clerk slides the window open without looking up.",
       "entries": [
-        { "type": "service", "id": "snack", "name": "Snack and a soda", "price": 2, "effects": { "hp": 4, "mp": 2 }, "say": "Crunchy. Fizzy. Restorative, scientifically." },
-        { "type": "item", "item": "good_tea", "price": 4 },
-        { "type": "item", "item": "squad_ribbon", "price": 5 },
-        { "type": "item", "item": "spice_tin", "price": 9 },
-        { "type": "item", "item": "rare_book", "price": 12 },
-        { "type": "item", "item": "theory_text", "price": 10 },
-        { "type": "item", "item": "sketchbook", "price": 6 },
-        { "type": "item", "item": "good_notebook", "price": 5 },
-        { "type": "item", "item": "joke_props", "price": 6 },
-        { "type": "item", "item": "sports_gear", "price": 10 },
-        { "type": "item", "item": "basketball", "price": 9 },
-        { "type": "item", "item": "collectible_figure", "price": 9 },
-        { "type": "item", "item": "snack_box", "price": 4 },
-        { "type": "item", "item": "lab_gadget", "price": 12 },
-        { "type": "item", "item": "music_tape", "price": 5 },
-        { "type": "item", "item": "lucky_coin", "price": 35 },
-        { "type": "item", "item": "chain_food", "price": 3 }
-      ] }
+        {
+          "type": "service",
+          "id": "snack",
+          "name": "Snack and a soda",
+          "price": 2,
+          "effects": {
+            "hp": 4,
+            "mp": 2
+          },
+          "say": "Crunchy. Fizzy. Restorative, scientifically."
+        },
+        {
+          "type": "item",
+          "item": "good_tea",
+          "price": 4
+        },
+        {
+          "type": "item",
+          "item": "squad_ribbon",
+          "price": 5
+        },
+        {
+          "type": "item",
+          "item": "spice_tin",
+          "price": 9
+        },
+        {
+          "type": "item",
+          "item": "rare_book",
+          "price": 12
+        },
+        {
+          "type": "item",
+          "item": "theory_text",
+          "price": 10
+        },
+        {
+          "type": "item",
+          "item": "sketchbook",
+          "price": 6
+        },
+        {
+          "type": "item",
+          "item": "good_notebook",
+          "price": 5
+        },
+        {
+          "type": "item",
+          "item": "joke_props",
+          "price": 6
+        },
+        {
+          "type": "item",
+          "item": "sports_gear",
+          "price": 10
+        },
+        {
+          "type": "item",
+          "item": "basketball",
+          "price": 9
+        },
+        {
+          "type": "item",
+          "item": "collectible_figure",
+          "price": 9
+        },
+        {
+          "type": "item",
+          "item": "snack_box",
+          "price": 4
+        },
+        {
+          "type": "item",
+          "item": "lab_gadget",
+          "price": 12
+        },
+        {
+          "type": "item",
+          "item": "music_tape",
+          "price": 5
+        },
+        {
+          "type": "item",
+          "item": "lucky_coin",
+          "price": 35
+        },
+        {
+          "type": "item",
+          "item": "chain_food",
+          "price": 3
+        }
+      ]
+    },
+    {
+      "id": "train_vendor",
+      "name": "The Traveling Vendor",
+      "keeper": "",
+      "greeting": "\"Everything has a story. Most end badly. That's why they're cheap.\"",
+      "entries": [
+        {
+          "type": "item",
+          "item": "frost_charm",
+          "price": 26
+        },
+        {
+          "type": "item",
+          "item": "relic_quicksilver",
+          "price": 40
+        },
+        {
+          "type": "item",
+          "item": "relic_ember_charm",
+          "price": 45
+        }
+      ]
+    }
   ]
 }

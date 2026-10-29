@@ -74,6 +74,11 @@ static func closed_reason(db: Dictionary, run: Dictionary, id: String, week: int
 static func door(db: Dictionary, run: Dictionary, id: String, week: int, day: String, part: String, day_count: int) -> Dictionary:
 	var r := rec(db, id)
 	var st := status(db, run, id)
+	# TL Part 3: a friend's house opens at Friend Bond (not at night).
+	if r.has("visitBond") and part != "night":
+		for npc in r.get("residents", []):
+			if RM.bond(run, str(npc)) >= float(r["visitBond"]):
+				return { "kind": "enter", "npcs": [], "text": "" }
 	var reason := closed_reason(db, run, id, week, part)
 	if reason == "":
 		return { "kind": "walkup" if st == "EXTERIOR" else "enter", "npcs": [], "text": "" }

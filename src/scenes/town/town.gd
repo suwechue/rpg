@@ -14,9 +14,12 @@ const Sched := preload("res://src/core/town/schedule.gd")
 const StoryRules := preload("res://src/core/story/story.gd")
 const Crowd := preload("res://src/core/town/crowd.gd")
 const Truancy := preload("res://src/core/town/truancy.gd")
+const RM_ := preload("res://src/core/run/run_model.gd")
+const Favors := preload("res://src/core/town/favors.gd")
 var _light: CanvasModulate
 var _particles: CPUParticles2D
 var _cars: Array = []
+var _visit_pending: Dictionary = {}
 var TILE: int:
 	get: return Display.tile
 const STEP_TIME := 0.11
@@ -194,6 +197,10 @@ func _load_map(id: String, is_int: bool, loc: String, at: Vector2i) -> void:
 	_camera.make_current()
 	_apply_light()
 	_start_sneak()
+	if not _visit_pending.is_empty():
+		var v := _visit_pending
+		_visit_pending = {}
+		Flow.show_event.call_deferred(v)
 	_spawn_followers()
 	_refresh_people()
 	_save_pos()
@@ -337,6 +344,10 @@ func _on_part_started() -> void:
 
 func _enter_interior(loc: String, zone: String, back_cell: Vector2i) -> void:
 	var r := Locs.rec(DataDB.all(), loc)
+	# TL Part 3: a friend's house: a scene and a gift the first time.
+	if r.has("visit") and not GameState.flag("visited_" + loc):
+		GameState.set_flag("visited_" + loc)
+		_visit_pending = r["visit"]
 	return_zone = zone
 	return_cell = back_cell
 	var tmpl := str(r.get("interior", ""))
@@ -609,6 +620,46 @@ func _spawn_followers() -> void:
 			var line := Crowd.zone_comment(DataDB.all(), str(id), map.map_id)
 			if line != "":
 				_bubble(w, line)
+
+
+## TL Part 3: the favor board.
+func _favor_board() -> void:
+	var db: Dictionary = DataDB.all()
+	var rng := Sched.day_rng(GameState.run, "favors", int(GameState.run.get("day_count", 0)))
+	var m := Modal.new()
+	m.build(Strings.t("favor.title"), Display.base.x * 0.62)
+	var open := Favors.open_now(db, GameState.run, Calendar.week(), Calendar.part_id(), rng)
+	if open.is_empty():
+		m.text(Strings.t("favor.none"), UiTheme.DIM)
+	for id in open:
+		var f := Favors.find(db, str(id))
+		var fid := str(id)
+		m.add_button(Strings.t("favor.row") % [str(f.get("name", fid)), int(f.get("ap", 1)), str(f.get("text", ""))], func() -> void: m.finish(fid), Calendar.ap() < int(f.get("ap", 1)))
+	m.add_button(Strings.t("town.leave"), func() -> void: m.finish(null))
+	var pick: Variant = await Flow.show_modal(m)
+	if pick == null:
+		return
+	var fav := Favors.find(db, str(pick))
+	if not Calendar.spend_ap(int(fav.get("ap", 1)), "favor"):
+		return
+	var lines := GameState.apply_effects(fav.get("effects", {}))
+	Favors.complete(GameState.run, str(pick))
+	Narrator.say((Strings.t("favor.done") % str(fav.get("name", pick))) + " " + " ".join(PackedStringArray(lines)))
+	if _skipping() and Rng.stream("events").randf() < Truancy.risk(db, GameState.run, interior_loc if interior else map_id, _watchers_near()):
+		await _spotted()
+
+
+## TL Part 3: a movie with the two friends you're closest to (Bond for both).
+func _movie() -> void:
+	var friends: Array = []
+	for id in GameState.run.get("bonds", {}):
+		if RM_.bond(GameState.run, str(id)) >= 11.0 and not DataDB.table("npcs/" + str(id)).is_empty() and bool(DataDB.table("npcs/" + str(id)).get("recruitable", false)):
+			friends.append(str(id))
+	friends.sort_custom(func(a: String, b: String) -> bool: return RM_.bond(GameState.run, a) > RM_.bond(GameState.run, b))
+	for id in friends.slice(0, 2):
+		GameState.apply_effects({ "bond": { id: 3 } })
+	if friends.size() >= 2:
+		Narrator.say(Strings.t("movie.pick") % [str(DataDB.table("npcs/" + str(friends[0])).get("name", "")), str(DataDB.table("npcs/" + str(friends[1])).get("name", ""))])
 
 
 ## TL Part 2: is the player out of class right now (a school-hours part, outside the school)?
@@ -1003,10 +1054,25 @@ func location_menu(loc: String) -> void:
 		_save_pos()
 		SceneRouter.goto("res://src/scenes/arena/arena.tscn")
 		return
+	if p.has("act") and bool(p["act"].get("board", false)):
+		await _favor_board()
+		_refresh_people()
+		return
 	if p.has("act"):
 		var act: Dictionary = p["act"]
 		if not Calendar.spend_ap(int(act.get("ap", 1)), "activity:" + loc):
 			return
+		# TL Part 3: some activities play a minigame (the score scales nothing yet: doing it is enough).
+		if act.has("minigame") and not GameState.dev_autoplay:
+			var rec := DataDB.record("minigames", str(act["minigame"]))
+			var mg: Control = (load(str(rec.get("script", "res://src/scenes/minigames/precision_minigame.gd"))) as GDScript).new()
+			mg.set("archetype", str(act["minigame"]))
+			mg.set("title", str(act.get("label", "")))
+			mg.set("hint", str(rec.get("text", "")))
+			add_child(mg)
+			await mg.finished
+		if bool(act.get("movie", false)):
+			await _movie()
 		if int(act.get("money", 0)) > 0:
 			GameState.spend_money(int(act["money"]))
 		var lines := GameState.apply_effects(act.get("effects", {}))

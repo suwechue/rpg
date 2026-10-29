@@ -975,6 +975,18 @@
     "truancy.streak": "Perfect attendance this week: +1 %s.",
     "truancy.attendance": "Attendance: %d classes, %d skipped",
     "truancy.curfew": "Curfew: home by dark (1 less AP tonight).",
-    "truancy.allowance": "Allowance: +$%d."
+    "truancy.allowance": "Allowance: +$%d.",
+    "favor.title": "The favor board",
+    "favor.none": "Nothing posted that you can do right now.",
+    "favor.row": "%s (%d AP): %s",
+    "favor.done": "Favor done: %s",
+    "movie.title": "Who comes along?",
+    "movie.pick": "%s and %s",
+    "paper.title": "The Morning Paper",
+    "paper.headline": "TODAY IN TOWN",
+    "paper.favors": "New on the favor board: %d",
+    "paper.open": "Open today: %s",
+    "paper.rumor": "Word around town: %s",
+    "paper.skipping": "Skipping today, probably: %s"
   }
 }

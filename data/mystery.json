@@ -55,6 +55,11 @@
       "id": "fountain_heart_hint",
       "text": "Under the school, someone drew the fountain with an arrow pointing down.",
       "category": "Upside-Down"
+    },
+    {
+      "id": "thirty_year_train",
+      "text": "The last train left thirty years ago, the night the fountain ran.",
+      "category": "Upside-Down"
     }
   ],
   "deductions": [
