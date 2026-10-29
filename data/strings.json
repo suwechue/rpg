@@ -766,7 +766,7 @@
     "feedback.send": "Save feedback",
     "feedback.cancel": "Cancel",
     "feedback.saved": "Feedback saved: %s",
-    "feedback.button": "Send feedback (F8)",
+    "feedback.button": "Report a bug / send feedback (F8)",
     "demo.thanks_title": "Thanks for playing!",
     "demo.thanks_text": "That's the end of the demo: the first week, and the Hollow Mascot.",
     "demo.combos": "Combos discovered: %d of %d",

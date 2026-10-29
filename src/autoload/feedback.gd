@@ -69,7 +69,7 @@ func save_zip(extra: Dictionary, shot: Image = null) -> String:
 	var files := extra.duplicate()
 	files["version.txt"] = ("%s\n%s\n" % [version(), Engine.get_version_info().get("string", "")]).to_utf8_buffer()
 	files["summary.json"] = JSON.stringify(_summary(), "  ").to_utf8_buffer()
-	for p in [PlayLog.path, SaveSystem.SAVE_PATH]:
+	for p in [PlayLog.path, SaveSystem.SAVE_PATH, "user://logs/godot.log"]:
 		if FileAccess.file_exists(str(p)):
 			files[str(p).get_file()] = FileAccess.get_file_as_bytes(str(p))
 	if shot != null and not shot.is_empty():
