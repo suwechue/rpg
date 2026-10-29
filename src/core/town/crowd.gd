@@ -30,7 +30,7 @@ static func generate(db: Dictionary, run: Dictionary, zone: String, part: String
 	var out: Array = []
 	var axes: Array = db.get("spaces", {}).get("disposition", {}).get("axes", [])
 	var n := 0
-	for kind in ["student", "adult"]:
+	for kind in ["student", "adult", "skipper"]:
 		for i in int(counts(db, zone, part).get(kind, 0)):
 			var disp := {}
 			for a in axes:

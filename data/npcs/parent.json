@@ -3,7 +3,10 @@
   "name": "Your guardian",
   "role": "Parent/Guardian",
   "home": "player_home",
-  "voice": { "id": "voice_default", "pitch": 0.95 },
+  "voice": {
+    "id": "voice_default",
+    "pitch": 0.95
+  },
   "sprite": "npc_parent_walk",
   "portrait": "portrait_parent",
   "startBond": 50,
@@ -20,7 +23,16 @@
   "awayOtherwise": true,
   "schedule": {
     "weekday": {
-      "before_school": "home"
+      "before_school": "home",
+      "period_1": [
+        "home",
+        "post_office"
+      ],
+      "period_2": "home",
+      "period_3": [
+        "home",
+        "corner_store"
+      ]
     },
     "weekend": {
       "morning": "home",

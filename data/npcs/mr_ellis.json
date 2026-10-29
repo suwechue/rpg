@@ -1,0 +1,61 @@
+{
+  "id": "mr_ellis",
+  "name": "Mr. Ellis",
+  "role": "Substitute teacher (on a 'break')",
+  "home": "elm_apartments",
+  "voice": {
+    "id": "voice_default",
+    "pitch": 1.1
+  },
+  "sprite": "npc_mr_ellis_walk",
+  "portrait": "portrait_mr_ellis",
+  "startBond": 0,
+  "disposition": {
+    "courage": 40,
+    "greed": 30,
+    "curiosity": 55,
+    "loyalty": 40,
+    "kindness": 75,
+    "pride": 25
+  },
+  "traits": [],
+  "recruitable": false,
+  "daytime": true,
+  "schedule": {
+    "weekday": {
+      "period_1": "garys_deli",
+      "period_2": "park",
+      "period_3": "library"
+    },
+    "weekend": {}
+  },
+  "greeting": "\"I didn't see you. You didn't see me. Deal?\"",
+  "topics": [
+    {
+      "id": "ellis_cover",
+      "label": "Ask him to cover for you",
+      "tone": {
+        "kindness": 0.8
+      },
+      "line": "If anyone asks, was I in your class?",
+      "baseRisk": 0.1,
+      "goodText": "\"Fine. Once. Don't make it a habit.\"",
+      "badText": "\"Nice try.\"",
+      "outcomes": {
+        "onGood": {
+          "flag": "ellis_covers"
+        }
+      }
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "food"
+    ],
+    "dislikes": [],
+    "likeText": "\"Oh. Thanks. Really.\""
+  },
+  "hangouts": [
+    "You sit with Mr. for a while. Nobody asks why you're not in school."
+  ]
+}

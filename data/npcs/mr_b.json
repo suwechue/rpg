@@ -3,7 +3,10 @@
   "name": "Mr. B",
   "role": "Vice principal",
   "home": "mr_b_house",
-  "voice": { "id": "voice_mr_b", "pitch": 0.75 },
+  "voice": {
+    "id": "voice_mr_b",
+    "pitch": 0.75
+  },
   "sprite": "npc_mr_b_walk",
   "portrait": "portrait_mr_b",
   "startBond": -20,
@@ -38,7 +41,10 @@
     "weekday": {
       "before_school": "admin_office",
       "lunch": "admin_office",
-      "after_school": "admin_office"
+      "after_school": "admin_office",
+      "period_1": "admin_office",
+      "period_2": "admin_office",
+      "period_3": "admin_office"
     },
     "weekend": {
       "morning": "town_hall",

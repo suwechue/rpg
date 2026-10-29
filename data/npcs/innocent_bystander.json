@@ -3,7 +3,10 @@
   "name": "Innocent Bystander",
   "role": "Townsperson",
   "home": "bystander_house",
-  "voice": { "id": "voice_default", "pitch": 0.94 },
+  "voice": {
+    "id": "voice_default",
+    "pitch": 0.94
+  },
   "sprite": "npc_innocent_bystander_walk",
   "portrait": "portrait_innocent_bystander",
   "startBond": 0,
@@ -21,7 +24,10 @@
     "weekday": {
       "before_school": "town_square",
       "lunch": "town_square",
-      "after_school": "town_square"
+      "after_school": "town_square",
+      "period_1": "town_square",
+      "period_2": "park",
+      "period_3": "town_square"
     },
     "weekend": {
       "morning": "town_square",

@@ -145,3 +145,7 @@ The wealthy end of town, which overlooks the abandoned mansion.
 - Upside-Down mirrors: the deli, forge, hospital, school field and town square have twisted versions in the matching weeks (DESIGN.md Section 10). Others can be added later by setting `upsideDown: true`.
 - Tiles: Kenney Tiny City for downtown streets and cars, Kenney Tiny Town for houses and nature, Ninja Adventure interiors for the school, deli, hospital, forge and the player's home, and Kenney Tiny Factory for the old factory.
 - Keep the map readable at 480x270: aim for each zone to be about 3 to 6 screens. Hillside and Maple Street can be dense; downtown should feel busy.
+
+## School hours (TL)
+
+During periods 1 to 3 the town is awake for anyone skipping: the deli, library, hospital, forge, corner store, post office, town hall, park, square, bus stops and the hidden alley are open, and the arcade opens in period 3. School rooms stay shut; the hallways become a sneaking area (TL Part 2).

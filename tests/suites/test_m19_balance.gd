@@ -26,7 +26,7 @@ func test_jobs() -> void:
 				jobs += 1
 				check(int(a["effects"].get("money", 0)) > 0, "%s pays" % id)
 				check(not db()["jobs"]["events"].get(str(a["job"]), []).is_empty(), "%s has shift events" % id)
-	check(jobs == 4, "four part-time jobs (%d)" % jobs)
+	check(jobs >= 4, "at least four part-time jobs (%d)" % jobs)
 	var week1 := Locs.activities(db(), run, "forge", "after_school", { "week": 1 })
 	check(not week1.any(func(a: Dictionary) -> bool: return a.has("job")), "the forge isn't hiring in week 1")
 

@@ -3,7 +3,10 @@
   "name": "Dr. Reyes",
   "role": "Hospital doctor",
   "home": "reyes_house",
-  "voice": { "id": "voice_default", "pitch": 1.06 },
+  "voice": {
+    "id": "voice_default",
+    "pitch": 1.06
+  },
   "sprite": "npc_dr_reyes_walk",
   "portrait": "portrait_dr_reyes",
   "startBond": 5,
@@ -21,7 +24,10 @@
   "schedule": {
     "weekday": {
       "lunch": "hospital",
-      "after_school": "hospital"
+      "after_school": "hospital",
+      "period_1": "hospital",
+      "period_2": "hospital",
+      "period_3": "hospital"
     },
     "weekend": {
       "morning": "hospital",

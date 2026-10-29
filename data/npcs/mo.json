@@ -1,0 +1,57 @@
+{
+  "id": "mo",
+  "name": "Mo",
+  "role": "Delivery driver",
+  "home": "elm_apartments",
+  "voice": {
+    "id": "voice_default",
+    "pitch": 1.05
+  },
+  "sprite": "npc_mo_walk",
+  "portrait": "portrait_mo",
+  "startBond": 0,
+  "disposition": {
+    "courage": 50,
+    "greed": 50,
+    "curiosity": 40,
+    "loyalty": 50,
+    "kindness": 60,
+    "pride": 40
+  },
+  "traits": [],
+  "recruitable": false,
+  "daytime": true,
+  "schedule": {
+    "weekday": {
+      "period_1": "post_office",
+      "period_2": "bus_stop_downtown",
+      "period_3": "bus_stop_outskirts",
+      "after_school": "post_office"
+    },
+    "weekend": {}
+  },
+  "greeting": "\"Every street in this town, every day. You notice things.\"",
+  "topics": [
+    {
+      "id": "mo_route",
+      "label": "Ask about the route",
+      "tone": {
+        "curiosity": 0.7
+      },
+      "line": "Seen anything weird on your route?",
+      "baseRisk": 0.1,
+      "goodText": "\"The water tower casts two shadows at noon. One of them points the wrong way.\"",
+      "badText": "\"Just traffic.\""
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "food"
+    ],
+    "dislikes": [],
+    "likeText": "\"Oh. Thanks. Really.\""
+  },
+  "hangouts": [
+    "You sit with Mo for a while. Nobody asks why you're not in school."
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "id": "walt",
+  "name": "Walt",
+  "role": "Retiree in the park",
+  "home": "elm_apartments",
+  "voice": {
+    "id": "voice_default",
+    "pitch": 1.0
+  },
+  "sprite": "npc_walt_walk",
+  "portrait": "portrait_walt",
+  "startBond": 0,
+  "disposition": {
+    "courage": 30,
+    "greed": 10,
+    "curiosity": 60,
+    "loyalty": 70,
+    "kindness": 80,
+    "pride": 20
+  },
+  "traits": [],
+  "recruitable": false,
+  "daytime": true,
+  "schedule": {
+    "weekday": {
+      "period_1": "park",
+      "period_2": "park",
+      "period_3": "park",
+      "before_school": "park"
+    },
+    "weekend": {}
+  },
+  "greeting": "\"Pigeons don't care what day it is. Neither do I, anymore.\"",
+  "topics": [
+    {
+      "id": "walt_fountain",
+      "label": "Ask about the fountain",
+      "tone": {
+        "curiosity": 0.9
+      },
+      "line": "Was the fountain ever on?",
+      "baseRisk": 0.1,
+      "goodText": "\"Thirty years ago it ran for one night. The whole town smelled like rain. Then three kids were gone.\"",
+      "badText": "\"Before your time. Before mine, almost.\"",
+      "outcomes": {
+        "onGood": {
+          "clue": "closed_wing_chart"
+        }
+      }
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "food"
+    ],
+    "dislikes": [],
+    "likeText": "\"Oh. Thanks. Really.\""
+  },
+  "hangouts": [
+    "You sit with Walt for a while. Nobody asks why you're not in school."
+  ]
+}

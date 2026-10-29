@@ -3,7 +3,10 @@
   "name": "The Mayor",
   "role": "Mayor",
   "home": "mayor_residence",
-  "voice": { "id": "voice_default", "pitch": 1.17 },
+  "voice": {
+    "id": "voice_default",
+    "pitch": 1.17
+  },
   "sprite": "npc_mayor_walk",
   "portrait": "portrait_mayor",
   "startBond": 5,
@@ -21,7 +24,10 @@
     "weekday": {
       "before_school": "town_square",
       "lunch": "town_square",
-      "after_school": "town_square"
+      "after_school": "town_square",
+      "period_1": "town_hall",
+      "period_2": "town_hall",
+      "period_3": "town_hall"
     },
     "weekend": {
       "morning": "town_hall",

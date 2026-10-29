@@ -1,0 +1,73 @@
+{
+  "id": "officer_pruitt",
+  "name": "Officer Dana Pruitt",
+  "role": "Truant officer",
+  "home": "elm_apartments",
+  "voice": {
+    "id": "voice_default",
+    "pitch": 0.9
+  },
+  "sprite": "npc_officer_pruitt_walk",
+  "portrait": "portrait_officer_pruitt",
+  "startBond": 0,
+  "disposition": {
+    "courage": 70,
+    "greed": 20,
+    "curiosity": 40,
+    "loyalty": 75,
+    "kindness": 35,
+    "pride": 60
+  },
+  "traits": [],
+  "recruitable": false,
+  "daytime": true,
+  "schedule": {
+    "weekday": {
+      "period_1": "town_square",
+      "period_2": "bus_stop_downtown",
+      "period_3": "park",
+      "after_school": "town_square"
+    },
+    "weekend": {}
+  },
+  "greeting": "\"Shouldn't you be in class?\" She already knows the answer.",
+  "topics": [
+    {
+      "id": "pruitt_rules",
+      "label": "Ask about the rules",
+      "tone": {
+        "loyalty": 0.8
+      },
+      "line": "What happens to kids you catch?",
+      "baseRisk": 0.1,
+      "goodText": "\"Detention. A call home. A long talk with Mr. B, if I'm feeling mean.\"",
+      "badText": "\"You'll find out.\""
+    },
+    {
+      "id": "pruitt_woods",
+      "label": "Ask about the woods",
+      "tone": {
+        "courage": 0.8
+      },
+      "line": "Do you patrol the woods?",
+      "baseRisk": 0.1,
+      "goodText": "\"Not after dark. Nobody does. Not anymore.\"",
+      "badText": "\"Stay out of them.\"",
+      "outcomes": {
+        "onGood": {
+          "clue": "woods_last_seen"
+        }
+      }
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "food"
+    ],
+    "dislikes": [],
+    "likeText": "\"Oh. Thanks. Really.\""
+  },
+  "hangouts": [
+    "You sit with Officer for a while. Nobody asks why you're not in school."
+  ]
+}

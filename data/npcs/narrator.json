@@ -3,7 +3,10 @@
   "name": "The Narrator",
   "role": "The narrator",
   "home": "park",
-  "voice": { "id": "voice_narrator", "pitch": 0.9 },
+  "voice": {
+    "id": "voice_narrator",
+    "pitch": 0.9
+  },
   "sprite": "npc_narrator_walk",
   "portrait": "portrait_narrator",
   "startBond": 0,
@@ -21,7 +24,10 @@
     "weekday": {
       "before_school": "park",
       "lunch": "park",
-      "after_school": "park"
+      "after_school": "park",
+      "period_1": "park",
+      "period_2": "park",
+      "period_3": "park"
     },
     "weekend": {
       "morning": "park",

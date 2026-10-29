@@ -1001,3 +1001,30 @@
 - **The Ms. Nonsense/Baxter/Sam classroom-scheme running gag** — still only represented through callback dialogue lines, not a mechanical system. Flag if you want it built out as an actual minigame/questline instead.
 - **Schoolamon** — sketched as a lunch-period minigame proposal, not fully speced out yet.
 - **The grading system** — only appears as an Easter egg dialogue reference from Ms. G so far.
+
+---
+
+# Daytime townsfolk (TL Part 1)
+
+People you only meet while you're skipping class. Names are placeholders.
+
+## Officer Dana Pruitt (truant officer) — NEW
+**Summary:** Patrols the square, the bus stops and the park during school hours. Not cruel, just thorough; she has a list and you're on it.
+**Where to find her:** town square (period 1), downtown bus stop (period 2), the park (period 3), the square after school.
+**Talks about:** the rules, and why nobody patrols the woods after dark.
+
+## Rae (corner store clerk) — NEW
+**Summary:** Dropped out two years ago, runs the corner store counter, and says out loud the Upside-Down rumors nobody at school will.
+**Where to find her:** the corner store, all day.
+
+## Walt (retiree in the park) — NEW
+**Summary:** Feeds pigeons and remembers the town before the fountain ran its one night, thirty years ago. A mystery lead.
+**Where to find him:** the park, mornings and school hours.
+
+## Mo (delivery driver) — NEW
+**Summary:** Drives every street every day and notices what changes. Gives cross-town errands (TL Part 3).
+**Where to find him:** the post office and the bus stops.
+
+## Mr. Ellis (substitute teacher, on a "break") — NEW
+**Summary:** A sympathetic sub who's skipping too, in his way. Might cover for you once.
+**Where to find him:** Gary's Deli (period 1), the park (period 2), the library (period 3).

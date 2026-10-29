@@ -6367,6 +6367,161 @@
       "layout": "4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored",
       "anchor": "bottom center (feet)",
       "notes": "M17 generated townsfolk (adult). Tinted per person for variety."
+    },
+    "npc_officer_pruitt_walk": {
+      "type": "characters",
+      "kind": "walker",
+      "source": "res://assets/packs/ninja_adventure/Actor/Character/SamuraiBlue/SpriteSheet.png",
+      "native": [
+        64,
+        112
+      ],
+      "scale": 2,
+      "frame": [
+        32,
+        32
+      ],
+      "layout": "4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored",
+      "anchor": "bottom center (feet)"
+    },
+    "npc_rae_walk": {
+      "type": "characters",
+      "kind": "walker",
+      "source": "res://assets/packs/ninja_adventure/Actor/Character/Caveman/SpriteSheet.png",
+      "native": [
+        64,
+        112
+      ],
+      "scale": 2,
+      "frame": [
+        32,
+        32
+      ],
+      "layout": "4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored",
+      "anchor": "bottom center (feet)"
+    },
+    "npc_walt_walk": {
+      "type": "characters",
+      "kind": "walker",
+      "source": "res://assets/packs/ninja_adventure/Actor/Character/Master/SpriteSheet.png",
+      "native": [
+        64,
+        112
+      ],
+      "scale": 2,
+      "frame": [
+        32,
+        32
+      ],
+      "layout": "4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored",
+      "anchor": "bottom center (feet)"
+    },
+    "npc_mo_walk": {
+      "type": "characters",
+      "kind": "walker",
+      "source": "res://assets/packs/ninja_adventure/Actor/Character/Tengu/SpriteSheet.png",
+      "native": [
+        64,
+        112
+      ],
+      "scale": 2,
+      "frame": [
+        32,
+        32
+      ],
+      "layout": "4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored",
+      "anchor": "bottom center (feet)"
+    },
+    "npc_mr_ellis_walk": {
+      "type": "characters",
+      "kind": "walker",
+      "source": "res://assets/packs/ninja_adventure/Actor/Character/Sultan2/SpriteSheet.png",
+      "native": [
+        64,
+        112
+      ],
+      "scale": 2,
+      "frame": [
+        32,
+        32
+      ],
+      "layout": "4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored",
+      "anchor": "bottom center (feet)"
+    },
+    "portrait_officer_pruitt": {
+      "type": "portraits",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Actor/Character/SamuraiBlue/Faceset.png",
+      "native": [
+        38,
+        38
+      ],
+      "fit": [
+        64,
+        64
+      ],
+      "anchor": "top left",
+      "notes": "Face and shoulders, readable at 1x."
+    },
+    "portrait_rae": {
+      "type": "portraits",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Actor/Character/Caveman/Faceset.png",
+      "native": [
+        38,
+        38
+      ],
+      "fit": [
+        64,
+        64
+      ],
+      "anchor": "top left",
+      "notes": "Face and shoulders, readable at 1x."
+    },
+    "portrait_walt": {
+      "type": "portraits",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Actor/Character/Master/Faceset.png",
+      "native": [
+        38,
+        38
+      ],
+      "fit": [
+        64,
+        64
+      ],
+      "anchor": "top left",
+      "notes": "Face and shoulders, readable at 1x."
+    },
+    "portrait_mo": {
+      "type": "portraits",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Actor/Character/Tengu/Faceset.png",
+      "native": [
+        38,
+        38
+      ],
+      "fit": [
+        64,
+        64
+      ],
+      "anchor": "top left",
+      "notes": "Face and shoulders, readable at 1x."
+    },
+    "portrait_mr_ellis": {
+      "type": "portraits",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Actor/Character/Sultan2/Faceset.png",
+      "native": [
+        38,
+        38
+      ],
+      "fit": [
+        64,
+        64
+      ],
+      "anchor": "top left",
+      "notes": "Face and shoulders, readable at 1x."
     }
   }
 }

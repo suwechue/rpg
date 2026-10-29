@@ -3,7 +3,10 @@
   "name": "The Blacksmith",
   "role": "Blacksmith",
   "home": "blacksmith_cottage",
-  "voice": { "id": "voice_default", "pitch": 1.03 },
+  "voice": {
+    "id": "voice_default",
+    "pitch": 1.03
+  },
   "sprite": "npc_blacksmith_walk",
   "portrait": "portrait_blacksmith",
   "startBond": 0,
@@ -21,7 +24,10 @@
   "schedule": {
     "weekday": {
       "before_school": "forge",
-      "after_school": "forge"
+      "after_school": "forge",
+      "period_1": "forge",
+      "period_2": "forge",
+      "period_3": "forge"
     },
     "weekend": {
       "morning": "forge",

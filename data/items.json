@@ -510,6 +510,13 @@
       "card": "card_cleansing_salts",
       "use": "backpack",
       "text": "Backpack: cleanse every bad status and heal 4 (Quick)."
+    },
+    {
+      "id": "ore_iron",
+      "name": "Iron Ore",
+      "kind": "ore",
+      "price": 4,
+      "text": "Plain iron from the forge's scrap pile. The blacksmith can work it (TL gear)."
     }
   ]
 }

@@ -33,7 +33,8 @@
         "after_school"
       ],
       "doorLine": "The school is locked. The trophy case glints at you through the glass, smug.",
-      "futureHook": "Lockers, notice board"
+      "futureHook": "Lockers, notice board",
+      "schoolHoursNote": "Sneaking area during class (TL Part 2)."
     },
     {
       "id": "cafeteria",
@@ -389,7 +390,8 @@
         "morning",
         "midday",
         "afternoon",
-        "weekend_evening"
+        "weekend_evening",
+        "@schoolHours"
       ],
       "activities": [
         {
@@ -416,6 +418,25 @@
           },
           "say": "You slice, you wrap, you learn exactly nothing about the recipe.",
           "job": "deli"
+        },
+        {
+          "label": "Help with the lunch rush (2 AP)",
+          "ap": 2,
+          "parts": [
+            "period_2"
+          ],
+          "job": "deli",
+          "daytime": true,
+          "effects": {
+            "money": 18,
+            "bond": {
+              "gary": 3
+            },
+            "statXp": {
+              "dex": 1
+            }
+          },
+          "say": "Twelve sandwiches, one Gary, no time. You're the rush now."
         }
       ],
       "doorLine": "The sign says CLOSED. The smell says otherwise.",
@@ -478,7 +499,8 @@
         "after_school",
         "morning",
         "midday",
-        "afternoon"
+        "afternoon",
+        "@schoolHours"
       ],
       "activities": [
         {
@@ -495,6 +517,26 @@
           "cond": {
             "minWeek": 2
           }
+        },
+        {
+          "label": "Read the town history shelf (1 AP)",
+          "ap": 1,
+          "parts": [
+            "period_1",
+            "period_2",
+            "period_3"
+          ],
+          "daytime": true,
+          "effects": {
+            "clue": "founder_fountain",
+            "statXp": {
+              "int": 1
+            },
+            "bond": {
+              "ms_marlowe": 1
+            }
+          },
+          "say": "Ms. Marlowe raises an eyebrow, then unlocks the history shelf anyway."
         }
       ],
       "doorLine": "Hours are posted in a very precise font. You are outside them."
@@ -511,7 +553,8 @@
         "morning",
         "midday",
         "afternoon",
-        "weekend_evening"
+        "weekend_evening",
+        "period_3"
       ],
       "activities": [
         {
@@ -546,7 +589,8 @@
         "morning",
         "midday",
         "afternoon",
-        "weekend_evening"
+        "weekend_evening",
+        "@schoolHours"
       ],
       "activities": [
         {
@@ -603,14 +647,40 @@
       "id": "town_hall",
       "name": "Town hall",
       "zone": "downtown",
-      "status": "EXTERIOR",
+      "status": "OPEN",
       "kind": "building",
       "residents": [
         "mayor",
         "mr_b"
       ],
       "doorLine": "Town hall. A schedule on the door lists 'closed session' for most of the week.",
-      "futureHook": "Planned interior: Mayor's office, records room (Mr. B evidence later)"
+      "futureHook": "Planned interior: Mayor's office, records room (Mr. B evidence later)",
+      "hours": [
+        "before_school",
+        "@schoolHours",
+        "after_school",
+        "morning",
+        "midday"
+      ],
+      "activities": [
+        {
+          "label": "Look through public records (1 AP)",
+          "ap": 1,
+          "parts": [
+            "period_1",
+            "period_2",
+            "period_3"
+          ],
+          "daytime": true,
+          "effects": {
+            "clue": "mayor_meetings",
+            "statXp": {
+              "per": 1
+            }
+          },
+          "say": "The clerk is asleep. The Mayor's calendar is not."
+        }
+      ]
     },
     {
       "id": "bus_stop_downtown",
@@ -638,7 +708,8 @@
         "morning",
         "midday",
         "afternoon",
-        "weekend_evening"
+        "weekend_evening",
+        "@schoolHours"
       ],
       "doorLine": "The door is stuck, but the walk-up window is open. A bell on a string. You ring it.",
       "futureHook": "Planned: second shop for snacks and gifts (interior later)",
@@ -669,10 +740,37 @@
       "id": "post_office",
       "name": "Post office",
       "zone": "downtown",
-      "status": "EXTERIOR",
+      "status": "OPEN",
       "kind": "building",
       "doorLine": "The post office has a single bench and a single, very tired clerk visible through the glass.",
-      "futureHook": "Letters and deliveries side quests"
+      "futureHook": "Letters and deliveries side quests",
+      "hours": [
+        "before_school",
+        "@schoolHours",
+        "after_school",
+        "morning",
+        "midday"
+      ],
+      "activities": [
+        {
+          "label": "Sort mail for a few coins (1 AP)",
+          "ap": 1,
+          "parts": [
+            "period_1",
+            "period_2",
+            "period_3",
+            "after_school"
+          ],
+          "daytime": true,
+          "effects": {
+            "money": 6,
+            "statXp": {
+              "per": 1
+            }
+          },
+          "say": "Three letters are addressed to people who moved away thirty years ago."
+        }
+      ]
     },
     {
       "id": "player_home",
@@ -1015,7 +1113,8 @@
         "morning",
         "midday",
         "afternoon",
-        "weekend_evening"
+        "weekend_evening",
+        "@schoolHours"
       ],
       "activities": [
         {
@@ -1041,6 +1140,28 @@
           "cond": {
             "minWeek": 2
           }
+        },
+        {
+          "label": "Apprentice shift (2 AP)",
+          "ap": 2,
+          "parts": [
+            "period_1",
+            "period_2",
+            "period_3"
+          ],
+          "job": "forge",
+          "daytime": true,
+          "effects": {
+            "money": 6,
+            "bond": {
+              "blacksmith": 3
+            },
+            "item": "ore_iron",
+            "statXp": {
+              "str": 1
+            }
+          },
+          "say": "\"School?\" the blacksmith grunts. \"Hand me the tongs.\""
         }
       ],
       "doorLine": "The forge is banked for the night. Still warm. Always warm.",

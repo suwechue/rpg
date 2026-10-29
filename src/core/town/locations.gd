@@ -31,11 +31,23 @@ static func status(db: Dictionary, run: Dictionary, id: String) -> String:
 	return s
 
 
-static func in_hours(r: Dictionary, part: String) -> bool:
+static func in_hours(r: Dictionary, part: String, db: Dictionary = {}) -> bool:
 	var hours: Variant = r.get("hours", [])
 	if typeof(hours) == TYPE_STRING:
 		return str(hours) == "*"
-	return Array(hours).has(part)
+	return expand_hours(db, Array(hours)).has(part)
+
+
+## Hours with aliases expanded ("@schoolHours" -> data/calendar.json schoolHours).
+static func expand_hours(db: Dictionary, hours: Array) -> Array:
+	var out: Array = []
+	for h in hours:
+		var s := str(h)
+		if s.begins_with("@"):
+			out.append_array(db.get("calendar", {}).get(s.substr(1), []))
+		else:
+			out.append(s)
+	return out
 
 
 ## Can the player use this place now? Returns "" or the reason it's shut.
@@ -52,7 +64,7 @@ static func closed_reason(db: Dictionary, run: Dictionary, id: String, week: int
 		return str(r.get("lockedLine", Str.t(db, "locations.you_can_t_get_in")))
 	if st == "EXTERIOR" and not bool(r.get("walkUp", false)):
 		return str(r.get("doorLine", Str.t(db, "locations.nobody_answers")))
-	if not in_hours(r, part):
+	if not in_hours(r, part, db):
 		return str(r.get("doorLine", Str.t(db, "locations.is_closed_right_now") % r.get("name", "It")))
 	return ""
 

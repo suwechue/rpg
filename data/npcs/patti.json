@@ -3,7 +3,10 @@
   "name": "Nurse Patti",
   "role": "Hospital nurse",
   "home": "elm_apartments",
-  "voice": { "id": "voice_default", "pitch": 1.11 },
+  "voice": {
+    "id": "voice_default",
+    "pitch": 1.11
+  },
   "sprite": "npc_patti_walk",
   "portrait": "portrait_patti",
   "startBond": 10,
@@ -21,7 +24,10 @@
     "weekday": {
       "before_school": "hospital",
       "lunch": "hospital",
-      "after_school": "hospital"
+      "after_school": "hospital",
+      "period_1": "hospital",
+      "period_2": "hospital",
+      "period_3": "hospital"
     },
     "weekend": {
       "morning": "hospital",

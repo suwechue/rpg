@@ -3,7 +3,10 @@
   "name": "Ms. Marlowe",
   "role": "Librarian",
   "home": "elm_apartments",
-  "voice": { "id": "voice_default", "pitch": 1.23 },
+  "voice": {
+    "id": "voice_default",
+    "pitch": 1.23
+  },
   "sprite": "npc_ms_marlowe_walk",
   "portrait": "portrait_ms_marlowe",
   "startBond": 5,
@@ -20,7 +23,10 @@
   "schedule": {
     "weekday": {
       "lunch": "library",
-      "after_school": "library"
+      "after_school": "library",
+      "period_1": "library",
+      "period_2": "library",
+      "period_3": "library"
     },
     "weekend": {
       "morning": "library",

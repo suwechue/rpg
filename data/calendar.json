@@ -87,5 +87,10 @@
       "name": "Evening",
       "ap": 2
     }
+  ],
+  "schoolHours": [
+    "period_1",
+    "period_2",
+    "period_3"
   ]
 }

@@ -58,6 +58,12 @@
       "crowd_adult_oldman3_walk",
       "crowd_adult_inspector_walk",
       "crowd_adult_mangreen_walk"
+    ],
+    "skipper": [
+      "crowd_student_eggboy_walk",
+      "crowd_student_cavegirl_walk",
+      "crowd_student_ninjagreen_walk",
+      "crowd_student_ninjayellow_walk"
     ]
   },
   "tints": [
@@ -127,6 +133,18 @@
       "afternoon": {
         "adult": 6,
         "student": 3
+      },
+      "period_1": {
+        "adult": 6,
+        "skipper": 2
+      },
+      "period_2": {
+        "adult": 6,
+        "skipper": 2
+      },
+      "period_3": {
+        "adult": 6,
+        "skipper": 2
       }
     },
     "residential": {
@@ -148,6 +166,18 @@
       "afternoon": {
         "adult": 2,
         "student": 3
+      },
+      "period_1": {
+        "adult": 3,
+        "skipper": 1
+      },
+      "period_2": {
+        "adult": 3,
+        "skipper": 1
+      },
+      "period_3": {
+        "adult": 3,
+        "skipper": 1
       }
     },
     "outskirts": {
@@ -161,6 +191,18 @@
       "afternoon": {
         "adult": 2,
         "student": 2
+      },
+      "period_1": {
+        "adult": 2,
+        "skipper": 1
+      },
+      "period_2": {
+        "adult": 2,
+        "skipper": 1
+      },
+      "period_3": {
+        "adult": 2,
+        "skipper": 1
       }
     }
   },
@@ -248,6 +290,12 @@
       "What's up?",
       "Busy day.",
       "See you around."
+    ],
+    "skipper": [
+      "Don't tell anyone you saw me.",
+      "You too, huh?",
+      "Shh. Officer Pruitt's around.",
+      "School's overrated. Today."
     ]
   },
   "barkSeconds": 2.0,

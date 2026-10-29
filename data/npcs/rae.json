@@ -1,0 +1,62 @@
+{
+  "id": "rae",
+  "name": "Rae",
+  "role": "Corner store clerk (dropped out)",
+  "home": "elm_apartments",
+  "voice": {
+    "id": "voice_default",
+    "pitch": 0.9500000000000001
+  },
+  "sprite": "npc_rae_walk",
+  "portrait": "portrait_rae",
+  "startBond": 0,
+  "disposition": {
+    "courage": 55,
+    "greed": 40,
+    "curiosity": 70,
+    "loyalty": 45,
+    "kindness": 50,
+    "pride": 30
+  },
+  "traits": [],
+  "recruitable": false,
+  "daytime": true,
+  "schedule": {
+    "weekday": {
+      "period_1": "corner_store",
+      "period_2": "corner_store",
+      "period_3": "corner_store",
+      "after_school": "corner_store"
+    },
+    "weekend": {}
+  },
+  "greeting": "\"Skipping? Respect. Buy something so it looks normal.\"",
+  "topics": [
+    {
+      "id": "rae_rumors",
+      "label": "Ask what people say",
+      "tone": {
+        "curiosity": 0.9
+      },
+      "line": "What does nobody at school say out loud?",
+      "baseRisk": 0.1,
+      "goodText": "\"That the woods take people. That Mr. B knows which ones.\"",
+      "badText": "\"Buy a soda first.\"",
+      "outcomes": {
+        "onGood": {
+          "flag": "rumor_rae"
+        }
+      }
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "food"
+    ],
+    "dislikes": [],
+    "likeText": "\"Oh. Thanks. Really.\""
+  },
+  "hangouts": [
+    "You sit with Rae for a while. Nobody asks why you're not in school."
+  ]
+}

@@ -3,7 +3,10 @@
   "name": "Gary",
   "role": "Deli owner",
   "home": "garys_apartment",
-  "voice": { "id": "voice_gary", "pitch": 0.8 },
+  "voice": {
+    "id": "voice_gary",
+    "pitch": 0.8
+  },
   "sprite": "npc_gary_walk",
   "portrait": "portrait_gary",
   "startBond": 15,
@@ -22,7 +25,10 @@
     "weekday": {
       "before_school": "garys_deli",
       "lunch": "garys_deli",
-      "after_school": "garys_deli"
+      "after_school": "garys_deli",
+      "period_1": "garys_deli",
+      "period_2": "garys_deli",
+      "period_3": "garys_deli"
     },
     "weekend": {
       "morning": "garys_deli",
