@@ -368,9 +368,10 @@ func _end_night() -> void:
 	Night.end_night(GameState.run)
 	GameState.run.erase("floor_pos")
 	GameState.run.erase("resume_scene")
-	if GameState.flag("week%d_cleared" % int(DataDB.table("calendar").get("totalWeeks", 5))):
-		SceneRouter.goto("res://src/scenes/story/narrator_reveal_tbd.tscn")
-		return
+	if GameState.flag("week%d_cleared" % int(DataDB.table("calendar").get("totalWeeks", 5))) and not GameState.flag("act1_finale_won"):
+		# M21: the finale is won; the aftermath weekend comes next, then End of Act 1.
+		GameState.set_flag("act1_finale_won")
+		Journal.note_ending("act1")
 	Narrator.say(Strings.t("dungeon.you_climb_out_into_the"))
 	GameState.advance_part()
 	SceneRouter.goto(TOWN)

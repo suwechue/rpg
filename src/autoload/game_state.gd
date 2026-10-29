@@ -186,7 +186,7 @@ func combat_setup(enemies: Array, layout_id: String, opts: Dictionary = {}) -> D
 		"library": cards,
 	}
 	for key in ["intro", "fleeAllowed", "context", "formation", "roles", "reinforcements", "turnMode",
-			"tutorial", "playerDeck", "addCards", "ui", "fair", "hpFloor", "guaranteeImprovise", "lesson", "stayedInRed", "partyFirst"]:
+			"tutorial", "playerDeck", "addCards", "ui", "fair", "hpFloor", "guaranteeImprovise", "lesson", "stayedInRed", "partyFirst", "winFlag"]:
 		if opts.has(key):
 			setup[key] = opts[key]
 	setup["difficulty"] = combat_difficulty
@@ -256,6 +256,8 @@ func debug_combat_setup() -> Dictionary:
 func finish_combat(summary: Dictionary) -> Dictionary:
 	last_combat = summary
 	var lines: Array = []
+	if str(summary.get("result", "")) == "win" and str(summary.get("winFlag", "")) != "":
+		set_flag(str(summary["winFlag"]))
 	# Items (user request, Oct 28): used consumables leave decks and the backpack;
 	# whoever went down loses the relics they wore.
 	const Inv := preload("res://src/core/items/inventory.gd")

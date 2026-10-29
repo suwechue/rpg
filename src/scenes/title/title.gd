@@ -95,6 +95,10 @@ func _draw() -> void:
 
 
 func _continue() -> void:
+	if SaveSystem.load_run() and GameState.flag("act1_complete"):
+		# M21: Act 1 is done and Act 2 isn't written yet; the save is kept.
+		Narrator.say(Strings.t("act.title_saved"))
+		return
 	if SaveSystem.load_run():
 		SceneRouter.goto(str(GameState.run.get("resume_scene", TOWN_SCENE)))
 
@@ -198,12 +202,12 @@ func _new_run() -> void:
 	GameState.new_run(int(pick["seed"]), str(pick["class"]), chosen_name, { "traits": traits,
 		"stats": PointBuy.final_stats(DataDB.all(), str(pick["class"]), alloc) })
 	GameState.combat_difficulty = str(diff["id"])
-	GameState.run["mode"] = str(pick.get("mode", "permadeath"))
-	var mode_rec: Dictionary = db.get("run_modes", {}).get("modes", {}).get(GameState.run["mode"], {})
+	GameState.run["runMode"] = str(pick.get("mode", "permadeath"))
+	var mode_rec: Dictionary = db.get("run_modes", {}).get("modes", {}).get(GameState.run["runMode"], {})
 	if mode_rec.has("combat"):
 		GameState.combat_difficulty = str(mode_rec["combat"])
 	var modes_log: Array = Journal.data.get("modes", [])
-	modes_log.append(GameState.run["mode"])
+	modes_log.append(GameState.run["runMode"])
 	Journal.data["modes"] = modes_log
 	Journal.save_journal()
 	Narrator.say(Strings.t("title.new_kid_in_a_small"))

@@ -561,6 +561,7 @@ Change these in `data/dungeon.json`, `data/weeks.json` and `data/encounters.json
 - **Place-based events:** a story with `"at": { "zone" }` or `{ "loc" }` waits until you're in that zone or within 4 tiles of that location's door or spot, any time from its day part to the end of that day (the banner at the front steps, the deli freezer, the forge, the closed wing, Mr. B at school). Others still play when their day part starts.
 
 - **Week 1 Monday:** Kelly is your guest on the first floor. Your choices that day add to **Kelly Risk**. At 4 or more, she panics and the run ends.
+- **Act 1 finale** (M21): week 5 Friday's dance ends with the fountain exploding; that night's boss, the Mirror Town, is fought in the square (layout fountain_square). Winning opens the aftermath weekend: the crater, curfew posters, the Mr. B fallout (depends on whether you exposed him), and three leak points (the square, the school steps, the park): small daylight fights that seal the leak when won. Sunday evening plays the Act 2 teaser and "End of Act 1"; the save is kept (Continue says Act 2 is coming). `docs/ACT2.md` holds the Act 2 stub.
 - **Story arc:** Mr. B's arc runs through weeks 1 to 5, with choices in weeks 3 and 4. The run ends at the `NARRATOR_REVEAL_TBD` finale.
 - **Death:** a run summary, then the **Narrator's Journal** keeps lore, creatures, endings, best week and trait unlocks across runs.
 

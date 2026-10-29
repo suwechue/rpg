@@ -92,6 +92,48 @@
         }
       ],
       "calendar": "Week 5, Friday: The dance"
+    },
+    {
+      "id": "act1_aftermath",
+      "inline": true,
+      "trigger": {
+        "week": 5,
+        "day": "sat",
+        "part": "morning"
+      },
+      "cond": {
+        "flag": "act1_finale_won"
+      },
+      "calendar": "Week 5, Saturday: The morning after",
+      "steps": [
+        {
+          "type": "cutscene",
+          "id": "act1_aftermath"
+        }
+      ]
+    },
+    {
+      "id": "act1_end",
+      "inline": true,
+      "trigger": {
+        "week": 5,
+        "day": "sun",
+        "part": "weekend_evening"
+      },
+      "cond": {
+        "flag": "act1_finale_won"
+      },
+      "calendar": "Week 5, Sunday: End of Act 1",
+      "steps": [
+        {
+          "type": "cutscene",
+          "id": "act1_end"
+        },
+        {
+          "type": "endAct",
+          "act": 1
+        }
+      ]
     }
   ]
 }

@@ -307,6 +307,8 @@ func play_inline_story(id: String) -> void:
 				GameState.set_flag("test_week")
 			"reportCard":
 				await _report_card()
+			"endAct":
+				await _end_act(int(step.get("act", 1)))
 			"foreshadow":
 				var l := Narrator.line("foreshadow")
 				Narrator.say(l)
@@ -334,6 +336,17 @@ func play_pending_friend_scenes() -> void:
 	GameState.run["pendingFriendScenes"] = []
 	for sid in pend:
 		await Cutscenes.play(str(sid), get_tree().current_scene)
+
+
+## M21: End of Act 1. The run is saved with act1_complete and the title says
+## so; Continue keeps it until Act 2 exists.
+func _end_act(act: int) -> void:
+	GameState.set_flag("act%d_complete" % act)
+	SaveSystem.save_run()
+	await show_event({ "title": "", "text": Strings.t("act.continue_later") })
+	_active = false
+	_queue.clear()
+	SceneRouter.goto(TITLE_SCENE)
 
 
 ## M16: the club fair. Join up to maxJoin clubs.
@@ -379,7 +392,7 @@ func _report_card() -> void:
 ## Permadeath: the save goes, the narrator gives the ending, back to the title.
 ## Narrator's Mercy (M19) rewinds to the start of the day instead.
 func _on_run_ended(cause: String) -> void:
-	var mode: Dictionary = DataDB.table("run_modes").get("modes", {}).get(str(GameState.run.get("mode", "permadeath")), {})
+	var mode: Dictionary = DataDB.table("run_modes").get("modes", {}).get(str(GameState.run.get("runMode", "permadeath")), {})
 	if bool(mode.get("rewind", false)) and cause != "demo_end" and not GameState.day_snapshot.is_empty():
 		_queue.clear()
 		_busy = false

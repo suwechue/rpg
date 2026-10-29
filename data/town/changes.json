@@ -115,6 +115,86 @@
       },
       "kind": "banner",
       "text": "The pep banner, fixed. PEP RALLY, the right way up."
+    },
+    {
+      "id": "curfew_posters",
+      "zone": "downtown",
+      "loc": "town_hall",
+      "offset": [
+        2,
+        1
+      ],
+      "cond": {
+        "flag": "act1_finale_won"
+      },
+      "kind": "poster",
+      "text": "CURFEW: everyone indoors by dark. By order of the Mayor. (Under it, in marker: 'what about the daytime ones?')"
+    },
+    {
+      "id": "leak_square",
+      "zone": "downtown",
+      "loc": "town_square",
+      "offset": [
+        3,
+        2
+      ],
+      "cond": {
+        "flag": "act1_finale_won",
+        "notFlag": "leak_square_closed"
+      },
+      "kind": "leak",
+      "text": "A crack in the air, humming. Something is climbing out.",
+      "fight": {
+        "enemies": [
+          "pom_pom_wisp",
+          "pom_pom_wisp"
+        ],
+        "closeFlag": "leak_square_closed"
+      }
+    },
+    {
+      "id": "leak_school",
+      "zone": "school",
+      "loc": "front_steps",
+      "offset": [
+        -3,
+        2
+      ],
+      "cond": {
+        "flag": "act1_finale_won",
+        "notFlag": "leak_school_closed"
+      },
+      "kind": "leak",
+      "text": "The front steps fold into themselves here. Something is climbing out.",
+      "fight": {
+        "enemies": [
+          "pom_pom_wisp",
+          "glitter_spark"
+        ],
+        "closeFlag": "leak_school_closed"
+      }
+    },
+    {
+      "id": "leak_park",
+      "zone": "outskirts",
+      "loc": "park",
+      "offset": [
+        2,
+        0
+      ],
+      "cond": {
+        "flag": "act1_finale_won",
+        "notFlag": "leak_park_closed"
+      },
+      "kind": "leak",
+      "text": "The pond has a second, upside-down sky. Something is climbing out.",
+      "fight": {
+        "enemies": [
+          "glitter_spark",
+          "glitter_spark"
+        ],
+        "closeFlag": "leak_park_closed"
+      }
     }
   ]
 }

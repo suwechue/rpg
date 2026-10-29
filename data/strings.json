@@ -871,6 +871,9 @@
     "phone.new_texts": "Your phone buzzes: %d new messages.",
     "title.mode": "Mode:",
     "flow.rewound_title": "Narrator's Mercy",
-    "journal.mode_row": "Run %d: %s"
+    "journal.mode_row": "Run %d: %s",
+    "act.continue_later": "End of Act 1. Your save is kept: Act 2 picks up from here once it's written.",
+    "act.title_saved": "Act 1 complete. Act 2 is coming.",
+    "town.e_seal_leak": "[E] Seal the leak point"
   }
 }

@@ -298,6 +298,18 @@
         "....c..EE",
         "........E"
       ]
+    },
+    {
+      "id": "fountain_square",
+      "theme": "mirror_square",
+      "weight": 0,
+      "map": [
+        "<P..c....",
+        "<P...ww..",
+        "<P.cwEw..",
+        "<P...ww..",
+        "<P..c...."
+      ]
     }
   ]
 }

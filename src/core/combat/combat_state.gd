@@ -61,6 +61,7 @@ var _undo: Array = []               # PT Part 1: snapshots of this turn, newest 
 var undo_lock := ""                 # why the turn can't be undone further (a roll, a draw, a reveal)
 var turn_mode := "two_actions"     # data/combat_rules.json "turnMode" (PT Part 1); setup "turnMode" overrides
 var difficulty := "normal"         # data/combat_rules.json "difficulty"; setup "difficulty" overrides
+var win_flag := ""                # setup "winFlag": a run flag set when the party wins (M21 leak points)
 var ramp := 1.0                    # 0 = early-game numbers, 1 = the difficulty's full numbers (see ramp_for)
 var ai_overrides: Dictionary = {}  # sims: data/ai.json values to replace for this fight
 var delayed: Array = []            # telegraphed strikes that land later: [{ cells, turns, spec, caster, neutral, name }]
@@ -88,6 +89,7 @@ func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) ->
 	guarantee_improvise = bool(setup.get("guaranteeImprovise", false))
 	difficulty = str(setup.get("difficulty", db.get("combat_rules", {}).get("difficulty", "normal")))
 	ramp = clampf(float(setup.get("ramp", 1.0)), 0.0, 1.0)
+	win_flag = str(setup.get("winFlag", ""))
 	ai_overrides = setup.get("ai", {})
 	mutators = setup.get("mutators", [])
 	boss_fight = bool(setup.get("boss", false))
@@ -3624,7 +3626,7 @@ func finish() -> Dictionary:
 	return {
 		"result": result, "xp": xp_total, "money": money_total, "party": party, "kills": kills,
 		"remaining": remaining, "wildSurges": wild_surges, "support": support_log,
-		"helpAnswered": answered, "helpIgnored": ignored, "rounds": round_num, "multiVector": multi_vector_casts, "combos": combos_cast, "cardsPlayed": cards_played, "backpackUsed": backpack_used, "highestHit": highest_hit,
+		"helpAnswered": answered, "helpIgnored": ignored, "rounds": round_num, "multiVector": multi_vector_casts, "combos": combos_cast, "cardsPlayed": cards_played, "backpackUsed": backpack_used, "winFlag": win_flag, "highestHit": highest_hit,
 	}
 
 

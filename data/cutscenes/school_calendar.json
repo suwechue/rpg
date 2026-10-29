@@ -139,6 +139,118 @@
         {
           "type": "narrator",
           "text": "The lights flicker. Outside, the fountain in the town square has started to run. It hasn't run in thirty years."
+        },
+        {
+          "type": "sfx",
+          "event": "explosion"
+        },
+        {
+          "type": "camera_shake",
+          "amount": 6
+        },
+        {
+          "type": "title_card",
+          "text": "The Fountain",
+          "seconds": 1.4
+        },
+        {
+          "type": "narrator",
+          "text": "The fountain doesn't run. It breaks. Water, then light, then the other town, pouring up out of the ground into the square."
+        },
+        {
+          "type": "say",
+          "speaker": "kelly",
+          "text": "That's not the woods. That's HERE.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "theo",
+          "text": "Both towns. At once. That's not supposed to be possible.",
+          "side": "left"
+        },
+        {
+          "type": "narrator",
+          "text": "..."
+        },
+        {
+          "type": "narrator",
+          "text": "For the first time, the narrator has nothing to say."
+        },
+        {
+          "type": "set_flag",
+          "flag": "act1_finale"
+        }
+      ]
+    },
+    {
+      "id": "act1_aftermath",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "The Morning After",
+          "seconds": 1.2
+        },
+        {
+          "type": "narrator",
+          "text": "The fountain is a crater now, glowing faintly blue. The town put a ribbon around it. The ribbon is not helping."
+        },
+        {
+          "type": "narrator",
+          "text": "Curfew posters on every door. The buses stop at six. Somebody spray-painted WE SAW IT on the town hall."
+        },
+        {
+          "type": "say",
+          "speaker": "innocent_bystander",
+          "text": "Huh. A portal. Neat. Anyway, the bakery's out of muffins.",
+          "side": "right"
+        },
+        {
+          "type": "if_flag",
+          "flag": "exposed_mr_b",
+          "then": [
+            {
+              "type": "narrator",
+              "text": "Mr. B's office is empty. His name is gone from the door. Diane's post has eleven thousand shares."
+            }
+          ],
+          "else": [
+            {
+              "type": "narrator",
+              "text": "Mr. B gives a statement on the local news: a gas main, he says. Nobody believes him. Nobody says so."
+            }
+          ]
+        },
+        {
+          "type": "narrator",
+          "text": "And around town, small cracks of the other place have opened in daylight. Leak points. Something keeps climbing out."
+        }
+      ]
+    },
+    {
+      "id": "act1_end",
+      "steps": [
+        {
+          "type": "narrator",
+          "text": "Sunday night. The crater hums. The train station's lights come on for the first time in thirty years."
+        },
+        {
+          "type": "narrator",
+          "text": "Up on the hill, a window in the abandoned mansion opens. Then closes. Then opens."
+        },
+        {
+          "type": "narrator",
+          "text": "...Ahem. Sorry. Lost my place there for a moment. It won't happen again."
+        },
+        {
+          "type": "fade",
+          "to": "black",
+          "seconds": 1.0
+        },
+        {
+          "type": "title_card",
+          "text": "End of Act 1",
+          "seconds": 2.5
         }
       ]
     }

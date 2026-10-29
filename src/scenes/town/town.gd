@@ -561,6 +561,22 @@ func _spawn_followers() -> void:
 				_bubble(w, line)
 
 
+## M21: a leak point: a small Upside-Down fight in daylight; winning seals it.
+func _leak_fight(c: Vector2i) -> void:
+	for ch in Crowd.changes(DataDB.all(), GameState.run, GameState.ctx(), map.map_id):
+		if str(ch.get("kind", "")) != "leak" or not ch.has("fight"):
+			continue
+		var base: Variant = map.door_by_loc.get(str(ch.get("loc", "")), map.spots.get(str(ch.get("loc", "")), null))
+		var off: Array = ch.get("offset", [0, 0])
+		if base == null or (base as Vector2i) + Vector2i(int(off[0]), int(off[1])) != c:
+			continue
+		Narrator.say(str(ch.get("text", "")))
+		var setup := GameState.combat_setup(ch["fight"].get("enemies", []), "open_field", { "winFlag": str(ch["fight"].get("closeFlag", "")) })
+		_save_pos()
+		GameState.start_combat(setup, "res://src/scenes/town/town.tscn")
+		return
+
+
 ## M17: the town's visible changes (posters, flyers, the forge, the crater).
 func _show_changes() -> void:
 	map.marks = {}
@@ -676,6 +692,8 @@ func _update_prompt() -> void:
 		text = "[E] %s" % Locs.rec(DataDB.all(), str(map.room_doors[f])).get("name", "Door")
 	elif map.furniture.has(f) and map.furniture[f].has("label"):
 		text = "[E] %s" % map.furniture[f]["label"]
+	elif map.marks.get(f, "") == "leak":
+		text = Strings.t("town.e_seal_leak")
 	elif map.signs.has(f):
 		text = Strings.t("town.e_read_sign")
 	else:
@@ -718,6 +736,9 @@ func interact() -> void:
 			Narrator.say(reason)
 		else:
 			_enter_interior(room, return_zone, return_cell)
+		return
+	if map.marks.get(f, "") == "leak":
+		await _leak_fight(f)
 		return
 	if map.signs.has(f):
 		Narrator.say(Strings.t("town.the_sign_says") % map.signs[f])
