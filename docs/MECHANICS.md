@@ -345,6 +345,7 @@ Change these in `data/arena/waves.json` cardReward and checkpointPick.
 
 ## C1. Days, time and AP
 
+- **Weekend AP** (M19 balance): each weekend part has 2 AP (was 3). tools/sim_days.gd measures how much of a simulated player's wish list fits: greedy (train, work, shop) 63%, social (talk, gift, hang out) 78%, against a target of about 60%.
 - **Unlock waves** (M19): week 1 is small. Week 2 opens the buses, the arcade, clubs and the part-time jobs; week 3 the corner store and museum; week 4 the hospital's closed wing; week 5 the dance. The narrator announces it each Monday. `data/unlocks.json`, locations' openFromWeek.
 - **Part-time jobs:** the deli ($14), forge ($12), hospital ($8) and library ($10), 2 AP a shift (forge, hospital and library from week 2). 60% of shifts have a small event with a choice. `data/jobs.json`.
 - **Modes** (chosen at a new run): Permadeath (as designed); Narrator's Mercy (dying rewinds to the start of that day with a quip); Story (permadeath, with easier fights: 0.6x enemy damage, 0.8x HP). The Journal records each run's mode. `data/run_modes.json`.

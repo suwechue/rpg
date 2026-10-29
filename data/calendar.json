@@ -1,21 +1,91 @@
 {
   "totalWeeks": 5,
-  "days": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
-  "weekendDays": ["sat", "sun"],
+  "days": [
+    "mon",
+    "tue",
+    "wed",
+    "thu",
+    "fri",
+    "sat",
+    "sun"
+  ],
+  "weekendDays": [
+    "sat",
+    "sun"
+  ],
   "weekdayParts": [
-    { "id": "before_school", "name": "Before School", "ap": 2, "start": "home" },
-    { "id": "period_1",      "name": "Period 1",      "ap": 0, "wholePart": true, "period": 1 },
-    { "id": "period_2",      "name": "Period 2",      "ap": 0, "wholePart": true, "period": 2 },
-    { "id": "lunch",         "name": "Lunch",         "ap": 2, "start": "school" },
-    { "id": "period_3",      "name": "Period 3",      "ap": 0, "wholePart": true, "period": 3 },
-    { "id": "after_school",  "name": "After School",  "ap": 3, "start": "school" },
-    { "id": "evening",       "name": "Evening: the Upside-Down", "ap": 0, "dungeon": true },
-    { "id": "night",         "name": "Night",         "ap": 1 }
+    {
+      "id": "before_school",
+      "name": "Before School",
+      "ap": 2,
+      "start": "home"
+    },
+    {
+      "id": "period_1",
+      "name": "Period 1",
+      "ap": 0,
+      "wholePart": true,
+      "period": 1
+    },
+    {
+      "id": "period_2",
+      "name": "Period 2",
+      "ap": 0,
+      "wholePart": true,
+      "period": 2
+    },
+    {
+      "id": "lunch",
+      "name": "Lunch",
+      "ap": 2,
+      "start": "school"
+    },
+    {
+      "id": "period_3",
+      "name": "Period 3",
+      "ap": 0,
+      "wholePart": true,
+      "period": 3
+    },
+    {
+      "id": "after_school",
+      "name": "After School",
+      "ap": 3,
+      "start": "school"
+    },
+    {
+      "id": "evening",
+      "name": "Evening: the Upside-Down",
+      "ap": 0,
+      "dungeon": true
+    },
+    {
+      "id": "night",
+      "name": "Night",
+      "ap": 1
+    }
   ],
   "weekendParts": [
-    { "id": "morning",         "name": "Morning",   "ap": 3, "start": "home" },
-    { "id": "midday",          "name": "Midday",    "ap": 3 },
-    { "id": "afternoon",       "name": "Afternoon", "ap": 3 },
-    { "id": "weekend_evening", "name": "Evening",   "ap": 3 }
+    {
+      "id": "morning",
+      "name": "Morning",
+      "ap": 2,
+      "start": "home"
+    },
+    {
+      "id": "midday",
+      "name": "Midday",
+      "ap": 2
+    },
+    {
+      "id": "afternoon",
+      "name": "Afternoon",
+      "ap": 2
+    },
+    {
+      "id": "weekend_evening",
+      "name": "Evening",
+      "ap": 2
+    }
   ]
 }

@@ -223,7 +223,7 @@ func test_calendar_day_parts_and_ap() -> void:
 	cal.advance_part()
 	cal.advance_part()
 	check(cal.is_weekend() and cal.part_id() == "morning", "weekend after Friday night")
-	check(cal.ap == 3, "weekend parts have 3 AP")
+	check(cal.ap == 2, "weekend parts have 2 AP (M19 balance)")
 
 
 # --- Data integrity -----------------------------------------------------------
