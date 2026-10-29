@@ -1704,6 +1704,9 @@ func _release_float_slot(view_id: int) -> void:
 
 
 func _shake(amount: float) -> void:
+	if not UiTheme.shake_on:
+		await _wait(0.1)
+		return
 	var tw := create_tween()
 	for i in 4:
 		tw.tween_property(self, "position", Vector2(randf_range_seeded(amount), randf_range_seeded(amount)), 0.03)

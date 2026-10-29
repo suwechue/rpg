@@ -28,6 +28,21 @@ func discover_combo(id: String) -> bool:
 	return fresh
 
 
+## M22: record what counts toward achievements, then check them.
+func note(list: String, id: String) -> void:
+	var l: Array = data.get(list, [])
+	if not l.has(id):
+		l.append(id)
+		data[list] = l
+	check_achievements()
+
+
+func check_achievements() -> void:
+	for a in preload("res://src/core/achievements.gd").check(DataDB.all(), data):
+		Narrator.say(Strings.t("achievement.earned") % str(a.get("name", "")))
+	save_journal()
+
+
 func load_journal() -> void:
 	data = { "runs": 0, "lore": {}, "enemies": {}, "endings": {}, "unlocks": [], "bestWeek": 0 }
 	if FileAccess.file_exists(PATH):

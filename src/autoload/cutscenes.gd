@@ -156,6 +156,8 @@ func _run(c: Dictionary, host_ref: Variant) -> void:
 	playing = ""
 	if GameState.has_run():
 		GameState.set_flag("cutscene_seen_" + id)
+	if id.begins_with("friend_"):
+		Journal.note("friendScenes", id)
 	finished.emit(id)
 
 

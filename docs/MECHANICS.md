@@ -583,6 +583,14 @@ Change these in `data/combos.json`, `data/sparks.json`, `data/intro/spark_quiz.j
 
 ---
 
+## E1. Options and the Journal (M22)
+
+- **Options** (title, pause menu): music, sounds, ambience and voice volumes (3 dB steps, -30 to +6 on top of data/audio.json), text speed (25, 45, 90 or instant), screen shake on or off, fullscreen and window size (1x to 3x), the colorblind palette, Easy minigames, key rebinding for every action (saved; controller buttons keep their defaults), and this run's mode and fight difficulty. Saved in user://settings.cfg.
+- **Continue** on the title says which week and day the save is at, its mode and when it was saved (hover).
+- **Achievements** in the Narrator's Journal: an ending, finishing Act 1 (unlocks alternate narrator lines), 5 and all 38 friendship scenes, one and all 5 deductions, 10 combos, arena wave 20, 5 runs. `data/achievements.json`.
+
+---
+
 # Part D: Changing next
 
 PT (`docs/PATCH_1.md`), P2 Parts 1 to 3 (`docs/PATCH_2.md`, with cutscenes M14 and the intro M15) and VD (combos, the spark, the card builder, the demo and feedback) are in. Demo mode (`data/demo.json`) ends a story run after the week 1 boss. Next:

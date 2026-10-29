@@ -55,6 +55,43 @@ func _ready() -> void:
 			InputMap.action_add_event(action, ev)
 
 
+	_load_rebinds()
+
+
+## M22: keys the player rebound in Options (user://settings.cfg "keys").
+func _load_rebinds() -> void:
+	var c := ConfigFile.new()
+	if c.load("user://settings.cfg") != OK or not c.has_section("keys"):
+		return
+	for action in c.get_section_keys("keys"):
+		rebind(str(action), int(c.get_value("keys", action, 0)), false)
+
+
+## Replace an action's keyboard keys with one key (controller buttons stay).
+func rebind(action: String, keycode: int, save: bool = true) -> void:
+	if not InputMap.has_action(action) or keycode == 0:
+		return
+	for ev in InputMap.action_get_events(action):
+		if ev is InputEventKey:
+			InputMap.action_erase_event(action, ev)
+	var k := InputEventKey.new()
+	k.physical_keycode = keycode as Key
+	InputMap.action_add_event(action, k)
+	if save:
+		var c := ConfigFile.new()
+		c.load("user://settings.cfg")
+		c.set_value("keys", action, keycode)
+		c.save("user://settings.cfg")
+
+
+## The first key bound to an action, as text ("E").
+func key_text(action: String) -> String:
+	for ev in InputMap.action_get_events(action):
+		if ev is InputEventKey:
+			return OS.get_keycode_string((ev as InputEventKey).physical_keycode)
+	return "-"
+
+
 func _ensure(action: String) -> void:
 	if not InputMap.has_action(action):
 		InputMap.add_action(action)

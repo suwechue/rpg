@@ -41,6 +41,22 @@ func _cfg() -> Dictionary:
 	return DataDB.table("audio")
 
 
+## The player's volume offset for a channel (music, sfx, ambience, voice), in dB (M22).
+func user_db(channel: String) -> float:
+	var c := ConfigFile.new()
+	if c.load("user://settings.cfg") == OK:
+		return float(c.get_value("audio", channel, 0.0))
+	return 0.0
+
+
+## Re-apply volumes after the Options screen changes them.
+func apply_volumes() -> void:
+	for m in _music:
+		if (m as AudioStreamPlayer).playing:
+			(m as AudioStreamPlayer).volume_db = float(_cfg().get("musicVolumeDb", -10)) + user_db("music")
+	_amb.volume_db = float(_cfg().get("ambienceVolumeDb", 0)) + user_db("ambience") + user_db("ambience")
+
+
 func _warn(what: String) -> void:
 	if not _warned.has(what):
 		_warned[what] = true
@@ -77,7 +93,7 @@ func play_music(situation: String) -> void:
 	var old: AudioStreamPlayer = _music[_music_on]
 	_music_on = 1 - _music_on
 	var new_p: AudioStreamPlayer = _music[_music_on]
-	var vol := float(_cfg().get("musicVolumeDb", -10)) + float(t.get("volumeDb", 0))
+	var vol := float(_cfg().get("musicVolumeDb", -10)) + float(t.get("volumeDb", 0)) + user_db("music")
 	var fade := float(t.get("crossfade", 0.8))
 	new_p.stream = s
 	new_p.volume_db = vol if fade <= 0.0 else -40.0
@@ -163,7 +179,7 @@ func event(event_name: String) -> void:
 	var vol: Array = rec.get("volumeDb", [0.0, 0.0])
 	p.stream = s
 	p.pitch_scale = rng.randf_range(float(pitch[0]), float(pitch[1]))
-	p.volume_db = float(_cfg().get("sfxVolumeDb", -6)) + rng.randf_range(float(vol[0]), float(vol[1]))
+	p.volume_db = float(_cfg().get("sfxVolumeDb", -6)) + rng.randf_range(float(vol[0]), float(vol[1])) + user_db("sfx")
 	p.play()
 
 
@@ -182,5 +198,5 @@ func voice(npc_id: String) -> void:
 		return
 	_voice.stream = s
 	_voice.pitch_scale = float(v.get("pitch", 1.0)) * Rng.stream("fx").randf_range(0.96, 1.04)
-	_voice.volume_db = float(_cfg().get("voiceVolumeDb", -10))
+	_voice.volume_db = float(_cfg().get("voiceVolumeDb", -10)) + user_db("voice")
 	_voice.play()

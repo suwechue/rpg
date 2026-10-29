@@ -40,6 +40,13 @@ func _ready() -> void:
 	add_child(_menu)
 	_menu.add_child(UiTheme.button(Strings.t("title.new_run"), _new_run))
 	var cont := UiTheme.button(Strings.t("title.continue"), _continue)
+	# M22: say what the save is (week, day, mode, when).
+	var pk := SaveSystem.peek()
+	if not pk.is_empty():
+		var days: Array = DataDB.table("calendar").get("days", [])
+		var mode_name := Strings.t("title.endless_arena") if bool(pk["arena"]) else str(DataDB.table("run_modes").get("modes", {}).get(str(pk["mode"]), {}).get("name", pk["mode"]))
+		var day_name := str(days[clampi(int(pk["day"]), 0, days.size() - 1)]).capitalize() if not days.is_empty() else ""
+		cont.tooltip_text = Strings.t("title.continue_detail") % [int(pk["week"]), day_name, mode_name, str(pk["saved"])]
 	cont.disabled = not SaveSystem.has_save()
 	_menu.add_child(cont)
 	for extra in extra_buttons:
@@ -317,6 +324,12 @@ func _show_journal() -> void:
 		m.text(Strings.t("title.defeated") % [e.get("name", k), int(e.get("defeated", 0)), e.get("text", "")])
 	m.text(Strings.t("title.starting_traits_unlocked") % (", ".join(PackedStringArray(Journal.unlocked_traits())) if not Journal.unlocked_traits().is_empty() else "none"), UiTheme.DIM)
 	m.text(Strings.t("title.endless_arena_best_wave") % int(j.get("arena", {}).get("bestWave", 0)), UiTheme.DIM)
+	# M22: achievements.
+	m.text(Strings.t("title.achievements"), UiTheme.ACCENT)
+	var Ach := preload("res://src/core/achievements.gd")
+	for a in Ach.all(DataDB.all()):
+		var got: bool = j.get("achievements", []).has(str(a["id"]))
+		m.text("%s %s: %s (%d/%d)" % ["[x]" if got else "[ ]", str(a["name"]), str(a["text"]), mini(Ach.progress(j, str(a["stat"])), int(a["min"])), int(a["min"])], UiTheme.GOOD if got else UiTheme.DIM)
 	m.add_button(Strings.t("title.close"), func() -> void: m.finish(null))
 	await Flow.show_modal(m)
 

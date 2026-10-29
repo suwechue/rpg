@@ -36,6 +36,7 @@ func _ready() -> void:
 	get_tree().node_added.connect(func(n: Node) -> void:
 		if n is Control and not (n as Control).mouse_entered.is_connected(_wrap_tooltip):
 			(n as Control).mouse_entered.connect(_wrap_tooltip.bind(n)))
+	_apply_window.call_deferred()
 	theme = ThemeDB.get_project_theme()
 	if theme == null:
 		theme = Theme.new()
@@ -68,6 +69,24 @@ static func wrap_text(text: String, width: int) -> String:
 				line = word if line == "" else line + " " + word
 		out.append(line)
 	return "\n".join(PackedStringArray(out))
+
+
+## M22: the saved window scale and fullscreen.
+func _apply_window() -> void:
+	var c := ConfigFile.new()
+	if c.load(SETTINGS) != OK or DisplayServer.get_name() == "headless":
+		return
+	if bool(c.get_value("display", "fullscreen", false)):
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+	elif c.has_section_key("display", "scale"):
+		DisplayServer.window_set_size(Display.base * int(c.get_value("display", "scale", 2)))
+
+
+## M22: screen shake on or off (Options).
+var shake_on: bool:
+	get:
+		var c := ConfigFile.new()
+		return c.load(SETTINGS) != OK or bool(c.get_value("fx", "shake", true))
 
 
 func _ui() -> Dictionary:

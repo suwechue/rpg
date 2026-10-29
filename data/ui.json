@@ -463,5 +463,37 @@
   "coverIcon": "icon_status_guard",
   "areaFlashSeconds": 0.6,
   "tooltipChars": 56,
-  "hitPauseSeconds": 0.07
+  "hitPauseSeconds": 0.07,
+  "options": {
+    "comment": "M22 Options screen: text speeds (characters per second; 999 = instant), window scales, volume steps (dB offsets added to data/audio.json volumes), and the actions that can be rebound.",
+    "textSpeeds": [
+      25,
+      45,
+      90,
+      999
+    ],
+    "windowScales": [
+      1,
+      2,
+      3
+    ],
+    "volumeStep": 3,
+    "volumeMin": -30,
+    "volumeMax": 6,
+    "rebindable": [
+      "move_up",
+      "move_down",
+      "move_left",
+      "move_right",
+      "interact",
+      "end_part",
+      "cancel",
+      "pause",
+      "card_prev",
+      "card_next",
+      "fast_forward",
+      "threat_view",
+      "feedback"
+    ]
+  }
 }

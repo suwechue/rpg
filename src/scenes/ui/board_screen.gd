@@ -36,6 +36,8 @@ func _refresh() -> void:
 		body.add_child(b)
 	add_button(Strings.t("board.connect"), func() -> void:
 		var d := Mystery.connect_clues(db, GameState.run, str(_picked[0]), str(_picked[1]))
+		if not d.is_empty():
+			Journal.note("deductions", str(d["id"]))
 		_picked.clear()
 		Narrator.say(Strings.t("board.deduced") % str(d["text"]) if not d.is_empty() else Strings.t("board.no_link"))
 		_refresh(), _picked.size() != 2)

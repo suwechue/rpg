@@ -1,0 +1,70 @@
+{
+  "comment": "M22 Narrator's Journal achievements, checked against the Journal across runs. 'stat' is a Journal list or count; 'min' the target. 'unlock' (optional) is a Journal flag that opens a small extra.",
+  "achievements": [
+    {
+      "id": "first_ending",
+      "name": "The End (One of Them)",
+      "text": "See an ending.",
+      "stat": "endings",
+      "min": 1
+    },
+    {
+      "id": "act1",
+      "name": "Act 1",
+      "text": "Finish Act 1.",
+      "stat": "endings:act1",
+      "min": 1,
+      "unlock": "alt_narrator"
+    },
+    {
+      "id": "friends_5",
+      "name": "Making Friends",
+      "text": "See 5 friendship scenes.",
+      "stat": "friendScenes",
+      "min": 5
+    },
+    {
+      "id": "friends_all",
+      "name": "Everyone's Person",
+      "text": "See every friendship scene.",
+      "stat": "friendScenes",
+      "min": 38,
+      "unlock": "trait_unlock_social"
+    },
+    {
+      "id": "deduce_1",
+      "name": "Detective",
+      "text": "Make a deduction.",
+      "stat": "deductions",
+      "min": 1
+    },
+    {
+      "id": "deduce_all",
+      "name": "The Whole Board",
+      "text": "Make every deduction.",
+      "stat": "deductions",
+      "min": 5
+    },
+    {
+      "id": "combos_10",
+      "name": "Vector Scholar",
+      "text": "Discover 10 combos.",
+      "stat": "combos",
+      "min": 10
+    },
+    {
+      "id": "arena_20",
+      "name": "Arena Regular",
+      "text": "Reach wave 20 in the Endless Arena.",
+      "stat": "arena.bestWave",
+      "min": 20
+    },
+    {
+      "id": "runs_5",
+      "name": "Again",
+      "text": "Start 5 runs.",
+      "stat": "runs",
+      "min": 5
+    }
+  ]
+}

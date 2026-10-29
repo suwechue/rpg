@@ -42,6 +42,20 @@ func load_run() -> bool:
 
 
 ## Permadeath: the run is over, the save goes with it.
+## What the save holds, without loading it (M22): week, day, part, mode, when.
+func peek() -> Dictionary:
+	if not has_save():
+		return {}
+	var d: Variant = JSON.parse_string(FileAccess.get_file_as_string(SAVE_PATH))
+	if not (d is Dictionary):
+		return {}
+	var cal: Dictionary = d.get("calendar", {})
+	var run: Dictionary = d.get("run", {})
+	return { "week": int(cal.get("week", 1)), "day": int(cal.get("day_index", 0)), "part": int(cal.get("part_index", 0)),
+		"mode": str(run.get("runMode", "permadeath")), "arena": str(run.get("mode", "")) == "arena",
+		"saved": Time.get_datetime_string_from_unix_time(FileAccess.get_modified_time(SAVE_PATH), true) }
+
+
 func delete_save() -> void:
 	if has_save():
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH))
