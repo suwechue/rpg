@@ -64,7 +64,7 @@ static func closed_reason(db: Dictionary, run: Dictionary, id: String, week: int
 		return str(r.get("lockedLine", Str.t(db, "locations.you_can_t_get_in")))
 	if st == "EXTERIOR" and not bool(r.get("walkUp", false)):
 		return str(r.get("doorLine", Str.t(db, "locations.nobody_answers")))
-	if not in_hours(r, part, db):
+	if not in_hours(r, part, db) and not expand_hours(db, Array(r.get("sneakHours", []))).has(part):
 		return str(r.get("doorLine", Str.t(db, "locations.is_closed_right_now") % r.get("name", "It")))
 	return ""
 

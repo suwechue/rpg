@@ -13,6 +13,7 @@ const Locs := preload("res://src/core/town/locations.gd")
 const Sched := preload("res://src/core/town/schedule.gd")
 const StoryRules := preload("res://src/core/story/story.gd")
 const Crowd := preload("res://src/core/town/crowd.gd")
+const Truancy := preload("res://src/core/town/truancy.gd")
 var _light: CanvasModulate
 var _particles: CPUParticles2D
 var _cars: Array = []
@@ -192,6 +193,7 @@ func _load_map(id: String, is_int: bool, loc: String, at: Vector2i) -> void:
 		_camera.limit_bottom = cb.end.y * TILE + TILE
 	_camera.make_current()
 	_apply_light()
+	_start_sneak()
 	_spawn_followers()
 	_refresh_people()
 	_save_pos()
@@ -609,6 +611,109 @@ func _spawn_followers() -> void:
 				_bubble(w, line)
 
 
+## TL Part 2: is the player out of class right now (a school-hours part, outside the school)?
+func _skipping() -> bool:
+	return Truancy.is_school_hours(DataDB.all(), Calendar.part_id()) and map_id != "school" and not (interior and interior_loc == "hallways")
+
+
+## Watchers (the truant officer, Mr. B, your parent) close enough to see you.
+func _watchers_near() -> Array:
+	var out: Array = []
+	var reach := float(DataDB.table("truancy").get("watchReach", 6))
+	for c in npcs:
+		if DataDB.table("truancy").get("watchers", {}).has(str(npcs[c])) and (c as Vector2i - cell).length() <= reach:
+			out.append(str(npcs[c]))
+	return out
+
+
+## Spotted: talk your way out, run, or take it.
+func _spotted() -> void:
+	var r: Variant = await Flow.show_event({ "title": Strings.t("truancy.spotted_title"), "text": Strings.t("truancy.spotted_text"),
+		"choices": [{ "label": Strings.t("truancy.talk"), "effects": {}, "id": "talk" }, { "label": Strings.t("truancy.run"), "effects": {}, "id": "run" },
+			{ "label": Strings.t("truancy.take"), "effects": {}, "id": "take" }] })
+	var choice := str((r as Dictionary).get("id", "take")) if r is Dictionary else "take"
+	var chase := 0.0
+	if choice == "run" and not GameState.dev_autoplay:
+		var rec := DataDB.record("minigames", "precision")
+		var mg: Control = (load(str(rec.get("script", "res://src/scenes/minigames/precision_minigame.gd"))) as GDScript).new()
+		mg.set("archetype", "precision")
+		mg.set("title", Strings.t("truancy.run"))
+		mg.set("hint", "")
+		get_tree().current_scene.add_child(mg)
+		chase = await mg.finished
+	var cha := int(GameState.player.get("stats", {}).get("cha", 5))
+	var res := Truancy.resolve(DataDB.all(), GameState.run, choice, cha, chase, Rng.stream("events"))
+	Narrator.say(Strings.t(str(res["key"])))
+
+
+# --- TL Part 2: sneaking through the school during class ---------------------------
+
+var _sneaking := false
+var _patrols: Array = []      # [{ "node", "route", "i", "cell", "facing" }]
+var _patrol_t := 0.0
+
+
+func _start_sneak() -> void:
+	_sneaking = false
+	for p in _patrols:
+		if is_instance_valid(p["node"]):
+			p["node"].queue_free()
+	_patrols.clear()
+	var sn: Dictionary = DataDB.table("truancy").get("sneak", {})
+	if not interior or interior_loc != str(sn.get("location", "hallways")) or not Truancy.is_school_hours(DataDB.all(), Calendar.part_id()):
+		return
+	_sneaking = true
+	Narrator.say(Strings.t("truancy.sneaking"))
+	for route in sn.get("patrols", []):
+		var a := Vector2i(int(route[0][0]), int(route[0][1]))
+		var w := Walker.new(str(DataDB.table("npcs/mr_b").get("sprite", "")))
+		w.position = _cell_pos(a)
+		w.z_index = 4
+		map.add_child(w)
+		_patrols.append({ "node": w, "route": route, "i": 1, "cell": a, "facing": Vector2i.RIGHT })
+
+
+## Patrols step toward their next waypoint; their cones are drawn; seeing you ends the sneak.
+func _patrol_step(delta: float) -> void:
+	if not _sneaking or _patrols.is_empty():
+		return
+	_patrol_t += delta
+	var marks := {}
+	for p in _patrols:
+		for c in Truancy.cone(DataDB.all(), p["cell"], p["facing"], map.blocked):
+			marks[c] = "cone"
+	map.marks = marks
+	if marks.has(cell):
+		_caught_sneaking()
+		return
+	if _patrol_t < float(DataDB.table("truancy").get("sneak", {}).get("stepSeconds", 0.9)):
+		return
+	_patrol_t = 0.0
+	for p in _patrols:
+		var wp: Array = p["route"][int(p["i"])]
+		var target := Vector2i(int(wp[0]), int(wp[1]))
+		var at: Vector2i = p["cell"]
+		if at == target:
+			p["i"] = (int(p["i"]) + 1) % p["route"].size()
+			continue
+		var d := Vector2i(signi(target.x - at.x), 0) if target.x != at.x else Vector2i(0, signi(target.y - at.y))
+		p["facing"] = d
+		p["cell"] = at + d
+		p["node"].face(d)
+		var tw := create_tween()
+		tw.tween_property(p["node"], "position", _cell_pos(p["cell"]), 0.3)
+		p["node"].play_walk(0.3)
+
+
+func _caught_sneaking() -> void:
+	_sneaking = false
+	Narrator.say(Strings.t("truancy.seen"))
+	Truancy.caught(DataDB.all(), GameState.run)
+	await Flow.show_event({ "title": Strings.t("truancy.office_title"), "text": Strings.t("truancy.office_text") })
+	map.marks = {}
+	_leave_interior()
+
+
 ## M21: a leak point: a small Upside-Down fight in daylight; winning seals it.
 func _leak_fight(c: Vector2i) -> void:
 	for ch in Crowd.changes(DataDB.all(), GameState.run, GameState.ctx(), map.map_id):
@@ -655,6 +760,7 @@ func _process(_delta: float) -> void:
 	if map != null:
 		# Lamps flicker, the fountain sparkles, water ripples (M12b).
 		map.refresh_overlay()
+		_patrol_step(_delta)
 	_wander_t += _delta
 	if _wander_t >= float(DataDB.table("town/crowd").get("wanderSeconds", 1.6)) and not Flow.is_busy():
 		_wander_t = 0.0
@@ -782,6 +888,15 @@ func interact() -> void:
 		return
 	if map.room_doors.has(f):
 		var room := str(map.room_doors[f])
+		# TL Part 2: while sneaking, the closed rooms hold secrets.
+		var secrets: Dictionary = DataDB.table("truancy").get("sneak", {}).get("secrets", {})
+		if _sneaking and secrets.has(room):
+			if not GameState.flag("secret_" + room):
+				GameState.set_flag("secret_" + room)
+				await Flow.show_event(secrets[room])
+			else:
+				Narrator.say(str(secrets[room].get("title", "")))
+			return
 		var reason := Locs.closed_reason(db, GameState.run, room, Calendar.week(), Calendar.part_id())
 		if reason != "":
 			Narrator.say(reason)
@@ -861,6 +976,8 @@ func location_menu(loc: String) -> void:
 		var cost := int(act.get("ap", 1))
 		var price := int(act.get("money", 0))
 		var label := Strings.t("town.ap") % [act.get("label", "?"), cost, ", $%d" % price if price > 0 else ""]
+		if _skipping():
+			label += "  " + Strings.t("truancy.risk") % Strings.t("truancy." + Truancy.label(db, Truancy.risk(db, GameState.run, loc, _watchers_near())))
 		m.add_button(label, func() -> void: m.finish({ "act": act }), Calendar.ap() < cost or price > GameState.money)
 	if r.has("shop"):
 		var visit := int(DataDB.table("town/shops").get("rules", {}).get("visitAp", 1))
@@ -894,6 +1011,9 @@ func location_menu(loc: String) -> void:
 			GameState.spend_money(int(act["money"]))
 		var lines := GameState.apply_effects(act.get("effects", {}))
 		Narrator.say(("%s %s" % [str(act.get("say", "")), " ".join(PackedStringArray(lines))]).strip_edges())
+		# TL Part 2: a school-hours action can get you spotted.
+		if _skipping() and Rng.stream("events").randf() < Truancy.risk(db, GameState.run, loc, _watchers_near()):
+			await _spotted()
 		# M19: part-time jobs sometimes have a small event on the shift.
 		var jobs: Dictionary = DataDB.table("jobs")
 		var evs: Array = jobs.get("events", {}).get(str(act.get("job", "")), [])

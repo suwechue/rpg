@@ -50,6 +50,11 @@
       "id": "mayor_meetings",
       "text": "The Mayor meets Mr. B after hours, every week.",
       "category": "Mr. B"
+    },
+    {
+      "id": "fountain_heart_hint",
+      "text": "Under the school, someone drew the fountain with an arrow pointing down.",
+      "category": "Upside-Down"
     }
   ],
   "deductions": [
@@ -78,7 +83,11 @@
         "closed_wing_chart"
       ],
       "text": "The fountain is the heart of it. It runs when the cycle peaks.",
-      "flag": "deduction_fountain_heart"
+      "flag": "deduction_fountain_heart",
+      "alt": [
+        "fountain_heart_hint",
+        "founder_fountain"
+      ]
     },
     {
       "id": "mayor_owned",

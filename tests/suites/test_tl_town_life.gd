@@ -38,3 +38,41 @@ func test_school_hours() -> void:
 	check(daytime >= 4, "at least 4 daytime-only activities (%d)" % daytime)
 	for id in ["officer_pruitt", "rae", "walt", "mo", "mr_ellis"]:
 		check(not db().get("npcs/" + id, {}).is_empty(), "%s exists" % id)
+
+
+## Part 2: getting caught, parent trust, patrol cones, the attendance streak.
+func test_truancy() -> void:
+	const Tr := preload("res://src/core/town/truancy.gd")
+	var run := run_()
+	var square := Tr.risk(db(), run, "town_square", [])
+	var alley := Tr.risk(db(), run, "hidden_alley", [])
+	check(square > alley, "the square is riskier than the alley")
+	check(Tr.risk(db(), run, "park", ["officer_pruitt"]) > Tr.risk(db(), run, "park", []), "Officer Pruitt nearby raises the risk")
+	run["skips_week"] = 3
+	check(Tr.risk(db(), run, "hidden_alley", []) > alley, "more skips, more risk")
+	check(Tr.label(db(), 0.05) == "low" and Tr.label(db(), 0.6) == "high", "risk labels")
+	var r := Tr.resolve(db(), run, "take", 5, 0.0, seeded(1))
+	check(not r["free"] and run["detention_pending"] and Tr.trust(db(), run) == 40, "taking it: detention and a call home")
+	var ran := Tr.resolve(db(), run_(), "run", 5, 0.9, seeded(1))
+	check(ran["free"], "a good chase gets away")
+	var frees := 0
+	for i in 40:
+		if Tr.resolve(db(), run_(), "talk", 12, 0.0, seeded(i))["free"]:
+			frees += 1
+	check(frees > 20, "high Charisma usually talks its way out (%d of 40)" % frees)
+	var cov := run_()
+	cov["flags"]["ellis_covers"] = true
+	check(Tr.resolve(db(), cov, "take", 5, 0.0, seeded(1))["key"] == "truancy.covered", "Mr. Ellis covers for you once")
+	var low := run_()
+	Tr.change_trust(db(), low, -30)
+	check(Tr.night_ap_delta(db(), low) == -1 and low["texts"].any(func(t: Dictionary) -> bool: return t["from"] == "parent"), "low trust: a curfew and a text home")
+	var high := run_()
+	Tr.change_trust(db(), high, 30)
+	check(Tr.allowance(db(), high) > 0, "high trust: an allowance")
+	var cone := Tr.cone(db(), Vector2i(5, 4), Vector2i.RIGHT, { Vector2i(8, 4): true })
+	check(cone.has(Vector2i(6, 4)) and cone.has(Vector2i(7, 5)) and not cone.has(Vector2i(8, 4)), "patrol cones widen and walls stop them")
+	var good := run_()
+	good["attendance_week"] = { "physics": 3 }
+	var st0 := int(good["player"]["stats"]["int"])
+	check(Tr.week_end(db(), good) != "", "a perfect week gives a stat")
+	check(Locs.closed_reason(db(), run_(), "hallways", 2, "period_2") == "", "the hallways can be snuck into during class")

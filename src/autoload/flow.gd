@@ -10,6 +10,7 @@ const Fx := preload("res://src/core/run/effects.gd")
 const Exams := preload("res://src/core/run/exams.gd")
 const Clubs := preload("res://src/core/run/clubs.gd")
 const Phone := preload("res://src/core/social/phone.gd")
+const Truancy := preload("res://src/core/town/truancy.gd")
 const NightScreen := preload("res://src/scenes/ui/night_screen.gd")
 const EventScreen := preload("res://src/scenes/ui/event_screen.gd")
 const Hud := preload("res://src/scenes/ui/hud.gd")
@@ -73,6 +74,20 @@ func _on_part_started() -> void:
 			Narrator.say(news)
 	if Calendar.part_id() in ["before_school", "morning"]:
 		GameState.day_snapshot = GameState.to_dict().duplicate(true)
+	# TL Part 2: the attendance streak, the curfew and the allowance.
+	if Calendar.day_name() == "mon" and Calendar.part_id() == "before_school" and str(GameState.run.get("lastStreak", "")) != "":
+		Narrator.say(Strings.t("truancy.streak") % str(GameState.run["lastStreak"]).to_upper())
+		GameState.run["lastStreak"] = ""
+	if Calendar.part_id() == "night":
+		var cd := Truancy.night_ap_delta(DataDB.all(), GameState.run)
+		if cd != 0:
+			Calendar.set_ap(maxi(0, Calendar.ap() + cd))
+			Narrator.say(Strings.t("truancy.curfew"))
+	if Calendar.day_name() == "sat" and Calendar.part_id() == "morning":
+		var pay := Truancy.allowance(DataDB.all(), GameState.run)
+		if pay > 0:
+			GameState.money += pay
+			Narrator.say(Strings.t("truancy.allowance") % pay)
 	# M18: friendship scenes waiting from Bond gains, tonight's texts, and today's plans.
 	for sid in GameState.run.get("pendingFriendScenes", []):
 		screens.push_front("friend:" + str(sid))
@@ -380,6 +395,10 @@ func _report_card() -> void:
 	for r in rep["rows"]:
 		lines.append(Strings.t("exam.row") % [str(r["name"]), str(r["letter"]), int(r["score"])])
 	lines.append(Strings.t("exam.gpa") % float(rep["gpa"]))
+	var att := 0
+	for cid in GameState.run.get("attendance", {}):
+		att += int(GameState.run["attendance"][cid])
+	lines.append(Strings.t("truancy.attendance") % [att, int(GameState.run.get("skips_total", 0))])
 	lines.append("")
 	lines.append(str(rep["parent"].get("text", "")))
 	for e in Exams.report_effects(db, rep):

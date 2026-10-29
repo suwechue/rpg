@@ -61,6 +61,8 @@ static func end_day(db: Dictionary, run: Dictionary) -> Array:
 ## A new week: school counters reset, Bonds decay 5% toward 0 (except
 ## Unbreakable), dispositions drift back toward rest.
 static func new_week(db: Dictionary, run: Dictionary) -> Array:
+	# TL Part 2: perfect attendance last week raises a class stat.
+	run["lastStreak"] = preload("res://src/core/town/truancy.gd").week_end(db, run)
 	School.new_week(run)
 	run["signature"] = {}
 	var bond_space: Dictionary = db.get("spaces", {}).get("bond", {})

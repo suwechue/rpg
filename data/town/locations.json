@@ -34,7 +34,10 @@
       ],
       "doorLine": "The school is locked. The trophy case glints at you through the glass, smug.",
       "futureHook": "Lockers, notice board",
-      "schoolHoursNote": "Sneaking area during class (TL Part 2)."
+      "schoolHoursNote": "Sneaking area during class (TL Part 2).",
+      "sneakHours": [
+        "@schoolHours"
+      ]
     },
     {
       "id": "cafeteria",

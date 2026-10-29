@@ -527,6 +527,8 @@ func _draw_mark(c: Vector2i, kind: String, t: float) -> void:
 				_overlay.draw_circle(o + Vector2(8, 12 - rise) * d, (2.0 + rise * 0.2) * d, Color(0.75, 0.75, 0.75, 0.6 - rise * 0.035))
 		"cold":
 			_overlay.draw_rect(Rect2(o, Vector2(TILE, TILE)), Color(0.2, 0.25, 0.4, 0.35))
+		"cone":
+			_overlay.draw_rect(Rect2(o, Vector2(TILE, TILE)), Color(1.0, 0.25, 0.2, 0.28))
 		"crater":
 			_overlay.draw_circle(o + Vector2(TILE, TILE) / 2.0, TILE * 0.9, Color("2a2a33"))
 			_overlay.draw_circle(o + Vector2(TILE, TILE) / 2.0, TILE * 0.6, Color(0.24, 0.45, 0.75, 0.9 + 0.05 * sin(t)))

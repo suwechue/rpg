@@ -1,0 +1,117 @@
+{
+  "comment": "TL Part 2: getting caught skipping. Each school-hours action outside school rolls Spotted: the place's risk (places, else zone), plus watchers within reach (watchers), plus perSkip for each skip this week, capped at maxRisk. Spotted offers Talk (CHA check), Run (a chase minigame) or Take it (detention and a call home). Parent trust (0..100, start 50): below lowTrust means a curfew (night AP -1), above highTrust a Saturday allowance. Sneaking: the school hallways during class have patrols with vision cones; being seen sends you to Mr. B. Perfect attendance for a week gives +1 to a class stat.",
+  "zoneRisk": {
+    "downtown": 0.2,
+    "residential": 0.1,
+    "outskirts": 0.08,
+    "school": 0.3
+  },
+  "places": {
+    "town_square": 0.3,
+    "bus_stop_downtown": 0.25,
+    "garys_deli": 0.15,
+    "library": 0.12,
+    "hidden_alley": 0.03,
+    "park": 0.1,
+    "town_hall": 0.2,
+    "post_office": 0.15,
+    "forge": 0.05,
+    "hospital": 0.1,
+    "corner_store": 0.1
+  },
+  "watchers": {
+    "officer_pruitt": 0.25,
+    "mr_b": 0.2,
+    "parent": 0.15
+  },
+  "watchReach": 6,
+  "perSkip": 0.05,
+  "maxRisk": 0.85,
+  "labels": [
+    [
+      0.15,
+      "low"
+    ],
+    [
+      0.3,
+      "medium"
+    ],
+    [
+      1.0,
+      "high"
+    ]
+  ],
+  "talkBase": 0.35,
+  "talkPerCha": 0.06,
+  "runNeed": 0.5,
+  "caught": {
+    "detention": true,
+    "trust": -10,
+    "ellisCovers": "ellis_covers"
+  },
+  "trustStart": 50,
+  "lowTrust": 30,
+  "highTrust": 70,
+  "curfewApDelta": -1,
+  "allowance": 15,
+  "trustTexts": {
+    "low": "We need to talk about the school calling. Home by dark. Every night.",
+    "high": "Your teacher says you're doing great. There's a little extra in your allowance this week."
+  },
+  "streakReward": 1,
+  "sneak": {
+    "location": "hallways",
+    "coneLength": 3,
+    "stepSeconds": 0.9,
+    "patrols": [
+      [
+        [
+          3,
+          4
+        ],
+        [
+          26,
+          4
+        ]
+      ],
+      [
+        [
+          24,
+          6
+        ],
+        [
+          6,
+          6
+        ]
+      ]
+    ],
+    "secrets": {
+      "teachers_lounge": {
+        "title": "The teachers' lounge",
+        "text": "Stale coffee, a fridge with names on everything, and a staff memo: 'Do NOT discuss the transfers with students.' Someone has underlined NOT three times.",
+        "effects": {
+          "clue": "transfer_signatures",
+          "money": 5
+        }
+      },
+      "roof_access": {
+        "title": "The roof",
+        "text": "The whole town from up here. The woods look closer than they should. Someone left a pair of binoculars and a notebook of times: every night, 9:14, 'lights in the trees'.",
+        "effects": {
+          "clue": "woods_last_seen",
+          "statXp": {
+            "per": 2
+          }
+        }
+      },
+      "boiler_room": {
+        "title": "The boiler room",
+        "text": "It's warm, and the boiler ticks like a clock. Behind it, chalk on the brick: a drawing of the fountain, with an arrow pointing down.",
+        "effects": {
+          "clue": "fountain_heart_hint",
+          "item": "ore_iron"
+        }
+      }
+    }
+  }
+}
