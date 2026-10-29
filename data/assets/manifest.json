@@ -6191,6 +6191,12 @@
       ],
       "anchor": "top center",
       "notes": "The title logo (VD Part 5). Drop assets/custom/ui/art_logo.png; until then the title is drawn as text."
+    },
+    "sfx_bell": {
+      "type": "sfx",
+      "kind": "sfx",
+      "source": "res://assets/packs/ninja_adventure/Audio/Sounds/Alert/Alert2.wav",
+      "notes": "The school bell between periods (M13). Short one-shot (.wav or .ogg)."
     }
   }
 }

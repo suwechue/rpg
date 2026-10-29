@@ -18,7 +18,7 @@ Sizes: tiles 32x32, characters 32x32 (up to 32x48 for tall ones), portraits 64x6
 
 Pack art is a placeholder: the 16x16 packs are scaled up 2x (nearest neighbour) to fit the 32x32 grid until you replace them.
 
-Replaced so far: Characters (walk sheets) 0/39, Portraits 0/35, Enemies and bosses 0/76, Tilesets 0/4, Single tiles 0/120, UI 0/20, Icons 0/42, Card art 0/24, VFX 0/38, Music 0/30, Sound effects 0/39, Ambience 0/9, Voice blips 0/10.
+Replaced so far: Characters (walk sheets) 0/39, Portraits 0/35, Enemies and bosses 0/76, Tilesets 0/4, Single tiles 0/120, UI 0/20, Icons 0/42, Card art 0/24, VFX 0/38, Music 0/30, Sound effects 0/40, Ambience 0/9, Voice blips 0/10.
 
 ## Characters (walk sheets) (39)
 
@@ -518,7 +518,7 @@ Background music by situation (data/audio.json). Tracks loop; jingles play once.
 | [ ] | `music_cutscene_funny` | - | - | - | pack: ninja_adventure | Looping track (.ogg). |
 | [ ] | `music_arena` | - | - | - | pack: ninja_adventure | Looping track (.ogg). |
 
-## Sound effects (39)
+## Sound effects (40)
 
 Short sound effects.
 
@@ -563,6 +563,7 @@ Short sound effects.
 | [ ] | `sfx_charge` | - | - | - | pack: ninja_adventure | Short one-shot (.wav or .ogg). |
 | [ ] | `sfx_combo_discovered` | - | - | - | pack: ninja_adventure | Short one-shot (.wav or .ogg). |
 | [ ] | `sfx_combo_cast` | - | - | - | pack: ninja_adventure | A combo spell goes off (VD Part 2). Short one-shot (.wav or .ogg). |
+| [ ] | `sfx_bell` | - | - | - | pack: ninja_adventure | The school bell between periods (M13). Short one-shot (.wav or .ogg). |
 
 ## Ambience (9)
 

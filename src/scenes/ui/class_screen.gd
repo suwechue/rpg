@@ -3,6 +3,7 @@ extends "res://src/scenes/ui/modal.gd"
 
 const School := preload("res://src/core/run/school.gd")
 const Fx := preload("res://src/core/run/effects.gd")
+const SchoolScenes := preload("res://src/core/run/school_scenes.gd")
 
 var period := 1
 var cls: Dictionary = {}
@@ -27,6 +28,11 @@ func _ready() -> void:
 
 func _attend() -> void:
 	var db: Dictionary = DataDB.all()
+	# M13: the bell, the walk to class and the class itself, as cutscenes.
+	visible = false
+	var teacher := str(db.get("school_classes", {}).get("professors", {}).get(str(cls.get("professor", "")), ""))
+	await Cutscenes.play_steps(SchoolScenes.steps(db, cls, period, teacher, Rng.stream("events")), get_tree().current_scene, "class_" + str(cls.get("id", "")))
+	visible = true
 	var report := School.attend(db, GameState.run, period, Rng.stream("events"), GameState.ctx())
 	_ctx = report["ctx"]
 	_ctx["teacher"] = str(db.get("school_classes", {}).get("professors", {}).get(str(cls.get("professor", "")), ""))

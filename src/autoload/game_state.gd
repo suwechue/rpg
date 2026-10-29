@@ -189,6 +189,7 @@ func combat_setup(enemies: Array, layout_id: String, opts: Dictionary = {}) -> D
 			setup[key] = opts[key]
 	setup["difficulty"] = combat_difficulty
 	setup["backpack"] = run.get("backpack", [])
+	setup["ramp"] = preload("res://src/core/combat/combat_state.gd").ramp_for(DataDB.all(), Calendar.week(), 0)
 	return setup
 
 

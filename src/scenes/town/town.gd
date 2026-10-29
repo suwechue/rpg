@@ -68,6 +68,39 @@ func _exit_tree() -> void:
 
 # --- Maps ------------------------------------------------------------------------
 
+## M13: your locker at school. Items move between it and your inventory;
+## friends' notes (run["lockerNotes"], filled in by M18) are taped inside.
+func _locker() -> void:
+	const LockerRules := preload("res://src/core/town/locker.gd")
+	while true:
+		var m := Modal.new()
+		m.build(Strings.t("locker.title"), 340)
+		var notes: Array = GameState.run.get("lockerNotes", [])
+		m.text(Strings.t("locker.notes") if not notes.is_empty() else Strings.t("locker.no_notes"), UiTheme.DIM)
+		for n in notes:
+			m.text("- " + str(n))
+		m.text(Strings.t("locker.inside"), UiTheme.ACCENT)
+		var inside: Dictionary = GameState.run.get("locker", {})
+		if inside.is_empty():
+			m.text(Strings.t("locker.empty"), UiTheme.DIM)
+		for id in inside:
+			var iid := str(id)
+			m.add_button(Strings.t("locker.take") % [str(DataDB.record("items", iid).get("name", iid)), int(inside[id])], func() -> void: m.finish(["take", iid]))
+		var inv: Dictionary = GameState.run.get("inventory", {})
+		for id in inv:
+			if int(inv[id]) > 0:
+				var iid := str(id)
+				m.add_button(Strings.t("locker.store") % [str(DataDB.record("items", iid).get("name", iid)), int(inv[id])], func() -> void: m.finish(["store", iid]))
+		m.add_button(Strings.t("locker.close"), func() -> void: m.finish(null))
+		var r: Variant = await Flow.show_modal(m)
+		if r == null:
+			return
+		if str(r[0]) == "take":
+			LockerRules.take(GameState.run, str(r[1]))
+		else:
+			LockerRules.store(GameState.run, str(r[1]))
+
+
 ## Stories tied to a place play when the player gets there (within reach of
 ## the location's door or spot, or anywhere in its zone).
 func _check_place_stories() -> void:
@@ -483,6 +516,9 @@ func interact() -> void:
 		var kind := str(map.furniture[f].get("kind", ""))
 		if kind == "workbench":
 			await _workbench(interior_loc)
+			return
+		if kind == "lockers" and interior_loc == "hallways":
+			await _locker()
 			return
 		if kind == "door_locked" and interior_loc == "hospital":
 			var reason := Locs.closed_reason(db, GameState.run, "hospital_closed_wing", Calendar.week(), Calendar.part_id())

@@ -1,0 +1,21 @@
+{
+  "comment": "M13 (user decision, Oct 28): class periods play as cutscenes, not walking: the bell and the walk to class, then the class itself with the teacher at the board and a seating chart of who's in it. Lines use {class}, {teacher}, {room}, {period}, {mate}. Art ids (art_class_<class id>) are optional; a dark backdrop stands in.",
+  "seatCols": 4,
+  "seatRows": 2,
+  "walkLines": [
+    "The bell. Lockers slam, sneakers squeak, and the hall empties toward {room}.",
+    "Between periods the hall is a river. You let it carry you to {room}.",
+    "Someone's phone plays the same ten seconds of a song. You follow the noise to {room}.",
+    "You take the long way past the trophy case. Nobody's polished it since the nineties. {room}, then."
+  ],
+  "classLines": [
+    "{teacher} is already writing on the board when you slip in. {class}, period {period}.",
+    "{teacher} looks up, counts heads, and starts without waiting. {class}.",
+    "The radiator clanks. {teacher} talks over it like it's a student. {class}, period {period}."
+  ],
+  "mateLines": [
+    "{mate} glances over and nods.",
+    "{mate} is doodling on the desk again.",
+    "{mate} slides you a note: \"later?\""
+  ]
+}

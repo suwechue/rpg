@@ -294,6 +294,9 @@ func _build_ui() -> void:
 	up.custom_minimum_size = Vector2(112, 0)
 	_ui.add_child(up)
 	_unit_panel = UiTheme.label("")
+	# Wrap inside the panel so long lines never run under the turn order strip.
+	_unit_panel.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_unit_panel.custom_minimum_size = Vector2(108, 0)
 	up.add_child(_unit_panel)
 	var ip := PanelContainer.new()
 	ip.position = Vector2(view.x - 128, 24)
@@ -495,8 +498,6 @@ func _refresh_hud() -> void:
 				lines.append(Strings.t("combat.actions_left") % [u.actions_left, state.actions_per_turn(), Strings.t("combat.quick_ready") if not u.quick_used else Strings.t("combat.quick_spent")])
 			else:
 				lines.append(Strings.t("combat.move") % [u.move_left, Strings.t("combat.action_used") if u.action_used else Strings.t("combat.action_ready")])
-			if u.deck != null:
-				lines.append(Strings.t("combat.deck_discard") % [u.deck.draw_pile.size(), u.deck.discard.size()])
 		if u.shield > 0:
 			lines.append(Strings.t("combat.shield") % u.shield)
 		_unit_panel.text = "\n".join(PackedStringArray(lines))

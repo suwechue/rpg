@@ -94,8 +94,8 @@ func _ready() -> void:
 	_choices = VBoxContainer.new()
 	v.add_child(_choices)
 	_skip_btn = UiTheme.button(Strings.t("cutscene.skip"), func() -> void: _skip = true)
-	# Above the dialogue box, clear of the HUD bar and its buttons.
-	_skip_btn.position = Vector2(view.x - 52, view.y - 86)
+	# Inside the dialogue box's top-right corner, clear of every HUD button.
+	_skip_btn.position = Vector2(view.x - 56, view.y - 64)
 	_skip_btn.visible = false
 	add_child(_skip_btn)
 
@@ -122,12 +122,22 @@ func _process(_delta: float) -> void:
 	_fast = playing != "" and Input.is_action_pressed("interact")
 
 
+## Play steps built at runtime (M13 class scenes), not from data.
+func play_steps(steps: Array, host: Node = null, tag: String = "generated") -> void:
+	await _run({ "id": tag, "steps": steps }, host)
+
+
 ## Play a cutscene by id. Returns when it ends (or is skipped). Unknown ids return at once.
 func play(id: String, host: Node = null) -> void:
 	var c := CS.find(DataDB.all(), id)
 	if c.is_empty():
 		push_warning("Cutscenes: no cutscene '%s'" % id)
 		return
+	await _run(c, host)
+
+
+func _run(c: Dictionary, host: Node) -> void:
+	var id := str(c.get("id", ""))
 	# One at a time: a cutscene asked for while another plays waits its turn.
 	while playing != "":
 		await finished
@@ -236,6 +246,9 @@ func _steps(steps: Array, host: Node, markers: Dictionary) -> void:
 					GameState.set_flag(str(st.get("flag", "")), st.get("value", true))
 			"give":
 				_apply(st.get("effects", {}))
+			"seating":
+				if not _skip:
+					await _seating(st)
 			"start_combat":
 				# Ends the cutscene and starts the fight (the scene that called comes back after).
 				var setup := GameState.combat_setup(st.get("enemies", []), str(st.get("layout", "open_field")), { "intro": _line(st) if st.has("text") or st.has("textKey") else "" })
@@ -313,6 +326,31 @@ func _choice(st: Dictionary) -> int:
 		c.queue_free()
 	_box.visible = false
 	return maxi(0, _picked)
+
+
+## M13: a seating chart, desks in rows with names and your seat marked.
+func _seating(st: Dictionary) -> void:
+	var panel := PanelContainer.new()
+	var v := VBoxContainer.new()
+	panel.add_child(v)
+	v.add_child(UiTheme.label(Strings.t("school.seating_title") % str(st.get("title", "")), UiTheme.ACCENT))
+	var grid := GridContainer.new()
+	var rows: Array = st.get("rows", [])
+	grid.columns = maxi(1, (rows[0] as Array).size() if not rows.is_empty() else 1)
+	v.add_child(grid)
+	for row in rows:
+		for seat in row:
+			var who := str(seat)
+			var text := Strings.t("school.you") if who == "@you" else (Strings.t("school.empty_seat") if who == "" else str(DataDB.table("npcs/" + who).get("name", who.capitalize())).split(" ")[0])
+			var l := UiTheme.label(text, UiTheme.ACCENT if who == "@you" else (UiTheme.DIM if who == "" else UiTheme.TEXT))
+			l.custom_minimum_size = Vector2(Display.tile * 2, Display.tile * 0.75)
+			l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			grid.add_child(l)
+	add_child(panel)
+	panel.reset_size()
+	panel.position = (Display.size_f() - panel.size) / 2.0 - Vector2(0, Display.tile)
+	await _until_advance()
+	panel.queue_free()
 
 
 func _until_advance() -> void:

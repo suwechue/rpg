@@ -141,3 +141,36 @@ func test_deck_synergies() -> void:
 	FX.run(st, me, { "effects": [{ "op": "hand_plus", "n": 1, "turns": 3 }] }, me.cell, [me.cell])
 	check(st.hand_size(me) == hs + 1, "a bigger hand for a few turns")
 	check(Arena.card_offer(db(), { "seed": 3 }, [hero()], 2).all(func(i: String) -> bool: return int(DT.index_under(db(), "cards/", "cards").get(i, {}).get("minWave", 0)) <= 2), "synergy cards only show up in later waves")
+
+
+func test_flanking() -> void:
+	var ch := hero()
+	var st := fight(ch, ["..E", "...", "..."])
+	var me = st.unit_by_id("player")
+	var foe = null
+	for u in st.units:
+		if u.team == "enemy":
+			foe = u
+	me.cell = Vector2i(0, 1)
+	foe.cell = Vector2i(1, 1)
+	check(is_equal_approx(st.position_mul(me, foe), 1.0), "no flank alone")
+	var ally := hero("rogue")
+	var other = StateScript.new(db(), seeded(5), { "layout": { "map": ["P.E"] }, "party": [{ "char": ch }, { "char": ally }], "enemies": [DT.index_under(db(), "enemies/", "enemies")["pom_pom_wisp"].duplicate(true)] })
+	var a1 = other.units[0]
+	var a2 = other.units[1]
+	var f = null
+	for u in other.units:
+		if u.team == "enemy":
+			f = u
+	a1.cell = Vector2i(0, 0)
+	f.cell = Vector2i(1, 0)
+	a2.cell = Vector2i(2, 0)
+	check(other.position_mul(a1, f) > 1.0, "an ally on the far side flanks the target")
+
+
+func test_difficulty_ramp() -> void:
+	check(is_equal_approx(StateScript.ramp_for(db(), 1, 0), 0.0) and is_equal_approx(StateScript.ramp_for(db(), 3, 0), 1.0), "story: gentle in week 1, full from week 3")
+	check(is_equal_approx(StateScript.ramp_for(db(), 0, 1), 0.0) and is_equal_approx(StateScript.ramp_for(db(), 0, 15), 1.0), "arena: gentle at wave 1, full from wave 15")
+	var early := fight(hero(), ["P..E"], { "ramp": 0.0 })
+	var late := fight(hero(), ["P..E"], { "ramp": 1.0 })
+	check(early.diff_value("enemyDamageMul") < late.diff_value("enemyDamageMul"), "enemies hit softer early (%.2f vs %.2f)" % [early.diff_value("enemyDamageMul"), late.diff_value("enemyDamageMul")])

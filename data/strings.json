@@ -107,7 +107,7 @@
     "card_view.mp": "%s (%d MP)\n%s",
     "combat.init": "%s%s (init %d)",
     "combat.move": "Move %d  %s",
-    "combat.deck_discard": "Deck %d  Discard %d",
+    "combat.deck_discard": "Draw %d  Discard %d",
     "combat.shield": "Shield %d",
     "combat.mp": "%s (%d MP)\n%s",
     "combat.hits_enemies": "Hits %d enemies",
@@ -808,6 +808,19 @@
     "combat_state.last_stand": "%s makes a last stand!",
     "card_effects.draws": "%s draws %d.",
     "card_effects.recalls": "%s takes back %d from the discard pile.",
-    "card_effects.seeks": "%s finds %s."
+    "card_effects.seeks": "%s finds %s.",
+    "combat_state.flanked": "flanked",
+    "school.period_card": "Period %d: %s",
+    "school.seating_title": "Seating chart: %s",
+    "school.you": "You",
+    "school.empty_seat": "-",
+    "locker.title": "Your locker",
+    "locker.notes": "Notes taped inside:",
+    "locker.no_notes": "No notes. Yet.",
+    "locker.store": "Put in: %s (%d)",
+    "locker.take": "Take out: %s (%d)",
+    "locker.close": "Close",
+    "locker.inside": "In the locker:",
+    "locker.empty": "Nothing in here but a gum wrapper."
   }
 }

@@ -61,6 +61,7 @@ var _undo: Array = []               # PT Part 1: snapshots of this turn, newest 
 var undo_lock := ""                 # why the turn can't be undone further (a roll, a draw, a reveal)
 var turn_mode := "two_actions"     # data/combat_rules.json "turnMode" (PT Part 1); setup "turnMode" overrides
 var difficulty := "normal"         # data/combat_rules.json "difficulty"; setup "difficulty" overrides
+var ramp := 1.0                    # 0 = early-game numbers, 1 = the difficulty's full numbers (see ramp_for)
 var ai_overrides: Dictionary = {}  # sims: data/ai.json values to replace for this fight
 var delayed: Array = []            # telegraphed strikes that land later: [{ cells, turns, spec, caster, neutral, name }]
 var revealed := 0                  # rounds Reveal keeps every plan visible
@@ -86,6 +87,7 @@ func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) ->
 	hp_floor = bool(setup.get("hpFloor", false))
 	guarantee_improvise = bool(setup.get("guaranteeImprovise", false))
 	difficulty = str(setup.get("difficulty", db.get("combat_rules", {}).get("difficulty", "normal")))
+	ramp = clampf(float(setup.get("ramp", 1.0)), 0.0, 1.0)
 	ai_overrides = setup.get("ai", {})
 	mutators = setup.get("mutators", [])
 	boss_fight = bool(setup.get("boss", false))
@@ -100,15 +102,30 @@ func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) ->
 		u.ai_controlled = bool(entry.get("ai", false))
 		u.guest = bool(entry.get("guest", false))
 		_place(u, grid.party_spawns, i, true)
-	var enemies: Array = setup.get("enemies", [])
+	var enemies: Array = setup.get("enemies", []).duplicate()
+	var roles: Array = setup.get("roles", []).duplicate()
+	# Hard (eased in by the ramp): extra copies of regular enemies, so fights
+	# ask for better positioning rather than lasting longer (user request, Oct 28).
+	var extra := roundi(diff_value("enemyExtra", 0.0))
+	if extra > 0 and not bool(setup.get("boss", false)):
+		var pool: Array = []
+		for i in enemies.size():
+			var e: Dictionary = enemies[i] if typeof(enemies[i]) == TYPE_DICTIONARY else {}
+			if str(e.get("tier", "normal")) in ["normal", "minion"]:
+				pool.append(i)
+		for k in extra:
+			if pool.is_empty():
+				break
+			var src: int = pool[rng.randi_range(0, pool.size() - 1)]
+			enemies.append((enemies[src] as Dictionary).duplicate(true))
+			roles.append(roles[src] if src < roles.size() else "fighter")
 	for i in enemies.size():
 		var rec: Dictionary = EnemyMods.apply(db, enemies[i])
 		var u := UnitScript.from_enemy(rec, float(rec.get("scale", 1.0)))
 		var hp_mul := "bossHpMul" if u.boss else "enemyHpMul"
 		u.max_hp = maxi(1, roundi(float(u.max_hp) * float(db.get("combat_rules", {}).get(hp_mul, 1.0))))
-		u.max_hp = maxi(1, roundi(float(u.max_hp) * float(difficulty_rules().get("enemyHpMul", 1.0)) * float(mutator_rules().get("enemyHpMul", 1.0))))
+		u.max_hp = maxi(1, roundi(float(u.max_hp) * diff_value("enemyHpMul") * float(mutator_rules().get("enemyHpMul", 1.0))))
 		u.hp = u.max_hp
-		var roles: Array = setup.get("roles", [])
 		u.role = str(roles[i]) if i < roles.size() else ("minion" if str(rec.get("tier", "")) == "minion" else "fighter")
 		_place(u, grid.enemy_spawns, i, false)
 		if float(rec.get("startShieldPct", 0.0)) > 0.0:
@@ -778,6 +795,23 @@ func mutator_rules() -> Dictionary:
 ## The combat difficulty's rules (normal or hard).
 func difficulty_rules() -> Dictionary:
 	return db.get("combat_rules", {}).get("difficulties", {}).get(difficulty, {})
+
+
+## A difficulty number eased in by the ramp: from data/combat_rules.json
+## ramp.start (week 1, the first arena waves) up to the difficulty's value.
+func diff_value(key: String, fallback: float = 1.0) -> float:
+	var full := float(difficulty_rules().get(key, fallback))
+	var start := float(db.get("combat_rules", {}).get("ramp", {}).get("start", {}).get(key, full))
+	return lerpf(minf(start, full), full, ramp)
+
+
+## How far into the difficulty ramp a fight is (user decision, Oct 28): 0 in
+## week 1 and arena wave 1, 1 from fullAtWeek / fullAtWave on.
+static func ramp_for(db: Dictionary, week: int, wave: int) -> float:
+	var r: Dictionary = db.get("combat_rules", {}).get("ramp", {})
+	if wave > 0:
+		return clampf(float(wave - 1) / float(maxi(1, int(r.get("fullAtWave", 15)) - 1)), 0.0, 1.0)
+	return clampf(float(week - 1) / float(maxi(1, int(r.get("fullAtWeek", 3)) - 1)), 0.0, 1.0)
 
 
 func move(u: UnitScript, dest: Vector2i) -> bool:
@@ -1643,6 +1677,31 @@ func _no_damage(card: Dictionary) -> bool:
 	return true
 
 
+## Tactical position (user request, Oct 28; data/combat_rules.json "tactics"):
+## Flanked: the target has a hostile unit on the opposite side from the
+## attacker (both teams can flank). Isolated (Hard): a party member with no
+## ally next to them takes more. Returns the damage multiplier.
+func position_mul(u: UnitScript, t: UnitScript) -> float:
+	var tac: Dictionary = db.get("combat_rules", {}).get("tactics", {})
+	var diff: Dictionary = difficulty_rules().get("tactics", {})
+	var mul := 1.0
+	if u.cell != t.cell and GridScript.manhattan(u.cell, t.cell) <= 2:
+		var d := t.cell - u.cell
+		var behind := t.cell + Vector2i(signi(d.x), signi(d.y))
+		var o := unit_at(behind)
+		if o != null and o != t and o.alive() and not o.is_prop() and is_hostile(o, t):
+			mul *= 1.0 + float(diff.get("flankBonus", tac.get("flankBonus", 0.0)))
+	if t.team == "party" and float(diff.get("isolatedBonus", tac.get("isolatedBonus", 0.0))) > 0.0:
+		var alone := true
+		for a2 in allies_of(t):
+			if a2 != t and a2.alive() and GridScript.manhattan(a2.cell, t.cell) == 1:
+				alone = false
+				break
+		if alone and allies_of(t).size() > 1:
+			mul *= 1.0 + float(diff.get("isolatedBonus", tac.get("isolatedBonus", 0.0)))
+	return mul
+
+
 func _expected_hit(u: UnitScript, t: UnitScript, spec: Dictionary) -> float:
 	var area := float(spec.get("areaMul", 1.0))
 	if u.statuses.has("encore"):
@@ -1660,6 +1719,7 @@ func _expected_hit(u: UnitScript, t: UnitScript, spec: Dictionary) -> float:
 	var guard := float(t.source.get("frontGuard", 0.0))
 	if guard > 0.0 and u.cell.x != t.cell.x and signi(u.cell.x - t.cell.x) == t.facing:
 		area *= 1.0 - guard
+	area *= position_mul(u, t)
 	# Shatter and friends: bonus against targets with certain statuses.
 	var bonus: Dictionary = spec.get("bonusVs", {})
 	for s in bonus.get("statuses", []):
@@ -2072,6 +2132,8 @@ func hit_note(u: UnitScript, t: UnitScript, vectors: Dictionary) -> String:
 	var c := Res.contest_mult(db, vectors, t)
 	if c > 1.05:
 		parts.append(Str.t(db, "combat_state.weak_spot"))
+	if position_mul(u, t) > 1.0:
+		parts.append(Str.t(db, "combat_state.flanked"))
 	elif c < 0.95:
 		parts.append("resisted")
 	if Res.is_behind(u, t):
@@ -2450,7 +2512,7 @@ func _build_order_keep_current() -> void:
 ## place enemy damage is decided: previews, telegraphs, the threat view and the
 ## hit all use it. Heals and shields use "power".
 func action_spec(u: UnitScript, action: Dictionary) -> Dictionary:
-	var dmg_mul := float(difficulty_rules().get("enemyDamageMul", 1.0)) if u.team == "enemy" else 1.0
+	var dmg_mul := diff_value("enemyDamageMul") if u.team == "enemy" else 1.0
 	if u.team == "enemy" and str(action.get("intent", u.source.get("intent", "locked"))) == "tracking":
 		# Tracking attacks can't be dodged by moving, so they hit softer (PT Part 4).
 		dmg_mul *= float(Res.combat_cfg(db).get("trackingDamageMul", 0.6))

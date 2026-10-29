@@ -1,29 +1,263 @@
 {
-  "id": "school", "name": "Vector High", "size": [60, 34], "ground": "grass", "music": "school",
-  "fills": [
-    { "ground": "plaza", "rect": [14, 12, 32, 4] },
-    { "ground": "path", "rect": [28, 16, 2, 2] },
-    { "ground": "path", "rect": [46, 12, 9, 1] },
-    { "ground": "path", "rect": [7, 11, 1, 5] },
-    { "ground": "field", "rect": [36, 20, 20, 11] }
+  "id": "school",
+  "name": "Vector High",
+  "size": [
+    60,
+    34
   ],
-  "roads": [ { "dir": "h", "x": 0, "y": 16, "len": 28 } ],
+  "ground": "grass",
+  "music": "school",
+  "fills": [
+    {
+      "ground": "plaza",
+      "rect": [
+        14,
+        12,
+        32,
+        4
+      ]
+    },
+    {
+      "ground": "path",
+      "rect": [
+        28,
+        16,
+        2,
+        2
+      ]
+    },
+    {
+      "ground": "path",
+      "rect": [
+        46,
+        12,
+        9,
+        1
+      ]
+    },
+    {
+      "ground": "path",
+      "rect": [
+        7,
+        11,
+        1,
+        5
+      ]
+    },
+    {
+      "ground": "field",
+      "rect": [
+        36,
+        20,
+        20,
+        11
+      ]
+    }
+  ],
+  "roads": [
+    {
+      "dir": "h",
+      "x": 0,
+      "y": 16,
+      "len": 28
+    }
+  ],
   "buildings": [
-    { "loc": "hallways", "rect": [16, 3, 26, 9], "style": "school", "door": 12, "label": "Vector High" },
-    { "loc": "gym", "rect": [46, 5, 10, 7], "style": "civic", "door": 4, "label": "Gym" },
-    { "loc": "shop_classroom", "rect": [4, 6, 8, 5], "style": "stone_gray", "door": 3, "label": "Shop" }
+    {
+      "loc": "hallways",
+      "rect": [
+        16,
+        3,
+        26,
+        9
+      ],
+      "style": "school",
+      "door": 12,
+      "label": "Vector High"
+    },
+    {
+      "loc": "gym",
+      "rect": [
+        46,
+        5,
+        10,
+        7
+      ],
+      "style": "civic",
+      "door": 4,
+      "label": "Gym"
+    },
+    {
+      "loc": "shop_classroom",
+      "rect": [
+        4,
+        6,
+        8,
+        5
+      ],
+      "style": "stone_gray",
+      "door": 3,
+      "label": "Shop"
+    }
   ],
   "props": [
-    { "kind": "trees", "rect": [0, 0, 60, 2], "step": 3 },
-    { "kind": "trees", "rect": [0, 31, 36, 3], "step": 3 },
-    { "kind": "trees", "rect": [57, 2, 3, 30], "step": 3 },
-    { "kind": "bench", "at": [38, 19] }, { "kind": "bench", "at": [43, 19] }, { "kind": "bench", "at": [48, 19] },
-    { "kind": "target", "at": [55, 25] }, { "kind": "target", "at": [36, 25] },
-    { "kind": "lamp", "at": [15, 13] }, { "kind": "lamp", "at": [44, 13] },
-    { "kind": "sign", "at": [26, 15], "text": "Vector High: Home of the Hornets" },
-    { "kind": "bin", "at": [33, 14] }, { "kind": "tree", "at": [12, 20] }, { "kind": "tree", "at": [20, 22] }, { "kind": "tree", "at": [27, 25] }
+    {
+      "kind": "trees",
+      "rect": [
+        0,
+        0,
+        60,
+        2
+      ],
+      "step": 3
+    },
+    {
+      "kind": "trees",
+      "rect": [
+        0,
+        31,
+        36,
+        3
+      ],
+      "step": 3
+    },
+    {
+      "kind": "trees",
+      "rect": [
+        57,
+        2,
+        3,
+        30
+      ],
+      "step": 3
+    },
+    {
+      "kind": "bench",
+      "at": [
+        38,
+        19
+      ]
+    },
+    {
+      "kind": "bench",
+      "at": [
+        43,
+        19
+      ]
+    },
+    {
+      "kind": "bench",
+      "at": [
+        48,
+        19
+      ]
+    },
+    {
+      "kind": "target",
+      "at": [
+        55,
+        25
+      ]
+    },
+    {
+      "kind": "target",
+      "at": [
+        36,
+        25
+      ]
+    },
+    {
+      "kind": "lamp",
+      "at": [
+        15,
+        13
+      ]
+    },
+    {
+      "kind": "lamp",
+      "at": [
+        44,
+        13
+      ]
+    },
+    {
+      "kind": "sign",
+      "at": [
+        26,
+        15
+      ],
+      "text": "Vector High: Home of the Hornets"
+    },
+    {
+      "kind": "bin",
+      "at": [
+        33,
+        14
+      ]
+    },
+    {
+      "kind": "tree",
+      "at": [
+        12,
+        20
+      ]
+    },
+    {
+      "kind": "tree",
+      "at": [
+        20,
+        22
+      ]
+    },
+    {
+      "kind": "tree",
+      "at": [
+        27,
+        25
+      ]
+    }
   ],
-  "spots": { "front_steps": [29, 13], "field": [45, 25] },
-  "exits": [ { "rect": [0, 16, 1, 2], "to": "downtown", "spawn": [57, 15] } ],
-  "starts": { "lunch": [29, 13], "after_school": [29, 13] }
+  "spots": {
+    "front_steps": [
+      29,
+      13
+    ],
+    "field": [
+      45,
+      25
+    ],
+    "bleachers": [
+      41,
+      23
+    ],
+    "back_stairs": [
+      37,
+      13
+    ]
+  },
+  "exits": [
+    {
+      "rect": [
+        0,
+        16,
+        1,
+        2
+      ],
+      "to": "downtown",
+      "spawn": [
+        57,
+        15
+      ]
+    }
+  ],
+  "starts": {
+    "lunch": [
+      29,
+      13
+    ],
+    "after_school": [
+      29,
+      13
+    ]
+  }
 }

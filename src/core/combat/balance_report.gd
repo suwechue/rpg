@@ -29,9 +29,10 @@ static func _party(db: Dictionary, level: int) -> Array:
 
 
 ## A fight with one party member and one enemy side by side (no back attack).
-static func _duel(db: Dictionary, ch: Dictionary, rec: Dictionary, diff: String) -> StateScript:
+static func _duel(db: Dictionary, ch: Dictionary, rec: Dictionary, diff: String, week: int = 1) -> StateScript:
+	# Measured where the week sits on the difficulty ramp (week 1 = the gentle start).
 	var st := StateScript.new(db, RandomNumberGenerator.new(), { "layout": { "map": [".PE......"] }, "party": [{ "char": ch.duplicate(true) }],
-		"enemies": [rec], "difficulty": diff, "turnMode": "move_and_act" })
+		"enemies": [rec], "difficulty": diff, "turnMode": "move_and_act", "ramp": StateScript.ramp_for(db, week, 0) })
 	st.units[0].facing = 1
 	st.units[1].facing = -1
 	return st
@@ -70,7 +71,7 @@ static func measure(db: Dictionary, week: int, level: int, diff: String) -> Dict
 		rec["scale"] = 1.0 if tier == "boss" else scale
 		var acts := 0.0
 		for ch in party:
-			var st := _duel(db, ch, rec.duplicate(true), diff)
+			var st := _duel(db, ch, rec.duplicate(true), diff, week)
 			acts += ceilf(float(st.units[1].max_hp) / player_hit(db, st))
 			var all_actions: Array = st.units[1].actions.duplicate()
 			for ph in st.units[1].phases:

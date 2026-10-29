@@ -10,8 +10,12 @@ extends RefCounted
 
 const RM := preload("res://src/core/run/run_model.gd")
 
-const NAP_SPOTS := ["field", "library", "art_room", "hallways", "shop_classroom", "park"]
 const WEEKEND_DAYS := ["sat", "sun"]
+
+
+## Nap spots come from data/town/locations.json "napSpots" (M13).
+static func nap_spots(db: Dictionary) -> Array:
+	return db.get("town/locations", {}).get("napSpots", ["hallways"])
 
 
 static func npc_ids(db: Dictionary) -> Array:
@@ -71,7 +75,8 @@ static func location_of(db: Dictionary, run: Dictionary, id: String, day: String
 	if s == "@missing":
 		return ""
 	if s == "@nap":
-		return NAP_SPOTS[day_rng(run, id + ":nap", day_count).randi_range(0, NAP_SPOTS.size() - 1)]
+		var naps := nap_spots(db)
+		return str(naps[day_rng(run, id + ":nap", day_count).randi_range(0, naps.size() - 1)])
 	return s
 
 

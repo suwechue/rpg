@@ -108,6 +108,11 @@ Most numbers live in `data/` (JSON). The main files:
 
 ## B3. Damage and defense
 
+- **Difficulty targets** (user request, Oct 28): a well-played full party should win about 75% of fights on Normal and 40% on Hard. Measured with tools/sim_ar.gd (30 to 40 runs): Normal 77 to 78%, Hard about 50%.
+  - Normal: enemies deal 2.5x damage. Hard: 5x damage, 1.3x HP, 90% chance to attack twice, and up to 3 extra copies of regular enemies per fight (not boss fights).
+  - **Ramp** (user decision): week 1 and arena wave 1 use 1x damage, normal HP and no extra enemies; the numbers climb to the full values by week 3 and wave 15. `data/combat_rules.json` ramp.
+- **Flanking** (user request, Oct 28): a hit on a target that has a hostile unit on the far side from the attacker deals +25% (+30% on Hard). Both teams can flank, and enemies look for flanking spots. **Isolated** (Hard): a party member with no ally next to them takes +20%. The combat log notes "flanked". `data/combat_rules.json` tactics, difficulties.hard.tactics.
+
 | Mechanic | How it works now | Change it in |
 | --- | --- | --- |
 | Spell damage | Power x Form multiplier x (1 + Vector affinity bonus) x **matchup** x (1 − target Magic Resistance %) x other bonuses | `src/core/combat/resolver.gd` spell_damage |

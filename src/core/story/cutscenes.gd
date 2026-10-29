@@ -8,7 +8,7 @@ const DT := preload("res://src/core/data_tables.gd")
 
 ## Every step type the player understands.
 const STEPS := ["say", "narrator", "portrait_talk", "title_card", "choice", "if_flag", "wait", "wait_input", "fade", "music", "sfx",
-	"image", "camera_shake", "camera_pan", "move", "face", "emote", "set_flag", "give", "start_combat"]
+	"image", "camera_shake", "camera_pan", "move", "face", "emote", "set_flag", "give", "start_combat", "seating"]
 
 
 static func all(db: Dictionary) -> Array:

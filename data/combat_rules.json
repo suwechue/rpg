@@ -107,15 +107,20 @@
         "boss": 0.5,
         "default": 0.5
       },
-      "enemyDamageMul": 1.0,
+      "enemyDamageMul": 2.5,
       "rangedBuiltinsCostAction": false
     },
     "hard": {
       "name": "Hard",
-      "enemyDoubleAttackChance": 0.75,
-      "enemyHpMul": 1.2,
-      "enemyDamageMul": 1.25,
-      "rangedBuiltinsCostAction": true
+      "enemyDoubleAttackChance": 0.9,
+      "enemyHpMul": 1.3,
+      "enemyDamageMul": 5.0,
+      "rangedBuiltinsCostAction": true,
+      "tactics": {
+        "flankBonus": 0.3,
+        "isolatedBonus": 0.2
+      },
+      "enemyExtra": 3
     }
   },
   "areaFalloff": {
@@ -124,5 +129,20 @@
     "mul": 0.75
   },
   "builtinsQuick": false,
-  "builtinsQuickNote": "Strike and Guard: true = they use the Quick (PT Part 1), false = they cost an Action (user request, Oct 28). Quick cards still use the Quick."
+  "builtinsQuickNote": "Strike and Guard: true = they use the Quick (PT Part 1), false = they cost an Action (user request, Oct 28). Quick cards still use the Quick.",
+  "tactics": {
+    "comment": "User request (Oct 28): difficulty through positioning, not longer fights. flankBonus: extra damage when the target has a hostile unit on the far side from the attacker (both teams). isolatedBonus: extra damage to a party member with no ally next to them. Each difficulty can override them under difficulties.<id>.tactics.",
+    "flankBonus": 0.25,
+    "isolatedBonus": 0.0
+  },
+  "ramp": {
+    "comment": "User decision (Oct 28): early fights stay gentle. Enemy numbers start at 'start' in week 1 and arena wave 1 and reach the difficulty's full value (the 75% Normal / 40% Hard target) at fullAtWeek and fullAtWave.",
+    "start": {
+      "enemyDamageMul": 1.0,
+      "enemyHpMul": 1.0,
+      "enemyExtra": 0
+    },
+    "fullAtWeek": 3,
+    "fullAtWave": 15
+  }
 }

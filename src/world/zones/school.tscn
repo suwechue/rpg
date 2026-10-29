@@ -89,3 +89,15 @@ spawn_id = "lunch"
 position = Vector2(928, 416)
 script = ExtResource("7_lmesb")
 spawn_id = "after_school"
+
+[node name="Spot_bleachers" type="Node2D" parent="Markers" unique_id=483154988]
+position = Vector2(1312, 736)
+script = ExtResource("4_32lv7")
+spot_id = "bleachers"
+tags = PackedStringArray("bench", "crowd")
+
+[node name="Spot_back_stairs" type="Node2D" parent="Markers" unique_id=1934021910]
+position = Vector2(1184, 416)
+script = ExtResource("4_32lv7")
+spot_id = "back_stairs"
+tags = PackedStringArray("nap")

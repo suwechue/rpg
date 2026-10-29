@@ -171,6 +171,7 @@ func _start_wave() -> void:
 	var setup := Arena.setup_for_wave(db, arena, wave)
 	setup["party"] = GameState.combat_party()
 	setup["backpack"] = GameState.run.get("backpack", [])
+	setup["ramp"] = preload("res://src/core/combat/combat_state.gd").ramp_for(db, 0, wave)
 	setup["library"] = GameState.cards
 	setup["difficulty"] = GameState.combat_difficulty
 	setup["partyFirst"] = bool(DataDB.table("combat_rules").get("actions", {}).get("partyFirstInArena", true))
