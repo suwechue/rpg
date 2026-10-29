@@ -1,0 +1,188 @@
+{
+  "comment": "M16 clubs: join up to maxJoin at the week 3 club fair. On a club's days its meeting takes your After School part (the weekly commitment) and gives its effects (stat XP, Bond with members) plus a short scene from 'lines'. firstScene plays at the first meeting.",
+  "maxJoin": 2,
+  "clubs": [
+    {
+      "id": "drama",
+      "name": "Drama Club",
+      "days": [
+        "tue",
+        "thu"
+      ],
+      "room": "drama_room",
+      "effects": {
+        "statXp": {
+          "cha": 3,
+          "wil": 1
+        },
+        "bond": {
+          "priya": 2,
+          "kelly": 2
+        }
+      },
+      "members": [
+        "priya",
+        "kelly"
+      ],
+      "adviser": "mr_mustard",
+      "blurb": "Mr. Mustard's club. Monologues, stage fright, glitter.",
+      "lines": [
+        "Mr. Mustard has you read a scene backwards 'for the vibe'. Priya nails it. You survive it.",
+        "Rehearsal. Kelly corrects everyone's blocking, including Mr. Mustard's. He lets her.",
+        "You build a cardboard moon. It's the best thing you've made all week."
+      ]
+    },
+    {
+      "id": "debate",
+      "name": "Debate Club",
+      "days": [
+        "mon",
+        "wed"
+      ],
+      "room": "debate_hall",
+      "effects": {
+        "statXp": {
+          "int": 2,
+          "cha": 2
+        },
+        "bond": {
+          "diane": 2,
+          "theo": 2
+        }
+      },
+      "members": [
+        "diane",
+        "theo"
+      ],
+      "adviser": "mr_mustard",
+      "blurb": "Arguing, but with rules and a timer.",
+      "lines": [
+        "Resolved: the cafeteria pizza is soup. Diane takes the affirmative and wins.",
+        "Theo argues both sides of a motion and loses to himself.",
+        "Mr. Mustard times you with an egg timer shaped like a chicken. You speak faster than you thought you could."
+      ]
+    },
+    {
+      "id": "cheer",
+      "name": "Cheer Squad",
+      "days": [
+        "mon",
+        "thu"
+      ],
+      "room": "field",
+      "effects": {
+        "statXp": {
+          "str": 2,
+          "dex": 2
+        },
+        "bond": {
+          "kelly": 2,
+          "kara": 2,
+          "kayla": 2
+        }
+      },
+      "members": [
+        "kelly",
+        "kara",
+        "kayla"
+      ],
+      "adviser": "coach_byrne",
+      "blurb": "Coach Byrne's squad. Kelly runs it.",
+      "lines": [
+        "Coach Byrne's whistle. Pyramids. Kara catches you, mostly.",
+        "Kelly drills the new routine until the sun goes orange. You can't feel your arms.",
+        "Kayla teaches you a chant. It's about the Hollow Mascot. Nobody remembers writing it."
+      ]
+    },
+    {
+      "id": "shop",
+      "name": "Shop Club",
+      "days": [
+        "tue",
+        "fri"
+      ],
+      "room": "shop_classroom",
+      "effects": {
+        "statXp": {
+          "str": 2,
+          "per": 2
+        },
+        "bond": {
+          "jake": 2,
+          "dex": 2
+        }
+      },
+      "members": [
+        "jake",
+        "dex"
+      ],
+      "adviser": "mr_j",
+      "blurb": "Saws, sawdust and Mr. J's safety speech.",
+      "lines": [
+        "Mr. J gives the safety speech. Then the safety speech about the safety speech.",
+        "Jake shows you a trick with a lathe that is definitely not in the manual.",
+        "Dex builds a tiny catapult. It works too well."
+      ]
+    },
+    {
+      "id": "art",
+      "name": "Art Club",
+      "days": [
+        "wed",
+        "fri"
+      ],
+      "room": "art_room",
+      "effects": {
+        "statXp": {
+          "per": 2,
+          "wil": 2
+        },
+        "bond": {
+          "mara": 2,
+          "mel": 2
+        }
+      },
+      "members": [
+        "mara",
+        "mel"
+      ],
+      "adviser": "ms_nonsense",
+      "blurb": "Ms. Nonsense's art room. Paint everywhere, rules nowhere.",
+      "lines": [
+        "Ms. Nonsense makes you paint with your wrong hand. It's better.",
+        "Mara draws the woods behind the school. There's a door in the drawing. She didn't draw a door.",
+        "Mel splatters a canvas and calls it 'Tuesday'. It's Wednesday."
+      ]
+    },
+    {
+      "id": "science",
+      "name": "Science Club",
+      "days": [
+        "mon",
+        "thu"
+      ],
+      "room": "lab",
+      "effects": {
+        "statXp": {
+          "int": 3,
+          "per": 1
+        },
+        "bond": {
+          "penny": 2,
+          "jon": 2
+        }
+      },
+      "members": [
+        "penny",
+        "jon"
+      ],
+      "adviser": "ms_g",
+      "blurb": "Ms. G's club. Experiments, tangents and small fires.",
+      "lines": [
+        "Ms. G goes off on a tangent about magnets that somehow ends at the moon.",
+        "Penny measures something three times and still doesn't trust it.",
+        "Jon's volcano erupts early. The fire alarm agrees."
+      ]
+    }
+  ]
+}

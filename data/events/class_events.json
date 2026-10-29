@@ -1,313 +1,1630 @@
 {
   "events": [
-    { "id": "story_w1_disruption", "class": "any", "type": "story", "forced": true, "once": true, "priority": 10,
-      "cond": { "week": 1, "day": "mon", "period": 2 },
+    {
+      "id": "story_w1_disruption",
+      "class": "any",
+      "type": "story",
+      "forced": true,
+      "once": true,
+      "priority": 10,
+      "cond": {
+        "week": 1,
+        "day": "mon",
+        "period": 2
+      },
       "text": "Halfway through class, somebody's phone plays a video of Kelly face-planting at cheer practice. The room erupts. Kelly goes very still. Every head turns to see what the new kid does.",
       "choices": [
-        { "label": "Laugh along. It IS funny.", "effects": { "kellyRisk": 1, "bond": { "kelly": -5, "kara": 2 }, "flag": "w1_laughed_at_kelly" },
-          "result": "You laugh. Everyone laughs. Kelly looks right at you, and files you somewhere permanent." },
-        { "label": "\"Put it away. That's low.\"", "effects": { "kellyRisk": -2, "bond": { "kelly": 5, "kayla": 3 }, "flag": "w1_defended_kelly" },
-          "result": "The laughter dies awkwardly. Kelly doesn't thank you. She does look at you a second longer than necessary." },
-        { "label": "Stare at your desk until it's over.", "effects": { "flag": "w1_ignored_disruption" },
-          "result": "You become extremely interested in a scratch on the desk. History will not remember this." }
-      ] },
-
-    { "id": "pe_laps", "class": "pe", "type": "lesson", "weight": 4,
+        {
+          "label": "Laugh along. It IS funny.",
+          "effects": {
+            "kellyRisk": 1,
+            "bond": {
+              "kelly": -5,
+              "kara": 2
+            },
+            "flag": "w1_laughed_at_kelly"
+          },
+          "result": "You laugh. Everyone laughs. Kelly looks right at you, and files you somewhere permanent."
+        },
+        {
+          "label": "\"Put it away. That's low.\"",
+          "effects": {
+            "kellyRisk": -2,
+            "bond": {
+              "kelly": 5,
+              "kayla": 3
+            },
+            "flag": "w1_defended_kelly"
+          },
+          "result": "The laughter dies awkwardly. Kelly doesn't thank you. She does look at you a second longer than necessary."
+        },
+        {
+          "label": "Stare at your desk until it's over.",
+          "effects": {
+            "flag": "w1_ignored_disruption"
+          },
+          "result": "You become extremely interested in a scratch on the desk. History will not remember this."
+        }
+      ]
+    },
+    {
+      "id": "pe_laps",
+      "class": "pe",
+      "type": "lesson",
+      "weight": 4,
       "text": "Coach Byrne blows the whistle. \"Laps. Until I get bored.\" She does not get bored.",
-      "effects": { "statXp": { "con": 0.5 } }, "result": "Your legs file a formal complaint." },
-    { "id": "pe_dodgeball", "class": "pe", "type": "lesson", "weight": 3,
+      "effects": {
+        "statXp": {
+          "con": 0.5
+        }
+      },
+      "result": "Your legs file a formal complaint."
+    },
+    {
+      "id": "pe_dodgeball",
+      "class": "pe",
+      "type": "lesson",
+      "weight": 3,
       "text": "Dodgeball. The Upside-Down has nothing on a gym full of teenagers with rubber balls.",
-      "effects": { "statXp": { "dex": 0.5 } }, "result": "You dodge most of them. Most." },
-    { "id": "pe_fitness_test", "class": "pe", "type": "quiz", "weight": 2,
+      "effects": {
+        "statXp": {
+          "dex": 0.5
+        }
+      },
+      "result": "You dodge most of them. Most."
+    },
+    {
+      "id": "pe_fitness_test",
+      "class": "pe",
+      "type": "quiz",
+      "weight": 2,
       "text": "Surprise fitness test. Coach has a clipboard and no mercy.",
-      "check": { "stat": "con", "dc": 9 },
+      "check": {
+        "stat": "con",
+        "dc": 9
+      },
       "successText": "You finish strong. Coach nods once, which from her is a standing ovation.",
       "failText": "You finish. Technically. Coach writes something down.",
-      "success": { "repeatClassGain": true, "gradeFor": { "coach_byrne": 2 } }, "fail": {} },
-    { "id": "pe_partner_stretch", "class": "pe", "type": "partner", "weight": 2, "partner": true,
+      "success": {
+        "repeatClassGain": true,
+        "gradeFor": {
+          "coach_byrne": 2
+        }
+      },
+      "fail": {}
+    },
+    {
+      "id": "pe_partner_stretch",
+      "class": "pe",
+      "type": "partner",
+      "weight": 2,
+      "partner": true,
       "text": "Partner stretches. You're stuck with {partner}.",
       "choices": [
-        { "label": "Make small talk", "effects": { "bondPartner": 4 }, "result": "You talk about nothing. It's nice." },
-        { "label": "Push the stretch (and them)", "effects": { "bondPartner": 1, "statXp": { "str": 0.5 } }, "result": "Somebody's hamstring makes a noise. Progress." }
-      ] },
-    { "id": "pe_rope_climb", "class": "pe", "type": "accident", "weight": 1,
+        {
+          "label": "Make small talk",
+          "effects": {
+            "bondPartner": 4
+          },
+          "result": "You talk about nothing. It's nice."
+        },
+        {
+          "label": "Push the stretch (and them)",
+          "effects": {
+            "bondPartner": 1,
+            "statXp": {
+              "str": 0.5
+            }
+          },
+          "result": "Somebody's hamstring makes a noise. Progress."
+        }
+      ]
+    },
+    {
+      "id": "pe_rope_climb",
+      "class": "pe",
+      "type": "accident",
+      "weight": 1,
       "text": "The rope climb. Somebody waxed the rope. Somebody always waxes the rope.",
-      "check": { "stat": "dex", "dc": 9 },
+      "check": {
+        "stat": "dex",
+        "dc": 9
+      },
       "successText": "You make it to the top and ring the little bell. Nobody claps, but you know.",
       "failText": "You make it a third of the way up, then very quickly all the way down.",
-      "success": { "statXp": { "str": 0.5 } }, "fail": { "hp": -4 } },
-    { "id": "pe_kelly_routine", "class": "pe", "type": "disruption", "weight": 1, "cond": { "minWeek": 1 },
+      "success": {
+        "statXp": {
+          "str": 0.5
+        }
+      },
+      "fail": {
+        "hp": -4
+      }
+    },
+    {
+      "id": "pe_kelly_routine",
+      "class": "pe",
+      "type": "disruption",
+      "weight": 1,
+      "cond": {
+        "minWeek": 1
+      },
       "text": "Kelly runs the squad through a routine at the edge of the gym, very loudly, during your class.",
       "choices": [
-        { "label": "Watch, honestly impressed", "effects": { "bond": { "kelly": 2 } }, "result": "She notices you noticing. She pretends she didn't." },
-        { "label": "Heckle", "effects": { "bond": { "kelly": -3, "dex": 2 } }, "result": "Dex laughs. Kelly does not." }
-      ] },
-    { "id": "pe_coach_spotlight", "class": "pe", "type": "spotlight", "weight": 3, "once": true, "cond": { "minGrade": { "coach_byrne": 25 } },
+        {
+          "label": "Watch, honestly impressed",
+          "effects": {
+            "bond": {
+              "kelly": 2
+            }
+          },
+          "result": "She notices you noticing. She pretends she didn't."
+        },
+        {
+          "label": "Heckle",
+          "effects": {
+            "bond": {
+              "kelly": -3,
+              "dex": 2
+            }
+          },
+          "result": "Dex laughs. Kelly does not."
+        }
+      ]
+    },
+    {
+      "id": "pe_coach_spotlight",
+      "class": "pe",
+      "type": "spotlight",
+      "weight": 3,
+      "once": true,
+      "cond": {
+        "minGrade": {
+          "coach_byrne": 25
+        }
+      },
       "text": "Coach Byrne keeps you after class. \"You've got more in you than that. I've seen it.\" She shows you how to plant your feet and put your whole body into a hit.",
-      "effects": { "learnForm": "touch", "stats": { "str": 1 } }, "result": "Your next punch feels like it has a mortgage." },
-    { "id": "pe_whistle", "class": "pe", "type": "lesson", "weight": 2,
+      "effects": {
+        "learnForm": "touch",
+        "stats": {
+          "str": 1
+        }
+      },
+      "result": "Your next punch feels like it has a mortgage."
+    },
+    {
+      "id": "pe_whistle",
+      "class": "pe",
+      "type": "lesson",
+      "weight": 2,
       "text": "Coach Byrne catches three people slacking without turning around. You stop slacking without having started.",
-      "effects": { "statXp": { "wil": 0.3 } } },
-
-    { "id": "physics_momentum", "class": "physics", "type": "lesson", "weight": 4,
+      "effects": {
+        "statXp": {
+          "wil": 0.3
+        }
+      }
+    },
+    {
+      "id": "physics_momentum",
+      "class": "physics",
+      "type": "lesson",
+      "weight": 4,
       "text": "Ms. G explains momentum for ten minutes, then momentum as a metaphor for forty.",
-      "effects": { "statXp": { "int": 0.3 } }, "result": "You understand momentum. And, briefly, yourself." },
-    { "id": "physics_tangent", "class": "physics", "type": "lesson", "weight": 3,
+      "effects": {
+        "statXp": {
+          "int": 0.3
+        }
+      },
+      "result": "You understand momentum. And, briefly, yourself."
+    },
+    {
+      "id": "physics_tangent",
+      "class": "physics",
+      "type": "lesson",
+      "weight": 3,
       "text": "\"Right, right, the assignment. Anyway, entropy—\" The lesson departs for parts unknown.",
-      "effects": { "affinity": { "motion": 1 } }, "result": "You learn three things, none of them on the test." },
-    { "id": "physics_quiz", "class": "physics", "type": "quiz", "weight": 2,
+      "effects": {
+        "affinity": {
+          "motion": 1
+        }
+      },
+      "result": "You learn three things, none of them on the test."
+    },
+    {
+      "id": "physics_quiz",
+      "class": "physics",
+      "type": "quiz",
+      "weight": 2,
       "text": "Pop quiz: a ball rolls off a desk. How fast is it going when Ms. G stops talking about it?",
-      "check": { "stat": "int", "dc": 10 },
+      "check": {
+        "stat": "int",
+        "dc": 10
+      },
       "successText": "You show your work. Ms. G draws a smiley face that is also a vector diagram.",
       "failText": "Your answer is 'fast'. Partial credit for vibes.",
-      "success": { "repeatClassGain": true }, "fail": {} },
-    { "id": "physics_partner_lab", "class": "physics", "type": "partner", "weight": 2, "partner": true,
+      "success": {
+        "repeatClassGain": true
+      },
+      "fail": {}
+    },
+    {
+      "id": "physics_partner_lab",
+      "class": "physics",
+      "type": "partner",
+      "weight": 2,
+      "partner": true,
       "text": "Lab partners: you and {partner}, a cart, a ramp, and a stopwatch that only works if you hold it at an angle.",
       "choices": [
-        { "label": "Let them run it", "effects": { "bondPartner": 5 }, "result": "They're good at this. You say so. They light up." },
-        { "label": "Take the measurements yourself", "effects": { "bondPartner": 2, "statXp": { "dex": 0.5 } }, "result": "Precise. Slightly bossy. Precise." }
-      ] },
-    { "id": "physics_pendulum", "class": "physics", "type": "accident", "weight": 1,
+        {
+          "label": "Let them run it",
+          "effects": {
+            "bondPartner": 5
+          },
+          "result": "They're good at this. You say so. They light up."
+        },
+        {
+          "label": "Take the measurements yourself",
+          "effects": {
+            "bondPartner": 2,
+            "statXp": {
+              "dex": 0.5
+            }
+          },
+          "result": "Precise. Slightly bossy. Precise."
+        }
+      ]
+    },
+    {
+      "id": "physics_pendulum",
+      "class": "physics",
+      "type": "accident",
+      "weight": 1,
       "text": "The giant demonstration pendulum swings back. Ms. G says 'don't flinch, trust the physics.'",
-      "check": { "stat": "wil", "dc": 9 },
+      "check": {
+        "stat": "wil",
+        "dc": 9
+      },
       "successText": "You don't flinch. It stops an inch from your nose. Physics: trusted.",
       "failText": "You flinch into the pendulum's path. Physics: right, you: wrong.",
-      "success": { "statXp": { "wil": 0.5 } }, "fail": { "hp": -3 } },
-    { "id": "physics_theo_whisper", "class": "physics", "type": "disruption", "weight": 1,
+      "success": {
+        "statXp": {
+          "wil": 0.5
+        }
+      },
+      "fail": {
+        "hp": -3
+      }
+    },
+    {
+      "id": "physics_theo_whisper",
+      "class": "physics",
+      "type": "disruption",
+      "weight": 1,
       "text": "Theo whispers a correction to Ms. G's equation, then looks horrified that he said it out loud.",
       "choices": [
-        { "label": "Back him up", "effects": { "bond": { "theo": 4 } }, "result": "Ms. G checks it. Theo was right. He goes pink." },
-        { "label": "Let it go", "effects": {}, "result": "Ms. G carries on. Theo sinks into his hoodie." }
-      ] },
-    { "id": "physics_spotlight", "class": "physics", "type": "spotlight", "weight": 3, "once": true, "cond": { "minGrade": { "ms_g": 25 } },
+        {
+          "label": "Back him up",
+          "effects": {
+            "bond": {
+              "theo": 4
+            }
+          },
+          "result": "Ms. G checks it. Theo was right. He goes pink."
+        },
+        {
+          "label": "Let it go",
+          "effects": {},
+          "result": "Ms. G carries on. Theo sinks into his hoodie."
+        }
+      ]
+    },
+    {
+      "id": "physics_spotlight",
+      "class": "physics",
+      "type": "spotlight",
+      "weight": 3,
+      "once": true,
+      "cond": {
+        "minGrade": {
+          "ms_g": 25
+        }
+      },
       "text": "Ms. G grabs you after class. \"You see it too, don't you? Force isn't a push. It's an argument with the universe.\" She sketches a line on the board that you can almost feel.",
-      "effects": { "learnForm": "line", "affinity": { "force": 4 } }, "result": "You can see straight lines in the air now. Is that normal? (It's not.)" },
-    { "id": "physics_grading_curve", "class": "physics", "type": "lesson", "weight": 1,
+      "effects": {
+        "learnForm": "line",
+        "affinity": {
+          "force": 4
+        }
+      },
+      "result": "You can see straight lines in the air now. Is that normal? (It's not.)"
+    },
+    {
+      "id": "physics_grading_curve",
+      "class": "physics",
+      "type": "lesson",
+      "weight": 1,
       "text": "Ms. G mutters about 'statistical outliers' while grading, eyeing two names on the roster you can't quite read.",
-      "effects": { "statXp": { "int": 0.3 } } },
-
-    { "id": "chem_titration", "class": "chemistry", "type": "lesson", "weight": 4,
+      "effects": {
+        "statXp": {
+          "int": 0.3
+        }
+      }
+    },
+    {
+      "id": "chem_titration",
+      "class": "chemistry",
+      "type": "lesson",
+      "weight": 4,
       "text": "Titration. One drop too many and the whole flask turns the color of regret.",
-      "effects": { "statXp": { "int": 0.3, "dex": 0.3 } } },
-    { "id": "chem_smell", "class": "chemistry", "type": "lesson", "weight": 3,
+      "effects": {
+        "statXp": {
+          "int": 0.3,
+          "dex": 0.3
+        }
+      }
+    },
+    {
+      "id": "chem_smell",
+      "class": "chemistry",
+      "type": "lesson",
+      "weight": 3,
       "text": "Something in the back cabinet smells like a penny that's seen things.",
-      "effects": { "statXp": { "per": 0.5 } }, "result": "You identify it. Nobody should be able to identify that." },
-    { "id": "chem_quiz", "class": "chemistry", "type": "quiz", "weight": 2,
+      "effects": {
+        "statXp": {
+          "per": 0.5
+        }
+      },
+      "result": "You identify it. Nobody should be able to identify that."
+    },
+    {
+      "id": "chem_quiz",
+      "class": "chemistry",
+      "type": "quiz",
+      "weight": 2,
       "text": "Quiz: balance the equation before Ms. G finishes her coffee.",
-      "check": { "stat": "int", "dc": 11 },
-      "successText": "Balanced. Ms. G raises her mug to you.", "failText": "Unbalanced, much like the lab stool.",
-      "success": { "repeatClassGain": true }, "fail": {} },
-    { "id": "chem_partner", "class": "chemistry", "type": "partner", "weight": 2, "partner": true,
+      "check": {
+        "stat": "int",
+        "dc": 11
+      },
+      "successText": "Balanced. Ms. G raises her mug to you.",
+      "failText": "Unbalanced, much like the lab stool.",
+      "success": {
+        "repeatClassGain": true
+      },
+      "fail": {}
+    },
+    {
+      "id": "chem_partner",
+      "class": "chemistry",
+      "type": "partner",
+      "weight": 2,
+      "partner": true,
       "text": "Paired with {partner} for a lab with the warning label 'probably fine'.",
       "choices": [
-        { "label": "Follow the procedure exactly", "effects": { "bondPartner": 3, "statXp": { "int": 0.5 } }, "result": "It is, in fact, probably fine." },
-        { "label": "Improvise a little", "effects": { "bondPartner": 5, "hp": -2 }, "result": "Your eyebrows survive. Mostly. {partner} thinks you're hilarious." }
-      ] },
-    { "id": "chem_spill", "class": "chemistry", "type": "accident", "weight": 1,
+        {
+          "label": "Follow the procedure exactly",
+          "effects": {
+            "bondPartner": 3,
+            "statXp": {
+              "int": 0.5
+            }
+          },
+          "result": "It is, in fact, probably fine."
+        },
+        {
+          "label": "Improvise a little",
+          "effects": {
+            "bondPartner": 5,
+            "hp": -2
+          },
+          "result": "Your eyebrows survive. Mostly. {partner} thinks you're hilarious."
+        }
+      ]
+    },
+    {
+      "id": "chem_spill",
+      "class": "chemistry",
+      "type": "accident",
+      "weight": 1,
       "text": "A beaker tips toward your sleeve in slow motion.",
-      "check": { "stat": "dex", "dc": 10 },
-      "successText": "You catch it. The lab applauds, then remembers to be cool.", "failText": "Your sleeve dissolves a little. So does your dignity.",
-      "success": { "statXp": { "dex": 0.5 } }, "fail": { "hp": -4 } },
-    { "id": "chem_penny_rival", "class": "chemistry", "type": "disruption", "weight": 1,
+      "check": {
+        "stat": "dex",
+        "dc": 10
+      },
+      "successText": "You catch it. The lab applauds, then remembers to be cool.",
+      "failText": "Your sleeve dissolves a little. So does your dignity.",
+      "success": {
+        "statXp": {
+          "dex": 0.5
+        }
+      },
+      "fail": {
+        "hp": -4
+      }
+    },
+    {
+      "id": "chem_penny_rival",
+      "class": "chemistry",
+      "type": "disruption",
+      "weight": 1,
       "text": "Penny finishes the lab first, then explains, loudly, why everyone else did it wrong.",
       "choices": [
-        { "label": "Challenge her result", "effects": { "bond": { "penny": 3 } }, "result": "She respects it. She'll never say so. She respects it." },
-        { "label": "Ask her to show you", "effects": { "bond": { "penny": 1 }, "statXp": { "int": 0.5 } }, "result": "She shows you. Slowly. Like you're a substitute teacher." }
-      ] },
-    { "id": "chem_spotlight", "class": "chemistry", "type": "spotlight", "weight": 3, "once": true, "cond": { "minGrade": { "ms_g": 40 } },
+        {
+          "label": "Challenge her result",
+          "effects": {
+            "bond": {
+              "penny": 3
+            }
+          },
+          "result": "She respects it. She'll never say so. She respects it."
+        },
+        {
+          "label": "Ask her to show you",
+          "effects": {
+            "bond": {
+              "penny": 1
+            },
+            "statXp": {
+              "int": 0.5
+            }
+          },
+          "result": "She shows you. Slowly. Like you're a substitute teacher."
+        }
+      ]
+    },
+    {
+      "id": "chem_spotlight",
+      "class": "chemistry",
+      "type": "spotlight",
+      "weight": 3,
+      "once": true,
+      "cond": {
+        "minGrade": {
+          "ms_g": 40
+        }
+      },
       "text": "\"Some reactions don't stop when they should,\" Ms. G says, not looking at you. \"Some of them leave a mark on the room itself.\" She writes three words on the board and erases them before anyone else comes in.",
-      "effects": { "stats": { "int": 1 }, "flag": "tier3_hint" }, "result": "Transmutation. Vitality. Corrosion. You'll remember them." },
-
-    { "id": "es_rocks", "class": "earth_science", "type": "lesson", "weight": 4,
+      "effects": {
+        "stats": {
+          "int": 1
+        },
+        "flag": "tier3_hint"
+      },
+      "result": "Transmutation. Vitality. Corrosion. You'll remember them."
+    },
+    {
+      "id": "es_rocks",
+      "class": "earth_science",
+      "type": "lesson",
+      "weight": 4,
       "text": "The Earth Science Teacher passes around a rock. \"This one is four hundred million years old.\" It looks it.",
-      "effects": { "statXp": { "per": 0.3 } } },
-    { "id": "es_forecast", "class": "earth_science", "type": "lesson", "weight": 4, "hint": true,
+      "effects": {
+        "statXp": {
+          "per": 0.3
+        }
+      }
+    },
+    {
+      "id": "es_forecast",
+      "class": "earth_science",
+      "type": "lesson",
+      "weight": 4,
+      "hint": true,
       "text": "Today's forecast, in a nature-documentary voice: \"And here we see the town's weather, behaving... not quite naturally.\" The board shows this week's readings.",
-      "effects": { "statXp": { "int": 0.3 }, "flag": "signature_hint_class", "sigHint": true }, "result": "Something about the numbers on the board tells you what tonight will feel like." },
-    { "id": "es_quiz", "class": "earth_science", "type": "quiz", "weight": 2,
+      "effects": {
+        "statXp": {
+          "int": 0.3
+        },
+        "flag": "signature_hint_class",
+        "sigHint": true
+      },
+      "result": "Something about the numbers on the board tells you what tonight will feel like."
+    },
+    {
+      "id": "es_quiz",
+      "class": "earth_science",
+      "type": "quiz",
+      "weight": 2,
       "text": "Quiz: name the three types of rock and one emotion they make you feel.",
-      "check": { "stat": "per", "dc": 9 },
-      "successText": "Igneous, sedimentary, metamorphic, and awe. Full marks.", "failText": "You put 'gravel' three times.",
-      "success": { "repeatClassGain": true }, "fail": {} },
-    { "id": "es_partner", "class": "earth_science", "type": "partner", "weight": 2, "partner": true,
+      "check": {
+        "stat": "per",
+        "dc": 9
+      },
+      "successText": "Igneous, sedimentary, metamorphic, and awe. Full marks.",
+      "failText": "You put 'gravel' three times.",
+      "success": {
+        "repeatClassGain": true
+      },
+      "fail": {}
+    },
+    {
+      "id": "es_partner",
+      "class": "earth_science",
+      "type": "partner",
+      "weight": 2,
+      "partner": true,
       "text": "Field notes with {partner}. You're both supposed to be looking at clouds.",
       "choices": [
-        { "label": "Name the clouds", "effects": { "bondPartner": 4 }, "result": "That one's a dog. That one's a worse dog. {partner} laughs." },
-        { "label": "Actually take notes", "effects": { "bondPartner": 2, "statXp": { "per": 0.5 } }, "result": "Cumulus, building. Weather's changing tonight." }
-      ] },
-    { "id": "es_sam_asleep", "class": "earth_science", "type": "disruption", "weight": 1,
+        {
+          "label": "Name the clouds",
+          "effects": {
+            "bondPartner": 4
+          },
+          "result": "That one's a dog. That one's a worse dog. {partner} laughs."
+        },
+        {
+          "label": "Actually take notes",
+          "effects": {
+            "bondPartner": 2,
+            "statXp": {
+              "per": 0.5
+            }
+          },
+          "result": "Cumulus, building. Weather's changing tonight."
+        }
+      ]
+    },
+    {
+      "id": "es_sam_asleep",
+      "class": "earth_science",
+      "type": "disruption",
+      "weight": 1,
       "text": "Sam is asleep on his textbook. The teacher is heading his way.",
       "choices": [
-        { "label": "Nudge him awake", "effects": { "bond": { "sam": 4 } }, "result": "He wakes up, mutters 'five more minutes', and answers the question perfectly." },
-        { "label": "Let fate decide", "effects": {}, "result": "Fate decides. Sam answers the question in his sleep. Correctly." }
-      ] },
-    { "id": "es_field_trip", "class": "earth_science", "type": "accident", "weight": 1,
+        {
+          "label": "Nudge him awake",
+          "effects": {
+            "bond": {
+              "sam": 4
+            }
+          },
+          "result": "He wakes up, mutters 'five more minutes', and answers the question perfectly."
+        },
+        {
+          "label": "Let fate decide",
+          "effects": {},
+          "result": "Fate decides. Sam answers the question in his sleep. Correctly."
+        }
+      ]
+    },
+    {
+      "id": "es_field_trip",
+      "class": "earth_science",
+      "type": "accident",
+      "weight": 1,
       "text": "A mini field trip to the edge of the park. The ground near the woods is... warm?",
-      "check": { "stat": "per", "dc": 10 },
-      "successText": "You notice the frost pattern on the grass is shaped like a hand. You do not mention this.", "failText": "You step in a cold patch that goes ankle-deep. It wasn't there a second ago.",
-      "success": { "statXp": { "per": 0.5 }, "flag": "signature_hint_class", "sigHint": true }, "fail": { "hp": -3 } },
-    { "id": "es_spotlight", "class": "earth_science", "type": "spotlight", "weight": 3, "once": true, "cond": { "minGrade": { "earth_science_teacher": 25 } },
+      "check": {
+        "stat": "per",
+        "dc": 10
+      },
+      "successText": "You notice the frost pattern on the grass is shaped like a hand. You do not mention this.",
+      "failText": "You step in a cold patch that goes ankle-deep. It wasn't there a second ago.",
+      "success": {
+        "statXp": {
+          "per": 0.5
+        },
+        "flag": "signature_hint_class",
+        "sigHint": true
+      },
+      "fail": {
+        "hp": -3
+      }
+    },
+    {
+      "id": "es_spotlight",
+      "class": "earth_science",
+      "type": "spotlight",
+      "weight": 3,
+      "once": true,
+      "cond": {
+        "minGrade": {
+          "earth_science_teacher": 25
+        }
+      },
       "text": "\"You've noticed it too,\" the teacher says quietly. \"The weather here keeps a schedule. Hot weeks. Cold weeks. Like something's breathing.\" They hand you an old notebook of readings.",
-      "effects": { "affinity": { "heat": 3, "cold": 3 }, "flag": "weather_notebook" }, "result": "Their handwriting gets shakier toward the back." },
-
-    { "id": "shop_birdhouse", "class": "shop", "type": "lesson", "weight": 4,
+      "effects": {
+        "affinity": {
+          "heat": 3,
+          "cold": 3
+        },
+        "flag": "weather_notebook"
+      },
+      "result": "Their handwriting gets shakier toward the back."
+    },
+    {
+      "id": "shop_birdhouse",
+      "class": "shop",
+      "type": "lesson",
+      "weight": 4,
       "text": "Birdhouses. Mr. J says 'nice, nice, just don't lose a finger' eleven times.",
-      "effects": { "statXp": { "dex": 0.3 } }, "result": "Your birdhouse is structurally a birdhouse." },
-    { "id": "shop_forge_day", "class": "shop", "type": "lesson", "weight": 3,
+      "effects": {
+        "statXp": {
+          "dex": 0.3
+        }
+      },
+      "result": "Your birdhouse is structurally a birdhouse."
+    },
+    {
+      "id": "shop_forge_day",
+      "class": "shop",
+      "type": "lesson",
+      "weight": 3,
       "text": "Mr. J fires up the little forge in the corner. The heat feels like it's listening.",
-      "effects": { "affinity": { "heat": 1 }, "counter": { "shop_forge": 1 } } },
-    { "id": "shop_quiz", "class": "shop", "type": "quiz", "weight": 2,
+      "effects": {
+        "affinity": {
+          "heat": 1
+        },
+        "counter": {
+          "shop_forge": 1
+        }
+      }
+    },
+    {
+      "id": "shop_quiz",
+      "class": "shop",
+      "type": "quiz",
+      "weight": 2,
       "text": "Safety quiz. Mr. J holds up a tool. You must name it and say how not to die using it.",
-      "check": { "stat": "dex", "dc": 9 },
-      "successText": "Correct, and all ten fingers agree.", "failText": "You call the chisel 'the pokey one'. Not wrong.",
-      "success": { "repeatClassGain": true }, "fail": {} },
-    { "id": "shop_partner", "class": "shop", "type": "partner", "weight": 2, "partner": true,
+      "check": {
+        "stat": "dex",
+        "dc": 9
+      },
+      "successText": "Correct, and all ten fingers agree.",
+      "failText": "You call the chisel 'the pokey one'. Not wrong.",
+      "success": {
+        "repeatClassGain": true
+      },
+      "fail": {}
+    },
+    {
+      "id": "shop_partner",
+      "class": "shop",
+      "type": "partner",
+      "weight": 2,
+      "partner": true,
       "text": "You and {partner} share a workbench and one working clamp.",
       "choices": [
-        { "label": "Let them have the clamp", "effects": { "bondPartner": 5 }, "result": "Generosity, in clamp form." },
-        { "label": "Build something together", "effects": { "bondPartner": 3, "statXp": { "str": 0.5 } }, "result": "It's a shelf. It's a bad shelf. It's YOUR bad shelf." }
-      ] },
-    { "id": "shop_saw", "class": "shop", "type": "accident", "weight": 1,
+        {
+          "label": "Let them have the clamp",
+          "effects": {
+            "bondPartner": 5
+          },
+          "result": "Generosity, in clamp form."
+        },
+        {
+          "label": "Build something together",
+          "effects": {
+            "bondPartner": 3,
+            "statXp": {
+              "str": 0.5
+            }
+          },
+          "result": "It's a shelf. It's a bad shelf. It's YOUR bad shelf."
+        }
+      ]
+    },
+    {
+      "id": "shop_saw",
+      "class": "shop",
+      "type": "accident",
+      "weight": 1,
       "text": "The bandsaw makes a noise bandsaws should not make.",
-      "check": { "stat": "dex", "dc": 10 },
-      "successText": "You hit the kill switch. Mr. J gives you a thumbs up from under a table.", "failText": "A splinter the size of a pencil finds your palm.",
-      "success": { "statXp": { "dex": 0.5 } }, "fail": { "hp": -4 } },
-    { "id": "shop_secret", "class": "shop", "type": "disruption", "weight": 1,
+      "check": {
+        "stat": "dex",
+        "dc": 10
+      },
+      "successText": "You hit the kill switch. Mr. J gives you a thumbs up from under a table.",
+      "failText": "A splinter the size of a pencil finds your palm.",
+      "success": {
+        "statXp": {
+          "dex": 0.5
+        }
+      },
+      "fail": {
+        "hp": -4
+      }
+    },
+    {
+      "id": "shop_secret",
+      "class": "shop",
+      "type": "disruption",
+      "weight": 1,
       "text": "You open the wrong cabinet. Inside: blueprints for something with too many gears and a label that just says 'TOWN'. Mr. J closes it, calmly. \"...you weren't supposed to see that yet.\"",
       "choices": [
-        { "label": "\"See what?\"", "effects": { "gradeFor": { "mr_j": 3 }, "flag": "saw_mr_j_project" }, "result": "He nods. You're good at this." },
-        { "label": "\"What is it?\"", "effects": { "flag": "saw_mr_j_project" }, "result": "\"Later.\" He means it. That's the scary part." }
-      ] },
-    { "id": "shop_spotlight", "class": "shop", "type": "spotlight", "weight": 3, "once": true, "cond": { "minGrade": { "mr_j": 25 } },
+        {
+          "label": "\"See what?\"",
+          "effects": {
+            "gradeFor": {
+              "mr_j": 3
+            },
+            "flag": "saw_mr_j_project"
+          },
+          "result": "He nods. You're good at this."
+        },
+        {
+          "label": "\"What is it?\"",
+          "effects": {
+            "flag": "saw_mr_j_project"
+          },
+          "result": "\"Later.\" He means it. That's the scary part."
+        }
+      ]
+    },
+    {
+      "id": "shop_spotlight",
+      "class": "shop",
+      "type": "spotlight",
+      "weight": 3,
+      "once": true,
+      "cond": {
+        "minGrade": {
+          "mr_j": 25
+        }
+      },
       "text": "Mr. J shows you how to wrap a spell around a tool so it holds, like tempering steel. \"The blacksmith taught me that. Don't tell him I told you.\"",
-      "effects": { "learnForm": "weapon_infusion", "flag": "smith_hint" }, "result": "Your hammer hums for a full minute afterward." },
-
-    { "id": "drama_projection", "class": "drama", "type": "lesson", "weight": 4,
+      "effects": {
+        "learnForm": "weapon_infusion",
+        "flag": "smith_hint"
+      },
+      "result": "Your hammer hums for a full minute afterward."
+    },
+    {
+      "id": "drama_projection",
+      "class": "drama",
+      "type": "lesson",
+      "weight": 4,
       "text": "Mr. Mustard: \"Project from the diaphragm. The structure is inside you, my guy.\"",
-      "effects": { "statXp": { "cha": 0.3 } } },
-    { "id": "drama_improv", "class": "drama", "type": "lesson", "weight": 3,
+      "effects": {
+        "statXp": {
+          "cha": 0.3
+        }
+      }
+    },
+    {
+      "id": "drama_improv",
+      "class": "drama",
+      "type": "lesson",
+      "weight": 3,
       "text": "Improv. You're a lighthouse keeper. Your scene partner is a lighthouse. It goes surprisingly well.",
-      "effects": { "affinity": { "light": 1 } } },
-    { "id": "drama_monologue", "class": "drama", "type": "quiz", "weight": 2,
+      "effects": {
+        "affinity": {
+          "light": 1
+        }
+      }
+    },
+    {
+      "id": "drama_monologue",
+      "class": "drama",
+      "type": "quiz",
+      "weight": 2,
       "text": "Cold read: a monologue about a lost sandwich. Mr. Mustard sits back, unbothered.",
-      "check": { "stat": "cha", "dc": 9 },
-      "successText": "Someone in the back row tears up over the sandwich.", "failText": "You read the stage directions out loud. Mr. Mustard calls it 'a choice'.",
-      "success": { "repeatClassGain": true }, "fail": {} },
-    { "id": "drama_partner", "class": "drama", "type": "partner", "weight": 2, "partner": true,
+      "check": {
+        "stat": "cha",
+        "dc": 9
+      },
+      "successText": "Someone in the back row tears up over the sandwich.",
+      "failText": "You read the stage directions out loud. Mr. Mustard calls it 'a choice'.",
+      "success": {
+        "repeatClassGain": true
+      },
+      "fail": {}
+    },
+    {
+      "id": "drama_partner",
+      "class": "drama",
+      "type": "partner",
+      "weight": 2,
+      "partner": true,
       "text": "Scene work with {partner}. The scene is 'two people who need the same parking spot'.",
       "choices": [
-        { "label": "Let them win the scene", "effects": { "bondPartner": 4 }, "result": "They get the parking spot. They're thrilled." },
-        { "label": "Go big", "effects": { "bondPartner": 2, "statXp": { "cha": 0.5 } }, "result": "You commit. You commit hard. There's polite applause." }
-      ] },
-    { "id": "drama_trapdoor", "class": "drama", "type": "accident", "weight": 1,
+        {
+          "label": "Let them win the scene",
+          "effects": {
+            "bondPartner": 4
+          },
+          "result": "They get the parking spot. They're thrilled."
+        },
+        {
+          "label": "Go big",
+          "effects": {
+            "bondPartner": 2,
+            "statXp": {
+              "cha": 0.5
+            }
+          },
+          "result": "You commit. You commit hard. There's polite applause."
+        }
+      ]
+    },
+    {
+      "id": "drama_trapdoor",
+      "class": "drama",
+      "type": "accident",
+      "weight": 1,
       "text": "The stage trapdoor is supposed to be locked.",
-      "check": { "stat": "per", "dc": 9 },
-      "successText": "You step around it like a pro.", "failText": "It was not locked. You are briefly, and then permanently, a theater legend.",
-      "success": { "statXp": { "per": 0.5 } }, "fail": { "hp": -3, "bond": { "dex": 2 } } },
-    { "id": "drama_priya_note", "class": "drama", "type": "disruption", "weight": 1,
+      "check": {
+        "stat": "per",
+        "dc": 9
+      },
+      "successText": "You step around it like a pro.",
+      "failText": "It was not locked. You are briefly, and then permanently, a theater legend.",
+      "success": {
+        "statXp": {
+          "per": 0.5
+        }
+      },
+      "fail": {
+        "hp": -3,
+        "bond": {
+          "dex": 2
+        }
+      }
+    },
+    {
+      "id": "drama_priya_note",
+      "class": "drama",
+      "type": "disruption",
+      "weight": 1,
       "text": "Priya gives you a 'note' on your performance. It's three pages long. Color-coded.",
       "choices": [
-        { "label": "Argue the note", "effects": { "bond": { "priya": 4 } }, "result": "She lights up. You've given her a worthy opponent." },
-        { "label": "Take the note", "effects": { "bond": { "priya": 1 }, "statXp": { "cha": 0.5 } }, "result": "It's... actually a good note." }
-      ] },
-    { "id": "drama_spotlight", "class": "drama", "type": "spotlight", "weight": 3, "once": true, "cond": { "minGrade": { "mr_mustard": 25 } },
+        {
+          "label": "Argue the note",
+          "effects": {
+            "bond": {
+              "priya": 4
+            }
+          },
+          "result": "She lights up. You've given her a worthy opponent."
+        },
+        {
+          "label": "Take the note",
+          "effects": {
+            "bond": {
+              "priya": 1
+            },
+            "statXp": {
+              "cha": 0.5
+            }
+          },
+          "result": "It's... actually a good note."
+        }
+      ]
+    },
+    {
+      "id": "drama_spotlight",
+      "class": "drama",
+      "type": "spotlight",
+      "weight": 3,
+      "once": true,
+      "cond": {
+        "minGrade": {
+          "mr_mustard": 25
+        }
+      },
       "text": "Mr. Mustard turns the stage lights on you and walks away. \"Stand there until it stops being scary.\" It takes a while. Then the light feels like yours.",
-      "effects": { "stats": { "cha": 1 }, "affinity": { "light": 4 } }, "result": "Being looked at is a skill. You have it now. A little." },
-
-    { "id": "debate_rebuttal", "class": "debate", "type": "lesson", "weight": 4,
+      "effects": {
+        "stats": {
+          "cha": 1
+        },
+        "affinity": {
+          "light": 4
+        }
+      },
+      "result": "Being looked at is a skill. You have it now. A little."
+    },
+    {
+      "id": "debate_rebuttal",
+      "class": "debate",
+      "type": "lesson",
+      "weight": 4,
       "text": "Rebuttal drills. Mr. Mustard agrees with everyone, which is somehow the hardest thing to argue with.",
-      "effects": { "statXp": { "wil": 0.3 } } },
-    { "id": "debate_resolution", "class": "debate", "type": "lesson", "weight": 3,
+      "effects": {
+        "statXp": {
+          "wil": 0.3
+        }
+      }
+    },
+    {
+      "id": "debate_resolution",
+      "class": "debate",
+      "type": "lesson",
+      "weight": 3,
       "text": "Resolved: this town should have more than one deli. The room nearly riots on Gary's behalf.",
-      "effects": { "affinity": { "binding": 1 } } },
-    { "id": "debate_round", "class": "debate", "type": "quiz", "weight": 2,
+      "effects": {
+        "affinity": {
+          "binding": 1
+        }
+      }
+    },
+    {
+      "id": "debate_round",
+      "class": "debate",
+      "type": "quiz",
+      "weight": 2,
       "text": "Timed round. Two minutes to argue that cereal is a soup.",
-      "check": { "stat": "cha", "dc": 10 },
-      "successText": "The judges are convinced. They're also uncomfortable.", "failText": "You argue that soup is a cereal. Points for courage.",
-      "success": { "repeatClassGain": true }, "fail": {} },
-    { "id": "debate_partner", "class": "debate", "type": "partner", "weight": 2, "partner": true,
+      "check": {
+        "stat": "cha",
+        "dc": 10
+      },
+      "successText": "The judges are convinced. They're also uncomfortable.",
+      "failText": "You argue that soup is a cereal. Points for courage.",
+      "success": {
+        "repeatClassGain": true
+      },
+      "fail": {}
+    },
+    {
+      "id": "debate_partner",
+      "class": "debate",
+      "type": "partner",
+      "weight": 2,
+      "partner": true,
       "text": "You're on a team with {partner}. Your opponents have binders.",
       "choices": [
-        { "label": "Back up their points", "effects": { "bondPartner": 4 }, "result": "You make them look brilliant. They notice." },
-        { "label": "Take the lead", "effects": { "bondPartner": 1, "statXp": { "cha": 0.5 } }, "result": "You win. They wanted to win. Complicated." }
-      ] },
-    { "id": "debate_baxter", "class": "debate", "type": "disruption", "weight": 1,
+        {
+          "label": "Back up their points",
+          "effects": {
+            "bondPartner": 4
+          },
+          "result": "You make them look brilliant. They notice."
+        },
+        {
+          "label": "Take the lead",
+          "effects": {
+            "bondPartner": 1,
+            "statXp": {
+              "cha": 0.5
+            }
+          },
+          "result": "You win. They wanted to win. Complicated."
+        }
+      ]
+    },
+    {
+      "id": "debate_baxter",
+      "class": "debate",
+      "type": "disruption",
+      "weight": 1,
       "text": "Baxter objects to the objection to his objection. Mr. Mustard says 'okay'.",
       "choices": [
-        { "label": "Side with Baxter", "effects": { "bond": { "baxter": 4, "priya": -1 } }, "result": "\"Finally. Someone with SENSE.\"" },
-        { "label": "Side with Priya", "effects": { "bond": { "priya": 3, "baxter": -2 } }, "result": "Priya smiles the smile of a shark." }
-      ] },
-    { "id": "debate_hoarse", "class": "debate", "type": "accident", "weight": 1,
+        {
+          "label": "Side with Baxter",
+          "effects": {
+            "bond": {
+              "baxter": 4,
+              "priya": -1
+            }
+          },
+          "result": "\"Finally. Someone with SENSE.\""
+        },
+        {
+          "label": "Side with Priya",
+          "effects": {
+            "bond": {
+              "priya": 3,
+              "baxter": -2
+            }
+          },
+          "result": "Priya smiles the smile of a shark."
+        }
+      ]
+    },
+    {
+      "id": "debate_hoarse",
+      "class": "debate",
+      "type": "accident",
+      "weight": 1,
       "text": "You argue so hard you nearly lose your voice.",
-      "check": { "stat": "con", "dc": 9 },
-      "successText": "Your voice holds. So does your point.", "failText": "Your last rebuttal comes out as a squeak.",
-      "success": { "statXp": { "con": 0.3 } }, "fail": { "hp": -2, "mp": -2 } },
-    { "id": "debate_spotlight", "class": "debate", "type": "spotlight", "weight": 3, "once": true, "cond": { "minGrade": { "mr_mustard": 30 } },
+      "check": {
+        "stat": "con",
+        "dc": 9
+      },
+      "successText": "Your voice holds. So does your point.",
+      "failText": "Your last rebuttal comes out as a squeak.",
+      "success": {
+        "statXp": {
+          "con": 0.3
+        }
+      },
+      "fail": {
+        "hp": -2,
+        "mp": -2
+      }
+    },
+    {
+      "id": "debate_spotlight",
+      "class": "debate",
+      "type": "spotlight",
+      "weight": 3,
+      "once": true,
+      "cond": {
+        "minGrade": {
+          "mr_mustard": 30
+        }
+      },
       "text": "\"An argument is a binding,\" Mr. Mustard says, very calmly, \"You tie two ideas together until one of them can't move.\" He means it literally. You can tell.",
-      "effects": { "stats": { "wil": 1 }, "affinity": { "binding": 4 } } },
-
-    { "id": "bio_cells", "class": "biology", "type": "lesson", "weight": 4,
+      "effects": {
+        "stats": {
+          "wil": 1
+        },
+        "affinity": {
+          "binding": 4
+        }
+      }
+    },
+    {
+      "id": "bio_cells",
+      "class": "biology",
+      "type": "lesson",
+      "weight": 4,
       "text": "Mitochondria, the powerhouse of the cell, explained by a teacher who will not look at the diagram of a heart.",
-      "effects": { "statXp": { "int": 0.3 } } },
-    { "id": "bio_jargon", "class": "biology", "type": "lesson", "weight": 3,
+      "effects": {
+        "statXp": {
+          "int": 0.3
+        }
+      }
+    },
+    {
+      "id": "bio_jargon",
+      "class": "biology",
+      "type": "lesson",
+      "weight": 3,
       "text": "The Biology Teacher describes a paper cut as 'a superficial epidermal discontinuity' and has to sit down.",
-      "effects": { "statXp": { "con": 0.3 } } },
-    { "id": "bio_quiz", "class": "biology", "type": "quiz", "weight": 2,
+      "effects": {
+        "statXp": {
+          "con": 0.3
+        }
+      }
+    },
+    {
+      "id": "bio_quiz",
+      "class": "biology",
+      "type": "quiz",
+      "weight": 2,
       "text": "Quiz: label the parts of a frog. The frog is, thankfully, a drawing.",
-      "check": { "stat": "int", "dc": 9 },
-      "successText": "Every label in the right place. The teacher is visibly relieved.", "failText": "You label the frog 'Gerald'. Not technically wrong.",
-      "success": { "repeatClassGain": true }, "fail": {} },
-    { "id": "bio_partner", "class": "biology", "type": "partner", "weight": 2, "partner": true,
+      "check": {
+        "stat": "int",
+        "dc": 9
+      },
+      "successText": "Every label in the right place. The teacher is visibly relieved.",
+      "failText": "You label the frog 'Gerald'. Not technically wrong.",
+      "success": {
+        "repeatClassGain": true
+      },
+      "fail": {}
+    },
+    {
+      "id": "bio_partner",
+      "class": "biology",
+      "type": "partner",
+      "weight": 2,
+      "partner": true,
       "text": "Microscope work with {partner}. One of you has to focus. The other has to not sneeze.",
       "choices": [
-        { "label": "You sneeze-guard, they focus", "effects": { "bondPartner": 4 }, "result": "Teamwork. Beautiful, sneeze-free teamwork." },
-        { "label": "You take the eyepiece", "effects": { "bondPartner": 2, "statXp": { "per": 0.5 } }, "result": "There's something in the sample that waves at you. You decide it didn't." }
-      ] },
-    { "id": "bio_dissection", "class": "biology", "type": "accident", "weight": 1,
+        {
+          "label": "You sneeze-guard, they focus",
+          "effects": {
+            "bondPartner": 4
+          },
+          "result": "Teamwork. Beautiful, sneeze-free teamwork."
+        },
+        {
+          "label": "You take the eyepiece",
+          "effects": {
+            "bondPartner": 2,
+            "statXp": {
+              "per": 0.5
+            }
+          },
+          "result": "There's something in the sample that waves at you. You decide it didn't."
+        }
+      ]
+    },
+    {
+      "id": "bio_dissection",
+      "class": "biology",
+      "type": "accident",
+      "weight": 1,
       "text": "Dissection day. The teacher hands you the scalpel and leaves the room 'for air'.",
-      "check": { "stat": "wil", "dc": 9 },
-      "successText": "Steady hands. You finish and clean up. The teacher returns, pale, and gives you an A.", "failText": "You get queasy and nick your thumb.",
-      "success": { "statXp": { "con": 0.5 } }, "fail": { "hp": -3 } },
-    { "id": "bio_mara_sketch", "class": "biology", "type": "disruption", "weight": 1,
+      "check": {
+        "stat": "wil",
+        "dc": 9
+      },
+      "successText": "Steady hands. You finish and clean up. The teacher returns, pale, and gives you an A.",
+      "failText": "You get queasy and nick your thumb.",
+      "success": {
+        "statXp": {
+          "con": 0.5
+        }
+      },
+      "fail": {
+        "hp": -3
+      }
+    },
+    {
+      "id": "bio_mara_sketch",
+      "class": "biology",
+      "type": "disruption",
+      "weight": 1,
       "text": "Mara's lab sketch is better than the textbook. It's also, in one corner, a drawing of something with too many eyes.",
       "choices": [
-        { "label": "Ask about the eyes", "effects": { "bond": { "mara": 4 }, "flag": "mara_sketch_seen" }, "result": "\"I don't know. I just see it sometimes.\" She closes the book." },
-        { "label": "Compliment the frog", "effects": { "bond": { "mara": 3 } }, "result": "She smiles at her shoes. It's a very good frog." }
-      ] },
-    { "id": "bio_spotlight", "class": "biology", "type": "spotlight", "weight": 3, "once": true, "cond": { "minGrade": { "biology_teacher": 25 } },
+        {
+          "label": "Ask about the eyes",
+          "effects": {
+            "bond": {
+              "mara": 4
+            },
+            "flag": "mara_sketch_seen"
+          },
+          "result": "\"I don't know. I just see it sometimes.\" She closes the book."
+        },
+        {
+          "label": "Compliment the frog",
+          "effects": {
+            "bond": {
+              "mara": 3
+            }
+          },
+          "result": "She smiles at her shoes. It's a very good frog."
+        }
+      ]
+    },
+    {
+      "id": "bio_spotlight",
+      "class": "biology",
+      "type": "spotlight",
+      "weight": 3,
+      "once": true,
+      "cond": {
+        "minGrade": {
+          "biology_teacher": 25
+        }
+      },
       "text": "\"Living things want to keep living,\" the teacher says, oddly intense. \"That want is a force. Some people can... borrow it.\" They swallow. \"Hypothetically.\"",
-      "effects": { "stats": { "con": 1 }, "flag": "vitality_hint" } },
-
-    { "id": "history_lecture", "class": "history", "type": "lesson", "weight": 4,
+      "effects": {
+        "stats": {
+          "con": 1
+        },
+        "flag": "vitality_hint"
+      }
+    },
+    {
+      "id": "history_lecture",
+      "class": "history",
+      "type": "lesson",
+      "weight": 4,
       "text": "Ms. Nonsense: \"Pay attention. I will not repeat myself twice in one century.\" She repeats herself twice.",
-      "effects": { "statXp": { "wil": 0.3 } } },
-    { "id": "history_founding", "class": "history", "type": "lesson", "weight": 3,
+      "effects": {
+        "statXp": {
+          "wil": 0.3
+        }
+      }
+    },
+    {
+      "id": "history_founding",
+      "class": "history",
+      "type": "lesson",
+      "weight": 3,
       "text": "The town's founding. There's a gap in the records around a bad winter. Ms. Nonsense skips it very quickly.",
-      "effects": { "statXp": { "int": 0.3 }, "flag": "lore_founding_gap" } },
-    { "id": "history_quiz", "class": "history", "type": "quiz", "weight": 2,
+      "effects": {
+        "statXp": {
+          "int": 0.3
+        },
+        "flag": "lore_founding_gap"
+      }
+    },
+    {
+      "id": "history_quiz",
+      "class": "history",
+      "type": "quiz",
+      "weight": 2,
       "text": "Quiz: list the town's mayors in order. All of them. From memory.",
-      "check": { "stat": "wil", "dc": 10 },
-      "successText": "Ms. Nonsense finds no mistakes and looks personally offended.", "failText": "You list four mayors and a weatherman.",
-      "success": { "repeatClassGain": true }, "fail": { "gradeFor": { "ms_nonsense": -1 } } },
-    { "id": "history_partner", "class": "history", "type": "partner", "weight": 2, "partner": true,
+      "check": {
+        "stat": "wil",
+        "dc": 10
+      },
+      "successText": "Ms. Nonsense finds no mistakes and looks personally offended.",
+      "failText": "You list four mayors and a weatherman.",
+      "success": {
+        "repeatClassGain": true
+      },
+      "fail": {
+        "gradeFor": {
+          "ms_nonsense": -1
+        }
+      }
+    },
+    {
+      "id": "history_partner",
+      "class": "history",
+      "type": "partner",
+      "weight": 2,
+      "partner": true,
       "text": "Group project with {partner}: a timeline of the town. Ms. Nonsense will grade it like a court case.",
       "choices": [
-        { "label": "Split the work evenly", "effects": { "bondPartner": 4 }, "result": "Fair. Efficient. Friendship-adjacent." },
-        { "label": "Dig into the weird years", "effects": { "bondPartner": 2, "flag": "lore_missing_people" }, "result": "There are a lot of 'moved away' notes in the 1980s. A LOT." }
-      ] },
-    { "id": "history_samBaxter", "class": "history", "type": "disruption", "weight": 1,
+        {
+          "label": "Split the work evenly",
+          "effects": {
+            "bondPartner": 4
+          },
+          "result": "Fair. Efficient. Friendship-adjacent."
+        },
+        {
+          "label": "Dig into the weird years",
+          "effects": {
+            "bondPartner": 2,
+            "flag": "lore_missing_people"
+          },
+          "result": "There are a lot of 'moved away' notes in the 1980s. A LOT."
+        }
+      ]
+    },
+    {
+      "id": "history_samBaxter",
+      "class": "history",
+      "type": "disruption",
+      "weight": 1,
       "text": "Something happens in the back row involving Sam, Baxter and a rubber band. Ms. Nonsense turns around. Nobody is doing anything.",
       "choices": [
-        { "label": "Cover for them", "effects": { "bond": { "sam": 3, "baxter": 3 }, "gradeFor": { "ms_nonsense": -2 } }, "result": "\"Those two think I don't notice. I notice.\"" },
-        { "label": "Stay out of it", "effects": {}, "result": "You learn nothing about rubber bands, and a lot about self-preservation." }
-      ] },
-    { "id": "history_textbook", "class": "history", "type": "accident", "weight": 1,
+        {
+          "label": "Cover for them",
+          "effects": {
+            "bond": {
+              "sam": 3,
+              "baxter": 3
+            },
+            "gradeFor": {
+              "ms_nonsense": -2
+            }
+          },
+          "result": "\"Those two think I don't notice. I notice.\""
+        },
+        {
+          "label": "Stay out of it",
+          "effects": {},
+          "result": "You learn nothing about rubber bands, and a lot about self-preservation."
+        }
+      ]
+    },
+    {
+      "id": "history_textbook",
+      "class": "history",
+      "type": "accident",
+      "weight": 1,
       "text": "Ms. Nonsense drops an enormous textbook on your desk to make a point. Your fingers are in the way of the point.",
-      "check": { "stat": "dex", "dc": 9 },
-      "successText": "Fingers withdrawn in time. Point received.", "failText": "Point received. By your fingers.",
-      "success": {}, "fail": { "hp": -2 } },
-    { "id": "history_spotlight", "class": "history", "type": "spotlight", "weight": 3, "once": true, "cond": { "minGrade": { "ms_nonsense": 30 } },
+      "check": {
+        "stat": "dex",
+        "dc": 9
+      },
+      "successText": "Fingers withdrawn in time. Point received.",
+      "failText": "Point received. By your fingers.",
+      "success": {},
+      "fail": {
+        "hp": -2
+      }
+    },
+    {
+      "id": "history_spotlight",
+      "class": "history",
+      "type": "spotlight",
+      "weight": 3,
+      "once": true,
+      "cond": {
+        "minGrade": {
+          "ms_nonsense": 30
+        }
+      },
       "text": "Ms. Nonsense keeps you after class. \"I'm not telling you this because I like you.\" She shows you a yearbook page where every face has been cut out except one. It's the vice principal, thirty years younger.",
-      "effects": { "stats": { "wil": 1 }, "flag": "lore_yearbook" }, "result": "She takes it back before you can look closer." }
+      "effects": {
+        "stats": {
+          "wil": 1
+        },
+        "flag": "lore_yearbook"
+      },
+      "result": "She takes it back before you can look closer."
+    },
+    {
+      "id": "chem_tangent",
+      "class": "chemistry",
+      "type": "flavor",
+      "weight": 1.0,
+      "text": "Ms. G starts explaining valence electrons and ends up on why cats knock things off tables. You take notes on both.",
+      "short": "Ms.",
+      "choices": [
+        {
+          "label": "Ask a follow-up about the cats",
+          "effects": {
+            "statXp": {
+              "int": 1
+            },
+            "grade": 2
+          },
+          "result": "She lights up. Twenty more minutes. You learn a lot about cats and something about electrons."
+        },
+        {
+          "label": "Steer her back to the test material",
+          "effects": {
+            "statXp": {
+              "int": 2
+            }
+          },
+          "result": "\"Right. Yes. Electrons.\" She looks a little sad."
+        }
+      ]
+    },
+    {
+      "id": "earth_rocks",
+      "class": "earth_science",
+      "type": "flavor",
+      "weight": 1.0,
+      "text": "The Earth Science Teacher passes around a rock that's 'older than the town'. It's warm. Rocks aren't warm.",
+      "short": "The Earth Science Teacher passes around a rock that's 'older than the town'.",
+      "choices": [
+        {
+          "label": "Hold it longer",
+          "effects": {
+            "statXp": {
+              "per": 2
+            },
+            "narratorBond": 1
+          },
+          "result": "It hums. Just for you. Probably."
+        },
+        {
+          "label": "Pass it on fast",
+          "effects": {
+            "statXp": {
+              "wil": 1
+            }
+          },
+          "result": "You pass it on. Your hand stays warm all period."
+        }
+      ]
+    },
+    {
+      "id": "shop_measure",
+      "class": "shop",
+      "type": "flavor",
+      "weight": 1.0,
+      "text": "Mr. J: 'Measure twice, cut once.' Dex measures zero times and cuts four.",
+      "short": "Mr.",
+      "choices": [
+        {
+          "label": "Help Dex fix it",
+          "effects": {
+            "bond": {
+              "dex": 3
+            },
+            "statXp": {
+              "per": 1
+            }
+          },
+          "result": "Together you save most of the birdhouse. The bird will be fine."
+        },
+        {
+          "label": "Do your own work perfectly",
+          "effects": {
+            "statXp": {
+              "str": 1,
+              "per": 1
+            },
+            "grade": 2
+          },
+          "result": "Mr. J holds up your cut for the class. Dex claps."
+        }
+      ]
+    },
+    {
+      "id": "debate_coin",
+      "class": "debate",
+      "type": "flavor",
+      "weight": 1.0,
+      "text": "Mr. Mustard flips a coin to pick your side: you must defend homework. The class boos.",
+      "short": "Mr.",
+      "choices": [
+        {
+          "label": "Argue it honestly",
+          "effects": {
+            "statXp": {
+              "int": 1,
+              "cha": 1
+            },
+            "grade": 2
+          },
+          "result": "You win on a technicality. Nobody forgives you."
+        },
+        {
+          "label": "Argue it as a joke",
+          "effects": {
+            "statXp": {
+              "cha": 2
+            },
+            "bond": {
+              "theo": 2
+            }
+          },
+          "result": "You lose, but Theo is crying laughing."
+        }
+      ]
+    },
+    {
+      "id": "bio_frog",
+      "class": "biology",
+      "type": "flavor",
+      "weight": 1.0,
+      "text": "Dissection day. The frog looks at you. You look at the frog. The Biology Teacher says it doesn't look at anyone anymore.",
+      "short": "Dissection day.",
+      "choices": [
+        {
+          "label": "Do it carefully",
+          "effects": {
+            "statXp": {
+              "per": 2
+            },
+            "grade": 2
+          },
+          "result": "Clean work. The teacher puts a gold star on your tray."
+        },
+        {
+          "label": "Let your partner do it",
+          "effects": {
+            "statXp": {
+              "wil": 1
+            }
+          },
+          "result": "Your partner faints. You do it anyway."
+        }
+      ]
+    },
+    {
+      "id": "history_dates",
+      "class": "history",
+      "type": "flavor",
+      "weight": 1.0,
+      "text": "Ms. Nonsense quizzes the class on dates, then admits two of them were made up. She won't say which.",
+      "short": "Ms.",
+      "choices": [
+        {
+          "label": "Call out the fake ones",
+          "effects": {
+            "statXp": {
+              "int": 2
+            },
+            "grade": 3
+          },
+          "result": "You get one right. She's furious and proud."
+        },
+        {
+          "label": "Keep quiet and write it all down",
+          "effects": {
+            "statXp": {
+              "per": 1
+            }
+          },
+          "result": "You'll never know which ones were real."
+        }
+      ]
+    },
+    {
+      "id": "history_grudge",
+      "class": "history",
+      "type": "flavor",
+      "weight": 1.0,
+      "text": "Ms. Nonsense has a grudge against the town founder. Today's lesson is mostly evidence.",
+      "short": "Ms.",
+      "choices": [
+        {
+          "label": "Ask what he did",
+          "effects": {
+            "statXp": {
+              "int": 1
+            },
+            "narratorBond": 1
+          },
+          "result": "\"He built the fountain.\" She says it like a crime."
+        },
+        {
+          "label": "Defend the founder",
+          "effects": {
+            "grade": -2,
+            "statXp": {
+              "cha": 1
+            }
+          },
+          "result": "Wrong answer. Very wrong answer."
+        }
+      ]
+    },
+    {
+      "id": "pe_drills",
+      "class": "pe",
+      "type": "flavor",
+      "weight": 1.0,
+      "text": "Coach Byrne runs drills until someone throws up. Today it isn't you.",
+      "short": "Coach Byrne runs drills until someone throws up.",
+      "choices": [
+        {
+          "label": "Push through",
+          "effects": {
+            "statXp": {
+              "con": 2
+            }
+          },
+          "result": "Your legs file a complaint."
+        },
+        {
+          "label": "Pace yourself",
+          "effects": {
+            "statXp": {
+              "con": 1,
+              "wil": 1
+            }
+          },
+          "result": "Coach notices. Coach always notices."
+        }
+      ]
+    },
+    {
+      "id": "physics_drop",
+      "class": "physics",
+      "type": "flavor",
+      "weight": 1.0,
+      "text": "Ms. G drops a bowling ball and a feather in a vacuum tube. The feather doesn't fall. It just hangs there.",
+      "short": "Ms.",
+      "choices": [
+        {
+          "label": "Point it out",
+          "effects": {
+            "statXp": {
+              "per": 2
+            },
+            "narratorBond": 1
+          },
+          "result": "\"Huh,\" says Ms. G. She writes something down and doesn't say what."
+        },
+        {
+          "label": "Pretend you didn't see",
+          "effects": {
+            "statXp": {
+              "int": 1
+            }
+          },
+          "result": "The feather drops when you look away."
+        }
+      ]
+    },
+    {
+      "id": "drama_missing_page",
+      "class": "drama",
+      "type": "flavor",
+      "weight": 1.0,
+      "text": "Mr. Mustard hands out scripts for a play nobody has heard of. The last page is missing. He says that's the point.",
+      "short": "Mr.",
+      "choices": [
+        {
+          "label": "Write your own ending",
+          "effects": {
+            "statXp": {
+              "cha": 1,
+              "int": 1
+            },
+            "bond": {
+              "priya": 2
+            }
+          },
+          "result": "Priya reads it out loud. It's better than the real play, probably."
+        },
+        {
+          "label": "Ask where the page went",
+          "effects": {
+            "narratorBond": 1,
+            "statXp": {
+              "per": 1
+            }
+          },
+          "result": "\"It was never there.\" He says it like a fact about the weather."
+        }
+      ]
+    }
   ]
 }

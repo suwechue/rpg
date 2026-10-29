@@ -821,6 +821,18 @@
     "locker.take": "Take out: %s (%d)",
     "locker.close": "Close",
     "locker.inside": "In the locker:",
-    "locker.empty": "Nothing in here but a gum wrapper."
+    "locker.empty": "Nothing in here but a gum wrapper.",
+    "club.fair_title": "Club Fair",
+    "club.fair_text": "Join up to %d clubs. Each takes your After School part on its days.",
+    "club.join": "%s (%s): %s",
+    "club.joined": "Joined: %s",
+    "club.done": "Done",
+    "club.meeting_title": "%s",
+    "club.days": "Meets %s",
+    "exam.title": "Report Card",
+    "exam.row": "%s: %s (%d)",
+    "exam.gpa": "GPA %.1f",
+    "exam.continue": "Continue",
+    "exam.test_week_note": "Test week: exams in every class."
   }
 }

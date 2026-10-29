@@ -1,0 +1,146 @@
+{
+  "cutscenes": [
+    {
+      "id": "cal_pep_rally",
+      "steps": [
+        {
+          "type": "sfx",
+          "event": "bell"
+        },
+        {
+          "type": "title_card",
+          "text": "Pep Rally",
+          "seconds": 1.2
+        },
+        {
+          "type": "narrator",
+          "text": "The whole school in the gym. The band plays the fight song in a key that doesn't exist."
+        },
+        {
+          "type": "say",
+          "speaker": "kelly",
+          "text": "Smile. Everyone's watching the new kid. And everyone's watching me watch you.",
+          "side": "right"
+        },
+        {
+          "type": "narrator",
+          "text": "The mascot costume sits on a folding chair by the bleachers. Empty. Nobody wanted to wear it this year. Nobody says why."
+        },
+        {
+          "type": "choice",
+          "text": "The squad needs one more for the human pyramid.",
+          "options": [
+            {
+              "label": "Climb up",
+              "effects": {
+                "bond": {
+                  "kelly": 3,
+                  "kara": 3
+                },
+                "statXp": {
+                  "dex": 2
+                }
+              }
+            },
+            {
+              "label": "Cheer from the bleachers",
+              "effects": {
+                "bond": {
+                  "dex": 2,
+                  "theo": 2
+                }
+              }
+            },
+            {
+              "label": "Look at the empty costume",
+              "effects": {
+                "narratorBond": 1,
+                "flag": "mascot_costume_noticed"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cal_club_fair",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Club Fair",
+          "seconds": 1.2
+        },
+        {
+          "type": "narrator",
+          "text": "Folding tables line the hallway. Every club has a sign, a sign-up sheet and one person trying too hard."
+        },
+        {
+          "type": "narrator",
+          "text": "You can join one or two. They'll take your After School on their days, every week. Choose like your afternoons matter. They do."
+        }
+      ]
+    },
+    {
+      "id": "cal_test_week",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Test Week",
+          "seconds": 1.2
+        },
+        {
+          "type": "narrator",
+          "text": "The posters go up overnight: TEST WEEK. Somebody has drawn a skull on every one. The skulls are crying."
+        },
+        {
+          "type": "narrator",
+          "text": "Your classes this week are exams. Your stats and your attendance decide the grades. The report card comes Friday."
+        }
+      ]
+    },
+    {
+      "id": "cal_report_card",
+      "steps": [
+        {
+          "type": "sfx",
+          "event": "bell"
+        },
+        {
+          "type": "title_card",
+          "text": "Report Card",
+          "seconds": 1.2
+        },
+        {
+          "type": "narrator",
+          "text": "An envelope with your name on it, sealed with the school crest. It's heavier than paper should be."
+        }
+      ]
+    },
+    {
+      "id": "cal_school_dance",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "The Dance",
+          "seconds": 1.4
+        },
+        {
+          "type": "narrator",
+          "text": "Paper stars on the gym ceiling. A disco ball that only half turns. Everyone you know, dressed like someone else."
+        },
+        {
+          "type": "narrator",
+          "text": "The DJ plays the slow song. Then, under the music, something else plays. Water. Running water, from everywhere at once."
+        },
+        {
+          "type": "set_flag",
+          "flag": "dance_interrupted"
+        },
+        {
+          "type": "narrator",
+          "text": "The lights flicker. Outside, the fountain in the town square has started to run. It hasn't run in thirty years."
+        }
+      ]
+    }
+  ]
+}

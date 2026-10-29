@@ -82,6 +82,15 @@ static func attend(db: Dictionary, run: Dictionary, period: int, rng: RandomNumb
 	var lines: Array = [Str.t(db, "school.you_attend") % [cls.get("name", cid), Str.t(db, "school.again_half_gains") if mul < 1.0 else ""]]
 	lines.append_array(Fx.apply(db, run, fx, rng, c))
 	var event := pick_event(db, run, cid, rng, c)
+	if not event.is_empty():
+		var counts: Dictionary = run.get("class_events_seen", {})
+		var times := int(counts.get(str(event["id"]), 0))
+		counts[str(event["id"])] = times + 1
+		run["class_events_seen"] = counts
+		if times > 0 and event.has("short"):
+			# A repeat plays its short version so it never drags.
+			event = event.duplicate()
+			event["text"] = str(event["short"])
 	if not event.is_empty() and bool(event.get("once", false)):
 		run["events_seen"][str(event["id"])] = true
 	return { "class": cid, "lines": lines, "event": event, "ctx": c }
@@ -114,7 +123,9 @@ static func pick_event(db: Dictionary, run: Dictionary, cid: String, rng: Random
 			if forced.is_empty() or int(e.get("priority", 0)) > int(forced.get("priority", 0)):
 				forced = e
 			continue
-		eligible[str(e["id"])] = float(e.get("weight", 1.0))
+		# M16: events seen before are much rarer (each repeat quarters the weight).
+		var seen := int(run.get("class_events_seen", {}).get(str(e["id"]), 0))
+		eligible[str(e["id"])] = float(e.get("weight", 1.0)) * pow(float(db.get("school_classes", {}).get("rules", {}).get("repeatWeight", 0.25)), float(seen))
 		order.append(str(e["id"]))
 	if not forced.is_empty():
 		return forced

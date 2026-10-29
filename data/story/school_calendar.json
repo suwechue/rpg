@@ -1,0 +1,92 @@
+{
+  "comment": "M16 school calendar: fixed set pieces (week 1's first day is the tutorial day). Club fair, test week and the report card run their own screens (clubFair, testWeek, reportCard steps). The dance sets dance_interrupted for M21.",
+  "stories": [
+    {
+      "id": "cal_w2_pep_rally",
+      "inline": true,
+      "trigger": {
+        "week": 2,
+        "day": "mon",
+        "part": "after_school"
+      },
+      "at": {
+        "zone": "school"
+      },
+      "steps": [
+        {
+          "type": "cutscene",
+          "id": "cal_pep_rally"
+        }
+      ]
+    },
+    {
+      "id": "cal_w3_club_fair",
+      "inline": true,
+      "trigger": {
+        "week": 3,
+        "day": "mon",
+        "part": "lunch"
+      },
+      "steps": [
+        {
+          "type": "cutscene",
+          "id": "cal_club_fair"
+        },
+        {
+          "type": "clubFair"
+        }
+      ]
+    },
+    {
+      "id": "cal_w4_test_week",
+      "inline": true,
+      "trigger": {
+        "week": 4,
+        "day": "mon",
+        "part": "before_school"
+      },
+      "steps": [
+        {
+          "type": "cutscene",
+          "id": "cal_test_week"
+        },
+        {
+          "type": "testWeek"
+        }
+      ]
+    },
+    {
+      "id": "cal_w4_report_card",
+      "inline": true,
+      "trigger": {
+        "week": 4,
+        "day": "fri",
+        "part": "after_school"
+      },
+      "steps": [
+        {
+          "type": "cutscene",
+          "id": "cal_report_card"
+        },
+        {
+          "type": "reportCard"
+        }
+      ]
+    },
+    {
+      "id": "cal_w5_dance",
+      "inline": true,
+      "trigger": {
+        "week": 5,
+        "day": "fri",
+        "part": "evening"
+      },
+      "steps": [
+        {
+          "type": "cutscene",
+          "id": "cal_school_dance"
+        }
+      ]
+    }
+  ]
+}

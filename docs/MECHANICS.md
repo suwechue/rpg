@@ -376,6 +376,11 @@ Change these in `data/calendar.json`, `data/social.json` and the locations data.
 
 ## C2. School
 
+- **Class periods** (M13, M16): the bell, a walk-to-class cutscene, the class with a seating chart, then the class screen and one class event. Seen events come up a quarter as often each time (`school_classes.json` rules.repeatWeight) and repeats play their short version. Every class has 8+ events in act 1.
+- **School calendar:** week 2 pep rally (after school, at school), week 3 club fair (lunch), week 4 test week (announced Monday) and the report card (Friday after school), week 5 the dance (Friday evening; it ends with the fountain running, for M21).
+- **Clubs:** join up to 2 at the club fair (Drama, Debate, Cheer, Shop, Art, Science; each meets 2 days a week). A meeting takes that day's After School part and gives stat XP and +2 Bond with its members. `data/clubs.json`.
+- **Exams:** each class in your schedule scores 50 + 6 x (average of its stats - 6) + 0.4 x Grade with its teacher, clamped 0 to 100. A 90+, B 80+, C 65+, D 50+, F below. Letters move teacher Grade (A +10 ... F -10). GPA 3.5+: honor roll (+20 money); 2.5+: +10 money; under 1.5: grounded. `data/exams.json`.
+
 - You set a **weekly schedule:** one class per period, from 9 classes (PE, Physics, Chemistry, Earth Science, Shop, Drama, Debate, Biology, History).
 - **Attending** plays a class event (lesson, pop quiz, partner work, disruption, accident or professor spotlight; 64 events) and gives **training bars** to that class's stats. A stat point costs 3 bars below 7, 4 from 7, and 5 from 13. Repeating a class the same day gives half. Attending also nudges your Vector affinity toward the subject.
 - **Grade** with each professor: +3 per attendance, −5 per skip (0 to 100). Spotlight events need Grade 25 to 40.

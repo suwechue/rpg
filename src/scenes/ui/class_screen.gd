@@ -20,6 +20,8 @@ func _ready() -> void:
 	text(Strings.t("class.with") % [cls.get("name", ""), prof, cls.get("blurb", "")], UiTheme.DIM)
 	var grade := float(GameState.run["grades"].get(str(cls.get("professor", "")), 0.0))
 	text(Strings.t("class.grade_with_skips_this_week") % [prof, roundi(grade), int(GameState.run.get("skips_week", 0))], UiTheme.DIM)
+	if GameState.flag("test_week") and Calendar.week() == 4:
+		text(Strings.t("exam.test_week_note"), UiTheme.ACCENT)
 	add_button(Strings.t("class.attend_takes_the_whole_period"), _attend)
 	add_button(Strings.t("class.skip_free_2_ap_part"), _skip)
 	focus_first()

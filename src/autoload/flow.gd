@@ -6,6 +6,9 @@ extends CanvasLayer
 
 const ScheduleScreen := preload("res://src/scenes/ui/schedule_screen.gd")
 const ClassScreen := preload("res://src/scenes/ui/class_screen.gd")
+const Fx := preload("res://src/core/run/effects.gd")
+const Exams := preload("res://src/core/run/exams.gd")
+const Clubs := preload("res://src/core/run/clubs.gd")
 const NightScreen := preload("res://src/scenes/ui/night_screen.gd")
 const EventScreen := preload("res://src/scenes/ui/event_screen.gd")
 const Hud := preload("res://src/scenes/ui/hud.gd")
@@ -60,6 +63,11 @@ func _on_part_started() -> void:
 	var screens := GameState.part_screens()
 	for id in StoryRules.due(DataDB.all(), GameState.run, GameState.ctx(), true):
 		screens.push_front("story:" + str(id))
+	# M16: a club meeting takes the After School part on its days.
+	if Calendar.part_id() == "after_school" and not Calendar.is_weekend():
+		var club := Clubs.meeting_today(DataDB.all(), GameState.run, Calendar.day_name())
+		if club != "":
+			screens.append("club:" + club)
 	if GameState.player.has("pendingClassChange") and not screens.has("class") and not screens.has("dungeon"):
 		screens.push_front("class_change")
 	if not GameState.player.get("pendingPerks", []).is_empty() and not screens.has("dungeon"):
@@ -134,6 +142,10 @@ func _next() -> void:
 			_next()
 		_ when screen.begins_with("story:"):
 			await play_inline_story(screen.substr(6))
+			_next()
+		_ when screen.begins_with("club:"):
+			await show_event(Clubs.meeting_event(DataDB.all(), GameState.run, screen.substr(5), Rng.stream("events")))
+			Calendar.spend_ap(Calendar.ap(), "club")
 			_next()
 		_:
 			var custom: Callable = custom_screens.get(screen, Callable())
@@ -263,10 +275,56 @@ func play_inline_story(id: String) -> void:
 				await show_event({ "title": "", "text": str(step["text"]) })
 			"cutscene":
 				await Cutscenes.play(str(step["id"]), get_tree().current_scene)
+			"clubFair":
+				await _club_fair()
+			"testWeek":
+				GameState.set_flag("test_week")
+			"reportCard":
+				await _report_card()
 			"foreshadow":
 				var l := Narrator.line("foreshadow")
 				Narrator.say(l)
 				await show_event({ "title": Strings.t("flow.the_narrator"), "text": l })
+
+
+## M16: the club fair. Join up to maxJoin clubs.
+func _club_fair() -> void:
+	var db: Dictionary = DataDB.all()
+	while true:
+		var m := preload("res://src/scenes/ui/modal.gd").new()
+		m.build(Strings.t("club.fair_title"), 400)
+		m.text(Strings.t("club.fair_text") % int(db.get("clubs", {}).get("maxJoin", 2)), UiTheme.DIM)
+		var joined: Array = Clubs.joined(GameState.run)
+		for c in Clubs.all(db):
+			var cid := str(c["id"])
+			var days := ", ".join(PackedStringArray(c.get("days", []).map(func(d: Variant) -> String: return str(d).capitalize())))
+			m.add_button(Strings.t("club.join") % [str(c.get("name", cid)), Strings.t("club.days") % days, str(c.get("blurb", ""))],
+				func() -> void: m.finish(cid), joined.has(cid) or joined.size() >= int(db.get("clubs", {}).get("maxJoin", 2)))
+		m.add_button(Strings.t("club.done"), func() -> void: m.finish(null))
+		if GameState.dev_autoplay:
+			m.finish.call_deferred(null)
+		var pick: Variant = await show_modal(m)
+		if pick == null:
+			return
+		if Clubs.join(db, GameState.run, str(pick)) == "":
+			Narrator.say(Strings.t("club.joined") % str(Clubs.find(db, str(pick)).get("name", pick)))
+
+
+## M16: the report card at the end of test week.
+func _report_card() -> void:
+	var db: Dictionary = DataDB.all()
+	var rep := Exams.report(db, GameState.run, GameState.schedule)
+	var lines: Array = []
+	for r in rep["rows"]:
+		lines.append(Strings.t("exam.row") % [str(r["name"]), str(r["letter"]), int(r["score"])])
+	lines.append(Strings.t("exam.gpa") % float(rep["gpa"]))
+	lines.append("")
+	lines.append(str(rep["parent"].get("text", "")))
+	for e in Exams.report_effects(db, rep):
+		Fx.apply(db, GameState.run, e["effects"], Rng.stream("events"), e["ctx"])
+	GameState.run["reportCard"] = rep
+	GameState.set_flag("report_card_done")
+	await show_event({ "title": Strings.t("exam.title"), "text": "\n".join(PackedStringArray(lines)) })
 
 
 ## Permadeath: the save goes, the narrator gives the ending, back to the title.

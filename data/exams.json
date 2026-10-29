@@ -1,0 +1,80 @@
+{
+  "comment": "M16 exams: in test week (week 4) each class you take is graded by the class's stats (statGains) against 'difficulty', plus Grade (attendance) from data/school_classes.json. score = 50 + statWeight x (average class stat - difficulty) + gradeWeight x Grade, clamped 0..100. Letters by 'letters'. The report card (week 4 Friday) applies the letter's effects (teacher Grade, parent reaction) and the GPA's unlock flags.",
+  "difficulty": 6,
+  "statWeight": 6,
+  "gradeWeight": 0.4,
+  "letters": [
+    {
+      "min": 90,
+      "letter": "A",
+      "gpa": 4
+    },
+    {
+      "min": 80,
+      "letter": "B",
+      "gpa": 3
+    },
+    {
+      "min": 65,
+      "letter": "C",
+      "gpa": 2
+    },
+    {
+      "min": 50,
+      "letter": "D",
+      "gpa": 1
+    },
+    {
+      "min": 0,
+      "letter": "F",
+      "gpa": 0
+    }
+  ],
+  "letterEffects": {
+    "A": {
+      "grade": 10
+    },
+    "B": {
+      "grade": 5
+    },
+    "C": {},
+    "D": {
+      "grade": -5
+    },
+    "F": {
+      "grade": -10
+    }
+  },
+  "parent": [
+    {
+      "minGpa": 3.5,
+      "text": "Your guardian reads the report card twice, then puts it on the fridge. Under a magnet. That's love.",
+      "effects": {
+        "money": 20,
+        "flag": "honor_roll"
+      }
+    },
+    {
+      "minGpa": 2.5,
+      "text": "\"Not bad, new kid.\" A pat on the shoulder. Dinner is your favourite.",
+      "effects": {
+        "money": 10
+      }
+    },
+    {
+      "minGpa": 1.5,
+      "text": "A long sigh. \"We'll talk about it.\" You don't talk about it. That's somehow worse.",
+      "effects": {}
+    },
+    {
+      "minGpa": 0,
+      "text": "The report card goes in a drawer. The drawer goes very quiet. Grounded: your next weekend has less time.",
+      "effects": {
+        "flag": "grounded"
+      }
+    }
+  ],
+  "unlocks": {
+    "honor_roll": "Honor roll: advanced classes that ask for good grades are open."
+  }
+}
