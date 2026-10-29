@@ -130,9 +130,12 @@ func test_shop_prices_and_buying() -> void:
 	check(run["player"]["deck"].size() == deck_before + 1 and run["collection"]["card_deli_sandwich"] == 1, "a combat item card goes into the deck")
 	var str_before := 0
 	r = Shop.buy(db(), run, "forge", { "type": "item", "item": "iron_knuckles", "price": 25 }, seeded(1))
-	check(run["player"]["equipment"]["weapon"] == "iron_knuckles", "new gear auto-equips in an empty slot")
+	check(run["player"]["equipment"]["weapon"] == null and int(run["inventory"]["iron_knuckles"]) == 1, "new gear goes in the bag (TL: equip on whom?)")
+	Shop.equip(db(), run, run["player"], "iron_knuckles")
+	check(run["player"]["equipment"]["weapon"] == "iron_knuckles", "and equips from there")
 	check(Char.collect_mods(db(), run["player"])["combat"]["strikePower"] == 2.0, "weapon adds Strike power")
 	Shop.buy(db(), run, "forge", { "type": "item", "item": "padded_jacket", "price": 20 }, seeded(1))
+	Shop.equip(db(), run, run["player"], "padded_jacket")
 	check(Char.derived(db(), run["player"])["physDefense"] >= 3, "armor adds Defense")
 	Shop.buy(db(), run, "corner_store", { "type": "item", "item": "good_coffee", "price": 5 }, seeded(1))
 	var m0: int = run["money"]

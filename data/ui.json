@@ -382,7 +382,7 @@
     },
     "armored": {
       "name": "Armored",
-      "text": "Extra Defense and Resistance.",
+      "text": "Extra Defense and Resistance. Blunt weapons hit it 50% harder.",
       "icon": "icon_status_guard",
       "color": "#c9c9c9"
     },

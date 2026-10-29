@@ -1,0 +1,142 @@
+{
+  "comment": "TL Part 4 gear rules. armorTypes: what light, medium and heavy armor do (on top of each piece's defense and magicResist). weaponTypes: Strike reach, push and damage share. classArmor: each class's preferred armor type gives +1 defense. Upgrades go +0 to +3 (each level +1 defense on armor, +2 Strike power on weapons). Ore drops after won fights (chance by week). Durability: gear loses 1 when its wearer goes down; at 0 it's broken (half its stats) until repaired; on/off per difficulty.",
+  "secondTrinketLevel": 6,
+  "armorTypes": {
+    "light": {
+      "movement": 1,
+      "initiative": 1
+    },
+    "medium": {},
+    "heavy": {
+      "movement": -1,
+      "guardShield": 3
+    }
+  },
+  "weaponTypes": {
+    "knuckles": {
+      "reach": 1,
+      "push": 0,
+      "mul": 1.0,
+      "tags": [
+        "blunt"
+      ]
+    },
+    "baton": {
+      "reach": 1,
+      "push": 1,
+      "mul": 1.0,
+      "tags": [
+        "blunt"
+      ]
+    },
+    "spear": {
+      "reach": 2,
+      "push": 0,
+      "mul": 1.0,
+      "tags": [
+        "blade"
+      ]
+    },
+    "sling": {
+      "reach": 3,
+      "push": 0,
+      "mul": 0.5,
+      "tags": [
+        "thrown"
+      ]
+    },
+    "blade": {
+      "reach": 1,
+      "push": 0,
+      "mul": 1.1,
+      "tags": [
+        "blade"
+      ]
+    },
+    "hammer": {
+      "reach": 1,
+      "push": 1,
+      "mul": 1.1,
+      "tags": [
+        "blunt"
+      ]
+    }
+  },
+  "classArmor": {
+    "fighter": "heavy",
+    "rogue": "light",
+    "mage": "light",
+    "healer": "medium",
+    "bard": "medium"
+  },
+  "classArmorBonus": 1,
+  "upgrade": {
+    "max": 3,
+    "armorDefense": 1,
+    "weaponPower": 2,
+    "baseCost": 15,
+    "ore": "ore_iron"
+  },
+  "infuse": {
+    "cost": 20,
+    "ores": {
+      "ore_ember": [
+        "heat"
+      ],
+      "ore_frost": [
+        "cold"
+      ],
+      "void_glass": [
+        "heat",
+        "cold",
+        "force",
+        "motion",
+        "binding",
+        "light"
+      ]
+    },
+    "resistPct": 25
+  },
+  "repair": {
+    "cost": 8,
+    "freeBond": 41
+  },
+  "durability": {
+    "max": 3,
+    "difficulties": {
+      "normal": true,
+      "hard": true,
+      "story": false
+    }
+  },
+  "bluntVsArmoredMul": 1.5,
+  "commissionDays": 2,
+  "oreDrops": {
+    "chance": 0.35,
+    "byWeek": {
+      "1": [
+        "ore_iron"
+      ],
+      "2": [
+        "ore_iron",
+        "ore_frost"
+      ],
+      "3": [
+        "ore_iron",
+        "ore_ember",
+        "ore_frost"
+      ],
+      "4": [
+        "ore_ember",
+        "ore_frost",
+        "void_glass"
+      ],
+      "5": [
+        "ore_ember",
+        "ore_frost",
+        "void_glass"
+      ]
+    }
+  },
+  "forgeGood": 0.8
+}

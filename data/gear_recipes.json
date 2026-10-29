@@ -1,0 +1,147 @@
+{
+  "comment": "TL Part 4: what the blacksmith can forge: the item, money and ore, the blacksmith Bond and week needed. Unique pieces are commissions (ready in commissionDays days).",
+  "recipes": [
+    {
+      "id": "r_knuckles",
+      "item": "iron_knuckles",
+      "money": 10,
+      "ores": {
+        "ore_iron": 1
+      },
+      "minBlacksmithBond": 0,
+      "fromWeek": 1
+    },
+    {
+      "id": "r_spear",
+      "item": "broom_spear",
+      "money": 12,
+      "ores": {
+        "ore_iron": 1
+      },
+      "minBlacksmithBond": 0,
+      "fromWeek": 1
+    },
+    {
+      "id": "r_windbreaker",
+      "item": "windbreaker",
+      "money": 10,
+      "ores": {
+        "ore_iron": 1
+      },
+      "minBlacksmithBond": 0,
+      "fromWeek": 1
+    },
+    {
+      "id": "r_baton",
+      "item": "forged_baton",
+      "money": 20,
+      "ores": {
+        "ore_iron": 2
+      },
+      "minBlacksmithBond": 11,
+      "fromWeek": 2
+    },
+    {
+      "id": "r_vest",
+      "item": "riveted_vest",
+      "money": 20,
+      "ores": {
+        "ore_iron": 2
+      },
+      "minBlacksmithBond": 11,
+      "fromWeek": 2
+    },
+    {
+      "id": "r_coat",
+      "item": "insulated_coat",
+      "money": 25,
+      "ores": {
+        "ore_iron": 1,
+        "ore_frost": 1
+      },
+      "minBlacksmithBond": 11,
+      "fromWeek": 2
+    },
+    {
+      "id": "r_apron",
+      "item": "forge_apron",
+      "money": 25,
+      "ores": {
+        "ore_iron": 1,
+        "ore_ember": 1
+      },
+      "minBlacksmithBond": 11,
+      "fromWeek": 2
+    },
+    {
+      "id": "r_hammer",
+      "item": "smith_hammer",
+      "money": 40,
+      "ores": {
+        "ore_iron": 2,
+        "ore_ember": 1
+      },
+      "minBlacksmithBond": 41,
+      "fromWeek": 3
+    },
+    {
+      "id": "r_hoodie",
+      "item": "chainmail_hoodie",
+      "money": 40,
+      "ores": {
+        "ore_iron": 3
+      },
+      "minBlacksmithBond": 41,
+      "fromWeek": 3
+    },
+    {
+      "id": "r_pads",
+      "item": "football_pads",
+      "money": 50,
+      "ores": {
+        "ore_iron": 3,
+        "ore_frost": 1
+      },
+      "minBlacksmithBond": 41,
+      "fromWeek": 3
+    }
+  ],
+  "commissions": [
+    {
+      "id": "c_cleaver",
+      "item": "garys_cleaver",
+      "money": 60,
+      "ores": {
+        "ore_iron": 2,
+        "void_glass": 1
+      },
+      "minBlacksmithBond": 41,
+      "needBond": {
+        "gary": 41
+      }
+    },
+    {
+      "id": "c_chain",
+      "item": "mayors_chain",
+      "money": 70,
+      "ores": {
+        "void_glass": 1
+      },
+      "minBlacksmithBond": 41,
+      "needFlag": "deduction_mayor_owned"
+    },
+    {
+      "id": "c_compass",
+      "item": "walts_compass",
+      "money": 50,
+      "ores": {
+        "ore_iron": 1,
+        "void_glass": 1
+      },
+      "minBlacksmithBond": 41,
+      "needBond": {
+        "walt": 30
+      }
+    }
+  ]
+}

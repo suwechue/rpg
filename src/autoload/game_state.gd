@@ -258,6 +258,19 @@ func finish_combat(summary: Dictionary) -> Dictionary:
 	var lines: Array = []
 	if str(summary.get("result", "")) == "win" and str(summary.get("winFlag", "")) != "":
 		set_flag(str(summary["winFlag"]))
+	# TL Part 4: ore from won fights; gear wears down when its wearer goes down.
+	const GearRules := preload("res://src/core/items/gear.gd")
+	if str(summary.get("result", "")) == "win" and combat_context in ["dungeon", "arena", ""]:
+		var ore := GearRules.ore_drop(DataDB.all(), Calendar.week(), Rng.stream("loot"))
+		if ore != "":
+			preload("res://src/core/run/effects.gd").add_item(run, ore, 1)
+			lines.append(Strings.t("loot.ore") % str(GearRules.item(DataDB.all(), ore).get("name", ore)))
+	if GearRules.durability_on(DataDB.all(), combat_difficulty):
+		for p in summary.get("party", []):
+			if bool(p.get("downed", false)):
+				var w := character(str(p.get("id", "")))
+				if not w.is_empty():
+					GearRules.wear_down(DataDB.all(), run, w)
 	# Items (user request, Oct 28): used consumables leave decks and the backpack;
 	# whoever went down loses the relics they wore.
 	const Inv := preload("res://src/core/items/inventory.gd")

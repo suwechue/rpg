@@ -67,9 +67,14 @@ func _refresh() -> void:
 	clear_body()
 	var members := _members()
 	var top := row()
-	for t in ["members", "effects", "compendium"]:
+	for t in ["members", "effects", "equipment", "compendium"]:
 		var key: String = t
 		var tb := UiTheme.button(Strings.t("party_panel.tab_" + key), func() -> void:
+			if key == "equipment":
+				visible = false
+				await Flow.show_modal(preload("res://src/scenes/ui/equipment_screen.gd").new())
+				visible = true
+				return
 			if key == "compendium":
 				# VD Part 2: the Vector Compendium opens over the panel.
 				visible = false

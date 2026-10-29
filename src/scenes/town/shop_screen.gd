@@ -49,7 +49,17 @@ func _refresh() -> void:
 			var it := Shop.item(db, iid)
 			if str(it.get("kind", "")) == "equipment":
 				add_button(Strings.t("shop.equip") % [it.get("name", iid), it.get("slot", "")], func() -> void:
-					_note = Shop.equip(DataDB.all(), GameState.run, GameState.player, iid)
+					# TL Part 4: equip on whom?
+					var q := preload("res://src/scenes/ui/modal.gd").new()
+					q.build(Strings.t("gear.whom") % str(it.get("name", iid)), Display.base.x * 0.5)
+					for who in [GameState.player] + GameState.roster:
+						var w: Dictionary = who
+						q.add_button(str(w.get("name", "?")), func() -> void: q.finish(w))
+					q.add_button(Strings.t("gear.keep"), func() -> void: q.finish(null))
+					var target: Variant = await Flow.show_modal(q)
+					if target == null:
+						return
+					_note = Shop.equip(DataDB.all(), GameState.run, target, iid)
 					if _note == "":
 						_note = Strings.t("shop.equipped_2") % it.get("name", iid)
 					EventBus.stats_changed.emit("player")

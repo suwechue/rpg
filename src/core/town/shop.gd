@@ -93,9 +93,7 @@ static func buy(db: Dictionary, run: Dictionary, shop_id: String, entry: Diction
 			Fx.add_item(run, iid, 1)
 			lines.append(Str.t(db, "shop.got") % entry_name(db, entry))
 			var it := item(db, iid)
-			if str(it.get("kind", "")) == "equipment" and run["player"]["equipment"].get(str(it.get("slot", ""))) == null:
-				equip(db, run, run["player"], iid)
-				lines.append(Str.t(db, "shop.equipped"))
+
 	return { "ok": true, "lines": lines }
 
 
@@ -114,19 +112,14 @@ static func sell(db: Dictionary, run: Dictionary, item_id: String) -> int:
 
 ## Put an owned item in its slot; the old one goes back to the inventory.
 static func equip(db: Dictionary, run: Dictionary, ch: Dictionary, item_id: String) -> String:
-	var it := item(db, item_id)
-	if str(it.get("kind", "")) != "equipment":
-		return Str.t(db, "shop.you_can_t_equip_that")
-	if int(run.get("inventory", {}).get(item_id, 0)) <= 0:
+	# TL Part 4: gear goes through the Gear rules (slots, types, the stats cache).
+	var err := preload("res://src/core/items/gear.gd").equip(db, run, ch, item_id)
+	if err == "":
+		Char.clamp_pools(db, ch)
+		return ""
+	if err == "not_owned":
 		return Str.t(db, "shop.you_don_t_have_it")
-	var slot := str(it.get("slot", ""))
-	var old: Variant = ch["equipment"].get(slot)
-	Fx.add_item(run, item_id, -1)
-	if old != null:
-		Fx.add_item(run, str(old), 1)
-	ch["equipment"][slot] = item_id
-	Char.clamp_pools(db, ch)
-	return ""
+	return Str.t(db, "shop.you_can_t_equip_that")
 
 
 static func unequip(db: Dictionary, run: Dictionary, ch: Dictionary, slot: String) -> void:

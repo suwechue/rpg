@@ -110,3 +110,92 @@ func test_town_content() -> void:
 	check(Locs.door(db(), friend, "theo_house", 2, "tue", "after_school", 3)["kind"] != "enter", "a stranger's house stays shut")
 	friend["bonds"]["theo"] = 50.0
 	check(Locs.door(db(), friend, "theo_house", 2, "tue", "after_school", 3)["kind"] == "enter", "at Friend Bond you can visit")
+
+
+## Part 4: gear.
+func test_gear() -> void:
+	const Gear := preload("res://src/core/items/gear.gd")
+	const Fx := preload("res://src/core/run/effects.gd")
+	const Char := preload("res://src/core/character.gd")
+	const StateScript := preload("res://src/core/combat/combat_state.gd")
+	var run := run_()
+	var ch: Dictionary = run["player"]
+	check(Gear.slots(db(), ch).size() == 3, "three slots at level 1")
+	ch["level"] = 6
+	check(Gear.slots(db(), ch).has("trinket2"), "a second trinket at level 6")
+	ch["level"] = 1
+	var mv0 := int(Char.derived(db(), ch)["movement"])
+	Fx.add_item(run, "windbreaker", 1)
+	check(Gear.compare(db(), run, ch, "windbreaker")["movement"] == 1, "the compare shows light armor's Movement")
+	check(Gear.equip(db(), run, ch, "windbreaker") == "" and int(Char.derived(db(), ch)["movement"]) == mv0 + 1, "light armor: +1 Movement")
+	Fx.add_item(run, "football_pads", 1)
+	Gear.equip(db(), run, ch, "football_pads")
+	check(int(Char.derived(db(), ch)["movement"]) == mv0 - 1 and int(ch["gearStats"]["guardShield"]) > 0, "heavy armor: -1 Movement, a bigger Guard")
+	check(int(run["inventory"].get("windbreaker", 0)) == 1, "the old piece goes back in the bag")
+	Fx.add_item(run, "insulated_coat", 1)
+	Gear.equip(db(), run, ch, "insulated_coat")
+	check(int(ch["gearStats"]["resist"].get("cold", 0)) == 25, "the Insulated Coat resists Cold")
+	Fx.add_item(run, "broom_spear", 1)
+	Gear.equip(db(), run, ch, "broom_spear")
+	check(int(ch["gearStats"]["weapon"]["reach"]) == 2, "a spear reaches 2")
+	var st := StateScript.new(db(), seeded(1), { "layout": { "map": ["P.E."] }, "party": [{ "char": ch }], "enemies": [DT.index_under(db(), "enemies/", "enemies")["pom_pom_wisp"].duplicate(true)] })
+	var me = st.unit_by_id("player")
+	check(st.card_targets(me, { "action": "strike", "builtin": true }).size() == 1, "Strike reaches the enemy 2 tiles away")
+	# Forging, upgrades, infusion, durability.
+	run["money"] = 500
+	Fx.add_item(run, "ore_iron", 10)
+	Fx.add_item(run, "ore_ember", 2)
+	var rec: Dictionary = db()["gear_recipes"]["recipes"][0]
+	check(Gear.forge(db(), run, rec, 0.9) == "" and int(Gear.state(run, str(rec["item"]))["level"]) == 1, "a great hammer score forges a +1 piece")
+	check(Gear.upgrade(db(), run, "broom_spear") == "" and int(Gear.state(run, "broom_spear")["level"]) == 1, "upgrade to +1")
+	check(Gear.infuse(db(), run, "broom_spear", "heat", "ore_ember") == "" and Gear.state(run, "broom_spear")["infusion"] == "heat", "infuse Heat with ember iron")
+	check(Gear.infuse(db(), run, "broom_spear", "cold", "ore_ember") != "", "ember iron can't infuse Cold")
+	for i in 3:
+		Gear.wear_down(db(), run, ch)
+	check(Gear.broken(db(), run, "broom_spear"), "going down three times breaks it")
+	check(Gear.repair(db(), run, "broom_spear") == "" and not Gear.broken(db(), run, "broom_spear"), "the blacksmith repairs it")
+	check(Gear.ore_drop(db(), 1, seeded(3)) in ["", "ore_iron"], "week 1 drops plain iron")
+	run["bonds"]["blacksmith"] = 50.0
+	run["bonds"]["walt"] = 40.0
+	var coms := Gear.commissions(db(), run)
+	check(coms.any(func(c: Dictionary) -> bool: return c["item"] == "walts_compass"), "Walt's compass can be commissioned")
+	Fx.add_item(run, "void_glass", 1)
+	var walt: Dictionary = coms.filter(func(c: Dictionary) -> bool: return c["item"] == "walts_compass")[0]
+	check(Gear.commission(db(), run, walt, 4) == "", "order it")
+	check(Gear.collect(run, 5).is_empty() and Gear.collect(run, 6) == ["walts_compass"], "ready two days later")
+
+
+func test_gear_in_combat() -> void:
+	const Gear := preload("res://src/core/items/gear.gd")
+	const Fx := preload("res://src/core/run/effects.gd")
+	const StateScript := preload("res://src/core/combat/combat_state.gd")
+	var run := run_()
+	var ch: Dictionary = run["player"]
+	Fx.add_item(run, "iron_knuckles", 1)
+	Gear.equip(db(), run, ch, "iron_knuckles")
+	var plain: Dictionary = DT.index_under(db(), "enemies/", "enemies")["pom_pom_wisp"].duplicate(true)
+	var armored := plain.duplicate(true)
+	armored["affixes"] = ["armored"]
+	var st := StateScript.new(db(), seeded(1), { "layout": { "map": ["PE.E"] }, "party": [{ "char": ch }], "enemies": [plain, armored] })
+	var me = st.unit_by_id("player")
+	var foes: Array = st.units.filter(func(u) -> bool: return u.team == "enemy")
+	var vs_plain: float = st._expected_strike(me, foes[0], { "action": "strike", "stat": "str" })
+	var vs_armored: float = st._expected_strike(me, foes[1], { "action": "strike", "stat": "str" })
+	check(st.weapon(me).get("tags", []).has("blunt"), "knuckles are blunt")
+	Gear.unequip(db(), run, ch, "weapon")
+	var st0 := StateScript.new(db(), seeded(1), { "layout": { "map": ["PE.E"] }, "party": [{ "char": ch }], "enemies": [plain.duplicate(true), armored.duplicate(true)] })
+	var me0 = st0.unit_by_id("player")
+	var foes0: Array = st0.units.filter(func(u) -> bool: return u.team == "enemy")
+	var r_none: float = st0._expected_strike(me0, foes0[1], { "action": "strike", "stat": "str" }) / maxf(0.01, st0._expected_strike(me0, foes0[0], { "action": "strike", "stat": "str" }))
+	check(vs_armored / maxf(0.01, vs_plain) > r_none, "blunt hits Armored harder (%.2f vs %.2f)" % [vs_armored / maxf(0.01, vs_plain), r_none])
+	Fx.add_item(run, "mirror_pin", 1)
+	Gear.equip(db(), run, ch, "mirror_pin")
+	var st2 := StateScript.new(db(), seeded(1), { "layout": { "map": ["PE"] }, "party": [{ "char": ch }], "enemies": [plain.duplicate(true)] })
+	var me2 = st2.unit_by_id("player")
+	var foe2 = st2.units.filter(func(u) -> bool: return u.team == "enemy")[0]
+	var hp0: int = me2.hp
+	var fh0: int = foe2.hp
+	st2._damage(me2, 5, foe2, "", "hit")
+	check(me2.hp == hp0 and foe2.hp < fh0, "the Mirror Pin reflects the first hit")
+	st2._damage(me2, 5, foe2, "", "hit")
+	check(me2.hp < hp0, "only the first")

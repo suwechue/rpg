@@ -151,5 +151,6 @@
     },
     "fullAtWeek": 3,
     "fullAtWave": 15
-  }
+  },
+  "gearNote": "TL Part 4: durability per difficulty lives in data/gear.json durability.difficulties."
 }

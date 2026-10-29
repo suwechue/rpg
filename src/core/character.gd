@@ -212,16 +212,20 @@ static func derived(db: Dictionary, ch: Dictionary) -> Dictionary:
 	var armor_id: Variant = ch.get("equipment", {}).get("armor")
 	if armor_id != null and items.has(str(armor_id)):
 		armor = int(items[str(armor_id)].get("defense", 0))
+	# TL Part 4: the gear cache (armor and weapon types, upgrades, durability).
+	var gs: Dictionary = ch.get("gearStats", {})
+	if not gs.is_empty():
+		armor = int(gs.get("defense", 0))
 	var out := {}
 	out["maxHp"] = int(_lin(f.get("maxHp", {}), st)) + int(cls.get("hpBonus", 0)) \
 		+ int(cls.get("hpPerLevel", 0)) * (level - 1) + int(mod(mods, "derived", "maxHp"))
 	out["maxMp"] = int(_lin(f.get("maxMp", {}), st)) + int(cls.get("mpBonus", 0)) + int(mod(mods, "derived", "maxMp")) \
 		+ floori(float(f.get("maxMp", {}).get("perLevel", 0.0)) * float(level - 1))
 	var mv: Dictionary = f.get("movement", {})
-	out["movement"] = int(mv.get("base", 3)) + floori(float(st["dex"]) / float(mv.get("dexDivisor", 5))) + int(mod(mods, "derived", "movement"))
-	out["initiative"] = int(floor(_lin(f.get("initiative", {}), st))) + int(mod(mods, "derived", "initiative"))
+	out["movement"] = int(mv.get("base", 3)) + floori(float(st["dex"]) / float(mv.get("dexDivisor", 5))) + int(mod(mods, "derived", "movement")) + int(gs.get("movement", 0))
+	out["initiative"] = int(floor(_lin(f.get("initiative", {}), st))) + int(mod(mods, "derived", "initiative")) + int(gs.get("initiative", 0))
 	out["physDefense"] = int(floor(_lin(f.get("physDefense", {}), st))) + armor + int(mod(mods, "derived", "physDefense"))
-	out["magicResist"] = int(floor(_lin(f.get("magicResist", {}), st))) + int(mod(mods, "derived", "magicResist"))
+	out["magicResist"] = int(floor(_lin(f.get("magicResist", {}), st))) + int(mod(mods, "derived", "magicResist")) + int(gs.get("magicResist", 0))
 	out["stability"] = int(floor(_lin(f.get("stability", {}), st))) + int(mod(mods, "derived", "stability"))
 	out["critChancePct"] = _lin(f.get("critChancePct", {}), st) + mod(mods, "derived", "critChancePct")
 	out["highCritChancePct"] = _lin(f.get("highCritChancePct", { "base": 1.0, "dex": 0.1 }), st) + mod(mods, "derived", "highCritChancePct")

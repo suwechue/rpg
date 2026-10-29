@@ -1311,6 +1311,13 @@
       ],
       "activities": [
         {
+          "label": "Blacksmith services (forge, upgrade, infuse, repair, commissions)",
+          "ap": 0,
+          "services": true,
+          "effects": {},
+          "say": ""
+        },
+        {
           "label": "Work the bellows",
           "ap": 2,
           "effects": {

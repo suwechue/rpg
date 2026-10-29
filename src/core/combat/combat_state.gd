@@ -178,8 +178,10 @@ func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) ->
 	var opening := int(Res.combat_cfg(db).get("openingHand", 3))
 	for u in units:
 		if u.deck != null:
-			u.deck.hand_limit = hand_size(u)
-			u.deck.draw(opening, rng)
+			# Pocket Notebook: an extra card on turn 1.
+			var extra_open := int(u.mods.get("combat", {}).get("openingHandBonus", 0))
+			u.deck.hand_limit = hand_size(u) + extra_open
+			u.deck.draw(opening + extra_open, rng)
 	_build_order()
 	turn_index = -1
 	_emit({ "t": "round", "n": round_num })
@@ -1039,7 +1041,8 @@ func card_targets(u: UnitScript, card: Dictionary) -> Array:
 		return _spell_targets(u, form_rec(str(card.get("form", ""))), CardRules.heals(card))
 	match str(card.get("action", "")):
 		"strike":
-			return _adjacent_hostiles(u, int(card.get("range", 1)))
+			# TL Part 4: a spear reaches 2, a sling 3.
+			return _adjacent_hostiles(u, maxi(int(card.get("range", 1)), int(weapon(u).get("reach", 1))))
 		"guard", "dash", "rally":
 			return [u.cell]
 		"heal":
@@ -1135,6 +1138,11 @@ func card_block(u: UnitScript, card: Dictionary) -> String:
 
 ## Spend the quick slot or the action for a card.
 func _use_slot(u: UnitScript, card: Dictionary) -> void:
+	# TL Part 4 (Lucky Quarter): the first Quick each fight is free.
+	if bool(card.get("quick", false)) and bool(u.mods.get("combat", {}).get("freeFirstQuick", false)) and not u.links.has("free_quick_used"):
+		u.links["free_quick_used"] = "1"
+		u.undo_ok = false
+		return
 	if bool(card.get("quick", false)) and not u.quick_used:
 		u.quick_used = true
 	else:
@@ -1467,6 +1475,10 @@ func guard(u: UnitScript) -> bool:
 	_push_undo(u)
 	_use_quick_builtin(u)
 	u.guard_active = true
+	var gshield := int(u.source.get("gearStats", {}).get("guardShield", 0)) if u.team == "party" else 0
+	if gshield > 0:
+		u.shield += gshield
+		_emit({ "t": "shield", "unit": u.id, "amount": gshield })
 	_emit({ "t": "guard", "unit": u.id })
 	_guard_aura(u)
 	return true
@@ -1763,9 +1775,20 @@ func _area_spec(spec: Dictionary, n: int) -> Dictionary:
 	return out
 
 
+## TL Part 4: the unit's weapon ({ reach, push, mul, tags, infusion }) from its gear.
+func weapon(u: UnitScript) -> Dictionary:
+	return u.source.get("gearStats", {}).get("weapon", {}) if u.team == "party" else {}
+
+
 func _expected_strike(u: UnitScript, t: UnitScript, card: Dictionary) -> float:
 	var base := float(u.stats.get(str(card.get("stat", "str")), 5)) * float(card.get("mult", 1.0))
 	base += float(u.mods.get("combat", {}).get("strikePower", 0.0))
+	base += float(u.source.get("gearStats", {}).get("strikePower", 0)) if u.team == "party" else 0.0
+	var w := weapon(u)
+	base *= float(w.get("mul", 1.0))
+	# Blunt weapons beat Armored enemies.
+	if w.get("tags", []).has("blunt") and t.source.get("affixes", []).has("armored"):
+		base *= float(db.get("gear", {}).get("bluntVsArmoredMul", 1.5))
 	if not u.infusion.is_empty():
 		base += float(u.infusion["power"]) * 0.5
 	var dmg := Res.strike_damage(db, base, u, t, _shared(u, t, false))
@@ -2094,9 +2117,13 @@ func _basic(u: UnitScript, card: Dictionary, target: Vector2i) -> void:
 			var axis := ""
 			if not u.infusion.is_empty():
 				axis = VO.dominant_axis(u.infusion["vectors"], CardRules.arcane_axes(db))
+			elif str(weapon(u).get("infusion", "")) != "":
+				axis = str(weapon(u)["infusion"])
 			_note = hit_note(u, t, u.infusion.get("vectors", {}))
 			_damage(t, int(dmg["amount"]), u, axis, "hit", bool(dmg["crit"]), bool(dmg.get("high", false)))
 			_note_support_attack(u, t)
+			if int(weapon(u).get("push", 0)) > 0 and t.alive() and not t.is_prop():
+				_push(u, t, Forms.direction_to(u.cell, t.cell), int(weapon(u)["push"]))
 			if not u.infusion.is_empty():
 				var spec := { "vectors": u.infusion["vectors"], "power": float(u.infusion["power"]), "form": form_rec("touch"), "heal": false, "mult": 1.0, "ranged": false, "name": "Infusion" }
 				_apply_vector_effects(u, spec, [t.cell], [t] if t.alive() else [])
@@ -2336,6 +2363,16 @@ func _note_support_attack(u: UnitScript, t: UnitScript) -> void:
 
 func _damage(t: UnitScript, amount: int, source: UnitScript, vector: String, cause: String, crit: bool = false, high: bool = false) -> void:
 	if t.dead or amount <= 0:
+		return
+	# TL Part 4: armor resists its Vector; the Mirror Pin reflects the first hit.
+	if t.team == "party" and vector != "":
+		var res := int(t.source.get("gearStats", {}).get("resist", {}).get(vector, 0))
+		if res > 0:
+			amount = maxi(1, roundi(float(amount) * (1.0 - float(res) / 100.0)))
+	if cause == "hit" and source != null and source != t and bool(t.mods.get("combat", {}).get("reflectFirst", false)) and not t.links.has("reflect_used"):
+		t.links["reflect_used"] = "1"
+		_emit({ "t": "log", "text": Str.t(db, "combat_state.reflects") % t.name })
+		_damage(source, amount, t, vector, "reflect")
 		return
 	if t.downed or t.statuses.has("burrowed"):
 		return

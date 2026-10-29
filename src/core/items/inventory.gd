@@ -6,6 +6,7 @@
 extends RefCounted
 
 const DT := preload("res://src/core/data_tables.gd")
+const Fx := preload("res://src/core/run/effects.gd")
 
 
 static func cfg(db: Dictionary) -> Dictionary:
@@ -76,6 +77,8 @@ static func needs(db: Dictionary, id: String) -> String:
 			return "relic"
 		"consumable":
 			return str(it.get("use", "deck"))
+		"equipment":
+			return "gear"
 	return ""
 
 
@@ -90,6 +93,10 @@ static func give(db: Dictionary, run: Dictionary, ch: Dictionary, id: String) ->
 			var deck: Array = ch.get("deck", [])
 			deck.append(str(it.get("card", "")))
 			ch["deck"] = deck
+			return ""
+		"gear":
+			# TL Part 4: gear goes in the bag; equip it from the Equipment screen.
+			Fx.add_item(run, id, 1)
 			return ""
 		"backpack":
 			var bp: Array = run.get("backpack", [])

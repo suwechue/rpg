@@ -10,5 +10,12 @@
   },
   "priceMul": 1.0,
   "cutsceneFirst": "arena_merchant",
-  "cutscene": "arena_merchant_again"
+  "cutscene": "arena_merchant_again",
+  "gearStock": [
+    "windbreaker",
+    "broom_spear",
+    "slingshot",
+    "insulated_coat",
+    "lucky_quarter"
+  ]
 }

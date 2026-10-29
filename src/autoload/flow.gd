@@ -88,6 +88,10 @@ func _on_part_started() -> void:
 		if pay > 0:
 			GameState.money += pay
 			Narrator.say(Strings.t("truancy.allowance") % pay)
+	# TL Part 4: commissions the blacksmith has ready.
+	if Calendar.part_id() in ["before_school", "morning"]:
+		for got in preload("res://src/core/items/gear.gd").collect(GameState.run, int(GameState.run.get("day_count", 0))):
+			Narrator.say(Strings.t("smith.ready") % str(DataDB.record("items", str(got)).get("name", got)))
 	# TL Part 3: the morning paper.
 	if Calendar.part_id() == "before_school":
 		screens.push_front("paper")

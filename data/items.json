@@ -11,7 +11,10 @@
           "strikePower": 2
         }
       },
-      "text": "+2 Strike damage. Subtle, these are not."
+      "text": "+2 Strike damage. Subtle, these are not.",
+      "weaponType": "knuckles",
+      "rarity": "common",
+      "tier": 1
     },
     {
       "id": "forged_baton",
@@ -25,7 +28,10 @@
           "strikePower": 4
         }
       },
-      "text": "+4 Strike damage. The blacksmith calls it 'a stick with opinions'."
+      "text": "+4 Strike damage; Strike pushes 1. The blacksmith calls it 'a stick with opinions'.",
+      "weaponType": "baton",
+      "rarity": "uncommon",
+      "tier": 2
     },
     {
       "id": "smith_hammer",
@@ -42,7 +48,10 @@
           "heat": 5
         }
       },
-      "text": "+6 Strike damage, +5% Heat affinity."
+      "text": "+6 Strike damage, pushes 1, +5% Heat affinity.",
+      "weaponType": "hammer",
+      "rarity": "rare",
+      "tier": 3
     },
     {
       "id": "padded_jacket",
@@ -52,7 +61,11 @@
       "price": 20,
       "defense": 1,
       "mods": {},
-      "text": "+1 Physical Defense. Smells like the 90s."
+      "text": "+1 Defense. Light: +1 Movement and Initiative. Smells like the 90s.",
+      "armorType": "light",
+      "magicResist": 0,
+      "rarity": "common",
+      "tier": 1
     },
     {
       "id": "riveted_vest",
@@ -67,7 +80,11 @@
           "maxHp": 4
         }
       },
-      "text": "+2 Defense, +4 Max HP."
+      "text": "+2 Defense, +1 Magic Resist, +4 Max HP.",
+      "armorType": "medium",
+      "magicResist": 1,
+      "rarity": "uncommon",
+      "tier": 2
     },
     {
       "id": "chainmail_hoodie",
@@ -82,7 +99,11 @@
           "maxHp": 8
         }
       },
-      "text": "+3 Defense, +8 Max HP. Comfortable, somehow."
+      "text": "+3 Defense, +1 Magic Resist, +8 Max HP. Heavy: -1 Movement, bigger Guard.",
+      "armorType": "heavy",
+      "magicResist": 1,
+      "rarity": "rare",
+      "tier": 3
     },
     {
       "id": "ember_charm",
@@ -95,7 +116,9 @@
           "heat": 10
         }
       },
-      "text": "+10% Heat affinity."
+      "text": "+10% Heat affinity.",
+      "rarity": "common",
+      "tier": 1
     },
     {
       "id": "frost_charm",
@@ -108,7 +131,9 @@
           "cold": 10
         }
       },
-      "text": "+10% Cold affinity."
+      "text": "+10% Cold affinity.",
+      "rarity": "common",
+      "tier": 1
     },
     {
       "id": "focus_pendant",
@@ -123,7 +148,9 @@
           "stability": 2
         }
       },
-      "text": "+3 Max MP, +2 Stability."
+      "text": "+3 Max MP, +2 Stability.",
+      "rarity": "common",
+      "tier": 1
     },
     {
       "id": "lucky_coin",
@@ -136,7 +163,9 @@
           "critChancePct": 5
         }
       },
-      "text": "+5% crit chance. Always lands on its edge."
+      "text": "+5% crit chance. Always lands on its edge.",
+      "rarity": "common",
+      "tier": 1
     },
     {
       "id": "good_coffee",
@@ -517,6 +546,229 @@
       "kind": "ore",
       "price": 4,
       "text": "Plain iron from the forge's scrap pile. The blacksmith can work it (TL gear)."
+    },
+    {
+      "kind": "equipment",
+      "mods": {},
+      "id": "windbreaker",
+      "name": "Windbreaker",
+      "slot": "armor",
+      "armorType": "light",
+      "defense": 1,
+      "magicResist": 1,
+      "price": 30,
+      "rarity": "common",
+      "tier": 1,
+      "text": "+1 Defense, +1 Magic Resist. Light.",
+      "merchant": true
+    },
+    {
+      "kind": "equipment",
+      "mods": {},
+      "id": "insulated_coat",
+      "name": "Insulated Coat",
+      "slot": "armor",
+      "armorType": "medium",
+      "defense": 2,
+      "magicResist": 1,
+      "resist": {
+        "cold": 25
+      },
+      "price": 55,
+      "fromWeek": 2,
+      "rarity": "uncommon",
+      "tier": 2,
+      "text": "+2 Defense, +1 Magic Resist, Cold resistance 25%.",
+      "merchant": true
+    },
+    {
+      "kind": "equipment",
+      "mods": {},
+      "id": "forge_apron",
+      "name": "Forge Apron",
+      "slot": "armor",
+      "armorType": "heavy",
+      "defense": 3,
+      "magicResist": 0,
+      "resist": {
+        "heat": 25
+      },
+      "price": 60,
+      "fromWeek": 2,
+      "rarity": "uncommon",
+      "tier": 2,
+      "text": "+3 Defense, Heat resistance 25%. Heavy."
+    },
+    {
+      "kind": "equipment",
+      "mods": {},
+      "id": "football_pads",
+      "name": "Football Pads",
+      "slot": "armor",
+      "armorType": "heavy",
+      "defense": 4,
+      "magicResist": 1,
+      "price": 90,
+      "fromWeek": 3,
+      "rarity": "rare",
+      "tier": 3,
+      "text": "+4 Defense, +1 Magic Resist. Heavy."
+    },
+    {
+      "kind": "equipment",
+      "mods": {
+        "combat": {
+          "strikePower": 2
+        }
+      },
+      "id": "broom_spear",
+      "name": "Broom Spear",
+      "slot": "weapon",
+      "weaponType": "spear",
+      "price": 35,
+      "rarity": "common",
+      "tier": 1,
+      "text": "+2 Strike damage; Strike reaches 2 tiles.",
+      "merchant": true
+    },
+    {
+      "kind": "equipment",
+      "mods": {
+        "combat": {
+          "strikePower": 2
+        }
+      },
+      "id": "slingshot",
+      "name": "Slingshot",
+      "slot": "weapon",
+      "weaponType": "sling",
+      "price": 35,
+      "rarity": "common",
+      "tier": 1,
+      "text": "Strike reaches 3 tiles at half damage.",
+      "merchant": true
+    },
+    {
+      "kind": "equipment",
+      "mods": {
+        "combat": {
+          "freeFirstQuick": true
+        }
+      },
+      "id": "lucky_quarter",
+      "name": "Lucky Quarter",
+      "slot": "trinket",
+      "price": 45,
+      "fromWeek": 2,
+      "rarity": "uncommon",
+      "tier": 2,
+      "text": "Your first Quick each fight doesn't use your Quick.",
+      "merchant": true
+    },
+    {
+      "kind": "equipment",
+      "mods": {
+        "combat": {
+          "openingHandBonus": 1
+        }
+      },
+      "id": "pocket_notebook",
+      "name": "Pocket Notebook",
+      "slot": "trinket",
+      "price": 45,
+      "fromWeek": 2,
+      "rarity": "uncommon",
+      "tier": 2,
+      "text": "+1 card in hand on turn 1."
+    },
+    {
+      "kind": "equipment",
+      "mods": {
+        "combat": {
+          "reflectFirst": true
+        }
+      },
+      "id": "mirror_pin",
+      "name": "Mirror Pin",
+      "slot": "trinket",
+      "price": 60,
+      "fromWeek": 3,
+      "rarity": "rare",
+      "tier": 3,
+      "text": "The first hit you take each fight is reflected back."
+    },
+    {
+      "kind": "equipment",
+      "mods": {
+        "combat": {
+          "strikePower": 8
+        }
+      },
+      "id": "garys_cleaver",
+      "name": "Gary's Cleaver",
+      "slot": "weapon",
+      "weaponType": "blade",
+      "price": 0,
+      "rarity": "unique",
+      "tier": 4,
+      "unique": true,
+      "perk": "Butcher's Eye: Strikes crit 10% more.",
+      "text": "+8 Strike damage. Gary's old cleaver. 'Don't tell anyone I gave you this.'"
+    },
+    {
+      "kind": "equipment",
+      "mods": {
+        "derived": {
+          "maxHp": 10,
+          "magicResist": 2
+        }
+      },
+      "id": "mayors_chain",
+      "name": "The Mayor's Ceremonial Chain",
+      "slot": "trinket",
+      "price": 0,
+      "rarity": "unique",
+      "tier": 4,
+      "unique": true,
+      "text": "+10 Max HP, +2 Magic Resist. It feels heavier than gold should."
+    },
+    {
+      "kind": "equipment",
+      "mods": {
+        "derived": {
+          "initiative": 3,
+          "movement": 1
+        }
+      },
+      "id": "walts_compass",
+      "name": "Walt's Old Compass",
+      "slot": "trinket",
+      "price": 0,
+      "rarity": "unique",
+      "tier": 4,
+      "unique": true,
+      "text": "+3 Initiative, +1 Movement. It points at the woods. Always."
+    },
+    {
+      "id": "ore_frost",
+      "name": "Frost Iron",
+      "kind": "ore",
+      "price": 8,
+      "text": "Iron that stays cold. Infuses Cold."
+    },
+    {
+      "id": "ore_ember",
+      "name": "Ember Iron",
+      "kind": "ore",
+      "price": 8,
+      "text": "Iron that stays warm. Infuses Heat."
+    },
+    {
+      "id": "void_glass",
+      "name": "Void Glass",
+      "kind": "ore",
+      "price": 20,
+      "text": "Glass from the Upside-Down. Infuses any Vector. Tier 4 gear."
     }
   ]
 }

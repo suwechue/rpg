@@ -1054,6 +1054,9 @@ func location_menu(loc: String) -> void:
 		_save_pos()
 		SceneRouter.goto("res://src/scenes/arena/arena.tscn")
 		return
+	if p.has("act") and bool(p["act"].get("services", false)):
+		await Flow.show_modal(preload("res://src/scenes/ui/smith_screen.gd").new())
+		return
 	if p.has("act") and bool(p["act"].get("board", false)):
 		await _favor_board()
 		_refresh_people()
