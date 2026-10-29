@@ -313,6 +313,10 @@ func _input(event: InputEvent) -> void:
 
 func _release_focus() -> void:
 	if not nav_mode and get_viewport() != null:
+		# Text fields keep focus so you can type into them (the name on the new run screen).
+		var f := get_viewport().gui_get_focus_owner()
+		if f is LineEdit or f is TextEdit:
+			return
 		get_viewport().gui_release_focus()
 
 

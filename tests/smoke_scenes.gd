@@ -99,7 +99,22 @@ func smoke_new_run_from_title() -> void:
 			if c is Control and c.get_script() != null:
 				match str(c.get_script().resource_path.get_file()):
 					"modal.gd":
-						c.call("finish", { "class": "mage", "seed": 1, "name": "Sam" })
+						var edit := (c as Node).find_child("NameEdit", true, false) as LineEdit
+						var start := (c as Node).find_child("StartButton", true, false) as Button
+						if edit != null and start != null:
+							check(start.disabled, "Start waits for a class")
+							edit.text = "Sam"
+							var picked_class := false
+							for b in (c as Node).find_children("*", "Button", true, false):
+								if (b as Button).has_meta("class") and str(b.get_meta("class")) == "mage":
+									(b as Button).pressed.emit()
+									picked_class = true
+							await process_frame
+							check(picked_class and is_instance_valid(c) and c.is_inside_tree(), "clicking a class doesn't leave the screen")
+							check(not start.disabled, "a picked class enables Start")
+							start.pressed.emit()
+						else:
+							c.call("finish", { "class": "mage", "seed": 1, "name": "Sam" })
 					"point_buy_screen.gd":
 						c.call("finish", c.get("stats"))
 					"spark_quiz_screen.gd":

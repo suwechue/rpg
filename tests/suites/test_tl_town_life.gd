@@ -477,3 +477,47 @@ func test_gear_icons() -> void:
 	for k in ["weapon", "armor", "trinket", "ore", "default"]:
 		check(assets.has("icon_item_" + k), "fallback icon_item_%s" % k)
 	check(Array(db()["arena/checkpoint"].get("blacksmithServices", [])) == ["upgrade", "infuse", "repair"], "the camp blacksmith offers upgrade, infuse and repair")
+
+
+func test_story_card_rewards() -> void:
+	const CR := preload("res://src/core/run/card_rewards.gd")
+	const CardRules := preload("res://src/core/card.gd")
+	var d := db()
+	var run := run_()
+	run["money"] = 100
+	check(CR.wave_for(d, 1) == 5 and CR.wave_for(d, 3, 5) == 20, "weeks map to arena waves")
+	var floor_pick := CR.offer(d, run, 1, "floor")
+	check(floor_pick.size() == 3, "a floor offers 3 cards")
+	check(str(floor_pick) == str(CR.offer(d, run, 1, "floor")), "the same day offers the same cards")
+	check(str(floor_pick) != str(CR.offer(d, run, 1, "deduction")), "each source rolls its own")
+	for id in floor_pick:
+		check(int(CardRules.resolve(d, str(id)).get("minWave", 0)) <= 5, "week 1 offers no late cards (%s)" % id)
+	CR.take(run, str(floor_pick[0]))
+	check(run["pendingCards"].has(str(floor_pick[0])), "a taken card waits for an owner")
+	check(CR.skip(d, run, "boss") == 10 and run["money"] == 110, "skipping a boss pick pays $10")
+	var shelf := CR.shelf(d, run, 2)
+	check(shelf.size() == 3 and int(shelf[0]["price"]) > 0, "the shelf has 3 priced cards")
+	var first := str(shelf[0]["id"])
+	check(CR.buy(d, run, 2, first) == "" and run["money"] == 110 - int(shelf[0]["price"]), "buying from the shelf costs its price")
+	check(CR.shelf(d, run, 2).size() == 2 and CR.buy(d, run, 2, first) == "gone", "a bought card leaves the shelf")
+	run["money"] = 0
+	check(CR.buy(d, run, 2, str(CR.shelf(d, run, 2)[0]["id"])) == "money", "no money, no card")
+	var lib: Array = d["town/locations"]["locations"].filter(func(l) -> bool: return str(l["id"]) == "library")
+	check(lib[0]["activities"].any(func(a) -> bool: return bool(a.get("cardShelf", false))), "the library has the card shelf")
+
+
+func test_effects_card_preview() -> void:
+	const CR := preload("res://src/core/card.gd")
+	var f := _deck_fight(["card_graveyard_shift"], ["card_strike", "card_strike", "card_strike"])
+	var st = f["st"]
+	var p: Dictionary = st.preview(f["me"], CR.resolve(db(), "card_graveyard_shift"), f["foe"].cell)
+	check(p["hits"].size() == 1 and int(p["hits"][0].get("damage", 0)) > 0, "an effects card previews its damage")
+	var hp0: int = f["foe"].hp
+	st.play_card(f["me"], 0, f["foe"].cell)
+	check(absi((hp0 - f["foe"].hp) - int(p["hits"][0]["damage"])) <= 2, "the preview matches the hit (%d vs %d)" % [hp0 - f["foe"].hp, int(p["hits"][0]["damage"])])
+	var b := _deck_fight(["card_bonfire"], ["card_strike", "card_strike"])
+	var pb: Dictionary = b["st"].preview(b["me"], CR.resolve(db(), "card_bonfire"), b["foe"].cell)
+	check(int(pb["hits"][0].get("damage", 0)) == 8, "Bonfire previews 2 discards x 4")
+	var c := _deck_fight(["card_cleave"], [])
+	var pc: Dictionary = c["st"].preview(c["me"], CR.resolve(db(), "card_cleave"), c["foe"].cell)
+	check(pc["hits"].size() == 1 and pc["cells"].size() >= 1, "Cleave previews its shape")

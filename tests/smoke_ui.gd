@@ -18,6 +18,7 @@ const SCREENS := [
 	["res://src/scenes/ui/smith_screen.gd", {}],
 	["res://src/scenes/ui/goals_screen.gd", {}],
 	["res://src/scenes/ui/town_pause.gd", {}],
+	["res://src/scenes/ui/card_pick_screen.gd", { "ids": ["card_strike", "card_graveyard_shift", "card_bonfire"], "skip_money": 5 }],
 	["res://src/scenes/ui/party_panel.gd", {}],
 	["res://src/scenes/ui/compendium_screen.gd", {}],
 	["res://src/scenes/ui/spark_quiz_screen.gd", {}],

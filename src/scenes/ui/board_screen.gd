@@ -35,11 +35,17 @@ func _refresh() -> void:
 		b.custom_minimum_size = Vector2(panel.custom_minimum_size.x - 2 * UiTheme.FONT_SIZE, 0)
 		body.add_child(b)
 	add_button(Strings.t("board.connect"), func() -> void:
+		var before: int = GameState.run.get("deductions", []).size()
 		var d := Mystery.connect_clues(db, GameState.run, str(_picked[0]), str(_picked[1]))
 		if not d.is_empty():
 			Journal.note("deductions", str(d["id"]))
 		_picked.clear()
 		Narrator.say(Strings.t("board.deduced") % str(d["text"]) if not d.is_empty() else Strings.t("board.no_link"))
+		# A new deduction earns a rare card pick (user request, Oct 29).
+		if GameState.run.get("deductions", []).size() > before:
+			visible = false
+			await Flow.card_reward("deduction")
+			visible = true
 		_refresh(), _picked.size() != 2)
 	var done: Array = GameState.run.get("deductions", [])
 	if not done.is_empty():

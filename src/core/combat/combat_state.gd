@@ -1617,11 +1617,72 @@ func preview(u: UnitScript, card: Dictionary, target: Vector2i, improvised: bool
 		out["cells"] = [target]
 		out["cost"] = card_cost(u, card, target)
 		var t := unit_at(target)
-		if t != null and str(card.get("action", "")) == "strike":
+		if str(card.get("action", "")) == "effects":
+			_effects_preview(u, card, target, out)
+		elif t != null and str(card.get("action", "")) == "strike":
 			out["hits"].append({ "unit": t.id, "damage": roundi(_expected_strike(u, t, card)), "cover": cover_mul(u.cell, t.cell, false) })
 		elif t != null and str(card.get("action", "")) == "heal":
 			out["hits"].append({ "unit": t.id, "heal": Res.heal_amount(float(card.get("amount", 10)), u) })
 	return out
+
+
+## The damage an effects card would deal (strike_x with its pattern, scaling,
+## growth and weapon tag; lunge, throw, hit and run, shoulder charge; the
+## discard pile cards), added to a preview as hits.
+func _effects_preview(u: UnitScript, card: Dictionary, target: Vector2i, out: Dictionary) -> void:
+	var dmg := {}
+	var cells: Array = [target]
+	card_weapon_tag = str(card.get("weaponTag", ""))
+	var t0 := unit_at(target)
+	var cid := str(card.get("id", ""))
+	for e in card.get("effects", []):
+		var fx: Dictionary = e
+		var victims: Array = []
+		var add := 0.0
+		match str(fx.get("op", "")):
+			"strike_x":
+				var mult := float(fx.get("mult", 1.0)) + scale_bonus(u, card, fx.get("scale", {}), true)
+				if fx.has("grow"):
+					mult += float(fx["grow"]) * float(card_growth.get(cid, 0))
+				match str(fx.get("pattern", "single")):
+					"cleave", "cone":
+						var fp := Forms.footprint(grid, { "footprint": str(fx.get("pattern", "")) }, u.cell, target, {})
+						cells = fp
+						for c in fp:
+							var o := unit_at(c)
+							if o != null and o.alive() and is_hostile(u, o):
+								victims.append(o)
+					_:
+						if t0 != null and t0.alive():
+							victims.append(t0)
+							if str(fx.get("pattern", "")) == "twin":
+								for o in opponents_of(u):
+									if o != t0 and o.alive() and GridScript.manhattan(o.cell, t0.cell) <= 2:
+										victims.append(o)
+										break
+				for v in victims:
+					dmg[v] = float(dmg.get(v, 0.0)) + _expected_strike(u, v, { "stat": str(fx.get("stat", "str")), "mult": mult })
+			"lunge", "hit_and_run", "throw", "dash_line":
+				if t0 != null and t0.alive() and is_hostile(u, t0):
+					var stat := str(fx.get("stat", "dex" if str(fx["op"]) == "hit_and_run" else "str"))
+					dmg[t0] = float(dmg.get(t0, 0.0)) + _expected_strike(u, t0, { "stat": stat, "mult": float(fx.get("mult", 1.0)) })
+			"burn_discard":
+				if u.deck != null and t0 != null and is_hostile(u, t0):
+					add = float(mini(int(fx.get("max", 4)), u.deck.discard.size()) * int(fx.get("per", 3)))
+			"discard_volley":
+				if u.deck != null and t0 != null and is_hostile(u, t0):
+					var shots := 0
+					for d in u.deck.discard:
+						if shots < int(fx.get("max", 5)) and not CardRules.ordered_vectors(db, CardRules.resolve(db, str(d), library).get("vectors", {})).is_empty():
+							shots += 1
+					add = float(shots * int(fx.get("per", 2)))
+		if add > 0.0:
+			dmg[t0] = float(dmg.get(t0, 0.0)) + add
+	card_weapon_tag = ""
+	out["cells"] = cells
+	for v in dmg:
+		var unit: UnitScript = v
+		out["hits"].append({ "unit": unit.id, "damage": roundi(float(dmg[v])), "cover": cover_mul(u.cell, unit.cell, false) })
 
 
 # --- Resolution ----------------------------------------------------------------
@@ -2689,13 +2750,15 @@ func _ai_script() -> GDScript:
 ## discard, discard_vector (cards there sharing a Vector with `card`), exhausted,
 ## hand, played_turn (cards played before this one this turn), missing_hp (per
 ## 10% missing). `per` each, at most `max`.
-func scale_bonus(u: UnitScript, card: Dictionary, scale: Dictionary) -> float:
+func scale_bonus(u: UnitScript, card: Dictionary, scale: Dictionary, previewing: bool = false) -> float:
 	if scale.is_empty() or u.deck == null:
 		return 0.0
 	var n := 0.0
+	# When it resolves, the card itself already sits on the discard pile.
+	var self_in := 0.0 if previewing else 1.0
 	match str(scale.get("by", "")):
 		"discard":
-			n = maxf(0.0, float(u.deck.discard.size()) - 1.0)
+			n = maxf(0.0, float(u.deck.discard.size()) - self_in)
 		"discard_vector":
 			for id in u.deck.discard:
 				var c := CardRules.resolve(db, str(id), library)
@@ -2708,7 +2771,7 @@ func scale_bonus(u: UnitScript, card: Dictionary, scale: Dictionary) -> float:
 		"hand":
 			n = float(u.deck.hand.size())
 		"played_turn":
-			n = maxf(0.0, float(u.played_turn) - 1.0)
+			n = maxf(0.0, float(u.played_turn) - self_in)
 		"missing_hp":
 			n = floorf((1.0 - u.hp_ratio()) * 10.0)
 	return minf(n * float(scale.get("per", 0.1)), float(scale.get("max", 99.0)))

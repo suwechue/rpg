@@ -364,6 +364,8 @@ func _exit_prompt() -> void:
 
 func _end_night() -> void:
 	var db: Dictionary = DataDB.all()
+	# New cards on the way out (user request, Oct 29).
+	await Flow.card_reward("boss" if bool(floor_data.get("boss", false)) else "floor")
 	Night.catch_up(db, GameState.run, int(GameState.run.get("night_xp", 0)), Rng.stream("leveling"))
 	Night.end_night(GameState.run)
 	GameState.run.erase("floor_pos")

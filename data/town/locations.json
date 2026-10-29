@@ -532,6 +532,13 @@
       ],
       "activities": [
         {
+          "label": "Browse the card shelf",
+          "ap": 0,
+          "cardShelf": true,
+          "effects": {},
+          "say": ""
+        },
+        {
           "label": "Study old town records",
           "ap": 2,
           "effects": {

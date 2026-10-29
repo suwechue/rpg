@@ -56,6 +56,9 @@ func _ready() -> void:
 	_menu.add_child(UiTheme.button(Strings.t("title.narrator_s_journal"), _show_journal))
 	_menu.add_child(UiTheme.button(Strings.t("title.options"), func() -> void:
 		await Flow.show_modal(preload("res://src/scenes/ui/options_modal.gd").new())))
+	_menu.add_child(UiTheme.button(Strings.t("title.clear_data"), func() -> void:
+		await preload("res://src/scenes/ui/clear_data.gd").ask()
+		cont.disabled = not SaveSystem.has_save()))
 	_menu.add_child(UiTheme.button(Strings.t("title.quit"), func() -> void: get_tree().quit()))
 	(_menu.get_child(1 if not cont.disabled else 0) as Button).grab_focus()
 	Audio.play_music("title")
@@ -119,7 +122,10 @@ func _new_run() -> void:
 	var name_row := m.row()
 	name_row.add_child(UiTheme.label(Strings.t("title.your_name")))
 	var name_edit := LineEdit.new()
-	name_edit.text = Strings.t("title.new_kid")
+	name_edit.name = "NameEdit"
+	name_edit.placeholder_text = Strings.t("title.new_kid")
+	name_edit.select_all_on_focus = true
+	name_edit.max_length = 20
 	name_edit.custom_minimum_size = Vector2(140, 0)
 	name_row.add_child(name_edit)
 	m.text(Strings.t("title.pick_a_starting_class_you"), UiTheme.DIM)
@@ -164,6 +170,11 @@ func _new_run() -> void:
 		mb.tooltip_text = str(modes[mid].get("text", ""))
 		mode_buttons.append(mb)
 		mode_row.add_child(mb)
+	# Clicking a class selects it; Start begins the run (user request, Oct 29).
+	var picked := { "class": "" }
+	var class_buttons: Array = []
+	var class_info := UiTheme.label("")
+	var ui := { "start": null }
 	for cls in db.get("classes", {}).get("classes", []):
 		if int(cls.get("tier", 1)) != 1:
 			continue
@@ -173,12 +184,18 @@ func _new_run() -> void:
 		tops.sort_custom(func(a: Variant, b: Variant) -> bool: return float(growth[a]) > float(growth[b]))
 		var tip := Strings.t("title.grows_starts_with_vector_s") % [cls["name"], ", ".join(PackedStringArray(tops.slice(0, 3).map(func(s: Variant) -> String: return str(s).to_upper()))),
 			int(cls.get("startVectors", 1)), ", ".join(PackedStringArray(cls.get("startForms", []))), str(cls.get("perk", {}).get("text", ""))]
-		m.add_button("%s: %s" % [cls["name"], str(cls.get("perk", {}).get("text", ""))], func() -> void:
-			var s := -1
-			if seed_edit.text.strip_edges().is_valid_int():
-				s = int(seed_edit.text.strip_edges())
-			# Read the name now: the creation screen is freed when it closes.
-			m.finish({ "class": cid, "seed": s, "name": name_edit.text.strip_edges(), "mode": str(mode["id"]) }), false, tip)
+		var cb := m.add_button("%s: %s" % [cls["name"], str(cls.get("perk", {}).get("text", ""))], func() -> void:
+			picked["class"] = cid
+			class_info.text = tip
+			for x in class_buttons:
+				(x as Button).theme_type_variation = "SelectedButton" if str(x.get_meta("class")) == cid else ""
+			(ui["start"] as Button).disabled = false, false, tip)
+		cb.set_meta("class", cid)
+		class_buttons.append(cb)
+	class_info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	class_info.custom_minimum_size = Vector2(400, 0)
+	class_info.modulate = UiTheme.DIM
+	m.body.add_child(class_info)
 	var unlocked: Array = Journal.unlocked_traits()
 	var trait_pick := { "id": "" }
 	if not unlocked.is_empty():
@@ -189,9 +206,24 @@ func _new_run() -> void:
 		for t in [""] + unlocked:
 			var tid := str(t)
 			var rec := DataDB.record("traits", tid)
-			var b := UiTheme.button(str(rec.get("name", "None")), func() -> void: trait_pick["id"] = tid)
+			var b := UiTheme.button(str(rec.get("name", "None")), func() -> void:
+				trait_pick["id"] = tid
+				for x in trow.get_children():
+					(x as Button).theme_type_variation = "SelectedButton" if str(x.get_meta("trait")) == tid else "")
+			b.set_meta("trait", tid)
+			b.theme_type_variation = "SelectedButton" if tid == "" else ""
 			b.tooltip_text = str(rec.get("text", Strings.t("title.no_trait")))
 			trow.add_child(b)
+	var start_btn := m.add_button(Strings.t("title.start_run"), func() -> void:
+		if str(picked["class"]) == "":
+			return
+		var s := -1
+		if seed_edit.text.strip_edges().is_valid_int():
+			s = int(seed_edit.text.strip_edges())
+		# Read the name now: the creation screen is freed when it closes.
+		m.finish({ "class": str(picked["class"]), "seed": s, "name": name_edit.text.strip_edges(), "mode": str(mode["id"]) }), true)
+	start_btn.name = "StartButton"
+	ui["start"] = start_btn
 	m.add_button(Strings.t("title.back"), func() -> void: m.finish(null))
 	var r: Variant = await Flow.show_modal(m)
 	if r == null:

@@ -1,0 +1,34 @@
+{
+  "comment": "New cards in the story (user request, Oct 29): a pick of 3 when you climb out of the Upside-Down (floor), a better one after a boss floor, a rare pick per mystery deduction, and the Town Library's weekly card shelf. Offers use the arena's card pool; waveForWeek maps a story week to the arena wave that sets minWave gates and rarity, plus each source's bonus. Skipping a pick pays skipMoney.",
+  "waveForWeek": [
+    0,
+    5,
+    10,
+    15,
+    20,
+    25
+  ],
+  "sources": {
+    "floor": {
+      "bonus": 0,
+      "skipMoney": 5
+    },
+    "boss": {
+      "bonus": 5,
+      "skipMoney": 10
+    },
+    "deduction": {
+      "bonus": 10,
+      "skipMoney": 0
+    }
+  },
+  "shelf": {
+    "bonus": 3,
+    "size": 3,
+    "prices": {
+      "common": 15,
+      "uncommon": 25,
+      "rare": 40
+    }
+  }
+}

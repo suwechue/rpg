@@ -226,6 +226,33 @@ func show_event(event: Dictionary, extra_ctx: Dictionary = {}) -> Variant:
 	return r
 
 
+## A story card pick (src/core/run/card_rewards.gd): 1 of 3 or skip for money,
+## then whose deck it goes into.
+func card_reward(source: String) -> void:
+	const CR := preload("res://src/core/run/card_rewards.gd")
+	if not GameState.has_run():
+		return
+	var db: Dictionary = DataDB.all()
+	var ids := CR.offer(db, GameState.run, Calendar.week(), source)
+	if ids.is_empty():
+		return
+	var pick: Variant = ids[0] if GameState.dev_autoplay else null
+	if not GameState.dev_autoplay:
+		var s := preload("res://src/scenes/ui/card_pick_screen.gd").new()
+		s.ids = ids
+		s.title_text = Strings.t("cards.title_" + source)
+		s.skip_money = CR.skip_money(db, source)
+		pick = await show_modal(s)
+	if pick == null:
+		var got := CR.skip(db, GameState.run, source)
+		if got > 0:
+			Narrator.say(Strings.t("cards.skipped") % got)
+			EventBus.money_changed.emit(GameState.money)
+		return
+	CR.take(GameState.run, str(pick))
+	await give_pending_cards()
+
+
 ## Cards granted by events, treasure and bosses: ask whose deck each goes into (P2 1.3).
 func give_pending_cards() -> void:
 	if not GameState.has_run():

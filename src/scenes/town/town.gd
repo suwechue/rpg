@@ -622,6 +622,33 @@ func _spawn_followers() -> void:
 				_bubble(w, line)
 
 
+## The library's weekly card shelf (user request, Oct 29; src/core/run/card_rewards.gd).
+func _card_shelf() -> void:
+	const CR := preload("res://src/core/run/card_rewards.gd")
+	const CardRules := preload("res://src/core/card.gd")
+	var db: Dictionary = DataDB.all()
+	while true:
+		var m := Modal.new()
+		m.build(Strings.t("cards.shelf_title"), Display.base.x * 0.62)
+		m.text(Strings.t("cards.shelf_help") % GameState.money, UiTheme.DIM)
+		var stock := CR.shelf(db, GameState.run, Calendar.week())
+		if stock.is_empty():
+			m.text(Strings.t("cards.shelf_empty"), UiTheme.DIM)
+		for e in stock:
+			var entry: Dictionary = e
+			var card := CardRules.resolve(db, str(entry["id"]), GameState.cards)
+			m.add_button(Strings.t("cards.shelf_row") % [str(card.get("name", entry["id"])), int(entry["price"])], func() -> void: m.finish(str(entry["id"])),
+				GameState.money < int(entry["price"]), str(card.get("text", "")))
+			m.text("  " + str(card.get("text", "")), UiTheme.DIM)
+		m.add_button(Strings.t("town.leave"), func() -> void: m.finish(null))
+		var pick: Variant = await Flow.show_modal(m)
+		if pick == null:
+			return
+		if CR.buy(db, GameState.run, Calendar.week(), str(pick)) == "":
+			EventBus.money_changed.emit(GameState.money)
+			await Flow.give_pending_cards()
+
+
 ## TL Part 3: the favor board.
 func _favor_board() -> void:
 	var db: Dictionary = DataDB.all()
@@ -1058,6 +1085,9 @@ func location_menu(loc: String) -> void:
 		return
 	if p.has("act") and bool(p["act"].get("services", false)):
 		await Flow.show_modal(preload("res://src/scenes/ui/smith_screen.gd").new())
+		return
+	if p.has("act") and bool(p["act"].get("cardShelf", false)):
+		await _card_shelf()
 		return
 	if p.has("act") and bool(p["act"].get("board", false)):
 		await _favor_board()

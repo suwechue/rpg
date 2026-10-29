@@ -5,6 +5,47 @@ extends Node
 const SAVE_PATH := "user://run_save.json"
 
 
+## Clear stored data (Options and the title's Clear data):
+## "meta" - the Narrator's Journal (unlocks, achievements, records, combos seen,
+## tutorial and spark unlocks); "settings"; "save" (the current run); "all" -
+## those plus the gameplay log and saved feedback zips. Returns what was removed.
+func clear_data(what: String) -> Array:
+	var gone: Array = []
+	if what in ["meta", "all"]:
+		_remove("user://journal.json", gone)
+		Journal.load_journal()
+	if what in ["settings", "all"]:
+		_remove("user://settings.cfg", gone)
+		Audio.apply_volumes()
+	if what in ["save", "all"]:
+		if has_save():
+			gone.append(SAVE_PATH)
+		delete_save()
+	if what == "all":
+		_remove(PlayLog.path, gone)
+		for dir in ["user://feedback", "user://custom_smoke", "user://skin_smoke"]:
+			_remove_dir(dir, gone)
+	return gone
+
+
+func _remove(path: String, gone: Array) -> void:
+	if FileAccess.file_exists(path):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+		gone.append(path)
+
+
+func _remove_dir(path: String, gone: Array) -> void:
+	var d := DirAccess.open(path)
+	if d == null:
+		return
+	for f in d.get_files():
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(path.path_join(f)))
+	for sub in d.get_directories():
+		_remove_dir(path.path_join(sub), gone)
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	gone.append(path)
+
+
 func has_save() -> bool:
 	return FileAccess.file_exists(SAVE_PATH)
 
