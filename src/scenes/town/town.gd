@@ -15,6 +15,7 @@ const StoryRules := preload("res://src/core/story/story.gd")
 const Crowd := preload("res://src/core/town/crowd.gd")
 var _light: CanvasModulate
 var _particles: CPUParticles2D
+var _cars: Array = []
 var TILE: int:
 	get: return Display.tile
 const STEP_TIME := 0.11
@@ -202,9 +203,56 @@ func _load_map(id: String, is_int: bool, loc: String, at: Vector2i) -> void:
 	Audio.play_ambience("school" if id == "school" else ("town_night" if late else "town_day"))
 
 
+## M12b: cars driving along the zone's road rows (they never block walking).
+func _spawn_cars(life: Dictionary) -> void:
+	for c in _cars:
+		if is_instance_valid(c):
+			c.queue_free()
+	_cars.clear()
+	if interior:
+		return
+	var n := int(life.get("cars", {}).get(map.map_id, 0))
+	var rows: Array = map.road_rows()
+	if n <= 0 or rows.is_empty():
+		return
+	var car: Dictionary = DataDB.table("town/styles").get("props", {}).get("car", {})
+	var tiles: Array = car.get("tiles", [0])
+	var rng := Rng.stream("fx")
+	for i in n:
+		var sprite := Sprite2D.new()
+		sprite.texture = map.tile_texture(str(car.get("pack", "city")), int(tiles[i % tiles.size()]))
+		sprite.centered = false
+		sprite.z_index = 3
+		var y := float(int(rows[i % rows.size()]) * TILE)
+		var left := i % 2 == 0
+		var w := float(map.size.x * TILE)
+		sprite.position = Vector2(rng.randf_range(0.0, w), y)
+		sprite.flip_h = not left
+		map.add_child(sprite)
+		_cars.append(sprite)
+		_drive(sprite, w, left, float(life.get("carSeconds", 9.0)))
+
+
+func _drive(sprite: Sprite2D, w: float, left: bool, seconds: float) -> void:
+	var tw := sprite.create_tween().set_loops()
+	var start := -float(TILE) if left else w
+	var end := w if left else -float(TILE)
+	tw.tween_property(sprite, "position:x", end, seconds * absf(end - sprite.position.x) / maxf(1.0, w))
+	tw.tween_callback(func() -> void: sprite.position.x = start)
+	tw.tween_property(sprite, "position:x", end, seconds)
+
+
 ## M12b: the day part's light over the map, and leaves or fireflies outdoors.
 func _apply_light() -> void:
 	var tints: Dictionary = DataDB.table("display").get("dayTint", {})
+	var life: Dictionary = DataDB.table("town/styles").get("life", {})
+	map.night = not interior and life.get("nightParts", []).has(Calendar.part_id())
+	map.find_lamps()
+	map.sparkle = Vector2i(-1, -1)
+	var fl := str(life.get("fountainLoc", ""))
+	if not interior and map.spots.has(fl) and not GameState.flag("dance_interrupted"):
+		map.sparkle = map.spots[fl] + Vector2i(0, -3)
+	_spawn_cars(life)
 	if _light == null:
 		_light = CanvasModulate.new()
 		add_child(_light)
@@ -604,6 +652,9 @@ func _process(_delta: float) -> void:
 	for w in _npc_nodes:
 		if w.get_child_count() > 0:
 			w.get_child(w.get_child_count() - 1).visible = w == nearest
+	if map != null:
+		# Lamps flicker, the fountain sparkles, water ripples (M12b).
+		map.refresh_overlay()
 	_wander_t += _delta
 	if _wander_t >= float(DataDB.table("town/crowd").get("wanderSeconds", 1.6)) and not Flow.is_busy():
 		_wander_t = 0.0

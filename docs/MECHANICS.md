@@ -511,6 +511,7 @@ Change these in `data/social.json`, `data/bonds.json` and `data/npcs/*.json`.
 
 ## C6. The town
 
+- **Life and motion** (M12b): lamps glow in the evening and at night, cars drive along the roads, and the fountain sparkles until the dance. `data/town/styles.json` life.
 - **The living town** (M17): generated students and townsfolk appear by zone and day part (the weekend square: 7 adults and 4 students; the school halls before school, at lunch and after school). Each has a name, a tinted base sprite, a trait, a rumor that hints at the week's dominant Upside-Down Vector, and a 25% chance of a small favor (1 AP for a little money or stat XP). Everyone wanders within 2 tiles of where they belong, nobody overlaps, and people at the same place spread out. Walking past someone may get a short bark. `data/town/crowd.json`.
 - **Party in town:** party members follow you outdoors, comment when you arrive in a zone, and pairs banter every 40 steps once both have enough Bond. `data/town/party_banter.json`.
 - **The town remembers:** posters for the pep rally, club fair and dance, missing flyers from week 3, the forge smoking (relit) or dark (left cold), the fixed pep banner, and the fountain crater after the dance. Press E to read them. `data/town/changes.json`.

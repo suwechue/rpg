@@ -598,5 +598,21 @@
     "plum": "#d6a3dc",
     "sand": "#f2d49a"
   },
-  "storyReach": 4
+  "storyReach": 4,
+  "life": {
+    "comment": "M12b life and motion: lamps glow in the evening and at night (lampGlow color and radius in tiles); cars drive along the road rows of a zone (cars per zone, seconds per crossing); the fountain sparkles until it's destroyed.",
+    "lampGlow": "#ffd27a",
+    "lampRadius": 1.6,
+    "nightParts": [
+      "evening",
+      "night",
+      "weekend_evening"
+    ],
+    "cars": {
+      "downtown": 2,
+      "residential": 1
+    },
+    "carSeconds": 9.0,
+    "fountainLoc": "town_square"
+  }
 }

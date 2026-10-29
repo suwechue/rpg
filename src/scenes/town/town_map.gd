@@ -31,7 +31,10 @@ var lit: Array = []                # loc ids with someone home
 var shut: Dictionary = {}          # loc id -> "closed" | "story" (drawn boards)
 var buildings: Array = []
 var camera_rect := Rect2i()
-var marks: Dictionary = {}           # M17 town changes: cell -> poster, flyer, smoke, cold, crater, banner          # M12 CameraBounds marker (empty = the whole zone)
+var marks: Dictionary = {}
+var lamps: Array = []                # M12b: lamp tiles (glow at night)
+var night := false
+var sparkle := Vector2i(-1, -1)      # M12b: the fountain's tile, sparkling until it's gone           # M17 town changes: cell -> poster, flyer, smoke, cold, crater, banner          # M12 CameraBounds marker (empty = the whole zone)
 
 var _ground: TileMapLayer
 var _decor: TileMapLayer             # M12b decorations (never block)
@@ -408,6 +411,48 @@ const FURN_COLORS := { "counter": "#8a5a3a", "table": "#9c7a52", "bed": "#6d8fbf
 	"easel": "#b08a5a", "closet": "#6a5a4a", "door_locked": "#3a2a2a" }
 
 
+## M12b: find the lamp tiles on the Objects layer (by their atlas tile).
+func find_lamps() -> void:
+	lamps.clear()
+	var lamp: Dictionary = _styles.get("props", {}).get("lamp", {})
+	var pack := str(lamp.get("pack", "city"))
+	var cols := int(_cols.get(pack, 1))
+	var wanted := {}
+	for t in lamp.get("tiles", []):
+		wanted[Vector2i(int(t) % cols, int(t) / cols)] = true
+	for c in _objects.get_used_cells():
+		if _objects.get_cell_source_id(c) == int(SRC[pack]) and wanted.has(_objects.get_cell_atlas_coords(c)):
+			lamps.append(c)
+
+
+## A texture for one atlas tile (cars driving by use the car tiles).
+func tile_texture(pack: String, index: int) -> AtlasTexture:
+	var src := _ground.tile_set.get_source(int(SRC[pack])) as TileSetAtlasSource
+	var cols := int(_cols.get(pack, 1))
+	var at := AtlasTexture.new()
+	at.atlas = src.texture
+	at.region = Rect2(Vector2((index % cols) * TILE, (index / cols) * TILE), Vector2(TILE, TILE))
+	return at
+
+
+## Road rows (horizontal road tiles) for traffic.
+func road_rows() -> Array:
+	var road: Dictionary = _styles.get("road", {})
+	var cols := int(_cols.get("city", 1))
+	var h0 := int(road.get("h", [0])[0])
+	var want := Vector2i(h0 % cols, h0 / cols)
+	var count := {}
+	for c in _ground.get_used_cells():
+		if _ground.get_cell_source_id(c) == int(SRC["city"]) and _ground.get_cell_atlas_coords(c) == want:
+			count[c.y] = int(count.get(c.y, 0)) + 1
+	var rows: Array = []
+	for y in count:
+		if int(count[y]) >= size.x / 2:
+			rows.append(int(y))
+	rows.sort()
+	return rows
+
+
 func _draw_overlay() -> void:
 	var font: Font = UiTheme.font
 	var d := Display.detail
@@ -444,6 +489,19 @@ func _draw_overlay() -> void:
 			_draw_boards(door)
 	for c in marks:
 		_draw_mark(c, str(marks[c]), t)
+	var life: Dictionary = _styles.get("life", {})
+	if night:
+		var glow := Color(str(life.get("lampGlow", "#ffd27a")))
+		for c in lamps:
+			var flicker := 0.85 + 0.15 * sin(t * 7.0 + float(c.x * 3 + c.y))
+			var center := Vector2(c * TILE) + Vector2(TILE / 2.0, TILE * 0.3)
+			_overlay.draw_circle(center, TILE * float(life.get("lampRadius", 1.6)), Color(glow, 0.2 * flicker))
+			_overlay.draw_circle(center, TILE * 0.6, Color(glow, 0.4 * flicker))
+	if sparkle.x >= 0:
+		for i in 4:
+			var a := t * 2.0 + float(i) * TAU / 4.0
+			var p := Vector2(sparkle * TILE) + Vector2(TILE / 2.0, TILE / 2.0) + Vector2(cos(a), sin(a) * 0.5) * TILE * 0.6
+			_overlay.draw_circle(p, Display.detail * (1.0 + 0.5 * sin(t * 5.0 + float(i))), Color(0.75, 0.9, 1.0, 0.8))
 	for l in _labels:
 		var p: Vector2 = l["pos"]
 		_overlay.draw_string(font, p + Vector2(1, 1), str(l["text"]), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, Color(0, 0, 0, 0.7))
