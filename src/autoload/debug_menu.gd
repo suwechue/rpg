@@ -102,6 +102,10 @@ func _dev_args() -> void:
 			GameState.run["arena"]["phase"] = "checkpoint"
 	if args.has("hand") or args.has("hovercard") or args.has("card"):
 		_combat_dev_args.call_deferred(args)
+	if args.has("call"):
+		# --call=method: after the scene loads, call it on the current scene (or Flow),
+		# e.g. town's _favor_board or _spotted; --call=paper shows the morning paper.
+		_call_arg.call_deferred(str(args["call"]))
 	if args.has("talk"):
 		for i in 10:
 			await get_tree().process_frame
@@ -121,6 +125,17 @@ func _dev_args() -> void:
 		var img := get_viewport().get_texture().get_image()
 		img.save_png(str(args["shot"]))
 		get_tree().quit()
+
+
+func _call_arg(method: String) -> void:
+	for i in 20:
+		await get_tree().process_frame
+	if method == "paper":
+		Flow.show_event(Flow._morning_paper())
+		return
+	var target: Object = get_tree().current_scene if get_tree().current_scene != null and get_tree().current_scene.has_method(method) else Flow
+	if target.has_method(method):
+		target.call(method)
 
 
 ## Combat screenshots: --hand=id,id (the acting unit's hand), --hovercard=N

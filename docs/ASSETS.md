@@ -18,7 +18,7 @@ Sizes: tiles 32x32, characters 32x32 (up to 32x48 for tall ones), portraits 64x6
 
 Pack art is a placeholder: the 16x16 packs are scaled up 2x (nearest neighbour) to fit the 32x32 grid until you replace them.
 
-Replaced so far: Characters (walk sheets) 0/54, Portraits 0/40, Enemies and bosses 0/78, Tilesets 0/4, Single tiles 0/120, UI 0/20, Icons 0/42, Card art 0/24, VFX 0/38, Music 0/30, Sound effects 0/40, Ambience 0/9, Voice blips 0/10.
+Replaced so far: Characters (walk sheets) 0/54, Portraits 0/40, Enemies and bosses 0/78, Tilesets 0/4, Single tiles 0/120, UI 0/20, Icons 0/73, Card art 0/24, VFX 0/38, Music 0/30, Sound effects 0/40, Ambience 0/9, Voice blips 0/10.
 
 ## Characters (walk sheets) (54)
 
@@ -378,7 +378,7 @@ Single tiles inside a tileset. Replacing one changes it everywhere it's used. Dr
 | [ ] | `font_damage_numbers` | - | - | - | skin placeholder | Floating damage and heal numbers in combat. A pixel font at its native size or a whole multiple. .ttf or .otf. |
 | [ ] | `art_logo` | 240x48 | - | top center | missing (add yours) | The title logo (VD Part 5). Drop assets/custom/ui/art_logo.png; until then the title is drawn as text. |
 
-## Icons (42)
+## Icons (73)
 
 
 
@@ -426,6 +426,37 @@ Single tiles inside a tileset. Replacing one changes it everywhere it's used. Dr
 | [ ] | `icon_intent_defend` | 16x16 | 16x16 white shape with dark outline; drawn over an enemy's head | center | skin placeholder |  |
 | [ ] | `icon_intent_move` | 16x16 | 16x16 white shape with dark outline; drawn over an enemy's head | center | skin placeholder |  |
 | [ ] | `icon_intent_tracking` | 16x16 | 16x16 white shape with dark outline; drawn over an enemy's head | center | skin placeholder |  |
+| [ ] | `icon_item_iron_knuckles` | 15x16 | one item icon, shown at native size beside its name | center | pack: ninja_adventure |  |
+| [ ] | `icon_item_forged_baton` | 8x14 | one item icon, shown at native size beside its name | center | pack: ninja_adventure |  |
+| [ ] | `icon_item_smith_hammer` | 9x16 | one item icon, shown at native size beside its name | center | pack: ninja_adventure |  |
+| [ ] | `icon_item_broom_spear` | 6x23 | one item icon, shown at native size beside its name | center | pack: ninja_adventure |  |
+| [ ] | `icon_item_slingshot` | 15x7 | one item icon, shown at native size beside its name | center | pack: ninja_adventure |  |
+| [ ] | `icon_item_garys_cleaver` | 11x13 | one item icon, shown at native size beside its name | center | pack: ninja_adventure |  |
+| [ ] | `icon_item_padded_jacket` | 24x24 | one item icon, shown at native size beside its name | center | pack: ninja_adventure |  |
+| [ ] | `icon_item_windbreaker` | 24x24 | one item icon, shown at native size beside its name | center | pack: ninja_adventure | Tinted pack icon (#b8d8ff) until you draw your own. |
+| [ ] | `icon_item_riveted_vest` | 24x24 | one item icon, shown at native size beside its name | center | pack: ninja_adventure |  |
+| [ ] | `icon_item_insulated_coat` | 24x24 | one item icon, shown at native size beside its name | center | pack: ninja_adventure | Tinted pack icon (#ffd2a8) until you draw your own. |
+| [ ] | `icon_item_chainmail_hoodie` | 24x24 | one item icon, shown at native size beside its name | center | pack: ninja_adventure |  |
+| [ ] | `icon_item_forge_apron` | 24x24 | one item icon, shown at native size beside its name | center | pack: ninja_adventure | Tinted pack icon (#ffb08a) until you draw your own. |
+| [ ] | `icon_item_football_pads` | 24x24 | one item icon, shown at native size beside its name | center | pack: ninja_adventure | Tinted pack icon (#c8ffc8) until you draw your own. |
+| [ ] | `icon_item_ember_charm` | 24x24 | one item icon, shown at native size beside its name | center | pack: ninja_adventure | Tinted pack icon (#ff9a7a) until you draw your own. |
+| [ ] | `icon_item_frost_charm` | 24x24 | one item icon, shown at native size beside its name | center | pack: ninja_adventure | Tinted pack icon (#9ad4ff) until you draw your own. |
+| [ ] | `icon_item_focus_pendant` | 24x24 | one item icon, shown at native size beside its name | center | pack: ninja_adventure |  |
+| [ ] | `icon_item_mayors_chain` | 24x24 | one item icon, shown at native size beside its name | center | pack: ninja_adventure | Tinted pack icon (#ffe08a) until you draw your own. |
+| [ ] | `icon_item_lucky_coin` | 7x7 | one item icon, shown at native size beside its name | center | pack: ninja_adventure |  |
+| [ ] | `icon_item_lucky_quarter` | 6x6 | one item icon, shown at native size beside its name | center | pack: ninja_adventure |  |
+| [ ] | `icon_item_pocket_notebook` | 16x16 | one item icon, shown at native size beside its name | center | pack: ninja_adventure |  |
+| [ ] | `icon_item_mirror_pin` | 24x24 | one item icon, shown at native size beside its name | center | pack: ninja_adventure |  |
+| [ ] | `icon_item_walts_compass` | 16x16 | one item icon, shown at native size beside its name | center | pack: ninja_adventure |  |
+| [ ] | `icon_item_ore_iron` | 16x15 | one item icon, shown at native size beside its name | center | pack: ninja_adventure |  |
+| [ ] | `icon_item_ore_frost` | 16x15 | one item icon, shown at native size beside its name | center | pack: ninja_adventure | Tinted pack icon (#a8d8ff) until you draw your own. |
+| [ ] | `icon_item_ore_ember` | 16x15 | one item icon, shown at native size beside its name | center | pack: ninja_adventure |  |
+| [ ] | `icon_item_void_glass` | 16x16 | one item icon, shown at native size beside its name | center | pack: ninja_adventure |  |
+| [ ] | `icon_item_weapon` | 6x17 | one item icon, shown at native size beside its name | center | pack: ninja_adventure |  |
+| [ ] | `icon_item_armor` | 24x24 | one item icon, shown at native size beside its name | center | pack: ninja_adventure |  |
+| [ ] | `icon_item_trinket` | 24x24 | one item icon, shown at native size beside its name | center | pack: ninja_adventure |  |
+| [ ] | `icon_item_ore` | 16x16 | one item icon, shown at native size beside its name | center | pack: ninja_adventure |  |
+| [ ] | `icon_item_default` | 16x16 | one item icon, shown at native size beside its name | center | pack: ninja_adventure |  |
 
 ## Card art (24)
 

@@ -45,6 +45,8 @@ var wild_surges := 0
 var combos_cast: Array = []         # combo ids the party cast this fight (VD Part 2)
 var together_used: Array = []       # TL Part 5: pairs that cast a party combo this fight
 var construct_info: Dictionary = {} # TL Part 6: Construct prop -> { mode, spec, caster }
+var card_growth: Dictionary = {}    # card id -> times a growing card was played this fight
+var card_weapon_tag := ""           # the weaponTag of the card being resolved (weapon card bonus)
 var support_log: Dictionary = {}
 var help_calls: Array = []
 var forms: Dictionary = {}
@@ -604,6 +606,7 @@ func _start_turn(u: UnitScript) -> void:
 	u.action_used = false
 	u.quick_used = u.statuses.has("dazed")    # Daze (PT Part 5): no Quick this turn
 	u.moved_steps = 0
+	u.played_turn = 0
 	u.undo_ok = true
 	_emit({ "t": "turn", "unit": u.id })
 	if u.shield_turns > 0:
@@ -1194,6 +1197,7 @@ func play_card(u: UnitScript, hand_index: int, target: Vector2i) -> bool:
 	u.mp -= cost
 	if u.team == "party":
 		cards_played += 1
+	u.played_turn += 1
 	if u.team == "party" and CardRules.is_spell(card):
 		last_party_card = card
 	u.deck.play(hand_index, bool(card.get("consumable", false)) or bool(card.get("oncePerFight", false)))
@@ -1820,6 +1824,9 @@ func _expected_strike(u: UnitScript, t: UnitScript, card: Dictionary) -> float:
 	base += float(u.source.get("gearStats", {}).get("strikePower", 0)) if u.team == "party" else 0.0
 	var w := weapon(u)
 	base *= float(w.get("mul", 1.0))
+	# A card with the weapon's tag (blunt, blade, thrown) hits harder with it.
+	if card_weapon_tag != "" and w.get("tags", []).has(card_weapon_tag):
+		base += float(db.get("gear", {}).get("cardBonus", {}).get(card_weapon_tag, 0))
 	# Blunt weapons beat Armored enemies.
 	if w.get("tags", []).has("blunt") and t.source.get("affixes", []).has("armored"):
 		base *= float(db.get("gear", {}).get("bluntVsArmoredMul", 1.5))
@@ -2676,6 +2683,35 @@ func _ai_script() -> GDScript:
 	if _ai == null:
 		_ai = load("res://src/core/combat/enemy_ai.gd")
 	return _ai
+
+
+## Scaling cards: extra multiplier from the deck and the fight, by `scale.by`:
+## discard, discard_vector (cards there sharing a Vector with `card`), exhausted,
+## hand, played_turn (cards played before this one this turn), missing_hp (per
+## 10% missing). `per` each, at most `max`.
+func scale_bonus(u: UnitScript, card: Dictionary, scale: Dictionary) -> float:
+	if scale.is_empty() or u.deck == null:
+		return 0.0
+	var n := 0.0
+	match str(scale.get("by", "")):
+		"discard":
+			n = maxf(0.0, float(u.deck.discard.size()) - 1.0)
+		"discard_vector":
+			for id in u.deck.discard:
+				var c := CardRules.resolve(db, str(id), library)
+				for axis in c.get("vectors", {}):
+					if card.get("vectors", {}).has(axis) or u.known_vectors.has(axis):
+						n += 1.0
+						break
+		"exhausted":
+			n = float(u.deck.exhausted.size())
+		"hand":
+			n = float(u.deck.hand.size())
+		"played_turn":
+			n = maxf(0.0, float(u.played_turn) - 1.0)
+		"missing_hp":
+			n = floorf((1.0 - u.hp_ratio()) * 10.0)
+	return minf(n * float(scale.get("per", 0.1)), float(scale.get("max", 99.0)))
 
 
 ## TL Part 6: Constructs that act. Mode by the spell's strongest Vector.

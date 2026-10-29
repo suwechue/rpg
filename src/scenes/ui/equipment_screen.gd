@@ -43,7 +43,7 @@ func _refresh() -> void:
 		if cur != null and str(cur) != "":
 			add_button(Strings.t("gear.unequip") % name, func() -> void:
 				Gear.unequip(db, run, ch, sl)
-				_refresh())
+				_refresh(), false, "", str(cur))
 		for id in run.get("inventory", {}):
 			var it := Gear.item(db, str(id))
 			var fits := str(it.get("slot", "")) == sl or (sl == "trinket2" and str(it.get("slot", "")) == "trinket")
@@ -53,7 +53,7 @@ func _refresh() -> void:
 			add_button(Strings.t("gear.equip") % [str(it.get("name", iid)), _delta_text(Gear.compare(db, run, ch, iid, sl))], func() -> void:
 				Gear.equip(db, run, ch, iid, sl)
 				EventBus.stats_changed.emit(str(ch.get("id", "player")))
-				_refresh())
+				_refresh(), false, "", iid)
 	add_button(Strings.t("gear.close"), func() -> void: finish(null))
 	focus_first()
 

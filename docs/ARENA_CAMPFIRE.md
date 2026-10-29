@@ -42,7 +42,7 @@ Each existing checkpoint action moves to a station. The costs stay in `data/aren
 | **Gary's Deli, Arena Branch** | Buy items (Part 5). | New |
 | **Workbench** | The Card Forge and deck editing: swap a card, craft, fuse, salvage, plus moving cards between members' decks. | Swap card, craft, forge |
 | **Equipment rack** | Change equipment (1 AP). | Change equipment |
-| **Blacksmith's stall** | **Closed for now.** A shuttered stall with a sign. Interacting gives a line from the blacksmith's note ("Back soon. Don't touch the anvil."). Hook for a later milestone: weapon and armor upgrades. | Nothing yet |
+| **Blacksmith's stall** | **Open (user request, Oct 29).** Upgrade, infuse and repair gear (TL Part 4's smith screen with those three tabs), paid from banked coins. Forging new gear and commissions stay in town. *(Was: closed with a note.)* | Banked coins, ore |
 | **Training room** (a tent or ring) | Train stats (Part 6), and pick the checkpoint perk or Technique from the trainer. | Perk or Technique pick |
 | **The gate** | Choose the next mutator (and reroll it for 1 AP), see the next 5 waves' hazard sets, then walk through to start the next waves (Part 7). | Mutator pick, continue |
 | **The path home** (story mode only) | Bank and leave (keep rewards so far). | Bank and leave |
@@ -123,7 +123,7 @@ Each existing checkpoint action moves to a station. The costs stay in `data/aren
   - Meal duration.
   - The training cap.
   - Talk lines pick by condition and don't repeat.
-  - The blacksmith is closed.
+  - The blacksmith upgrades, infuses and repairs (opened Oct 29; it was closed).
   - The gate starts the right next wave with the chosen mutator.
 - **Smoke test:** autoplay reaches wave 15 through two camps with no errors.
 
@@ -132,7 +132,7 @@ Each existing checkpoint action moves to a station. The costs stay in `data/aren
 - Every old checkpoint action is reachable from a station.
 - Companions talk and can be swapped in and out.
 - The deli sells items for tickets.
-- The blacksmith is visibly closed.
+- The blacksmith is open for upgrades, infusion and repair (it was visibly closed until Oct 29).
 - The training room raises stats through minigames.
 - The gate starts the next 5 waves.
 - **Screenshots in `tools/screenshots/`:** the camp, the deli and the gate screen.

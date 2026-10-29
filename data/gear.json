@@ -158,5 +158,11 @@
       "armor": "chainmail_hoodie",
       "level": 3
     }
-  ]
+  ],
+  "cardBonus": {
+    "comment": "A weapon adds this much Strike power to cards with its tag (card weaponTag).",
+    "blunt": 3,
+    "blade": 2,
+    "thrown": 2
+  }
 }

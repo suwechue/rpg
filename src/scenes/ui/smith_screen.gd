@@ -5,11 +5,17 @@ extends "res://src/scenes/ui/modal.gd"
 
 const Gear := preload("res://src/core/items/gear.gd")
 
-var tab := "forge"
+var tab := ""
+## Which services this stall offers (the arena camp: upgrade, infuse, repair).
+var services: Array = ["forge", "upgrade", "infuse", "repair", "commission"]
+## Shown under the title (the arena camp: what the money is).
+var note := ""
 
 
 func _ready() -> void:
 	build(Strings.t("smith.title"), Display.base.x * 0.72)
+	if tab == "" or not services.has(tab):
+		tab = str(services[0])
 	_refresh()
 
 
@@ -37,8 +43,10 @@ func _refresh() -> void:
 	clear_body()
 	var db: Dictionary = DataDB.all()
 	var run: Dictionary = GameState.run
+	if note != "":
+		text(note % GameState.money, UiTheme.DIM)
 	var tabs := row()
-	for t in ["forge", "upgrade", "infuse", "repair", "commission"]:
+	for t in services:
 		var key: String = t
 		var b := UiTheme.button(Strings.t("smith." + key), func() -> void:
 			tab = key
@@ -49,7 +57,7 @@ func _refresh() -> void:
 		"forge":
 			for r in Gear.recipes(db, run, Calendar.week()):
 				var rec: Dictionary = r
-				add_button(Strings.t("smith.recipe") % [str(Gear.item(db, str(rec["item"])).get("name", rec["item"])), int(rec.get("money", 0)), _ores(rec.get("ores", {}))], func() -> void: await _forge(rec))
+				add_button(Strings.t("smith.recipe") % [str(Gear.item(db, str(rec["item"])).get("name", rec["item"])), int(rec.get("money", 0)), _ores(rec.get("ores", {}))], func() -> void: await _forge(rec), false, "", str(rec["item"]))
 		"upgrade":
 			for id in _owned_gear():
 				var iid: String = id
@@ -57,7 +65,7 @@ func _refresh() -> void:
 				if lvl < int(Gear.cfg(db).get("upgrade", {}).get("max", 3)):
 					add_button(Strings.t("smith.upgrade_row") % [str(Gear.item(db, iid).get("name", iid)), lvl, lvl + 1, Gear.upgrade_cost(db, run, iid)], func() -> void:
 						Narrator.say(Strings.t("smith.upgraded") % [str(Gear.item(db, iid).get("name", iid)), lvl + 1] if Gear.upgrade(db, run, iid) == "" else Strings.t("smith.no"))
-						_after())
+						_after(), false, "", iid)
 		"infuse":
 			var inf: Dictionary = Gear.cfg(db).get("infuse", {})
 			for id in _owned_gear():
@@ -70,7 +78,7 @@ func _refresh() -> void:
 						var o := str(ore)
 						add_button(Strings.t("smith.infuse_row") % [str(Gear.item(db, iid).get("name", iid)), vec.capitalize(), str(Gear.item(db, o).get("name", o))], func() -> void:
 							Narrator.say(Strings.t("smith.infused") % [str(Gear.item(db, iid).get("name", iid)), vec.capitalize()] if Gear.infuse(db, run, iid, vec, o) == "" else Strings.t("smith.no"))
-							_after())
+							_after(), false, "", iid)
 		"repair":
 			for id in _owned_gear():
 				var iid: String = id
@@ -78,13 +86,13 @@ func _refresh() -> void:
 				if d >= 0 and d < Gear.max_durability(db):
 					add_button(Strings.t("smith.repair_row") % [str(Gear.item(db, iid).get("name", iid)), Gear.repair_cost(db, run)], func() -> void:
 						Narrator.say(Strings.t("smith.repaired") % str(Gear.item(db, iid).get("name", iid)) if Gear.repair(db, run, iid) == "" else Strings.t("smith.no"))
-						_after())
+						_after(), false, "", iid)
 		"commission":
 			for c in Gear.commissions(db, run):
 				var com: Dictionary = c
 				add_button(Strings.t("smith.commission_row") % [str(Gear.item(db, str(com["item"])).get("name", com["item"])), int(com.get("money", 0)), _ores(com.get("ores", {})), int(Gear.cfg(db).get("commissionDays", 2))], func() -> void:
 					Narrator.say(Strings.t("smith.ordered") % int(Gear.cfg(db).get("commissionDays", 2)) if Gear.commission(db, run, com, int(run.get("day_count", 0))) == "" else Strings.t("smith.no"))
-					_after())
+					_after(), false, "", str(com["item"]))
 	add_button(Strings.t("smith.close"), func() -> void: finish(null))
 	focus_first()
 

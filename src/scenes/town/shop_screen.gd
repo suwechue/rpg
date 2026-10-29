@@ -40,7 +40,7 @@ func _refresh() -> void:
 				Audio.play_sfx("coin")
 			EventBus.money_changed.emit(GameState.money)
 			EventBus.stats_changed.emit("player")
-			_refresh(), not ok or price > GameState.money, tip)
+			_refresh(), not ok or price > GameState.money, tip, str(entry.get("item", "")))
 	var inv: Dictionary = GameState.run.get("inventory", {})
 	if not inv.is_empty():
 		text(Strings.t("shop.your_things_click_to_sell"), UiTheme.DIM)
@@ -63,7 +63,7 @@ func _refresh() -> void:
 					if _note == "":
 						_note = Strings.t("shop.equipped_2") % it.get("name", iid)
 					EventBus.stats_changed.emit("player")
-					_refresh())
+					_refresh(), false, "", iid)
 			add_button(Strings.t("shop.sell_x_for") % [it.get("name", iid), int(inv[id]), Shop.sell_price(db, iid)], func() -> void:
 				var got := Shop.sell(DataDB.all(), GameState.run, iid)
 				_note = "+$%d" % got

@@ -60,6 +60,7 @@ var action_used := false         # each turn is Move + 1 Action (CU)
 var quick_used := false          # plus one quick card
 var start_cell := Vector2i.ZERO  # where this turn began (undo move)
 var moved_steps := 0
+var played_turn := 0            # cards played this turn (scaling cards)
 var undo_ok := true              # false once something happened that can't be taken back
 var intent: Dictionary = {}      # enemies: the telegraphed next action (see combat_state.plan_intent)
 var both_this_turn := false      # enemies: may move and attack on the planned turn (rolled when planning)

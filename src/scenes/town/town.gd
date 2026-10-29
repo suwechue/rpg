@@ -634,7 +634,9 @@ func _favor_board() -> void:
 	for id in open:
 		var f := Favors.find(db, str(id))
 		var fid := str(id)
-		m.add_button(Strings.t("favor.row") % [str(f.get("name", fid)), int(f.get("ap", 1)), str(f.get("text", ""))], func() -> void: m.finish(fid), Calendar.ap() < int(f.get("ap", 1)))
+		# The name on the button, the details under it (long rows ran off screen).
+		m.add_button(Strings.t("favor.row") % [str(f.get("name", fid)), int(f.get("ap", 1))], func() -> void: m.finish(fid), Calendar.ap() < int(f.get("ap", 1)), str(f.get("text", "")))
+		m.text("  " + str(f.get("text", "")), UiTheme.DIM)
 	m.add_button(Strings.t("town.leave"), func() -> void: m.finish(null))
 	var pick: Variant = await Flow.show_modal(m)
 	if pick == null:

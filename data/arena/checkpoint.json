@@ -25,5 +25,11 @@
     "cost": 1,
     "capPerRun": 3,
     "good": 0.5
-  }
+  },
+  "blacksmithServices": [
+    "upgrade",
+    "infuse",
+    "repair"
+  ],
+  "blacksmithNote": "User request, Oct 29: the camp blacksmith opens for upgrades, infusion and repair, paid from banked coins. Forging new gear and commissions stay in town."
 }

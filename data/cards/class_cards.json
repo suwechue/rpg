@@ -33,7 +33,8 @@
             "tiles": 3
           }
         ]
-      }
+      },
+      "weaponTag": "blade"
     },
     {
       "kind": "basic",

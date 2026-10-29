@@ -39,7 +39,7 @@ func _ready() -> void:
 		map.add_child(l)
 		_labels[str(s["id"])] = l
 		var mark := ColorRect.new()
-		mark.color = UiTheme.BAD if str(s.get("kind", "")) == "blacksmith" else UiTheme.ACCENT
+		mark.color = UiTheme.ACCENT
 		mark.modulate.a = 0.5
 		mark.size = Vector2(TILE, TILE) * 0.75
 		mark.position = Vector2(c * TILE) + Vector2(TILE, TILE) * 0.125

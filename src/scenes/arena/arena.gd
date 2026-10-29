@@ -461,7 +461,7 @@ func camp_action(st: Dictionary) -> void:
 		"rack":
 			await _equipment()
 		"blacksmith":
-			Narrator.say(Strings.t("camp.blacksmith_note"))
+			await _blacksmith()
 		"training":
 			await _training()
 		"merchant":
@@ -638,6 +638,21 @@ func _gate() -> void:
 
 
 ## Arena coins: the banked money.
+## The camp blacksmith (user request, Oct 29): upgrade, infuse and repair, paid
+## from the arena's banked coins. Forging and commissions stay in town.
+func _blacksmith() -> void:
+	var s := preload("res://src/scenes/ui/smith_screen.gd").new()
+	s.services = Array(Arena.checkpoint_cfg(DataDB.all()).get("blacksmithServices", ["upgrade", "infuse", "repair"]))
+	s.note = Strings.t("camp.blacksmith_coins")
+	var town_money := GameState.money
+	GameState.money = _coins()
+	await Flow.show_modal(s)
+	var banked: Dictionary = arena.get("banked", {})
+	banked["money"] = GameState.money
+	arena["banked"] = banked
+	GameState.money = town_money
+
+
 func _coins() -> int:
 	return int(arena.get("banked", {}).get("money", 0))
 
@@ -664,7 +679,7 @@ func _merchant() -> void:
 			var tag: String = { "relic": "merchant.relic_tag", "backpack": "merchant.backpack_tag", "deck": "merchant.deck_tag" }.get(Inv.needs(db, str(id)), "")
 			var iid := str(id)
 			m.add_button((Strings.t(tag) if tag != "" else "") + Strings.t("merchant.buy") % [str(it.get("name", id)), Inv.price(db, iid), str(it.get("text", ""))],
-				func() -> void: m.finish(iid), _coins() < Inv.price(db, iid))
+				func() -> void: m.finish(iid), _coins() < Inv.price(db, iid), "", iid)
 		m.add_button(Strings.t("merchant.leave"), func() -> void: m.finish(null))
 		var pick: Variant = await Flow.show_modal(m)
 		if pick == null:

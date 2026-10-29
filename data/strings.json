@@ -807,7 +807,7 @@
     "combat_state.calls_the_pack": "%s calls the pack! Minions arrive next round.",
     "combat_state.last_stand": "%s makes a last stand!",
     "card_effects.draws": "%s draws %d.",
-    "card_effects.recalls": "%s takes back %d from the discard pile.",
+    "card_effects.recalls": "%s takes back %s.",
     "card_effects.seeks": "%s finds %s.",
     "combat_state.flanked": "flanked",
     "school.period_card": "Period %d: %s",
@@ -911,7 +911,7 @@
     "camp.deli": "Gary's Deli",
     "camp.workbench": "Workbench",
     "camp.rack": "Equipment rack",
-    "camp.blacksmith": "Blacksmith (closed)",
+    "camp.blacksmith": "Blacksmith",
     "camp.training": "Training ring",
     "camp.merchant": "Merchant",
     "camp.gate": "The gate",
@@ -978,7 +978,7 @@
     "truancy.allowance": "Allowance: +$%d.",
     "favor.title": "The favor board",
     "favor.none": "Nothing posted that you can do right now.",
-    "favor.row": "%s (%d AP): %s",
+    "favor.row": "%s (%d AP)",
     "favor.done": "Favor done: %s",
     "movie.title": "Who comes along?",
     "movie.pick": "%s and %s",
@@ -1071,6 +1071,11 @@
     "summary.skip_friends": "Skipped with: %s.",
     "summary.daytime": "People met while skipping: %d. Clues found: %d.",
     "summary.gear": "%s wore: %s.",
-    "summary.no_gear": "nothing"
+    "summary.no_gear": "nothing",
+    "card_effects.burns_discard": "%s burns %d cards from the discard pile!",
+    "card_effects.shuffles_back": "%s shuffles the discard pile back into the deck.",
+    "card_effects.gains_mp": "%s gains %d MP.",
+    "card_effects.volley": "%s's spent spells fire again: %d hits!",
+    "camp.blacksmith_coins": "Paid from your banked coins: $%d. Forging and commissions are back in town."
   }
 }

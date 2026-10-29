@@ -1,0 +1,303 @@
+{
+  "comment": "Discard pile and deck tricks (user request, Oct 29): cards that scale with your discard pile, hand, chain, missing HP or repeat plays (strike_x \"scale\" and \"grow\"), and ops that burn, reshuffle, recall the best card, cycle the hand, turn the discard pile into MP, or make spent spells fire again. Offered in the arena from minWave, like the other synergy cards.",
+  "cards": [
+    {
+      "id": "card_graveyard_shift",
+      "name": "Graveyard Shift",
+      "kind": "basic",
+      "rarity": "uncommon",
+      "minWave": 10,
+      "short": "Hit + discard",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "strike_x",
+          "stat": "str",
+          "mult": 0.6,
+          "scale": {
+            "by": "discard",
+            "per": 0.1,
+            "max": 1.0
+          }
+        }
+      ],
+      "text": "Strike (STR x0.6), +0.1 for every other card in your discard pile (up to +1.0).",
+      "weaponTag": "blunt",
+      "tags": {
+        "setsUp": [],
+        "paysOff": [
+          "discard"
+        ]
+      }
+    },
+    {
+      "id": "card_echo_strike",
+      "name": "Echo Strike",
+      "kind": "basic",
+      "rarity": "uncommon",
+      "minWave": 10,
+      "short": "Hit + chain",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "strike_x",
+          "stat": "dex",
+          "mult": 0.5,
+          "scale": {
+            "by": "played_turn",
+            "per": 0.4,
+            "max": 1.6
+          }
+        }
+      ],
+      "text": "Strike (DEX x0.5), +0.4 for every card you played before it this turn.",
+      "weaponTag": "blade"
+    },
+    {
+      "id": "card_last_stand",
+      "name": "Last Stand",
+      "kind": "basic",
+      "rarity": "uncommon",
+      "minWave": 10,
+      "short": "Hit + hurt",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "strike_x",
+          "stat": "str",
+          "mult": 0.7,
+          "scale": {
+            "by": "missing_hp",
+            "per": 0.15,
+            "max": 1.35
+          }
+        }
+      ],
+      "text": "Strike (STR x0.7), +0.15 for every 10% of HP you're missing.",
+      "weaponTag": "blunt"
+    },
+    {
+      "id": "card_hoarders_jab",
+      "name": "Hoarder's Jab",
+      "kind": "basic",
+      "rarity": "uncommon",
+      "minWave": 10,
+      "short": "Hit + hand",
+      "action": "effects",
+      "cost": 0,
+      "quick": true,
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "strike_x",
+          "stat": "dex",
+          "mult": 0.4,
+          "scale": {
+            "by": "hand",
+            "per": 0.15,
+            "max": 1.05
+          }
+        }
+      ],
+      "text": "Quick. Strike (DEX x0.4), +0.15 for every card in your hand.",
+      "weaponTag": "blade"
+    },
+    {
+      "id": "card_rampage",
+      "name": "Rampage",
+      "kind": "basic",
+      "rarity": "rare",
+      "minWave": 15,
+      "short": "Grows",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "strike_x",
+          "stat": "str",
+          "mult": 0.8,
+          "grow": 0.3
+        }
+      ],
+      "text": "Strike (STR x0.8). Each time you play it this fight, it hits +0.3 harder.",
+      "weaponTag": "blunt"
+    },
+    {
+      "id": "card_bonfire",
+      "name": "Bonfire",
+      "kind": "basic",
+      "rarity": "rare",
+      "minWave": 15,
+      "short": "Burn discard",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "enemy",
+        "range": 3
+      },
+      "effects": [
+        {
+          "op": "burn_discard",
+          "max": 4,
+          "per": 4,
+          "vector": "heat"
+        }
+      ],
+      "text": "Exhaust up to 4 cards from your discard pile (gone this fight). The target takes 4 Heat damage for each.",
+      "tags": {
+        "setsUp": [],
+        "paysOff": [
+          "discard"
+        ]
+      }
+    },
+    {
+      "id": "card_discard_volley",
+      "name": "Spent Spells",
+      "kind": "basic",
+      "rarity": "rare",
+      "minWave": 15,
+      "short": "Discard volley",
+      "action": "effects",
+      "cost": 2,
+      "targeting": {
+        "type": "enemy",
+        "range": 4
+      },
+      "effects": [
+        {
+          "op": "discard_volley",
+          "per": 3,
+          "max": 5
+        }
+      ],
+      "text": "Every spell in your discard pile fires again: 3 damage of its Vector each, up to 5 hits.",
+      "tags": {
+        "setsUp": [],
+        "paysOff": [
+          "discard"
+        ]
+      }
+    },
+    {
+      "id": "card_second_wind_deck",
+      "name": "Second Wind",
+      "kind": "basic",
+      "rarity": "uncommon",
+      "minWave": 10,
+      "short": "Reshuffle",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "self",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "shuffle_back",
+          "n": 1
+        }
+      ],
+      "text": "Shuffle your discard pile back into your draw pile (no Fatigue), then draw 1."
+    },
+    {
+      "id": "card_dig_deep",
+      "name": "Dig Deep",
+      "kind": "basic",
+      "rarity": "rare",
+      "minWave": 15,
+      "short": "Best back",
+      "action": "effects",
+      "cost": 0,
+      "quick": true,
+      "targeting": {
+        "type": "self",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "recall_best"
+        }
+      ],
+      "text": "Quick. Return the most expensive card in your discard pile to your hand."
+    },
+    {
+      "id": "card_clean_slate",
+      "name": "Clean Slate",
+      "kind": "basic",
+      "rarity": "uncommon",
+      "minWave": 10,
+      "short": "New hand",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "self",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "cycle_hand",
+          "bonus": 1
+        }
+      ],
+      "text": "Discard the rest of your hand, then draw that many cards plus 1.",
+      "tags": {
+        "setsUp": [
+          "discard"
+        ],
+        "paysOff": []
+      }
+    },
+    {
+      "id": "card_grim_harvest",
+      "name": "Grim Harvest",
+      "kind": "basic",
+      "rarity": "uncommon",
+      "minWave": 10,
+      "short": "MP from discard",
+      "action": "effects",
+      "cost": 0,
+      "quick": true,
+      "targeting": {
+        "type": "self",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "mp_per_discard",
+          "every": 3,
+          "max": 3
+        }
+      ],
+      "text": "Quick. Gain 1 MP for every 3 cards in your discard pile (up to 3).",
+      "tags": {
+        "setsUp": [],
+        "paysOff": [
+          "discard"
+        ]
+      }
+    }
+  ]
+}

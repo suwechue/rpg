@@ -62,10 +62,13 @@ func text(t: String, color: Variant = null) -> Label:
 	return l
 
 
-func add_button(t: String, cb: Callable, disabled: bool = false, tip: String = "") -> Button:
+func add_button(t: String, cb: Callable, disabled: bool = false, tip: String = "", item_id: String = "") -> Button:
 	var b := UiTheme.button(t, cb)
 	b.disabled = disabled
 	b.tooltip_text = tip
+	b.icon = UiTheme.item_icon(item_id)
+	# Item icons share one width (skill-frame icons are bigger than item sprites).
+	b.add_theme_constant_override("icon_max_width", Display.tile / 2)
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	body.add_child(b)
 	_fit.call_deferred()

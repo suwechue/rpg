@@ -18,7 +18,8 @@ const OPS := ["burn_tiles", "fire_wall", "empower", "detonate", "self_burn", "st
 	"transmute_ground", "strip", "toxic_tiles", "shred", "once_heal_pct",
 	"hit_and_run", "shadow_step", "blind_adjacent", "free_move", "ward", "pull_ally", "sanctuary", "intercept", "encore",
 	"strike_x", "dash_line", "pull_root", "status_target", "status_self", "status_area",
-	"draw", "recall", "seek", "hand_plus"]
+	"draw", "recall", "seek", "hand_plus",
+	"burn_discard", "shuffle_back", "recall_best", "cycle_hand", "mp_per_discard", "discard_volley"]
 const TARGETING := ["self", "enemy", "ally", "unit", "empty", "any", "dir"]
 
 ## Statuses that count as "bad" for Cleanse.
@@ -26,11 +27,13 @@ const NEGATIVE := ["root", "slow", "blind", "tether"]
 
 
 static func run(st, u: UnitScript, card: Dictionary, target: Vector2i, cells: Array) -> void:
+	st.card_weapon_tag = str(card.get("weaponTag", ""))
 	for e in card.get("effects", []):
 		var fx: Dictionary = e
 		if st.result != "" or not u.alive():
-			return
+			break
 		_op(st, u, card, fx, target, cells)
+	st.card_weapon_tag = ""
 
 
 ## Units standing on the cells (not the caster), alive.
@@ -375,7 +378,12 @@ static func _op(st, u: UnitScript, card: Dictionary, fx: Dictionary, target: Vec
 		"strike_x":
 			# A weapon hit in a shape: single, cleave (the 3 tiles in front), cone, or twin (a second foe within 2).
 			var stat := str(fx.get("stat", "str"))
-			var mult := float(fx.get("mult", 1.0))
+			var mult: float = float(fx.get("mult", 1.0)) + float(st.scale_bonus(u, card, fx.get("scale", {})))
+			# Growing cards hit harder each time they're played this fight.
+			if fx.has("grow"):
+				var cid := str(card.get("id", ""))
+				mult += float(fx["grow"]) * float(st.card_growth.get(cid, 0))
+				st.card_growth[cid] = int(st.card_growth.get(cid, 0)) + 1
 			var victims: Array = []
 			match str(fx.get("pattern", "single")):
 				"cleave":
@@ -448,6 +456,87 @@ static func _op(st, u: UnitScript, card: Dictionary, fx: Dictionary, target: Vec
 						u.deck.draw_pile.remove_at(i)
 						st._emit({ "t": "log", "text": Str.t(st.db, "card_effects.seeks") % [u.name, str(c.get("name", ""))] })
 						break
+		# --- Discard pile tricks (user request, Oct 29) ---
+		"burn_discard":
+			# Exhaust up to `max` cards from the discard pile (not this one); `per` damage each.
+			if u.deck != null:
+				var burned := 0
+				for i in range(u.deck.discard.size() - 1, -1, -1):
+					if burned >= int(fx.get("max", 4)):
+						break
+					var cid := str(u.deck.discard[i])
+					if cid == str(card.get("id", "")) and burned == 0 and i == u.deck.discard.size() - 1:
+						continue
+					u.deck.discard.remove_at(i)
+					u.deck.exhausted.append(cid)
+					burned += 1
+				var t: UnitScript = st.unit_at(target)
+				st._emit({ "t": "log", "text": Str.t(st.db, "card_effects.burns_discard") % [u.name, burned] })
+				if t != null and t.alive() and st.is_hostile(u, t) and burned > 0:
+					st._damage(t, burned * int(fx.get("per", 3)), u, str(fx.get("vector", "heat")), "hit")
+		"shuffle_back":
+			# The discard pile (not this card) goes back into the draw pile; then draw.
+			if u.deck != null:
+				var keep: Array = []
+				for cid in u.deck.discard:
+					if str(cid) == str(card.get("id", "")) and keep.is_empty():
+						keep.append(cid)
+					else:
+						u.deck.draw_pile.append(cid)
+				u.deck.discard = keep
+				u.deck.shuffle_pile(st.rng)
+				u.deck.draw(int(fx.get("n", 1)), st.rng)
+				st._emit({ "t": "log", "text": Str.t(st.db, "card_effects.shuffles_back") % u.name })
+		"recall_best":
+			# The most expensive card in the discard pile (not this one) back to hand.
+			if u.deck != null:
+				var best := -1
+				var best_cost := -1
+				for i in u.deck.discard.size():
+					var cid := str(u.deck.discard[i])
+					if cid == str(card.get("id", "")):
+						continue
+					var c := CardRules.cost(st.db, CardRules.resolve(st.db, cid, st.library))
+					if c > best_cost:
+						best_cost = c
+						best = i
+				if best >= 0:
+					var got := str(u.deck.discard[best])
+					u.deck.discard.remove_at(best)
+					u.deck.hand.append(got)
+					st._emit({ "t": "log", "text": Str.t(st.db, "card_effects.recalls") % [u.name, str(CardRules.resolve(st.db, got, st.library).get("name", got))] })
+		"cycle_hand":
+			# Discard the rest of your hand, then draw that many plus `bonus`.
+			if u.deck != null:
+				var n := u.deck.hand.size()
+				for cid in u.deck.hand:
+					u.deck.discard.append(cid)
+				u.deck.hand.clear()
+				u.deck.hand_limit = maxi(u.deck.hand_limit, n + int(fx.get("bonus", 1)))
+				u.deck.draw(n + int(fx.get("bonus", 1)), st.rng)
+				st._emit({ "t": "log", "text": Str.t(st.db, "card_effects.draws") % [u.name, n + int(fx.get("bonus", 1))] })
+		"mp_per_discard":
+			# 1 MP for every `every` cards in the discard pile, at most `max`.
+			if u.deck != null:
+				var gain := mini(int(fx.get("max", 3)), u.deck.discard.size() / maxi(1, int(fx.get("every", 3))))
+				u.mp = mini(u.max_mp, u.mp + gain)
+				st._emit({ "t": "log", "text": Str.t(st.db, "card_effects.gains_mp") % [u.name, gain] })
+		"discard_volley":
+			# Every spell in the discard pile fires once more: `per` damage of its first Vector, at most `max`.
+			var t: UnitScript = st.unit_at(target)
+			if u.deck != null and t != null and t.alive() and st.is_hostile(u, t):
+				var shots := 0
+				for cid in u.deck.discard:
+					if shots >= int(fx.get("max", 5)) or not t.alive():
+						break
+					var c := CardRules.resolve(st.db, str(cid), st.library)
+					var axes := CardRules.ordered_vectors(st.db, c.get("vectors", {}))
+					if axes.is_empty() or str(cid) == str(card.get("id", "")):
+						continue
+					st._emit({ "t": "area", "cells": [t.cell], "vectors": { str(axes[0]): 1.0 } })
+					st._damage(t, int(fx.get("per", 2)), u, str(axes[0]), "hit")
+					shots += 1
+				st._emit({ "t": "log", "text": Str.t(st.db, "card_effects.volley") % [u.name, shots] })
 		"hand_plus":
 			u.statuses["hand_plus"] = int(fx.get("turns", 3))
 			u.links["hand_plus"] = str(int(fx.get("n", 1)))

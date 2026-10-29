@@ -32,7 +32,8 @@
       "vfx": "vfx_basic_effect",
       "sfx": "card_play_basic",
       "moves": true,
-      "pool": "fighter"
+      "pool": "fighter",
+      "weaponTag": "blunt"
     },
     {
       "id": "card_grapple",
@@ -92,7 +93,8 @@
       },
       "vfx": "vfx_basic_effect",
       "sfx": "card_play_basic",
-      "pool": "fighter"
+      "pool": "fighter",
+      "weaponTag": "blade"
     },
     {
       "id": "card_iron_wall",
@@ -152,7 +154,8 @@
       },
       "vfx": "vfx_basic_effect",
       "sfx": "card_play_basic",
-      "pool": "fighter"
+      "pool": "fighter",
+      "weaponTag": "thrown"
     },
     {
       "id": "card_riposte",
@@ -214,7 +217,8 @@
       },
       "vfx": "vfx_basic_effect",
       "sfx": "card_play_basic",
-      "pool": "fighter"
+      "pool": "fighter",
+      "weaponTag": "blunt"
     },
     {
       "id": "card_hamstring_blow",
@@ -247,7 +251,8 @@
       },
       "vfx": "vfx_basic_effect",
       "sfx": "card_play_basic",
-      "pool": "fighter"
+      "pool": "fighter",
+      "weaponTag": "blunt"
     },
     {
       "id": "card_bulwark",
@@ -313,7 +318,8 @@
       },
       "vfx": "vfx_basic_effect",
       "sfx": "card_play_basic",
-      "pool": "fighter"
+      "pool": "fighter",
+      "weaponTag": "blunt"
     },
     {
       "id": "card_rally_cry",
@@ -378,7 +384,8 @@
       },
       "vfx": "vfx_basic_effect",
       "sfx": "card_play_basic",
-      "pool": "fighter"
+      "pool": "fighter",
+      "weaponTag": "blade"
     }
   ]
 }

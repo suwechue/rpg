@@ -6556,6 +6556,394 @@
       "anchor": "bottom center (feet)",
       "tint": "#8a7ab8",
       "notes": "Palette swap of the pack sprite (tint #8a7ab8) until you draw your own."
+    },
+    "icon_item_iron_knuckles": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Items/Action/Hit.png",
+      "native": [
+        15,
+        16
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center"
+    },
+    "icon_item_forged_baton": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Items/Weapons/Club/Sprite.png",
+      "native": [
+        8,
+        14
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center"
+    },
+    "icon_item_smith_hammer": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Items/Weapons/Hammer/Sprite.png",
+      "native": [
+        9,
+        16
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center"
+    },
+    "icon_item_broom_spear": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Items/Weapons/Lance/Sprite.png",
+      "native": [
+        6,
+        23
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center"
+    },
+    "icon_item_slingshot": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Items/Weapons/Bow2/Sprite.png",
+      "native": [
+        15,
+        7
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center"
+    },
+    "icon_item_garys_cleaver": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Items/Weapons/Axe/Sprite.png",
+      "native": [
+        11,
+        13
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center"
+    },
+    "icon_item_padded_jacket": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Ui/Skill Icon/Items & Weapon/Armor.png",
+      "native": [
+        24,
+        24
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center"
+    },
+    "icon_item_windbreaker": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Ui/Skill Icon/Items & Weapon/Armor.png",
+      "native": [
+        24,
+        24
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center",
+      "tint": "#b8d8ff",
+      "notes": "Tinted pack icon (#b8d8ff) until you draw your own."
+    },
+    "icon_item_riveted_vest": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Ui/Skill Icon/Items & Weapon/Guard.png",
+      "native": [
+        24,
+        24
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center"
+    },
+    "icon_item_insulated_coat": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Ui/Skill Icon/Items & Weapon/Guard.png",
+      "native": [
+        24,
+        24
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center",
+      "tint": "#ffd2a8",
+      "notes": "Tinted pack icon (#ffd2a8) until you draw your own."
+    },
+    "icon_item_chainmail_hoodie": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Ui/Skill Icon/Items & Weapon/Helmet.png",
+      "native": [
+        24,
+        24
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center"
+    },
+    "icon_item_forge_apron": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Ui/Skill Icon/Items & Weapon/Helmet.png",
+      "native": [
+        24,
+        24
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center",
+      "tint": "#ffb08a",
+      "notes": "Tinted pack icon (#ffb08a) until you draw your own."
+    },
+    "icon_item_football_pads": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Ui/Skill Icon/Items & Weapon/Helmet.png",
+      "native": [
+        24,
+        24
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center",
+      "tint": "#c8ffc8",
+      "notes": "Tinted pack icon (#c8ffc8) until you draw your own."
+    },
+    "icon_item_ember_charm": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Ui/Skill Icon/Items & Weapon/Amulet.png",
+      "native": [
+        24,
+        24
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center",
+      "tint": "#ff9a7a",
+      "notes": "Tinted pack icon (#ff9a7a) until you draw your own."
+    },
+    "icon_item_frost_charm": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Ui/Skill Icon/Items & Weapon/Amulet.png",
+      "native": [
+        24,
+        24
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center",
+      "tint": "#9ad4ff",
+      "notes": "Tinted pack icon (#9ad4ff) until you draw your own."
+    },
+    "icon_item_focus_pendant": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Ui/Skill Icon/Items & Weapon/Amulet.png",
+      "native": [
+        24,
+        24
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center"
+    },
+    "icon_item_mayors_chain": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Ui/Skill Icon/Items & Weapon/Amulet.png",
+      "native": [
+        24,
+        24
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center",
+      "tint": "#ffe08a",
+      "notes": "Tinted pack icon (#ffe08a) until you draw your own."
+    },
+    "icon_item_lucky_coin": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Items/Treasure/GoldCoin.png",
+      "native": [
+        7,
+        7
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center"
+    },
+    "icon_item_lucky_quarter": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Items/Treasure/SilverCoin.png",
+      "native": [
+        6,
+        6
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center"
+    },
+    "icon_item_pocket_notebook": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Items/Object/Book.png",
+      "native": [
+        16,
+        16
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center"
+    },
+    "icon_item_mirror_pin": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Ui/Skill Icon/Items & Weapon/Ring.png",
+      "native": [
+        24,
+        24
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center"
+    },
+    "icon_item_walts_compass": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Items/Object/Hourglass.png",
+      "native": [
+        16,
+        16
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center"
+    },
+    "icon_item_ore_iron": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Items/Resource/BarIron.png",
+      "native": [
+        16,
+        15
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center"
+    },
+    "icon_item_ore_frost": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Items/Resource/BarSilver.png",
+      "native": [
+        16,
+        15
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center",
+      "tint": "#a8d8ff",
+      "notes": "Tinted pack icon (#a8d8ff) until you draw your own."
+    },
+    "icon_item_ore_ember": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Items/Resource/BarCopper.png",
+      "native": [
+        16,
+        15
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center"
+    },
+    "icon_item_void_glass": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Items/Resource/GemPurple.png",
+      "native": [
+        16,
+        16
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center"
+    },
+    "icon_item_weapon": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Items/Weapons/Sword/Sprite.png",
+      "native": [
+        6,
+        17
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center"
+    },
+    "icon_item_armor": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Ui/Skill Icon/Items & Weapon/Armor.png",
+      "native": [
+        24,
+        24
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center"
+    },
+    "icon_item_trinket": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Ui/Skill Icon/Items & Weapon/Amulet.png",
+      "native": [
+        24,
+        24
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center"
+    },
+    "icon_item_ore": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Items/Resource/Rock.png",
+      "native": [
+        16,
+        16
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center"
+    },
+    "icon_item_default": {
+      "type": "icons",
+      "kind": "image",
+      "source": "res://assets/packs/ninja_adventure/Items/Object/Bag.png",
+      "native": [
+        16,
+        16
+      ],
+      "scale": 1,
+      "layout": "one item icon, shown at native size beside its name",
+      "anchor": "center"
     }
   }
 }

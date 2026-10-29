@@ -369,3 +369,111 @@ func test_goal_tracker() -> void:
 	check(sm.contains("attended 5") and sm.contains("skipped 4"), "attendance vs skips")
 	check(sm.contains("Dex, Theo") and sm.contains("met while skipping: 1"), "what the skips bought")
 	check(sm.contains("Windbreaker"), "the gear you finished with")
+
+
+func _deck_fight(hand: Array, discard: Array) -> Dictionary:
+	const StateScript := preload("res://src/core/combat/combat_state.gd")
+	var run := run_()
+	var ch: Dictionary = run["player"].duplicate(true)
+	var foe: Dictionary = DT.index_under(db(), "enemies/", "enemies")["pom_pom_wisp"].duplicate(true)
+	foe["hp"] = 400
+	var st := StateScript.new(db(), seeded(5), { "layout": { "map": ["PE..."] }, "party": [{ "char": ch }], "enemies": [foe] })
+	var me = st.unit_by_id("player")
+	st.current = me
+	me.actions_left = 2
+	me.mp = me.max_mp
+	me.deck.hand = hand.duplicate()
+	me.deck.discard = discard.duplicate()
+	return { "st": st, "me": me, "foe": st.units.filter(func(u) -> bool: return u.team == "enemy")[0], "run": run }
+
+
+func test_deck_trick_cards() -> void:
+	const CR := preload("res://src/core/card.gd")
+	const FX := preload("res://src/core/combat/card_effects.gd")
+	var d := db()
+	var ids := ["card_graveyard_shift", "card_echo_strike", "card_last_stand", "card_hoarders_jab", "card_rampage", "card_bonfire",
+		"card_discard_volley", "card_second_wind_deck", "card_dig_deep", "card_clean_slate", "card_grim_harvest"]
+	for id in ids:
+		var c := CR.resolve(d, id)
+		check(not c.is_empty(), "%s exists" % id)
+		for e in c.get("effects", []):
+			check(FX.OPS.has(str(e["op"])), "%s uses a known op" % id)
+	var fill := ["card_strike", "card_strike", "card_strike", "card_strike", "card_strike", "card_strike"]
+	# Graveyard Shift scales with the discard pile.
+	var a := _deck_fight(["card_graveyard_shift"], [])
+	var b := _deck_fight(["card_graveyard_shift"], fill)
+	var fa: int = a["foe"].hp
+	var fb: int = b["foe"].hp
+	a["st"].play_card(a["me"], 0, a["foe"].cell)
+	b["st"].play_card(b["me"], 0, b["foe"].cell)
+	check(fb - b["foe"].hp > fa - a["foe"].hp, "Graveyard Shift hits harder with a full discard pile (%d vs %d)" % [fb - b["foe"].hp, fa - a["foe"].hp])
+	# Bonfire exhausts discards for damage.
+	var f := _deck_fight(["card_bonfire"], fill)
+	var hp0: int = f["foe"].hp
+	f["st"].play_card(f["me"], 0, f["foe"].cell)
+	check(f["me"].deck.exhausted.size() == 4 and f["foe"].hp < hp0, "Bonfire burns 4 cards for damage")
+	# Spent Spells fires the spells in the discard pile.
+	var spell_id := ""
+	for c in d["cards/starter_cards"]["cards"]:
+		if str(c.get("kind", "")) == "spell":
+			spell_id = str(c["id"])
+			break
+	var v := _deck_fight(["card_discard_volley"], [spell_id, spell_id, "card_strike"])
+	hp0 = v["foe"].hp
+	check(spell_id != "" and v["st"].play_card(v["me"], 0, v["foe"].cell) and v["foe"].hp < hp0, "Spent Spells fires the discarded spells")
+	# Second Wind reshuffles; Dig Deep returns the most expensive; Clean Slate cycles; Grim Harvest gives MP.
+	var s := _deck_fight(["card_second_wind_deck"], fill)
+	s["me"].deck.draw_pile = []
+	s["st"].play_card(s["me"], 0, s["me"].cell)
+	check(s["me"].deck.discard.size() == 1 and s["me"].deck.hand.size() == 1 and s["me"].deck.reshuffles == 0, "Second Wind shuffles the discard back (no Fatigue) and draws 1")
+	var dd := _deck_fight(["card_dig_deep"], ["card_strike", "card_overflow", "card_strike"])
+	dd["st"].play_card(dd["me"], 0, dd["me"].cell)
+	check(dd["me"].deck.hand.has("card_overflow"), "Dig Deep takes back the most expensive card")
+	var cs := _deck_fight(["card_clean_slate", "card_strike", "card_strike"], [])
+	cs["me"].deck.draw_pile = fill.duplicate()
+	cs["st"].play_card(cs["me"], 0, cs["me"].cell)
+	check(cs["me"].deck.hand.size() == 3, "Clean Slate discards 2 and draws 3")
+	var gh := _deck_fight(["card_grim_harvest"], fill)
+	gh["me"].mp = 0
+	gh["st"].play_card(gh["me"], 0, gh["me"].cell)
+	check(gh["me"].mp == 2, "Grim Harvest: 7 in the discard pile is 2 MP")
+	# Rampage grows.
+	var r := _deck_fight(["card_rampage"], [])
+	var st = r["st"]
+	hp0 = r["foe"].hp
+	st.play_card(r["me"], 0, r["foe"].cell)
+	var first: int = hp0 - r["foe"].hp
+	r["me"].deck.hand = ["card_rampage"]
+	r["me"].actions_left = 2
+	hp0 = r["foe"].hp
+	st.play_card(r["me"], 0, r["foe"].cell)
+	check(hp0 - r["foe"].hp > first, "Rampage hits harder the second time")
+
+
+func test_weapon_card_bonus() -> void:
+	const Gear := preload("res://src/core/items/gear.gd")
+	const Fx := preload("res://src/core/run/effects.gd")
+	var a := _deck_fight(["card_crushing_blow"], [])
+	var b := _deck_fight(["card_crushing_blow"], [])
+	var ch: Dictionary = b["run"]["player"]
+	Fx.add_item(b["run"], "forged_baton", 1)
+	Gear.equip(db(), b["run"], ch, "forged_baton")
+	b["me"].source["gearStats"] = ch["gearStats"]
+	var plain := float(b["st"]._expected_strike(b["me"], b["foe"], { "stat": "str", "mult": 1.8 }))
+	b["st"].card_weapon_tag = "blunt"
+	var tagged := float(b["st"]._expected_strike(b["me"], b["foe"], { "stat": "str", "mult": 1.8 }))
+	b["st"].card_weapon_tag = "blade"
+	var wrong := float(b["st"]._expected_strike(b["me"], b["foe"], { "stat": "str", "mult": 1.8 }))
+	check(tagged > plain and wrong == plain, "a blunt card gets the baton's bonus; a blade card doesn't (%.1f, %.1f, %.1f)" % [plain, tagged, wrong])
+	check(str(preload("res://src/core/card.gd").resolve(db(), "card_crushing_blow").get("weaponTag", "")) == "blunt", "Crushing Blow is blunt")
+	check(a["st"].card_weapon_tag == "", "no tag outside a card")
+
+
+func test_gear_icons() -> void:
+	var assets: Dictionary = db()["assets/manifest"]["assets"]
+	for it in db()["items"]["items"]:
+		if str(it.get("kind", "")) in ["equipment", "ore"]:
+			check(assets.has("icon_item_" + str(it["id"])), "%s has an icon" % it["id"])
+	for k in ["weapon", "armor", "trinket", "ore", "default"]:
+		check(assets.has("icon_item_" + k), "fallback icon_item_%s" % k)
+	check(Array(db()["arena/checkpoint"].get("blacksmithServices", [])) == ["upgrade", "infuse", "repair"], "the camp blacksmith offers upgrade, infuse and repair")

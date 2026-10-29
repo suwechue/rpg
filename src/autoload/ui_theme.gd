@@ -323,6 +323,21 @@ func _apply_focus_style() -> void:
 	theme.set_stylebox("focus", "Button", skin_box(skin("button"), "focus") if nav_mode else StyleBoxEmpty.new())
 
 
+## Gear and ore icons by asset id: icon_item_<id>, then icon_item_<slot or kind>,
+## then icon_item_default. Null for items that aren't gear or ore.
+func item_icon(item_id: String) -> Texture2D:
+	if item_id == "":
+		return null
+	var it: Dictionary = DataDB.record("items", item_id)
+	var kind := str(it.get("kind", ""))
+	if kind != "equipment" and kind != "ore":
+		return null
+	for id in ["icon_item_" + item_id, "icon_item_" + str(it.get("slot", kind)), "icon_item_default"]:
+		if Assets.has(id):
+			return Assets.texture(id)
+	return null
+
+
 func button(text: String, callback: Callable) -> Button:
 	var b := Button.new()
 	b.text = text
