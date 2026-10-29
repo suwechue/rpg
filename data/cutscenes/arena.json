@@ -67,6 +67,55 @@
           "text": "The Arena rearranges itself for the next five waves."
         }
       ]
+    },
+    {
+      "id": "arena_merchant",
+      "steps": [
+        {
+          "type": "narrator",
+          "text": "Between waves, a cart rolls out of the dark on its own. Nobody pushes it. There's a bell."
+        },
+        {
+          "type": "say",
+          "speaker": "narrator",
+          "text": "Behind the cart: a woman in a coat made of other coats. She smells like rain and pennies."
+        },
+        {
+          "type": "title_card",
+          "text": "The Merchant",
+          "seconds": 1.2
+        },
+        {
+          "type": "narrator",
+          "text": "\"Charms for the brave, tonics for the foolish. Same price either way.\" She taps a sign: COINS ONLY. NO SOULS. (ANYMORE.)"
+        },
+        {
+          "type": "narrator",
+          "text": "Relics go on one of you. If that one falls, the relic falls with them. Potions and trinkets are used once. Choose like it matters."
+        }
+      ]
+    },
+    {
+      "id": "arena_merchant_again",
+      "steps": [
+        {
+          "type": "narrator",
+          "text": "The bell. The cart. The coat of coats. \"Still breathing? Good. Breathing customers spend more.\""
+        }
+      ]
+    },
+    {
+      "id": "arena_gimmick_first",
+      "steps": [
+        {
+          "type": "narrator",
+          "text": "The arena goes quiet. Every fifth wave, something big comes, and it never fights fair."
+        },
+        {
+          "type": "narrator",
+          "text": "Read what it does before you swing. The narrator will tell you. Once."
+        }
+      ]
     }
   ]
 }

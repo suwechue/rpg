@@ -19,6 +19,8 @@ func fight() -> StateScript:
 
 
 func test_quicks_after_actions() -> void:
+	# The PT Part 1 rule (Strike and Guard as Quicks) is a data option now.
+	db()["combat_rules"]["builtinsQuick"] = true
 	var st := fight()
 	var p = st.units[0]
 	check(st.move(p, Vector2i(1, 0)) and st.move(p, Vector2i(1, 1)) and p.actions_left == 0, "two Actions spent (two moves)")
@@ -37,6 +39,7 @@ func test_quicks_after_actions() -> void:
 	check(st3.is_quick_now(g, { "builtin": true }), "labels say QUICK under two Actions")
 	st3.turn_mode = "move_or_act"
 	check(not st3.is_quick_now(g, { "builtin": true }), "labels say ACTION under another turn rule")
+	db()["combat_rules"]["builtinsQuick"] = false
 
 
 func test_card_owners() -> void:
@@ -107,6 +110,8 @@ func test_arena_block_themes() -> void:
 
 
 func test_ranged_builtins_on_hard() -> void:
+	# The PT Part 1 rule (Strike and Guard as Quicks) is a data option now.
+	db()["combat_rules"]["builtinsQuick"] = true
 	var mage := Char.create(db(), "mage", seeded(1), { "isPlayer": true })
 	var e: Dictionary = DT.index_under(db(), "enemies/", "enemies")["pom_pom_wisp"].duplicate(true)
 	var hard := StateScript.new(db(), seeded(5), { "layout": { "map": ["PE......."] }, "party": [{ "char": mage }], "enemies": [e], "difficulty": "hard", "partyFirst": true })
@@ -119,3 +124,4 @@ func test_ranged_builtins_on_hard() -> void:
 	check(hard2.is_quick_now(hard2.units[0], { "builtin": true }), "melee characters keep the Quick")
 	var normal := StateScript.new(db(), seeded(5), { "layout": { "map": ["PE......."] }, "party": [{ "char": mage }], "enemies": [e.duplicate(true)], "partyFirst": true })
 	check(normal.is_quick_now(normal.units[0], { "builtin": true }), "Normal: ranged characters keep the Quick")
+	db()["combat_rules"]["builtinsQuick"] = false

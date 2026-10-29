@@ -93,6 +93,8 @@ func unit_state(party: Array, enemies: Array) -> StateScript:
 
 
 func test_signature_perks_in_combat() -> void:
+	# The PT Part 1 rule (Strike and Guard as Quicks) is a data option now.
+	db()["combat_rules"]["builtinsQuick"] = true
 	var run := fresh("mage")
 	var p: Dictionary = run["player"]
 	p["class"] = "elementalist"
@@ -118,6 +120,7 @@ func test_signature_perks_in_combat() -> void:
 	var su = st3.unit_by_id("player")
 	st3._resolve_spec(su, st3._spell_spec(su, CardRules.make_spell(db(), { "heat": 1 }, "weapon_infusion", "standard")), su.cell)
 	check(int(su.infusion["strikes"]) == 3, "Spellsteel: infusion lasts 3 strikes")
+	db()["combat_rules"]["builtinsQuick"] = false
 
 
 func test_weeks_content() -> void:
@@ -148,8 +151,8 @@ func test_weeks_content() -> void:
 func test_main_story_beats() -> void:
 	var run := fresh()
 	check(StoryRules.due(db(), run, { "week": 2, "day": "mon", "part": "lunch" }, true).has("s2_not_alone"), "week 2: others are pulled in")
-	check(StoryRules.due(db(), run, { "week": 3, "day": "wed", "part": "after_school" }, true).has("s3_coverup"), "week 3: Mr. B's cover-up")
-	check(StoryRules.due(db(), run, { "week": 5, "day": "wed", "part": "after_school" }, true).has("s5_reveal_mr_b"), "week 5: Mr. B is revealed")
+	check(StoryRules.due_at(db(), run, { "week": 3, "day": "wed", "part": "after_school" }, "school", []).has("s3_coverup"), "week 3: Mr. B's cover-up")
+	check(StoryRules.due_at(db(), run, { "week": 5, "day": "wed", "part": "after_school" }, "school", ["front_steps"]).has("s5_reveal_mr_b"), "week 5: Mr. B is revealed")
 	var end: Dictionary = db()["endings"]["alpha"]
 	check(str(end["reveal"]).begins_with("NARRATOR_REVEAL_TBD"), "the reveal is a marked placeholder")
 	check(ResourceLoader.exists("res://src/scenes/story/narrator_reveal_tbd.tscn"), "the NARRATOR_REVEAL_TBD scene exists")

@@ -5,8 +5,8 @@
   "maxCount": 10,
   "hpPerWave": 0.05,
   "powerPerWave": 0.04,
-  "eliteEvery": 5,
-  "bossEvery": 10,
+  "eliteEvery": 4,
+  "bossEvery": 5,
   "eliteAffixes": [
     1,
     2
@@ -194,5 +194,10 @@
         "text": "Puddles that eat armor. Heal often; Transmutation cleans."
       }
     ]
-  }
+  },
+  "bossNote": "User request (Oct 28): a boss every 5th wave, each with a gimmick from data/arena/gimmicks.json; elites every 4th wave (a boss wave wins when both land).",
+  "summonMinion": "pom_pom_wisp",
+  "loopAt": 50,
+  "loopMul": 1.25,
+  "loopNote": "After loopAt waves the arena starts over (weeks, themes, bosses, gimmicks) with everything loopMul times stronger per loop (user request, Oct 28)."
 }

@@ -122,5 +122,7 @@
     "comment": "Area attacks deal this much to every target beyond the first `fullHits`.",
     "fullHits": 2,
     "mul": 0.75
-  }
+  },
+  "builtinsQuick": false,
+  "builtinsQuickNote": "Strike and Guard: true = they use the Quick (PT Part 1), false = they cost an Action (user request, Oct 28). Quick cards still use the Quick."
 }

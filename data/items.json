@@ -1,34 +1,515 @@
 {
   "items": [
-    { "id": "iron_knuckles", "name": "Iron Knuckles", "kind": "equipment", "slot": "weapon", "price": 25, "mods": { "combat": { "strikePower": 2 } }, "text": "+2 Strike damage. Subtle, these are not." },
-    { "id": "forged_baton", "name": "Forged Baton", "kind": "equipment", "slot": "weapon", "price": 50, "fromWeek": 2, "mods": { "combat": { "strikePower": 4 } }, "text": "+4 Strike damage. The blacksmith calls it 'a stick with opinions'." },
-    { "id": "smith_hammer", "name": "Smith's Hammer", "kind": "equipment", "slot": "weapon", "price": 85, "fromWeek": 3, "mods": { "combat": { "strikePower": 6 }, "affinity": { "heat": 5 } }, "text": "+6 Strike damage, +5% Heat affinity." },
-    { "id": "padded_jacket", "name": "Padded Jacket", "kind": "equipment", "slot": "armor", "price": 20, "defense": 1, "mods": {}, "text": "+1 Physical Defense. Smells like the 90s." },
-    { "id": "riveted_vest", "name": "Riveted Vest", "kind": "equipment", "slot": "armor", "price": 45, "fromWeek": 2, "defense": 2, "mods": { "derived": { "maxHp": 4 } }, "text": "+2 Defense, +4 Max HP." },
-    { "id": "chainmail_hoodie", "name": "Chainmail Hoodie", "kind": "equipment", "slot": "armor", "price": 80, "fromWeek": 3, "defense": 3, "mods": { "derived": { "maxHp": 8 } }, "text": "+3 Defense, +8 Max HP. Comfortable, somehow." },
-    { "id": "ember_charm", "name": "Ember Charm", "kind": "equipment", "slot": "trinket", "price": 30, "mods": { "affinity": { "heat": 10 } }, "text": "+10% Heat affinity." },
-    { "id": "frost_charm", "name": "Frost Charm", "kind": "equipment", "slot": "trinket", "price": 30, "mods": { "affinity": { "cold": 10 } }, "text": "+10% Cold affinity." },
-    { "id": "focus_pendant", "name": "Focus Pendant", "kind": "equipment", "slot": "trinket", "price": 40, "fromWeek": 2, "mods": { "derived": { "maxMp": 3, "stability": 2 } }, "text": "+3 Max MP, +2 Stability." },
-    { "id": "lucky_coin", "name": "Lucky Coin", "kind": "equipment", "slot": "trinket", "price": 35, "mods": { "derived": { "critChancePct": 5 } }, "text": "+5% crit chance. Always lands on its edge." },
-
-    { "id": "good_coffee", "name": "Actually Good Coffee", "kind": "gift", "price": 5, "tags": ["coffee"], "text": "Not the cafeteria stuff." },
-    { "id": "good_tea", "name": "Good Tea", "kind": "gift", "price": 4, "tags": ["tea"], "text": "Loose leaf, in a tin with a little bird on it." },
-    { "id": "squad_ribbon", "name": "Squad-Color Ribbon", "kind": "gift", "price": 5, "tags": ["squad", "cheer"], "text": "In the cheer squad's exact colors." },
-    { "id": "spice_tin", "name": "Rare Spice Tin", "kind": "gift", "price": 9, "tags": ["spice"], "text": "Smells like somewhere far away." },
-    { "id": "old_photo", "name": "Old Town Photo", "kind": "gift", "price": 6, "tags": ["photo", "history"], "text": "The town, decades ago. The woods were further back." },
-    { "id": "rare_ore", "name": "Rare Ore", "kind": "gift", "price": 15, "tags": ["ore", "material", "rare"], "text": "Heavy, warm, faintly humming." },
-    { "id": "rare_book", "name": "Out-of-Print Book", "kind": "gift", "price": 12, "tags": ["book", "rare", "academic"], "text": "Correctly cited. Not dog-eared." },
-    { "id": "theory_text", "name": "Theoretical Physics Text", "kind": "gift", "price": 10, "tags": ["book", "theory", "academic"], "text": "Margins full of someone else's arguments." },
-    { "id": "sketchbook", "name": "Nice Sketchbook", "kind": "gift", "price": 6, "tags": ["art", "handmade"], "text": "Heavy paper. Takes ink beautifully." },
-    { "id": "good_notebook", "name": "Precise Notebook", "kind": "gift", "price": 5, "tags": ["notebook", "precise"], "text": "Dot grid. Numbered pages. Diane would approve." },
-    { "id": "joke_props", "name": "Joke Props", "kind": "gift", "price": 6, "tags": ["joke", "absurd"], "text": "A rubber chicken, glasses with a nose, and a buzzer." },
-    { "id": "sports_gear", "name": "Sports Gear", "kind": "gift", "price": 10, "tags": ["sports"], "text": "Wristbands and a very loud whistle." },
-    { "id": "basketball", "name": "Basketball", "kind": "gift", "price": 9, "tags": ["sports", "basketball"], "text": "Properly inflated, unlike some egos." },
-    { "id": "collectible_figure", "name": "Collectible Figure", "kind": "gift", "price": 9, "tags": ["collectible", "rare"], "text": "Still in the box. Jon would scream." },
-    { "id": "snack_box", "name": "Snack Box", "kind": "gift", "price": 4, "tags": ["snack", "food"], "text": "Crackers, cheese, and one suspicious gummy." },
-    { "id": "lab_gadget", "name": "Weird Lab Gadget", "kind": "gift", "price": 12, "tags": ["lab", "science", "tools"], "text": "It beeps. Nobody knows why." },
-    { "id": "music_tape", "name": "Mixtape", "kind": "gift", "price": 5, "tags": ["music", "handmade"], "text": "Track 7 is just someone breathing. Art." },
-    { "id": "baked_goods", "name": "Baked Goods", "kind": "gift", "price": 4, "tags": ["baked", "food"], "text": "Still warm." },
-    { "id": "chain_food", "name": "Chain Burger", "kind": "gift", "price": 3, "tags": ["chainfood"], "text": "From the highway. Do not bring this to Gary." }
+    {
+      "id": "iron_knuckles",
+      "name": "Iron Knuckles",
+      "kind": "equipment",
+      "slot": "weapon",
+      "price": 25,
+      "mods": {
+        "combat": {
+          "strikePower": 2
+        }
+      },
+      "text": "+2 Strike damage. Subtle, these are not."
+    },
+    {
+      "id": "forged_baton",
+      "name": "Forged Baton",
+      "kind": "equipment",
+      "slot": "weapon",
+      "price": 50,
+      "fromWeek": 2,
+      "mods": {
+        "combat": {
+          "strikePower": 4
+        }
+      },
+      "text": "+4 Strike damage. The blacksmith calls it 'a stick with opinions'."
+    },
+    {
+      "id": "smith_hammer",
+      "name": "Smith's Hammer",
+      "kind": "equipment",
+      "slot": "weapon",
+      "price": 85,
+      "fromWeek": 3,
+      "mods": {
+        "combat": {
+          "strikePower": 6
+        },
+        "affinity": {
+          "heat": 5
+        }
+      },
+      "text": "+6 Strike damage, +5% Heat affinity."
+    },
+    {
+      "id": "padded_jacket",
+      "name": "Padded Jacket",
+      "kind": "equipment",
+      "slot": "armor",
+      "price": 20,
+      "defense": 1,
+      "mods": {},
+      "text": "+1 Physical Defense. Smells like the 90s."
+    },
+    {
+      "id": "riveted_vest",
+      "name": "Riveted Vest",
+      "kind": "equipment",
+      "slot": "armor",
+      "price": 45,
+      "fromWeek": 2,
+      "defense": 2,
+      "mods": {
+        "derived": {
+          "maxHp": 4
+        }
+      },
+      "text": "+2 Defense, +4 Max HP."
+    },
+    {
+      "id": "chainmail_hoodie",
+      "name": "Chainmail Hoodie",
+      "kind": "equipment",
+      "slot": "armor",
+      "price": 80,
+      "fromWeek": 3,
+      "defense": 3,
+      "mods": {
+        "derived": {
+          "maxHp": 8
+        }
+      },
+      "text": "+3 Defense, +8 Max HP. Comfortable, somehow."
+    },
+    {
+      "id": "ember_charm",
+      "name": "Ember Charm",
+      "kind": "equipment",
+      "slot": "trinket",
+      "price": 30,
+      "mods": {
+        "affinity": {
+          "heat": 10
+        }
+      },
+      "text": "+10% Heat affinity."
+    },
+    {
+      "id": "frost_charm",
+      "name": "Frost Charm",
+      "kind": "equipment",
+      "slot": "trinket",
+      "price": 30,
+      "mods": {
+        "affinity": {
+          "cold": 10
+        }
+      },
+      "text": "+10% Cold affinity."
+    },
+    {
+      "id": "focus_pendant",
+      "name": "Focus Pendant",
+      "kind": "equipment",
+      "slot": "trinket",
+      "price": 40,
+      "fromWeek": 2,
+      "mods": {
+        "derived": {
+          "maxMp": 3,
+          "stability": 2
+        }
+      },
+      "text": "+3 Max MP, +2 Stability."
+    },
+    {
+      "id": "lucky_coin",
+      "name": "Lucky Coin",
+      "kind": "equipment",
+      "slot": "trinket",
+      "price": 35,
+      "mods": {
+        "derived": {
+          "critChancePct": 5
+        }
+      },
+      "text": "+5% crit chance. Always lands on its edge."
+    },
+    {
+      "id": "good_coffee",
+      "name": "Actually Good Coffee",
+      "kind": "gift",
+      "price": 5,
+      "tags": [
+        "coffee"
+      ],
+      "text": "Not the cafeteria stuff."
+    },
+    {
+      "id": "good_tea",
+      "name": "Good Tea",
+      "kind": "gift",
+      "price": 4,
+      "tags": [
+        "tea"
+      ],
+      "text": "Loose leaf, in a tin with a little bird on it."
+    },
+    {
+      "id": "squad_ribbon",
+      "name": "Squad-Color Ribbon",
+      "kind": "gift",
+      "price": 5,
+      "tags": [
+        "squad",
+        "cheer"
+      ],
+      "text": "In the cheer squad's exact colors."
+    },
+    {
+      "id": "spice_tin",
+      "name": "Rare Spice Tin",
+      "kind": "gift",
+      "price": 9,
+      "tags": [
+        "spice"
+      ],
+      "text": "Smells like somewhere far away."
+    },
+    {
+      "id": "old_photo",
+      "name": "Old Town Photo",
+      "kind": "gift",
+      "price": 6,
+      "tags": [
+        "photo",
+        "history"
+      ],
+      "text": "The town, decades ago. The woods were further back."
+    },
+    {
+      "id": "rare_ore",
+      "name": "Rare Ore",
+      "kind": "gift",
+      "price": 15,
+      "tags": [
+        "ore",
+        "material",
+        "rare"
+      ],
+      "text": "Heavy, warm, faintly humming."
+    },
+    {
+      "id": "rare_book",
+      "name": "Out-of-Print Book",
+      "kind": "gift",
+      "price": 12,
+      "tags": [
+        "book",
+        "rare",
+        "academic"
+      ],
+      "text": "Correctly cited. Not dog-eared."
+    },
+    {
+      "id": "theory_text",
+      "name": "Theoretical Physics Text",
+      "kind": "gift",
+      "price": 10,
+      "tags": [
+        "book",
+        "theory",
+        "academic"
+      ],
+      "text": "Margins full of someone else's arguments."
+    },
+    {
+      "id": "sketchbook",
+      "name": "Nice Sketchbook",
+      "kind": "gift",
+      "price": 6,
+      "tags": [
+        "art",
+        "handmade"
+      ],
+      "text": "Heavy paper. Takes ink beautifully."
+    },
+    {
+      "id": "good_notebook",
+      "name": "Precise Notebook",
+      "kind": "gift",
+      "price": 5,
+      "tags": [
+        "notebook",
+        "precise"
+      ],
+      "text": "Dot grid. Numbered pages. Diane would approve."
+    },
+    {
+      "id": "joke_props",
+      "name": "Joke Props",
+      "kind": "gift",
+      "price": 6,
+      "tags": [
+        "joke",
+        "absurd"
+      ],
+      "text": "A rubber chicken, glasses with a nose, and a buzzer."
+    },
+    {
+      "id": "sports_gear",
+      "name": "Sports Gear",
+      "kind": "gift",
+      "price": 10,
+      "tags": [
+        "sports"
+      ],
+      "text": "Wristbands and a very loud whistle."
+    },
+    {
+      "id": "basketball",
+      "name": "Basketball",
+      "kind": "gift",
+      "price": 9,
+      "tags": [
+        "sports",
+        "basketball"
+      ],
+      "text": "Properly inflated, unlike some egos."
+    },
+    {
+      "id": "collectible_figure",
+      "name": "Collectible Figure",
+      "kind": "gift",
+      "price": 9,
+      "tags": [
+        "collectible",
+        "rare"
+      ],
+      "text": "Still in the box. Jon would scream."
+    },
+    {
+      "id": "snack_box",
+      "name": "Snack Box",
+      "kind": "gift",
+      "price": 4,
+      "tags": [
+        "snack",
+        "food"
+      ],
+      "text": "Crackers, cheese, and one suspicious gummy."
+    },
+    {
+      "id": "lab_gadget",
+      "name": "Weird Lab Gadget",
+      "kind": "gift",
+      "price": 12,
+      "tags": [
+        "lab",
+        "science",
+        "tools"
+      ],
+      "text": "It beeps. Nobody knows why."
+    },
+    {
+      "id": "music_tape",
+      "name": "Mixtape",
+      "kind": "gift",
+      "price": 5,
+      "tags": [
+        "music",
+        "handmade"
+      ],
+      "text": "Track 7 is just someone breathing. Art."
+    },
+    {
+      "id": "baked_goods",
+      "name": "Baked Goods",
+      "kind": "gift",
+      "price": 4,
+      "tags": [
+        "baked",
+        "food"
+      ],
+      "text": "Still warm."
+    },
+    {
+      "id": "chain_food",
+      "name": "Chain Burger",
+      "kind": "gift",
+      "price": 3,
+      "tags": [
+        "chainfood"
+      ],
+      "text": "From the highway. Do not bring this to Gary."
+    },
+    {
+      "id": "relic_iron_heart",
+      "name": "Iron Heart",
+      "kind": "relic",
+      "price": 30,
+      "rarity": "common",
+      "merchant": true,
+      "mods": {
+        "derived": {
+          "maxHp": 10
+        }
+      },
+      "text": "+10 Max HP."
+    },
+    {
+      "id": "relic_mana_stone",
+      "name": "Mana Stone",
+      "kind": "relic",
+      "price": 30,
+      "rarity": "common",
+      "merchant": true,
+      "mods": {
+        "derived": {
+          "maxMp": 4
+        }
+      },
+      "text": "+4 Max MP."
+    },
+    {
+      "id": "relic_quicksilver",
+      "name": "Quicksilver Anklet",
+      "kind": "relic",
+      "price": 35,
+      "rarity": "uncommon",
+      "merchant": true,
+      "mods": {
+        "derived": {
+          "initiative": 3,
+          "movement": 1
+        }
+      },
+      "text": "+3 Initiative, +1 Movement."
+    },
+    {
+      "id": "relic_ember_charm",
+      "name": "Ember Charm",
+      "kind": "relic",
+      "price": 40,
+      "rarity": "uncommon",
+      "merchant": true,
+      "mods": {
+        "combat": {
+          "spellDamagePct": 0.12
+        }
+      },
+      "text": "+12% spell damage."
+    },
+    {
+      "id": "relic_whetstone",
+      "name": "Whetstone Pendant",
+      "kind": "relic",
+      "price": 40,
+      "rarity": "uncommon",
+      "merchant": true,
+      "mods": {
+        "combat": {
+          "strikeDamagePct": 0.2
+        }
+      },
+      "text": "+20% Strike damage."
+    },
+    {
+      "id": "relic_warm_hands",
+      "name": "Warm Hands",
+      "kind": "relic",
+      "price": 45,
+      "rarity": "rare",
+      "merchant": true,
+      "mods": {
+        "combat": {
+          "healPct": 0.25
+        }
+      },
+      "text": "Heals you cast are 25% stronger."
+    },
+    {
+      "id": "relic_bulwark_badge",
+      "name": "Bulwark Badge",
+      "kind": "relic",
+      "price": 45,
+      "rarity": "rare",
+      "merchant": true,
+      "mods": {
+        "combat": {
+          "shieldPct": 0.4
+        }
+      },
+      "text": "Shields you cast are 40% stronger."
+    },
+    {
+      "id": "goods_potion_heal",
+      "name": "Healing Potion",
+      "kind": "consumable",
+      "price": 10,
+      "rarity": "common",
+      "merchant": true,
+      "card": "card_potion_heal",
+      "use": "backpack",
+      "text": "Backpack: anyone can drink it in a fight (Quick). Heal 15."
+    },
+    {
+      "id": "goods_potion_mana",
+      "name": "Mana Tonic",
+      "kind": "consumable",
+      "price": 10,
+      "rarity": "common",
+      "merchant": true,
+      "card": "card_potion_mana",
+      "use": "backpack",
+      "text": "Backpack: anyone can drink it in a fight (Quick). +6 MP."
+    },
+    {
+      "id": "goods_potion_greater",
+      "name": "Greater Healing Potion",
+      "kind": "consumable",
+      "price": 22,
+      "rarity": "uncommon",
+      "merchant": true,
+      "card": "card_potion_greater",
+      "use": "deck",
+      "text": "Goes into a deck: heal 30 HP and 4 MP, then it's gone."
+    },
+    {
+      "id": "goods_smoke_bomb",
+      "name": "Smoke Bomb",
+      "kind": "consumable",
+      "price": 12,
+      "rarity": "common",
+      "merchant": true,
+      "card": "card_smoke_bomb",
+      "use": "deck",
+      "text": "Goes into a deck: Shadowed for 2 turns, then it's gone."
+    },
+    {
+      "id": "goods_fire_flask",
+      "name": "Fire Flask",
+      "kind": "consumable",
+      "price": 15,
+      "rarity": "uncommon",
+      "merchant": true,
+      "card": "card_fire_flask",
+      "use": "deck",
+      "text": "Goes into a deck: set an enemy Burning for 3 turns, then it's gone."
+    },
+    {
+      "id": "goods_cleansing_salts",
+      "name": "Cleansing Salts",
+      "kind": "consumable",
+      "price": 12,
+      "rarity": "common",
+      "merchant": true,
+      "card": "card_cleansing_salts",
+      "use": "backpack",
+      "text": "Backpack: cleanse every bad status and heal 4 (Quick)."
+    }
   ]
 }

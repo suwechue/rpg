@@ -8,6 +8,7 @@ const Str := preload("res://src/core/strings.gd")
 
 const GridScript := preload("res://src/core/combat/grid.gd")
 const Forms := preload("res://src/core/combat/forms.gd")
+const CardRules := preload("res://src/core/card.gd")
 const UnitScript := preload("res://src/core/combat/unit.gd")
 
 ## Every op name the data may use (DataDB validates cards against this list).
@@ -16,7 +17,8 @@ const OPS := ["burn_tiles", "fire_wall", "empower", "detonate", "self_burn", "st
 	"tailwind", "tether", "leash", "regen", "root_area", "pact", "heal", "taunt", "reveal", "halo", "radiance", "parry", "throw", "overwatch",
 	"transmute_ground", "strip", "toxic_tiles", "shred", "once_heal_pct",
 	"hit_and_run", "shadow_step", "blind_adjacent", "free_move", "ward", "pull_ally", "sanctuary", "intercept", "encore",
-	"strike_x", "dash_line", "pull_root", "status_target", "status_self", "status_area"]
+	"strike_x", "dash_line", "pull_root", "status_target", "status_self", "status_area",
+	"draw", "recall", "seek", "hand_plus"]
 const TARGETING := ["self", "enemy", "ally", "unit", "empty", "any", "dir"]
 
 ## Statuses that count as "bad" for Cleanse.
@@ -414,6 +416,41 @@ static func _op(st, u: UnitScript, card: Dictionary, fx: Dictionary, target: Vec
 					st._push(u, t, Forms.direction_to(t.cell, u.cell), GridScript.manhattan(t.cell, u.cell) - 1, false)
 				t.statuses["root"] = int(fx.get("turns", 1))
 				st._emit({ "t": "status", "unit": t.id, "status": "root" })
+		# --- Deck synergies (user request, Oct 28) ---
+		"draw":
+			if u.deck != null:
+				u.deck.hand_limit = maxi(u.deck.hand_limit, u.deck.hand.size() + int(fx.get("n", 1)))
+				u.deck.draw(int(fx.get("n", 1)), st.rng)
+				st._emit({ "t": "log", "text": Str.t(st.db, "card_effects.draws") % [u.name, int(fx.get("n", 1))] })
+		"recall":
+			# The most recently discarded cards come back to hand (not this card).
+			if u.deck != null:
+				var n := 0
+				for i in range(u.deck.discard.size() - 1, -1, -1):
+					if n >= int(fx.get("n", 1)):
+						break
+					var cid := str(u.deck.discard[i])
+					if cid == str(card.get("id", "")):
+						continue
+					u.deck.discard.remove_at(i)
+					u.deck.hand.append(cid)
+					n += 1
+				st._emit({ "t": "log", "text": Str.t(st.db, "card_effects.recalls") % [u.name, n] })
+		"seek":
+			# A spell of the caster's first Vector (or fx.vector) from the draw pile.
+			if u.deck != null and not u.known_vectors.is_empty():
+				var axis := str(fx.get("vector", u.known_vectors[0]))
+				for i in range(u.deck.draw_pile.size() - 1, -1, -1):
+					var c := CardRules.resolve(st.db, str(u.deck.draw_pile[i]), st.library)
+					if c.get("vectors", {}).has(axis):
+						u.deck.hand.append(u.deck.draw_pile[i])
+						u.deck.draw_pile.remove_at(i)
+						st._emit({ "t": "log", "text": Str.t(st.db, "card_effects.seeks") % [u.name, str(c.get("name", ""))] })
+						break
+		"hand_plus":
+			u.statuses["hand_plus"] = int(fx.get("turns", 3))
+			u.links["hand_plus"] = str(int(fx.get("n", 1)))
+			st._emit({ "t": "status", "unit": u.id, "status": "hand_plus" })
 		"status_target":
 			st.add_status(st.unit_at(target), str(fx.get("status", "")), int(fx.get("turns", -1)))
 		"status_self":

@@ -11,6 +11,7 @@ const Workbench := preload("res://src/scenes/ui/workbench_screen.gd")
 const ShopScreen := preload("res://src/scenes/town/shop_screen.gd")
 const Locs := preload("res://src/core/town/locations.gd")
 const Sched := preload("res://src/core/town/schedule.gd")
+const StoryRules := preload("res://src/core/story/story.gd")
 var _light: CanvasModulate
 var _particles: CPUParticles2D
 var TILE: int:
@@ -66,6 +67,26 @@ func _exit_tree() -> void:
 
 
 # --- Maps ------------------------------------------------------------------------
+
+## Stories tied to a place play when the player gets there (within reach of
+## the location's door or spot, or anywhere in its zone).
+func _check_place_stories() -> void:
+	if map == null or Flow.is_busy():
+		return
+	var near: Array = []
+	var reach := int(DataDB.table("town/styles").get("storyReach", 4))
+	if interior:
+		near.append(interior_loc)
+	else:
+		for loc in map.door_by_loc:
+			if (map.door_by_loc[loc] as Vector2i - cell).length() <= reach:
+				near.append(str(loc))
+		for loc in map.spots:
+			if (map.spots[loc] as Vector2i - cell).length() <= reach:
+				near.append(str(loc))
+	for id in StoryRules.due_at(DataDB.all(), GameState.run, GameState.ctx(), map.map_id if not interior else return_zone, near):
+		await Flow.play_inline_story(str(id))
+
 
 func _load_map(id: String, is_int: bool, loc: String, at: Vector2i) -> void:
 	if map != null:
@@ -379,6 +400,7 @@ func step(dir: Vector2i) -> void:
 	_moving = false
 	if not Input.is_anything_pressed():
 		player.stop()
+	_check_place_stories()
 
 
 func _unhandled_input(event: InputEvent) -> void:

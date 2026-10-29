@@ -6,6 +6,7 @@
 ## rewards bank at checkpoints, losing knocks you out until tomorrow).
 extends Node2D
 
+const Inv := preload("res://src/core/items/inventory.gd")
 const Arena := preload("res://src/core/arena/arena.gd")
 const Party := preload("res://src/core/arena/arena_party.gd")
 const Night := preload("res://src/core/dungeon/night.gd")
@@ -157,8 +158,19 @@ func _start_wave() -> void:
 		var th := Arena.theme_for(DataDB.all(), arena, wave)
 		if not th.is_empty() and not GameState.dev_autoplay:
 			Narrator.say(Strings.t("arena.theme_banner") % [str(th.get("name", "")), str(th.get("text", ""))])
+	# Boss waves announce their gimmick before the fight (user request, Oct 28).
+	var gim := Arena.gimmick_for(db, wave)
+	if not gim.is_empty() and not GameState.dev_autoplay:
+		if not bool(Journal.data.get("arena_gimmick_seen", false)):
+			Journal.data["arena_gimmick_seen"] = true
+			Journal.save_journal()
+			await Cutscenes.play("arena_gimmick_first", self)
+		var boss_rec: Dictionary = Arena.wave_enemies(db, arena, wave)["enemies"][0]
+		await Flow.show_event({ "title": Strings.t("arena.boss_gimmick_title") % [wave, str(boss_rec.get("name", "?"))],
+			"text": Strings.t("arena.boss_gimmick_text") % [str(boss_rec.get("intro", boss_rec.get("text", ""))), str(gim.get("name", "")), str(gim.get("text", ""))] })
 	var setup := Arena.setup_for_wave(db, arena, wave)
 	setup["party"] = GameState.combat_party()
+	setup["backpack"] = GameState.run.get("backpack", [])
 	setup["library"] = GameState.cards
 	setup["difficulty"] = GameState.combat_difficulty
 	setup["partyFirst"] = bool(DataDB.table("combat_rules").get("actions", {}).get("partyFirstInArena", true))
@@ -300,6 +312,7 @@ func _checkpoint() -> void:
 		# The next block's theme: rebuild decks for it here.
 		_text(Strings.t("arena.next_theme") % [str(nth.get("name", "")), str(nth.get("text", ""))], UiTheme.ACCENT)
 	_button(Strings.t("arena.technique_pick"), _perk_pick, int(arena.get("perkPicked", -1)) == int(arena["wave"]))
+	_button(Strings.t("arena.merchant") % _coins(), _merchant)
 	_button(Strings.t("forge.title"), func() -> void:
 		var fs := preload("res://src/scenes/ui/forge_screen.gd").new()
 		fs.spend_ap = _arena_spend
@@ -358,6 +371,67 @@ func _arena_cutscenes() -> void:
 	if bool(arena.get("newBest", false)) and str(arena.get("phase", "")) == "over" and not bool(arena.get("bestShown", false)):
 		arena["bestShown"] = true
 		await Cutscenes.play("arena_new_best", self)
+
+
+## Arena coins: the banked money.
+func _coins() -> int:
+	return int(arena.get("banked", {}).get("money", 0))
+
+
+## The merchant (user request, Oct 28): relics, potions and effect items for coins.
+func _merchant() -> void:
+	var db: Dictionary = DataDB.all()
+	var first := not bool(Journal.data.get("arena_merchant_seen", false))
+	Journal.data["arena_merchant_seen"] = true
+	Journal.save_journal()
+	await Cutscenes.play(str(Inv.cfg(db).get("cutsceneFirst" if first else "cutscene", "")), self)
+	if int(arena.get("merchantWave", -1)) != int(arena["wave"]):
+		arena["merchantWave"] = int(arena["wave"])
+		arena["merchantStock"] = Inv.stock(db, Arena.rng_for(arena, int(arena["wave"]), "merchant"))
+	while true:
+		var m := Modal.new()
+		m.build(Strings.t("merchant.title"), 420)
+		m.text(Strings.t("merchant.coins") % _coins(), UiTheme.ACCENT)
+		var stock: Array = arena.get("merchantStock", [])
+		if stock.is_empty():
+			m.text(Strings.t("merchant.sold_out"), UiTheme.DIM)
+		for id in stock:
+			var it := Inv.item(db, str(id))
+			var tag: String = { "relic": "merchant.relic_tag", "backpack": "merchant.backpack_tag", "deck": "merchant.deck_tag" }.get(Inv.needs(db, str(id)), "")
+			var iid := str(id)
+			m.add_button((Strings.t(tag) if tag != "" else "") + Strings.t("merchant.buy") % [str(it.get("name", id)), Inv.price(db, iid), str(it.get("text", ""))],
+				func() -> void: m.finish(iid), _coins() < Inv.price(db, iid))
+		m.add_button(Strings.t("merchant.leave"), func() -> void: m.finish(null))
+		var pick: Variant = await Flow.show_modal(m)
+		if pick == null:
+			break
+		var id := str(pick)
+		var who: Dictionary = GameState.player
+		if Inv.needs(db, id) in ["relic", "deck"]:
+			var q := Modal.new()
+			q.build(Strings.t("merchant.who") % str(Inv.item(db, id).get("name", id)), 300)
+			for ch in Party.party(GameState.run):
+				var c: Dictionary = ch
+				var worn: Array = c.get("relics", [])
+				q.add_button("%s%s" % [c.get("name", "?"), (" (" + ", ".join(PackedStringArray(worn.map(func(r: Variant) -> String: return str(Inv.item(db, str(r)).get("name", r))))) + ")") if not worn.is_empty() else ""],
+					func() -> void: q.finish(c))
+			q.add_button(Strings.t("merchant.leave"), func() -> void: q.finish(null))
+			var got: Variant = await Flow.show_modal(q)
+			if got == null:
+				continue
+			who = got
+		var err := Inv.give(db, GameState.run, who, id)
+		if err == "full":
+			Narrator.say(Strings.t("merchant.slots_full") % [str(who.get("name", "?")), int(Inv.cfg(db).get("relicSlots", 2))])
+			continue
+		if err == "backpack_full":
+			Narrator.say(Strings.t("merchant.backpack_full") % int(Inv.cfg(db).get("backpackSize", 6)))
+			continue
+		arena["banked"]["money"] = _coins() - Inv.price(db, id)
+		stock.erase(id)
+		Audio.event("coin")
+		Narrator.say(Strings.t("merchant.bought") % str(Inv.item(db, id).get("name", id)))
+	_refresh()
 
 
 ## PT Part 9: point buy for each party member, from their recommended picks.

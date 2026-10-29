@@ -47,6 +47,8 @@ func foe(st: StateScript):
 
 
 func test_two_actions_and_quicks() -> void:
+	# The PT Part 1 rule (Strike and Guard as Quicks) is a data option now.
+	db()["combat_rules"]["builtinsQuick"] = true
 	var st := fight(["P.......E", "........."], [enemy("pom_pom_wisp")])
 	var p = me(st)
 	foe(st).hp = 999
@@ -65,6 +67,7 @@ func test_two_actions_and_quicks() -> void:
 	p2.deck.hand = ["card_heavy_swing", "card_heavy_swing", "card_heavy_swing"]
 	p2.mp = 10
 	check(st2.play_card(p2, 0, foe(st2).cell) and st2.play_card(p2, 0, foe(st2).cell) and p2.actions_left == 0, "card + card is allowed")
+	db()["combat_rules"]["builtinsQuick"] = false
 
 
 func test_cantrip() -> void:

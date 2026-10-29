@@ -149,7 +149,8 @@ func _new_run() -> void:
 			var s := -1
 			if seed_edit.text.strip_edges().is_valid_int():
 				s = int(seed_edit.text.strip_edges())
-			m.finish({ "class": cid, "seed": s }), false, tip)
+			# Read the name now: the creation screen is freed when it closes.
+			m.finish({ "class": cid, "seed": s, "name": name_edit.text.strip_edges() }), false, tip)
 	var unlocked: Array = Journal.unlocked_traits()
 	var trait_pick := { "id": "" }
 	if not unlocked.is_empty():
@@ -176,7 +177,7 @@ func _new_run() -> void:
 		return
 	SaveSystem.delete_save()
 	var traits: Array = [] if str(trait_pick["id"]) == "" else [str(trait_pick["id"])]
-	var chosen_name := name_edit.text.strip_edges() if name_edit.text.strip_edges() != "" else Strings.t("title.new_kid")
+	var chosen_name := str(pick.get("name", "")) if str(pick.get("name", "")) != "" else Strings.t("title.new_kid")
 	GameState.new_run(int(pick["seed"]), str(pick["class"]), chosen_name, { "traits": traits,
 		"stats": PointBuy.final_stats(DataDB.all(), str(pick["class"]), alloc) })
 	GameState.combat_difficulty = str(diff["id"])
@@ -187,7 +188,8 @@ func _new_run() -> void:
 		q.build(Strings.t("tut_skip_title"), 320)
 		q.add_button(Strings.t("title.skip_tutorial_day"), func() -> void: q.finish(true))
 		q.add_button(Strings.t("tut_skip_no"), func() -> void: q.finish(false))
-		if bool(await Flow.show_modal(q)):
+		var skip_day: Variant = await Flow.show_modal(q)
+		if skip_day is bool and skip_day:
 			GameState.set_flag("tut_skip_day")
 			GameState.set_flag("tut_skip_lessons")
 	# VD Part 3: the narrator's spark quiz (or a direct pick once the Journal unlocks it).

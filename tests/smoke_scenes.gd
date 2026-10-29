@@ -75,6 +75,46 @@ func _press(modal: Node, needle: String = "") -> bool:
 	return false
 
 
+## The real new-run flow from the title (the intro, creation, point buy,
+## the spark quiz, the first night) ends in town, not back at the title.
+func smoke_new_run_from_title() -> void:
+	# Autoplay advances the cutscenes; the modals are answered below.
+	_root_node("GameState").set("dev_autoplay", true)
+	for c in _root_node("Flow").get_children():
+		if c is Control and c.has_method("finish") and c.get_script() != null and not str(c.get_script().resource_path).ends_with("hud.gd"):
+			c.call("finish", null)
+	await _goto("res://src/scenes/title/title.tscn")
+	current_scene.call("_new_run")
+	var flow := _root_node("Flow")
+	var reached := false
+	for i in 2400:
+		await process_frame
+		if current_scene != null and current_scene.name == "Town":
+			reached = true
+			break
+		if i % 20 != 19:
+			continue
+		for c in flow.get_children():
+			if c is Control and c.get_script() != null:
+				match str(c.get_script().resource_path.get_file()):
+					"modal.gd":
+						c.call("finish", { "class": "mage", "seed": 1, "name": "Sam" })
+					"point_buy_screen.gd":
+						c.call("finish", c.get("stats"))
+					"spark_quiz_screen.gd":
+						c.call("finish", "heat")
+	if not reached:
+		var tops: Array = []
+		for c in flow.get_children():
+			if c.get_script() != null:
+				tops.append(str(c.get_script().resource_path.get_file()))
+		printerr("  new run stuck: scene=%s modals=%s cutscene=%s" % [current_scene.name if current_scene else "-", str(tops), str(_root_node("Cutscenes").get("playing"))])
+	check(reached, "a new run from the title reaches the town")
+	check(str(_root_node("GameState").get("player").get("name", "")) == "Sam", "the chosen name is kept")
+	_root_node("GameState").set("dev_autoplay", false)
+	await _goto("res://src/scenes/title/title.tscn")
+
+
 ## M12: each zone scene builds the same map as the zone data it came from
 ## (blocked tiles, doors, spots, signs and exits).
 func smoke_zone_scenes_match_data() -> void:
@@ -395,7 +435,7 @@ func _smoke_combat() -> void:
 	if scene.call("_player_turn"):
 		scene.call("_on_button", "guard")
 		await create_timer(0.5).timeout
-		check(bool(u.get("quick_used")), "Guard uses the Quick (PT Part 1)")
+		check(not bool(u.get("quick_used")) and int(u.get("actions_left")) < 2, "Guard costs an Action (user request, Oct 28)")
 		scene.call("_on_button", "wheel")
 		check(scene.get("_wheel") != null, "the Vector Wheel opens")
 		scene.call("_cancel")
@@ -612,5 +652,10 @@ func smoke_p2_quick_and_selection() -> void:
 	u.set("action_used", true)
 	u.set("quick_used", false)
 	scene.call("_on_button", "strike")
-	check(str(scene.get("mode")) == "strike", "Strike targeting starts after both Actions are spent (it's a Quick)")
+	check(str(scene.get("mode")) != "strike", "Strike needs an Action now: no targeting after both Actions are spent")
+	scene.call("_cancel")
+	u.set("actions_left", 1)
+	u.set("action_used", false)
+	scene.call("_on_button", "strike")
+	check(str(scene.get("mode")) == "strike", "with an Action left, Strike targeting starts")
 	scene.call("_cancel")

@@ -1,0 +1,116 @@
+{
+  "comment": "Potions and effect items (user request, Oct 28): bought from the merchant, they go into a deck (consumable: once used they leave the deck for good) or into the party's backpack (usable by anyone in combat, as a Quick).",
+  "cards": [
+    {
+      "id": "card_potion_heal",
+      "name": "Healing Potion",
+      "kind": "item",
+      "rarity": "common",
+      "action": "heal",
+      "amount": 15,
+      "range": 1,
+      "short": "Heal 15",
+      "quick": true,
+      "cost": 0,
+      "consumable": true,
+      "text": "Quick. Heal 15 HP to yourself or an adjacent ally. Gone once used."
+    },
+    {
+      "id": "card_potion_mana",
+      "name": "Mana Tonic",
+      "kind": "item",
+      "rarity": "common",
+      "action": "heal",
+      "amount": 0,
+      "mp": 6,
+      "range": 1,
+      "short": "+6 MP",
+      "quick": true,
+      "cost": 0,
+      "consumable": true,
+      "text": "Quick. Restore 6 MP to yourself or an adjacent ally. Gone once used."
+    },
+    {
+      "id": "card_potion_greater",
+      "name": "Greater Healing Potion",
+      "kind": "item",
+      "rarity": "uncommon",
+      "action": "heal",
+      "amount": 30,
+      "mp": 4,
+      "range": 1,
+      "short": "Heal 30",
+      "cost": 0,
+      "consumable": true,
+      "text": "Heal 30 HP and 4 MP to yourself or an adjacent ally. Gone once used."
+    },
+    {
+      "id": "card_smoke_bomb",
+      "name": "Smoke Bomb",
+      "kind": "item",
+      "rarity": "common",
+      "action": "effects",
+      "cost": 0,
+      "quick": true,
+      "consumable": true,
+      "short": "Hide",
+      "targeting": {
+        "type": "self",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "status_self",
+          "status": "shadowed",
+          "turns": 2
+        }
+      ],
+      "text": "Quick. You're Shadowed for 2 turns. Gone once used."
+    },
+    {
+      "id": "card_fire_flask",
+      "name": "Fire Flask",
+      "kind": "item",
+      "rarity": "uncommon",
+      "action": "effects",
+      "cost": 0,
+      "consumable": true,
+      "short": "Burn 3",
+      "targeting": {
+        "type": "enemy",
+        "range": 4
+      },
+      "effects": [
+        {
+          "op": "status_target",
+          "status": "burning",
+          "turns": 3
+        }
+      ],
+      "text": "Throw at an enemy within 4: Burning for 3 turns. Gone once used."
+    },
+    {
+      "id": "card_cleansing_salts",
+      "name": "Cleansing Salts",
+      "kind": "item",
+      "rarity": "common",
+      "action": "effects",
+      "cost": 0,
+      "quick": true,
+      "consumable": true,
+      "short": "Cleanse",
+      "targeting": {
+        "type": "ally",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "cleanse",
+          "all": true,
+          "heal": 4
+        }
+      ],
+      "text": "Quick. You or an adjacent ally shake off every bad status and heal 4. Gone once used."
+    }
+  ]
+}

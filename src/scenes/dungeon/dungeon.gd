@@ -293,8 +293,8 @@ func _update_prompt() -> void:
 	var room := _front_feature()
 	var labels := { "treasure": Strings.t("dungeon.open_the_chest"), "rest": Strings.t("dungeon.rest_by_the_fire"), "merchant": Strings.t("dungeon.browse_the_merchant"), "event": Strings.t("dungeon.approach_the_figure"), "exit": Strings.t("dungeon.leave_the_upside_down"), "start": "" }
 	var t := str(room.get("type", ""))
-	if t == "exit" and Night.fights_left(floor_data) > 0:
-		_prompt.text = "[E] %s" % (Strings.t("dungeon.exit_sealed_prompt") % Night.fights_left(floor_data))
+	if t == "exit" and Night.exit_blockers(DataDB.all(), floor_data) > 0:
+		_prompt.text = "[E] %s" % (Strings.t("dungeon.exit_sealed_prompt") % Night.exit_blockers(DataDB.all(), floor_data))
 		return
 	_prompt.text = ("[E] %s" % labels[t]) if labels.has(t) and str(labels[t]) != "" and not (t in ["treasure", "event", "rest"] and bool(room.get("cleared", false))) else ""
 
@@ -338,7 +338,7 @@ func interact() -> void:
 func _exit_prompt() -> void:
 	var m := Modal.new()
 	m.build(Strings.t("dungeon.the_way_out"), 320)
-	var sealed := Night.fights_left(floor_data)
+	var sealed := Night.exit_blockers(DataDB.all(), floor_data)
 	if sealed > 0:
 		m.text(Strings.t("dungeon.exit_sealed") % sealed, UiTheme.BAD)
 		m.add_button(Strings.t("dungeon.not_yet"), func() -> void: m.finish(false))

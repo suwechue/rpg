@@ -31,6 +31,11 @@ var theme: Theme
 
 
 func _ready() -> void:
+	# Tooltips never wrap on their own, so long ones ran off the screen: wrap
+	# each control's tooltip just before it can show (user report, Oct 28).
+	get_tree().node_added.connect(func(n: Node) -> void:
+		if n is Control and not (n as Control).mouse_entered.is_connected(_wrap_tooltip):
+			(n as Control).mouse_entered.connect(_wrap_tooltip.bind(n)))
 	theme = ThemeDB.get_project_theme()
 	if theme == null:
 		theme = Theme.new()
@@ -42,6 +47,27 @@ func _ready() -> void:
 		colorblind = bool(_ui().get("colorblind", false))
 	rebuild()
 	Assets.reloaded.connect(rebuild)
+
+
+func _wrap_tooltip(c: Control) -> void:
+	if is_instance_valid(c) and c.tooltip_text.length() > int(_ui().get("tooltipChars", 56)):
+		c.tooltip_text = wrap_text(c.tooltip_text, int(_ui().get("tooltipChars", 56)))
+
+
+## Break text into lines of at most `width` characters at spaces, keeping its
+## own line breaks.
+static func wrap_text(text: String, width: int) -> String:
+	var out: Array = []
+	for para in text.split("\n"):
+		var line := ""
+		for word in para.split(" ", false):
+			if line != "" and line.length() + 1 + word.length() > width:
+				out.append(line)
+				line = word
+			else:
+				line = word if line == "" else line + " " + word
+		out.append(line)
+	return "\n".join(PackedStringArray(out))
 
 
 func _ui() -> Dictionary:

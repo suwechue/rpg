@@ -368,7 +368,8 @@ func _build_ui() -> void:
 			["guard", "Guard", Strings.t("combat.basic_guard_defense_until_your")],
 			["wheel", "Wheel", Strings.t("combat.vector_wheel_improvise_a_spell_2")], ["flee", "Flee", Strings.t("combat.flee_when_everyone_stands_on")],
 			["undo", "Undo", Strings.t("combat.undo_this_turn_s_move")], ["cantrip", Strings.t("combat.cantrip"), Strings.t("combat.cantrip_tip")],
-			["hold", Strings.t("combat.hold"), Strings.t("combat.hold_tip")], ["party", Strings.t("combat.party"), Strings.t("combat.party_tip")]]:
+			["hold", Strings.t("combat.hold"), Strings.t("combat.hold_tip")], ["party", Strings.t("combat.party"), Strings.t("combat.party_tip")],
+			["backpack", Strings.t("combat.backpack"), Strings.t("combat.backpack_tip")]]:
 		var key: String = spec[0]
 		var b := UiTheme.button(spec[1], func() -> void: _on_button(key))
 		b.custom_minimum_size = Vector2(39, 18)
@@ -567,8 +568,9 @@ func _refresh_hand() -> void:
 	_hand_owner.text = ""
 	if u == null or u.deck == null or u.team != "party" or u.ai_controlled:
 		return
-	# The hand belongs to someone: their name above it, their color around each card.
-	_hand_owner.text = Strings.t("combat.hand_of") % u.name
+	# The hand belongs to someone: their name above it, their color around each
+	# card, and how many cards are left to draw and in the discard pile.
+	_hand_owner.text = Strings.t("combat.hand_of") % u.name + "   " + Strings.t("combat.piles") % [u.deck.draw_pile.size(), u.deck.discard.size()]
 	var owner_color := _party_color(u)
 	_hand_owner.add_theme_color_override("font_color", owner_color)
 	for i in u.deck.hand.size():
@@ -1022,13 +1024,13 @@ func _update_hover_info(at: Vector2) -> void:
 	if lines.is_empty():
 		_hover_info.visible = false
 		return
-	_hover_label.text = "\n".join(PackedStringArray(lines))
+	_hover_label.text = UiTheme.wrap_text("\n".join(PackedStringArray(lines)), int(DataDB.table("ui").get("tooltipChars", 56)))
 	_hover_shapes.visible = _hover_shapes.get_child_count() > 0
 	_hover_info.reset_size()
 	var pos := at + Vector2(10, 10)
 	var view := Display.size_f()
-	pos.x = minf(pos.x, view.x - _hover_info.size.x - 2)
-	pos.y = minf(pos.y, view.y - _hover_info.size.y - 2)
+	pos.x = maxf(2.0, minf(pos.x, view.x - _hover_info.size.x - 2))
+	pos.y = maxf(2.0, minf(pos.y, view.y - _hover_info.size.y - 2))
 	_hover_info.position = pos
 	_hover_info.visible = true
 
@@ -1081,6 +1083,25 @@ func _on_card(i: int) -> void:
 	_refresh_hud()
 
 
+## The party backpack: pick an item; the current character uses it on themselves.
+func _open_backpack() -> void:
+	if not _player_turn():
+		return
+	var u := state.current
+	var m := Modal.new()
+	m.build(Strings.t("combat.backpack_title"), 300)
+	if state.backpack.is_empty():
+		m.text(Strings.t("combat.backpack_empty"), UiTheme.DIM)
+	for i in state.backpack.size():
+		var idx := i
+		var card := CardRules.resolve(DataDB.all(), str(state.backpack[i]), GameState.cards)
+		m.add_button("%s: %s" % [card.get("name", "?"), card.get("text", "")], func() -> void: m.finish(idx), state.backpack_block(u) != "")
+	m.add_button(Strings.t("combat.close"), func() -> void: m.finish(null))
+	var pick: Variant = await Flow.show_modal(m)
+	if pick != null and state.use_backpack(u, int(pick)):
+		_after_action()
+
+
 func _on_button(key: String) -> void:
 	if key == "party":
 		await _open_party_panel()
@@ -1089,6 +1110,8 @@ func _on_button(key: String) -> void:
 		return
 	var u := state.current
 	match key:
+		"backpack":
+			await _open_backpack()
 		"end":
 			_cancel()
 			state.end_turn()

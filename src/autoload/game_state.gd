@@ -188,6 +188,7 @@ func combat_setup(enemies: Array, layout_id: String, opts: Dictionary = {}) -> D
 		if opts.has(key):
 			setup[key] = opts[key]
 	setup["difficulty"] = combat_difficulty
+	setup["backpack"] = run.get("backpack", [])
 	return setup
 
 
@@ -252,6 +253,20 @@ func debug_combat_setup() -> Dictionary:
 func finish_combat(summary: Dictionary) -> Dictionary:
 	last_combat = summary
 	var lines: Array = []
+	# Items (user request, Oct 28): used consumables leave decks and the backpack;
+	# whoever went down loses the relics they wore.
+	const Inv := preload("res://src/core/items/inventory.gd")
+	Inv.spend_from_backpack(run, summary.get("backpackUsed", []))
+	for p in summary.get("party", []):
+		var who := character(str(p.get("id", "")))
+		if who.is_empty():
+			continue
+		if not p.get("spent", []).is_empty():
+			Inv.spend_from_deck(who, p["spent"])
+			lines.append(Strings.t("game_state.item_used_up") % [str(who.get("name", "?")), ", ".join(PackedStringArray(p["spent"].map(func(c: Variant) -> String: return str(DataDB.record("cards", str(c)).get("name", c)))))])
+		if bool(p.get("downed", false)):
+			for rid in Inv.lose_relics(who):
+				lines.append(Strings.t("relic.lost") % [str(who.get("name", "?")), str(Inv.item(DataDB.all(), str(rid)).get("name", rid))])
 	var result := str(summary.get("result", ""))
 	if result == "win":
 		money += int(summary.get("money", 0))

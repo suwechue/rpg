@@ -1,25 +1,113 @@
 {
   "comment": "Floor composition per weekday (DESIGN.md Section 10). 'rooms' is the total including the start and exit rooms; the mix fills the rest.",
   "days": {
-    "mon": { "rooms": 6, "mix": { "combat": 3, "rest": 1 } },
-    "tue": { "rooms": 7, "mix": { "combat": 3, "elite": 1, "rest": 1 } },
-    "wed": { "rooms": 8, "mix": { "combat": 3, "event": 1, "treasure": 1, "rest": 1 } },
-    "thu": { "rooms": 9, "mix": { "combat": 3, "elite": 2, "merchant": 1, "rest": 1 } },
-    "fri": { "boss": true, "returning": 3, "rest": 1 }
+    "mon": {
+      "rooms": 6,
+      "mix": {
+        "combat": 3,
+        "rest": 1
+      }
+    },
+    "tue": {
+      "rooms": 7,
+      "mix": {
+        "combat": 3,
+        "elite": 1,
+        "rest": 1
+      }
+    },
+    "wed": {
+      "rooms": 8,
+      "mix": {
+        "combat": 3,
+        "event": 1,
+        "treasure": 1,
+        "rest": 1
+      }
+    },
+    "thu": {
+      "rooms": 9,
+      "mix": {
+        "combat": 3,
+        "elite": 2,
+        "merchant": 1,
+        "rest": 1
+      }
+    },
+    "fri": {
+      "boss": true,
+      "returning": 3,
+      "rest": 1
+    }
   },
-  "weekScale": [1.0, 1.0, 1.15, 1.35, 1.55, 1.75],
+  "weekScale": [
+    1.0,
+    1.0,
+    1.15,
+    1.35,
+    1.55,
+    1.75
+  ],
   "returningScale": 1.15,
   "fledFirst": true,
-  "roomSize": [11, 9],
+  "roomSize": [
+    11,
+    9
+  ],
   "roomSpacing": 13,
   "tileset": "tileset_dungeon",
-  "tiles": { "floor": [48, 48, 48, 49, 50], "wall": 40, "door": 48, "stairs": 36, "chest": 89, "chestOpen": 91, "fire": 29, "merchant": 84, "bones": 64 },
-  "treasure": { "money": [8, 20], "itemChance": 0.6, "items": ["rare_ore", "old_photo", "good_coffee", "spice_tin", "collectible_figure", "lucky_coin"], "shardChance": 0.5, "cardChance": 0.4, "cards": ["card_first_aid", "card_deli_sandwich"] },
-  "combatLoot": { "shardChance": 0.15 },
+  "tiles": {
+    "floor": [
+      48,
+      48,
+      48,
+      49,
+      50
+    ],
+    "wall": 40,
+    "door": 48,
+    "stairs": 36,
+    "chest": 89,
+    "chestOpen": 91,
+    "fire": 29,
+    "merchant": 84,
+    "bones": 64
+  },
+  "treasure": {
+    "money": [
+      8,
+      20
+    ],
+    "itemChance": 0.6,
+    "items": [
+      "rare_ore",
+      "old_photo",
+      "good_coffee",
+      "spice_tin",
+      "collectible_figure",
+      "lucky_coin"
+    ],
+    "shardChance": 0.5,
+    "cardChance": 0.4,
+    "cards": [
+      "card_first_aid",
+      "card_deli_sandwich"
+    ]
+  },
+  "combatLoot": {
+    "shardChance": 0.15
+  },
   "shardsToLearn": 3,
-  "rest": { "hpPct": 1.0, "mpPct": 1.0 },
+  "rest": {
+    "hpPct": 1.0,
+    "mpPct": 1.0
+  },
   "afterFightHpPct": 0.2,
-  "merchant": { "shop": "upside_merchant" },
+  "merchant": {
+    "shop": "upside_merchant"
+  },
   "pulledInText": "The spark yanks you under wherever you're standing. You land somewhere random, with whoever happened to be near.",
-  "woodsEdgeText": "You walk into the woods on purpose. The spark meets you halfway and lets you choose who comes."
+  "woodsEdgeText": "You walk into the woods on purpose. The spark meets you halfway and lets you choose who comes.",
+  "sealExitUntilCleared": false,
+  "sealExitNote": "When true, the exit stays shut until every fight room is won (CT Part 6). The user turned it off (Oct 28): only the boss room is required."
 }

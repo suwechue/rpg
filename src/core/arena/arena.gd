@@ -33,8 +33,30 @@ static func rng_for(arena: Dictionary, wave: int, salt: String) -> RandomNumberG
 	return rng
 
 
+## The arena loops (user request, Oct 28): after loopAt waves the content
+## (weeks, themes, bosses, gimmicks) starts over, and enemies keep growing.
+static func content_wave(db: Dictionary, wave: int) -> int:
+	var loop_at := int(waves(db).get("loopAt", 0))
+	return wave if loop_at <= 0 else ((maxi(1, wave) - 1) % loop_at) + 1
+
+
+static func loop_index(db: Dictionary, wave: int) -> int:
+	var loop_at := int(waves(db).get("loopAt", 0))
+	return 0 if loop_at <= 0 else (maxi(1, wave) - 1) / loop_at
+
+
+## The boss gimmick for a boss wave (data/arena/gimmicks.json), cycling in order.
+static func gimmick_for(db: Dictionary, wave: int) -> Dictionary:
+	var list: Array = db.get("arena/gimmicks", {}).get("gimmicks", [])
+	if list.is_empty() or not is_boss(db, wave):
+		return {}
+	var n := content_wave(db, wave) / int(waves(db).get("bossEvery", 5))
+	return list[(n - 1) % list.size()]
+
+
 ## Which week's enemies a wave draws from.
 static func week_for_wave(db: Dictionary, wave: int) -> int:
+	wave = content_wave(db, wave)
 	var week := 1
 	for pair in waves(db).get("waveForWeek", [[1, 1]]):
 		if wave >= int(pair[0]):
@@ -76,7 +98,7 @@ static func theme_for(db: Dictionary, arena: Dictionary, wave: int) -> Dictionar
 	if list.is_empty():
 		return {}
 	var size := maxi(1, int(th.get("blockSize", 5)))
-	var block := (maxi(1, wave) - 1) / size
+	var block := (content_wave(db, wave) - 1) / size
 	var prev := -1
 	var pick := 0
 	for b in block + 1:
@@ -131,11 +153,23 @@ static func wave_enemies(db: Dictionary, arena: Dictionary, wave: int) -> Dictio
 	var idx := DT.index_under(db, "enemies/", "enemies")
 	var hp_mul := 1.0 + float(w.get("hpPerWave", 0.05)) * float(wave - 1)
 	var power := 1.0 + float(w.get("powerPerWave", 0.04)) * float(wave - 1)
+	# Each loop past loopAt makes everything stronger on top.
+	var loop_mul := pow(float(w.get("loopMul", 1.25)), float(loop_index(db, wave)))
+	hp_mul *= loop_mul
+	power *= loop_mul
 	if is_boss(db, wave):
 		var bosses: Array = w.get("bosses", [])
-		var cycle := wave / int(w.get("bossEvery", 10))
+		var cycle := content_wave(db, wave) / int(w.get("bossEvery", 10))
 		var rec: Dictionary = idx.get(str(bosses[(cycle - 1) % bosses.size()]), {}).duplicate(true)
-		rec["affixes"] = EnemyMods.roll(db, mini(6, int(w.get("bossAffixesPerCycle", 1)) * cycle), rng)
+		rec["affixes"] = EnemyMods.roll(db, mini(3, int(w.get("bossAffixesPerCycle", 1)) * ((cycle + 1) / 2)), rng)
+		var gim := gimmick_for(db, wave)
+		if not gim.is_empty():
+			rec["gimmick"] = str(gim["id"])
+			rec.merge(gim.get("set", {}), true)
+			for a in gim.get("affixes", []):
+				if not rec["affixes"].has(a):
+					rec["affixes"].append(a)
+			rec["summon"] = str(w.get("summonMinion", ""))
 		rec["hp"] = roundi(float(rec.get("hp", 50)) * hp_mul)
 		rec["scale"] = power
 		return { "enemies": [rec], "roles": ["boss"], "formation": "default", "boss": true }
@@ -240,6 +274,11 @@ static func card_offer(db: Dictionary, arena: Dictionary, party: Array, wave: in
 	var fresh: Array = []
 	for c in DT.records_under(db, "cards/", "cards"):
 		if str(c.get("kind", "")) == "item" or str(c.get("id", "")) in ["card_strike", "card_guard"] or str(c.get("id", "")).begins_with("card_ember") or str(c.get("id", "")).begins_with("card_heat_shield") or str(c.get("id", "")).begins_with("card_frost_line"):
+			continue
+		if wave < int(c.get("minWave", 0)):
+			continue
+		# Only cards at least one party member can put in their deck (user request, Oct 28).
+		if not party.any(func(ch: Dictionary) -> bool: return Crafting.eligibility(db, ch, c) == ""):
 			continue
 		var r := str(c.get("rarity", "common"))
 		var w := lerpf(float(early.get(r, 1)), float(late.get(r, 1)), t)

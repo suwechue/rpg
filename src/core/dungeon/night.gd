@@ -107,6 +107,19 @@ static func fights_left(floor_data: Dictionary) -> int:
 	return n
 
 
+## Fights that keep the exit shut: every fight room when data/dungeon.json
+## "sealExitUntilCleared" is on, otherwise only the boss (the user's rule:
+## you may leave a floor early, but not skip the week's boss).
+static func exit_blockers(db: Dictionary, floor_data: Dictionary) -> int:
+	if bool(db.get("dungeon", {}).get("sealExitUntilCleared", false)):
+		return fights_left(floor_data)
+	var n := 0
+	for r in floor_data.get("rooms", []):
+		if str(r.get("type", "")) == "boss" and not bool(r.get("cleared", false)):
+			n += 1
+	return n
+
+
 static func party_chars(run: Dictionary) -> Array:
 	var out: Array = [run["player"]]
 	for id in run.get("party_ids", []):

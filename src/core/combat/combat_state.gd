@@ -71,6 +71,8 @@ var reinforcements: Dictionary = {}   # { "round", "enemies": [records], "cells"
 var mutators: Array = []              # arena mutator records (data/arena/mutators.json) active in this fight
 var multi_vector_casts := 0           # party spells with two or more Vectors (arena score)
 var cards_played := 0                 # party cards played (gameplay log, VD Part 6)
+var backpack: Array = []              # item card ids in the party's backpack (user request, Oct 28)
+var backpack_used: Array = []
 var highest_hit := 0                  # the biggest single party hit (arena score screen, PT Part 6)
 
 
@@ -113,6 +115,7 @@ func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) ->
 			u.shield = roundi(float(u.max_hp) * float(rec["startShieldPct"]))
 			u.shield_turns = 99
 	_formation(str(setup.get("formation", "default")))
+	backpack = setup.get("backpack", []).duplicate()
 	if not setup.get("reinforcements", {}).is_empty():
 		reinforcements = setup["reinforcements"].duplicate()
 		reinforcements["cells"] = []
@@ -547,6 +550,8 @@ func _start_turn(u: UnitScript) -> void:
 	u.turns_taken += 1
 	u.last_turn_round = round_num
 	u.actions_left = 1 if u.statuses.has("encore") else actions_per_turn()
+	if u.team == "enemy" and u.alive():
+		_gimmick_turn(u)
 	if u.statuses.has("burning") and u.alive():
 		_damage(u, int(status_rules().get("burning", {}).get("damage", 3)), null, "heat", "burn")
 	if u.statuses.has("poisoned") and u.alive():
@@ -639,7 +644,7 @@ func _end_cleanup(u: UnitScript) -> void:
 	u.links.erase("taunted_by")
 	u.statuses.erase("free_move")
 	for s in ["slow", "root", "blind", "haste", "rally", "rime", "tether", "pact", "regen", "taunting", "haste_full", "sanctuary", "intercept", "slowed2", "dazed", "weakened",
-			"wet", "frozen", "burning", "marked", "exposed", "shadowed", "conductive", "poisoned"]:
+			"wet", "frozen", "burning", "marked", "exposed", "shadowed", "conductive", "poisoned", "hand_plus"]:
 		if u.statuses.has(s):
 			u.statuses[s] = int(u.statuses[s]) - 1
 			if int(u.statuses[s]) <= 0:
@@ -1946,8 +1951,45 @@ func _hit_unit(u: UnitScript, t: UnitScript, spec: Dictionary, can_miss: bool) -
 	return true
 
 
+## Arena boss gimmicks (data/arena/gimmicks.json) at the start of its turn:
+## Rising Fury (enrage), Regrowing Shell (shieldEachRound), Calls the Pack
+## (summonEvery: minions arrive next round on telegraphed tiles).
+func _gimmick_turn(u: UnitScript) -> void:
+	var src: Dictionary = u.source
+	if float(src.get("enrage", 0.0)) > 0.0 and u.turns_taken > 1:
+		var m: Dictionary = u.mods.get("combat", {})
+		m["spellDamagePct"] = float(m.get("spellDamagePct", 0.0)) + float(src["enrage"])
+		u.mods["combat"] = m
+		_emit({ "t": "log", "text": Str.t(db, "combat_state.enrages") % [u.name, roundi(100.0 * float(m["spellDamagePct"]))] })
+	if float(src.get("shieldEachRound", 0.0)) > 0.0:
+		var amount := roundi(float(u.max_hp) * float(src["shieldEachRound"]))
+		u.shield += amount
+		u.shield_turns = maxi(u.shield_turns, 1)
+		_emit({ "t": "shield", "unit": u.id, "amount": amount })
+	var every := int(src.get("summonEvery", 0))
+	if every > 0 and u.turns_taken % every == 0 and reinforcements.is_empty() and str(src.get("summon", "")) != "":
+		var minions: Array = []
+		for i in int(src.get("summonCount", 2)):
+			minions.append(str(src["summon"]))
+		reinforcements = { "round": round_num + 1, "enemies": minions, "cells": [] }
+		_emit({ "t": "log", "text": Str.t(db, "combat_state.calls_the_pack") % u.name })
+		_reinforce()
+
+
 ## Leech enemies drain MP; vampiric ones heal from the hit.
 func _after_hit(u: UnitScript, t: UnitScript, amount: int) -> void:
+	# Gimmicks: Thorned Hide hurts each party attacker back; Last Stand hardens at half HP.
+	if int(t.source.get("thorns", 0)) > 0 and u != null and u != t and u.team == "party" and u.alive() and amount > 0:
+		_damage(u, int(t.source["thorns"]), t, "", "thorns")
+	if float(t.source.get("lastStand", 0.0)) > 0.0 and t.alive() and not t.links.has("last_stand") and t.hp * 2 <= t.max_hp:
+		t.links["last_stand"] = "1"
+		var stand := roundi(float(t.max_hp) * float(t.source["lastStand"]))
+		t.shield += stand
+		t.shield_turns = maxi(t.shield_turns, 3)
+		_emit({ "t": "shield", "unit": t.id, "amount": stand })
+		_emit({ "t": "log", "text": Str.t(db, "combat_state.last_stand") % t.name })
+	if u == null:
+		return
 	if float(u.source.get("leech", 0.0)) > 0.0 and t.max_mp > 0 and t.mp > 0:
 		var drained := mini(t.mp, maxi(1, ceili(float(amount) * float(u.source["leech"]))))
 		t.mp -= drained
@@ -2540,9 +2582,15 @@ func is_quick_now(u: UnitScript, card: Dictionary) -> bool:
 	return bool(card.get("builtin", false)) or bool(card.get("quick", false))
 
 
-## Ranged characters pay an Action for Strike and Guard when the difficulty says so (user request).
+## Whether Strike and Guard cost an Action for this unit: always when
+## data/combat_rules.json "builtinsQuick" is off (user request, Oct 28), else
+## only for ranged characters when the difficulty says so.
 func ranged_builtins_cost(u: UnitScript) -> bool:
-	if u.team != "party" or not bool(difficulty_rules().get("rangedBuiltinsCostAction", false)):
+	if u.team != "party":
+		return false
+	if not bool(db.get("combat_rules", {}).get("builtinsQuick", true)):
+		return true
+	if not bool(difficulty_rules().get("rangedBuiltinsCostAction", false)):
 		return false
 	for c in db.get("classes", {}).get("classes", []):
 		if str(c.get("id", "")) == str(u.source.get("class", "")):
@@ -2564,6 +2612,38 @@ func _use_quick_builtin(u: UnitScript) -> void:
 		u.quick_used = true
 	else:
 		u.action_used = true
+
+
+## The party backpack (user request, Oct 28): any party member uses an item
+## on themselves; it costs what the item card costs (a Quick for potions).
+func backpack_block(u: UnitScript) -> String:
+	if u == null or u.team != "party":
+		return "no"
+	if backpack.is_empty():
+		return Str.t(db, "combat.backpack_empty")
+	return quick_block(u)
+
+
+func use_backpack(u: UnitScript, index: int) -> bool:
+	if index < 0 or index >= backpack.size() or backpack_block(u) != "":
+		return false
+	var id := str(backpack[index])
+	var card := CardRules.resolve(db, id, library)
+	if card.is_empty():
+		return false
+	_push_undo(u)
+	_use_slot(u, card)
+	backpack.remove_at(index)
+	backpack_used.append(id)
+	_emit({ "t": "cast", "unit": u.id, "name": str(card.get("name", "")), "target": u.cell, "improvised": false })
+	_emit({ "t": "log", "text": Str.t(db, "combat_state.uses_item") % [u.name, str(card.get("name", id))] })
+	if str(card.get("action", "")) == "effects":
+		_effects_script().run(self, u, card, u.cell, [u.cell])
+	else:
+		_basic(u, card, u.cell)
+	_check_end()
+	_after_step(u)
+	return true
 
 
 func cantrip_cfg() -> Dictionary:
@@ -2785,7 +2865,8 @@ func undo(u: UnitScript) -> bool:
 
 ## Cards in hand at the start of a turn: data "drawUpTo" plus draw bonuses.
 func hand_size(u: UnitScript) -> int:
-	return int(Res.combat_cfg(db).get("drawUpTo", 3)) + int(u.mods.get("combat", {}).get("drawBonus", 0))
+	var plus := int(str(u.links.get("hand_plus", "0"))) if u.statuses.has("hand_plus") else 0
+	return int(Res.combat_cfg(db).get("drawUpTo", 3)) + int(u.mods.get("combat", {}).get("drawBonus", 0)) + plus
 
 
 ## Movement cards (CT Part 4): before moving or acting this turn the tiles
@@ -3461,7 +3542,12 @@ func finish() -> Dictionary:
 			continue
 		u.source["hp"] = maxi(1, u.hp) if u.downed else u.hp
 		u.source["mp"] = u.mp
-		party.append({ "id": u.id, "hp": u.hp, "mp": u.mp, "downed": u.downed })
+		var spent: Array = []
+		if u.deck != null:
+			for id in u.deck.exhausted:
+				if bool(CardRules.resolve(db, str(id), library).get("consumable", false)):
+					spent.append(str(id))
+		party.append({ "id": u.id, "hp": u.hp, "mp": u.mp, "downed": u.downed, "spent": spent })
 	var remaining: Array = []
 	for u in units:
 		if u.team == "enemy" and u.alive():
@@ -3476,7 +3562,7 @@ func finish() -> Dictionary:
 	return {
 		"result": result, "xp": xp_total, "money": money_total, "party": party, "kills": kills,
 		"remaining": remaining, "wildSurges": wild_surges, "support": support_log,
-		"helpAnswered": answered, "helpIgnored": ignored, "rounds": round_num, "multiVector": multi_vector_casts, "combos": combos_cast, "cardsPlayed": cards_played, "highestHit": highest_hit,
+		"helpAnswered": answered, "helpIgnored": ignored, "rounds": round_num, "multiVector": multi_vector_casts, "combos": combos_cast, "cardsPlayed": cards_played, "backpackUsed": backpack_used, "highestHit": highest_hit,
 	}
 
 

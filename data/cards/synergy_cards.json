@@ -1,397 +1,142 @@
 {
-  "comment": "PT Part 7: status setup and payoff cards for every class.",
+  "comment": "Deck synergies (user request, Oct 28): draw, recall from the discard pile, seek a card, a bigger hand. Higher tier: the arena offers them from minWave on.",
   "cards": [
     {
-      "id": "card_splash",
-      "name": "Splash",
-      "kind": "spell",
-      "vectors": {
-        "cold": 1.0
-      },
-      "form": "bolt",
-      "magnitude": "minor",
-      "rarity": "common",
-      "short": "Wet",
-      "text": "Make an enemy Wet. Cold freezes it; Lightning arcs through it.",
-      "vfx": "vfx_cold_bolt",
-      "sfx": "card_play_cold",
-      "tags": {
-        "setsUp": [
-          "wet"
-        ],
-        "paysOff": []
+      "id": "card_rummage",
+      "name": "Rummage",
+      "kind": "basic",
+      "rarity": "uncommon",
+      "minWave": 10,
+      "short": "Draw 1",
+      "action": "effects",
+      "cost": 0,
+      "quick": true,
+      "targeting": {
+        "type": "self",
+        "range": 1
       },
       "effects": [
         {
-          "op": "status_target",
-          "status": "wet",
-          "turns": 2
+          "op": "draw",
+          "n": 1
         }
       ],
+      "text": "Quick. Draw a card."
+    },
+    {
+      "id": "card_second_look",
+      "name": "Second Look",
+      "kind": "basic",
+      "rarity": "uncommon",
+      "minWave": 10,
+      "short": "Recall 1",
+      "action": "effects",
+      "cost": 1,
       "targeting": {
-        "type": "enemy",
-        "range": 4
-      },
-      "effectsOnly": true,
-      "upgrade": {
-        "magnitude": "standard"
-      },
-      "cost": 1
-    },
-    {
-      "id": "card_acid_spit",
-      "name": "Acid Spit",
-      "kind": "spell",
-      "vectors": {
-        "corrosion": 1.0
-      },
-      "form": "bolt",
-      "magnitude": "minor",
-      "rarity": "common",
-      "short": "Bolt {power}",
-      "text": "A Corrosion Bolt that Exposes the target.",
-      "vfx": "vfx_corrosion_bolt",
-      "sfx": "card_play_corrosion",
-      "tags": {
-        "setsUp": [
-          "exposed"
-        ],
-        "paysOff": []
-      },
-      "upgrade": {
-        "magnitude": "standard"
-      },
-      "cost": 1
-    },
-    {
-      "id": "card_kindle_cone",
-      "name": "Kindling Breath",
-      "kind": "spell",
-      "vectors": {
-        "heat": 1.0
-      },
-      "form": "cone",
-      "magnitude": "minor",
-      "rarity": "common",
-      "short": "Cone {power}",
-      "text": "A Heat Cone. Sets the targets Burning.",
-      "vfx": "vfx_heat_bolt",
-      "sfx": "card_play_heat",
-      "tags": {
-        "setsUp": [
-          "burning"
-        ],
-        "paysOff": []
-      },
-      "upgrade": {
-        "magnitude": "standard"
-      },
-      "cost": 3
-    },
-    {
-      "id": "card_ice_lance",
-      "name": "Ice Lance",
-      "kind": "spell",
-      "vectors": {
-        "cold": 1.0
-      },
-      "form": "line",
-      "magnitude": "standard",
-      "rarity": "uncommon",
-      "short": "Line {power}",
-      "text": "A Cold Line; Wet targets freeze.",
-      "vfx": "vfx_cold_line",
-      "sfx": "card_play_cold",
-      "tags": {
-        "setsUp": [
-          "frozen"
-        ],
-        "paysOff": [
-          "wet"
-        ]
-      },
-      "upgrade": {
-        "magnitude": "major"
-      },
-      "cost": 3
-    },
-    {
-      "id": "card_hammer_drop",
-      "name": "Hammer Drop",
-      "kind": "spell",
-      "vectors": {
-        "force": 1.0
-      },
-      "form": "burst",
-      "magnitude": "standard",
-      "rarity": "uncommon",
-      "short": "Burst {power}",
-      "text": "A Force Burst; shatters the Frozen.",
-      "vfx": "vfx_force_burst",
-      "sfx": "card_play_force",
-      "tags": {
-        "setsUp": [
-          "push"
-        ],
-        "paysOff": [
-          "frozen"
-        ]
-      },
-      "upgrade": {
-        "magnitude": "major"
-      },
-      "cost": 3
-    },
-    {
-      "id": "card_flare_mark",
-      "name": "Flare Mark",
-      "kind": "spell",
-      "vectors": {
-        "light": 1.0
-      },
-      "form": "burst",
-      "magnitude": "minor",
-      "rarity": "common",
-      "short": "Mark area",
-      "text": "Mark every enemy in a plus shape.",
-      "vfx": "vfx_light_burst",
-      "sfx": "card_play_light",
-      "tags": {
-        "setsUp": [
-          "marked"
-        ],
-        "paysOff": []
+        "type": "self",
+        "range": 1
       },
       "effects": [
         {
-          "op": "status_area",
-          "status": "marked",
-          "turns": 1
+          "op": "recall",
+          "n": 1
+        },
+        {
+          "op": "draw",
+          "n": 1
         }
       ],
-      "targeting": {
-        "type": "any",
-        "range": 4
-      },
-      "effectsOnly": true,
-      "area": "plus",
-      "upgrade": {
-        "magnitude": "standard"
-      },
-      "cost": 3
+      "text": "Return your last discarded card to your hand, then draw a card."
     },
     {
-      "id": "card_tar_pit",
-      "name": "Tar Pit",
-      "kind": "spell",
-      "vectors": {
-        "binding": 1.0
-      },
-      "form": "glyph",
-      "magnitude": "standard",
-      "rarity": "common",
-      "short": "Trap",
-      "text": "A sticky Glyph that Roots and Slows.",
-      "vfx": "vfx_binding_glyph",
-      "sfx": "card_play_binding",
-      "tags": {
-        "setsUp": [
-          "rooted",
-          "slow"
-        ],
-        "paysOff": []
-      },
-      "upgrade": {
-        "magnitude": "major"
-      },
-      "cost": 5
-    },
-    {
-      "id": "card_rust_cloud",
-      "name": "Rust Cloud",
-      "kind": "spell",
-      "vectors": {
-        "corrosion": 1.0
-      },
-      "form": "burst",
-      "magnitude": "minor",
+      "id": "card_seek_the_spark",
+      "name": "Seek the Spark",
+      "kind": "basic",
       "rarity": "uncommon",
-      "short": "Burst {power}",
-      "text": "A Corrosion Burst that Exposes and doubles Poison.",
-      "vfx": "vfx_corrosion_burst",
-      "sfx": "card_play_corrosion",
-      "tags": {
-        "setsUp": [
-          "exposed"
-        ],
-        "paysOff": [
-          "poisoned"
-        ]
+      "minWave": 10,
+      "short": "Find spell",
+      "action": "effects",
+      "cost": 0,
+      "quick": true,
+      "targeting": {
+        "type": "self",
+        "range": 1
       },
-      "upgrade": {
-        "magnitude": "standard"
-      },
-      "cost": 3
+      "effects": [
+        {
+          "op": "seek"
+        }
+      ],
+      "text": "Quick. Put a spell of your first Vector from your draw pile into your hand."
     },
     {
-      "id": "card_blaze_line",
-      "name": "Blaze Line",
-      "kind": "spell",
-      "vectors": {
-        "heat": 1.0
-      },
-      "form": "line",
-      "magnitude": "minor",
-      "rarity": "common",
-      "short": "Line {power}",
-      "text": "A Heat Line. Everything in it Burns.",
-      "vfx": "vfx_heat_line",
-      "sfx": "card_play_heat",
-      "tags": {
-        "setsUp": [
-          "burning"
-        ],
-        "paysOff": []
-      },
-      "upgrade": {
-        "magnitude": "standard"
-      },
-      "cost": 2
-    },
-    {
-      "id": "card_updraft",
-      "name": "Updraft",
-      "kind": "spell",
-      "vectors": {
-        "motion": 1.0
-      },
-      "form": "burst",
-      "magnitude": "minor",
-      "rarity": "common",
-      "short": "Burst {power}",
-      "text": "A Motion Burst that throws everyone 1 tile out.",
-      "vfx": "vfx_motion_burst",
-      "sfx": "card_play_motion",
-      "tags": {
-        "setsUp": [
-          "push"
-        ],
-        "paysOff": []
-      },
-      "upgrade": {
-        "magnitude": "standard"
-      },
-      "cost": 3
-    },
-    {
-      "id": "card_frost_ring",
-      "name": "Frost Ring",
-      "kind": "spell",
-      "vectors": {
-        "cold": 1.0
-      },
-      "form": "sphere",
-      "magnitude": "minor",
-      "rarity": "common",
-      "short": "Sphere {power}",
-      "text": "A Cold Sphere around you; Wet targets freeze.",
-      "vfx": "vfx_cold_sphere",
-      "sfx": "card_play_cold",
-      "tags": {
-        "setsUp": [
-          "frozen"
-        ],
-        "paysOff": [
-          "wet"
-        ]
-      },
-      "upgrade": {
-        "magnitude": "standard"
-      },
-      "cost": 3
-    },
-    {
-      "id": "card_ember_storm",
-      "name": "Ember Storm",
-      "kind": "spell",
-      "vectors": {
-        "heat": 1.0
-      },
-      "form": "burst",
-      "magnitude": "major",
+      "id": "card_recall",
+      "name": "Recall",
+      "kind": "basic",
       "rarity": "rare",
-      "short": "Burst {power}",
-      "text": "A Major Heat Burst.",
-      "vfx": "vfx_heat_burst",
-      "sfx": "card_play_heat",
-      "tags": {
-        "setsUp": [
-          "burning"
-        ],
-        "paysOff": []
-      },
-      "upgrade": {
-        "magnitude": "major"
-      },
-      "cost": 6
-    },
-    {
-      "id": "card_glare",
-      "name": "Glare",
-      "kind": "spell",
-      "vectors": {
-        "light": 1.0
-      },
-      "form": "cone",
-      "magnitude": "minor",
-      "rarity": "common",
-      "short": "Cone {power}",
-      "text": "A Light Cone that Blinds.",
-      "vfx": "vfx_light_bolt",
-      "sfx": "card_play_light",
-      "tags": {
-        "setsUp": [
-          "blind"
-        ],
-        "paysOff": []
-      },
-      "upgrade": {
-        "magnitude": "standard"
-      },
-      "cost": 3
-    },
-    {
-      "id": "card_steam_vent",
-      "name": "Steam Vent",
-      "kind": "spell",
-      "vectors": {
-        "heat": 1.0
-      },
-      "form": "burst",
-      "magnitude": "minor",
-      "rarity": "common",
-      "short": "Burst {power}",
-      "text": "Heat that leaves enemies Wet as the steam settles.",
-      "vfx": "vfx_heat_burst",
-      "sfx": "card_play_heat",
-      "tags": {
-        "setsUp": [
-          "wet",
-          "burning"
-        ],
-        "paysOff": []
+      "minWave": 15,
+      "short": "Recall 2",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "self",
+        "range": 1
       },
       "effects": [
         {
-          "op": "status_area",
-          "status": "wet",
-          "turns": 1
+          "op": "recall",
+          "n": 2
         }
       ],
-      "upgrade": {
-        "magnitude": "standard"
+      "text": "Return your last 2 discarded cards to your hand."
+    },
+    {
+      "id": "card_battle_plan",
+      "name": "Battle Plan",
+      "kind": "basic",
+      "rarity": "rare",
+      "minWave": 15,
+      "short": "Hand +1",
+      "action": "effects",
+      "cost": 1,
+      "quick": true,
+      "targeting": {
+        "type": "self",
+        "range": 1
       },
-      "cost": 3
+      "effects": [
+        {
+          "op": "hand_plus",
+          "n": 1,
+          "turns": 3
+        },
+        {
+          "op": "draw",
+          "n": 1
+        }
+      ],
+      "text": "Quick. Your hand holds 1 more card for 3 turns; draw 1 now."
+    },
+    {
+      "id": "card_overflow",
+      "name": "Overflow",
+      "kind": "basic",
+      "rarity": "rare",
+      "minWave": 20,
+      "short": "Draw 3",
+      "action": "effects",
+      "cost": 2,
+      "targeting": {
+        "type": "self",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "draw",
+          "n": 3
+        }
+      ],
+      "text": "Draw 3 cards."
     }
   ]
 }

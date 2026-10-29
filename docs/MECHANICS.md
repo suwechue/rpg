@@ -47,7 +47,7 @@ Most numbers live in `data/` (JSON). The main files:
 
 **Combat in 30 seconds:**
 - Fights are on a grid. Each of your characters takes a turn in **initiative order** (the bar at the top).
-- Every turn you get **2 Actions** (a Move, or a card) and **1 Quick** (Strike, Guard or a quick card). Move + card, card + move, card + card and move + move are all fine.
+- Every turn you get **2 Actions** (a Move, a card, Strike or Guard) and **1 Quick** (a quick card or a backpack item). Move + card, card + move, card + card and move + move are all fine.
 - Casters always have a **Cantrip** (0 MP, 1 Action) in their first Vector.
 - You draw **back up to 3 cards** every turn; unplayed cards are discarded at End Turn unless you **Hold** one (1 Action).
 - **Undo** anything until a die rolls or something new is revealed.
@@ -66,7 +66,7 @@ Most numbers live in `data/` (JSON). The main files:
 | --- | --- | --- |
 | Turn order | Every unit acts once per **round** in **initiative** order (DEX + PER/2). Party and enemies interleave. In the **arena's first round of a wave, the whole party acts first**. A "Round N" banner starts each round; the timeline shows past turns faded, the current portrait enlarged, and the next round | `data/stats.json` derived.initiative; `data/combat_rules.json` actions.partyFirstInArena |
 | Turn rule | **2 Actions + 1 Quick** (PT Part 1). An Action is a **Move** (up to your Movement: 3 + DEX/5, so 4 for most) or a **non-quick card**. Any order: move + card, card + move, card + card, move + move. Older rules (move-or-act and friends) stay in F1 > Fights | `data/combat_rules.json` turnMode, actions.actionsPerTurn |
-| Quicks | **1 per turn**: the built-in **Strike** (adjacent, STR), the built-in **Guard** (+3 Defense, +15% Magic Resistance until your next turn), or a **quick card**. Usable before or after moving and after your Actions. Strike and Guard are not cards any more | actions.quicksPerTurn; `data/stats.json` combat.guardDefense |
+| Quicks | **1 per turn**: a **quick card** or a **backpack item**. The built-in **Strike** (adjacent, STR) and **Guard** (+3 Defense, +15% Magic Resistance until your next turn) cost an **Action** (user request, Oct 28; `builtinsQuick` true brings back the old Quick rule). Usable before or after moving and after your Actions. Strike and Guard are not cards any more | actions.quicksPerTurn; `data/stats.json` combat.guardDefense |
 | Cantrip | Everyone who knows a Vector has a built-in **0 MP, 1 Action** single-target Bolt in their first Vector (range 4, 3 to 4 damage, no riders) | `data/combat_rules.json` cantrip |
 | Hold | **1 Action:** keep 1 card in hand for next turn (a pin on the card). Everything else is discarded at End Turn | actions.holdCost, holdMax |
 | Undo | Until End Turn, undo any step that didn't roll dice (crit, miss, Stability), draw a card or reveal something. From that point back the Undo button greys out and says why. Snapshots live in `CombatState` | — |
@@ -86,6 +86,10 @@ Most numbers live in `data/` (JSON). The main files:
 | Combat difficulty | Chosen at new run. Enemies get **2 Actions** like you: move + attack, or move + move when nothing is in reach. **Double attack chance** (an enemy already in reach attacks twice): Normal minion 40%, normal 50%, elite 35%, boss 50%; Hard 75%. **Hard** also gives enemies x1.2 HP and x1.25 damage | `data/combat_rules.json` difficulties.enemyDoubleAttackChance |
 
 ## B2. Cards, hand and MP
+
+- **The deck cycles in batches of 3:** each fight starts with a fresh shuffle. Every turn you're dealt up to 3 cards; unplayed ones go to the discard pile (except one Held card). Only when the draw pile is empty is the discard shuffled back in (with Fatigue). When fewer than 3 are left, you get those, then the rest from the reshuffle. The hand's label shows **Draw N · Discard N**.
+- **Deck synergies** (arena cards from wave 10): Rummage (Quick: draw 1), Second Look (recall your last discard, draw 1), Seek the Spark (Quick: a spell of your first Vector from the draw pile), Recall (wave 15: your last 2 discards back to hand), Battle Plan (wave 15, Quick: hand +1 for 3 turns, draw 1), Overflow (wave 20: draw 3). `data/cards/synergy_cards.json`.
+- **Items:** potions and effect items are consumable cards: once used they leave the deck for good. **Backpack** items (`run.backpack`, up to 6) can be used by anyone in combat with the Pack button (a Quick, on yourself). **Relics** are worn by one character (2 slots) and add mods; if that character goes down in a fight, every relic they wore is lost. `data/items.json`, `data/cards/item_cards.json`, `data/merchant.json`.
 
 | Mechanic | How it works now | Change it in |
 | --- | --- | --- |
@@ -292,6 +296,11 @@ Advanced classes (Class Change at levels 5 and 12): Elementalist, Kinetic Logici
 
 ## B12. The Endless Arena
 
+- **Bosses every 5th wave** (elites every 4th), each with a **gimmick** announced before the wave: Thorned Hide (hits hurt the attacker for 3), Rising Fury (+15% damage per round), Regrowing Shell (shield of 10% HP each turn), Calls the Pack (2 minions every 2 rounds), Last Stand (a 35% HP shield at half HP), Too Fast (hasted). `data/arena/gimmicks.json`.
+- **The loop:** after wave 50 the arena starts over (weeks, themes, bosses, gimmicks) with everything 1.25x stronger per loop. `data/arena/waves.json` loopAt, loopMul.
+- **The merchant** at checkpoints sells relics, backpack potions and deck items for arena coins (the banked money): 5 goods per checkpoint, weighted by rarity. A cutscene introduces her the first time.
+- **Card picks** only offer cards at least one party member can put in their deck.
+
 - **Two ways in:** from the title screen (a preset party: your class plus one of each other class, named Ash, Brick, Quill, Sage and Lyric), or in the story through **the Rift** (week 2+). In the story, losing knocks you out instead of killing you.
 - **Waves:**
   - Seeded, endless and growing.
@@ -491,6 +500,8 @@ Change these in `data/town/*.json` and `docs/TOWN.md`.
 
 ## C7. The Upside-Down (story dungeon)
 
+- **Leaving early:** the exit is open whenever the boss room (if the floor has one) is beaten; other fights are optional (user request, Oct 28; `data/dungeon.json` sealExitUntilCleared).
+
 - **Each week** has a **Vector signature**, shaped by town events, that decides which enemies and loot appear.
 - **Floors:**
   - Monday to Thursday floors are generated rooms: combat, elite, treasure, rest, event, merchant and exit.
@@ -520,6 +531,8 @@ Change these in `data/town/*.json` and `docs/TOWN.md`.
 Change these in `data/dungeon.json`, `data/weeks.json` and `data/encounters.json`.
 
 ## C8. Story, death and the Journal
+
+- **Place-based events:** a story with `"at": { "zone" }` or `{ "loc" }` waits until you're in that zone or within 4 tiles of that location's door or spot, any time from its day part to the end of that day (the banner at the front steps, the deli freezer, the forge, the closed wing, Mr. B at school). Others still play when their day part starts.
 
 - **Week 1 Monday:** Kelly is your guest on the first floor. Your choices that day add to **Kelly Risk**. At 4 or more, she panics and the run ends.
 - **Story arc:** Mr. B's arc runs through weeks 1 to 5, with choices in weeks 3 and 4. The run ends at the `NARRATOR_REVEAL_TBD` finale.

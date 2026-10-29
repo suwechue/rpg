@@ -48,9 +48,47 @@ static func due(db: Dictionary, run: Dictionary, ctx: Dictionary, inline: bool) 
 	for s in all(db):
 		if bool(s.get("inline", false)) != inline or done(run, str(s["id"])):
 			continue
+		# Stories with a place wait until the player gets there (due_at).
+		if s.has("at"):
+			continue
 		if Fx.conditions_met(db, run, s.get("trigger", {}), ctx) and Fx.conditions_met(db, run, s.get("cond", {}), ctx):
 			out.append(str(s["id"]))
 	return out
+
+
+## Stories tied to a place ("at": { "zone": id } or { "loc": id }) that are
+## due now: their week and day match, their day part has started (they stay
+## available for the rest of that day), and the player is in that zone or
+## near that location (near_locs: location ids within reach).
+static func due_at(db: Dictionary, run: Dictionary, ctx: Dictionary, zone: String, near_locs: Array) -> Array:
+	var out: Array = []
+	var parts := part_order(db, str(ctx.get("day", "")))
+	for s in all(db):
+		if not s.has("at") or done(run, str(s["id"])):
+			continue
+		var at: Dictionary = s["at"]
+		if at.has("zone") and str(at["zone"]) != zone:
+			continue
+		if at.has("loc") and not near_locs.has(str(at["loc"])):
+			continue
+		var trig: Dictionary = s.get("trigger", {}).duplicate()
+		var want := str(trig.get("part", ""))
+		trig.erase("part")
+		if want != "" and parts.find(str(ctx.get("part", ""))) < parts.find(want):
+			continue
+		if want != "" and parts.find(want) < 0:
+			continue
+		if Fx.conditions_met(db, run, trig, ctx) and Fx.conditions_met(db, run, s.get("cond", {}), ctx):
+			out.append(str(s["id"]))
+	return out
+
+
+## The day parts of a day, in order (weekday or weekend).
+static func part_order(db: Dictionary, day: String) -> Array:
+	var cal: Dictionary = db.get("calendar", {})
+	var weekend: Array = cal.get("weekendDays", [])
+	var parts: Array = cal.get("weekendParts" if weekend.has(day) else "weekdayParts", [])
+	return parts.map(func(p: Variant) -> String: return str(p.get("id", "")) if p is Dictionary else str(p))
 
 
 ## Resolve a choice that may be misheard (a choice with "misheard": { risk,

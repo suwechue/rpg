@@ -17,7 +17,7 @@ func test_waves_from_a_seed() -> void:
 	var w1: int = Arena.wave_enemies(db(), a, 1)["enemies"].size()
 	var w20: int = Arena.wave_enemies(db(), a, 19)["enemies"].size()
 	check(w1 >= 3 and w20 >= 8 and w20 > w1, "waves grow from about 3 to 8-10 enemies (%d -> %d)" % [w1, w20])
-	check(Arena.is_elite(db(), 5) and not Arena.is_elite(db(), 10) and Arena.is_boss(db(), 10), "every 5th wave is elite, every 10th a boss")
+	check(Arena.is_boss(db(), 5) and Arena.is_boss(db(), 10) and Arena.is_elite(db(), 4) and not Arena.is_elite(db(), 20), "a boss every 5th wave (user request), elites every 4th")
 	var boss := Arena.wave_enemies(db(), a, 20)
 	check(bool(boss["boss"]) and boss["enemies"][0]["affixes"].size() == 2, "bosses come back remixed with affixes")
 	var elite := Arena.wave_enemies(db(), a, 5)

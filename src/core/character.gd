@@ -148,6 +148,9 @@ static func collect_mods(db: Dictionary, ch: Dictionary) -> Dictionary:
 		var item_id: Variant = equipment[slot]
 		if item_id != null and items.has(str(item_id)):
 			sources.append(items[str(item_id)].get("mods", {}))
+	for rid in ch.get("relics", []):
+		if items.has(str(rid)):
+			sources.append(items[str(rid)].get("mods", {}))
 	if ch.has("extraMods"):
 		sources.append(ch["extraMods"])
 	sources.append(class_data(db, str(ch.get("class", ""))).get("mods", {}))

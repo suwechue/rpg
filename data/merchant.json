@@ -1,0 +1,14 @@
+{
+  "comment": "The arena merchant (user request, Oct 28): visit at checkpoints. Relics are worn by one character (relicSlots each) and are LOST if that character goes down in a fight. Consumables go into a deck (gone once used) or the party backpack (anyone, as a Quick in combat). Prices are in arena coins (the banked money). stockSize items are offered per checkpoint, weighted by rarity.",
+  "stockSize": 5,
+  "relicSlots": 2,
+  "backpackSize": 6,
+  "rarityWeights": {
+    "common": 6,
+    "uncommon": 3,
+    "rare": 1
+  },
+  "priceMul": 1.0,
+  "cutsceneFirst": "arena_merchant",
+  "cutscene": "arena_merchant_again"
+}

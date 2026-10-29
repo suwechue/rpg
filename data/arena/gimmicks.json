@@ -1,0 +1,54 @@
+{
+  "comment": "Arena bosses (every bossEvery waves) each get one gimmick (user request, Oct 28), announced at the start of the wave. 'set' fields go onto the boss record and are read by combat (thorns: damage back to each attacker; enrage: +damage per round; shieldEachRound: shield as a share of max HP at the start of its turn; summonEvery/summon/summonCount: calls minions; lastStand: a shield as a share of max HP the first time it drops to half). 'affixes' are elite affixes (data/enemy_affixes.json).",
+  "gimmicks": [
+    {
+      "id": "thorns",
+      "name": "Thorned Hide",
+      "text": "Every hit you land on it hurts you back for 3. Big hits beat many small ones.",
+      "set": {
+        "thorns": 3
+      }
+    },
+    {
+      "id": "enrage",
+      "name": "Rising Fury",
+      "text": "It hits 15% harder every round. End it fast.",
+      "set": {
+        "enrage": 0.15
+      }
+    },
+    {
+      "id": "shield",
+      "name": "Regrowing Shell",
+      "text": "At the start of each of its turns it regains a shield of 10% of its HP. Burst it down in one turn.",
+      "set": {
+        "shieldEachRound": 0.1
+      }
+    },
+    {
+      "id": "summoner",
+      "name": "Calls the Pack",
+      "text": "Every 2 rounds it calls 2 minions. Watch the marked tiles.",
+      "set": {
+        "summonEvery": 2,
+        "summonCount": 2
+      }
+    },
+    {
+      "id": "last_stand",
+      "name": "Last Stand",
+      "text": "At half HP it hardens: a shield of 35% of its HP. Save something for the second half.",
+      "set": {
+        "lastStand": 0.35
+      }
+    },
+    {
+      "id": "hasted",
+      "name": "Too Fast",
+      "text": "It moves 2 more tiles and acts sooner. Use cover and keep your distance.",
+      "affixes": [
+        "hasted"
+      ]
+    }
+  ]
+}

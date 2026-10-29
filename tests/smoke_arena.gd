@@ -64,8 +64,9 @@ func _run() -> void:
 			break
 	var arena: Dictionary = gs.get("run").get("arena", {})
 	print("arena smoke: cleared %d waves, score %d, phase %s" % [int(arena.get("cleared", 0)), int(arena.get("score", 0)), str(arena.get("phase", ""))])
-	check(int(arena.get("cleared", 0)) >= 14, "autoplay reaches wave 15 (cleared %d)" % int(arena.get("cleared", 0)))
-	check(arena.get("picked", []).size() >= 10, "a card was picked after every wave (%d)" % arena.get("picked", []).size())
+	# The arena gets harder with gimmick bosses every 5 waves; the smoke checks the flow, not the balance.
+	check(int(arena.get("cleared", 0)) >= 8, "autoplay clears 8+ waves, past two bosses (cleared %d)" % int(arena.get("cleared", 0)))
+	check(arena.get("picked", []).size() >= 7, "a card was picked after every wave (%d)" % arena.get("picked", []).size())
 	check(not arena.get("perksTaken", []).is_empty(), "a Technique was picked at a checkpoint")
 	check(mutators_seen, "a checkpoint mutator was picked")
 	check(int(arena.get("score", 0)) > 0, "the score counts up")
