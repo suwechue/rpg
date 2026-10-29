@@ -16,6 +16,8 @@ const SCREENS := [
 	["res://src/scenes/ui/board_screen.gd", {}],
 	["res://src/scenes/ui/equipment_screen.gd", {}],
 	["res://src/scenes/ui/smith_screen.gd", {}],
+	["res://src/scenes/ui/goals_screen.gd", {}],
+	["res://src/scenes/ui/town_pause.gd", {}],
 	["res://src/scenes/ui/party_panel.gd", {}],
 	["res://src/scenes/ui/compendium_screen.gd", {}],
 	["res://src/scenes/ui/spark_quiz_screen.gd", {}],

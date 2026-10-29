@@ -152,5 +152,24 @@
     "fullAtWeek": 3,
     "fullAtWave": 15
   },
-  "gearNote": "TL Part 4: durability per difficulty lives in data/gear.json durability.difficulties."
+  "gearNote": "TL Part 4: durability per difficulty lives in data/gear.json durability.difficulties.",
+  "constructs": {
+    "comment": "TL Part 6: a Construct's mode comes from its strongest Vector (a card can set \"construct\"). Turrets fire at the nearest visible enemy within turretRange at the end of each round for turretShare of the spell's power; decoys pull enemy attacks aimed within decoyRadius onto themselves; walls just block.",
+    "turret": [
+      "heat",
+      "cold",
+      "light",
+      "lightning",
+      "sound"
+    ],
+    "decoy": [
+      "motion",
+      "shadow",
+      "cognition",
+      "psychic"
+    ],
+    "turretRange": 3,
+    "turretShare": 0.5,
+    "decoyRadius": 2
+  }
 }

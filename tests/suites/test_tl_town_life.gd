@@ -199,3 +199,173 @@ func test_gear_in_combat() -> void:
 	check(me2.hp == hp0 and foe2.hp < fh0, "the Mirror Pin reflects the first hit")
 	st2._damage(me2, 5, foe2, "", "hit")
 	check(me2.hp < hp0, "only the first")
+
+
+func test_party_combo() -> void:
+	const StateScript := preload("res://src/core/combat/combat_state.gd")
+	var run := run_()
+	var ch: Dictionary = run["player"].duplicate(true)
+	ch["knownVectors"] = ["heat"]
+	var pal: Dictionary = ch.duplicate(true)
+	pal["id"] = "dex"
+	pal["name"] = "Dex"
+	pal["isPlayer"] = false
+	pal["knownVectors"] = ["cold"]
+	pal.erase("partyBonds")
+	var foe: Dictionary = DT.index_under(db(), "enemies/", "enemies")["pom_pom_wisp"].duplicate(true)
+	for bond in [50, 80]:
+		ch["partyBonds"] = { "dex": bond }
+		pal["partyBonds"] = { "player": bond }
+		var st := StateScript.new(db(), seeded(2), { "layout": { "map": ["PP..E"] }, "party": [{ "char": ch.duplicate(true) }, { "char": pal.duplicate(true) }], "enemies": [foe.duplicate(true)] })
+		var me = st.unit_by_id("player")
+		var dex = st.unit_by_id("dex")
+		st.current = me
+		me.actions_left = 2
+		if bond < 71:
+			check(st.together_options(me).is_empty(), "no party combo below Close Bond")
+			continue
+		var opts: Array = st.together_options(me)
+		check(opts.size() == 1 and str(opts[0]["combo"].get("id", "")) == "thermal_shock", "heat + cold together is Thermal Shock")
+		var e = st.units.filter(func(u) -> bool: return u.team == "enemy")[0]
+		var hp0: int = e.hp
+		check(st.together_targets(me).has(e.cell), "the enemy is a target")
+		check(st.cast_together(me, e.cell), "cast together")
+		check(e.hp < hp0 or not e.alive(), "the combo hits")
+		check(me.actions_left == 1, "it spends one of your Actions")
+		check(dex.links.has("owedAction"), "and one of Dex's")
+		check(st.combos_cast.has("thermal_shock"), "the combo is discovered")
+		check(st.together_options(me).is_empty(), "once per pair per fight")
+		st._start_turn(dex)
+		check(dex.actions_left == st.actions_per_turn() - 1, "Dex starts the next turn an Action short")
+
+
+func test_social_gaps() -> void:
+	const Phone := preload("res://src/core/social/phone.gd")
+	const Truancy := preload("res://src/core/town/truancy.gd")
+	const CS := preload("res://src/core/story/cutscenes.gd")
+	const RM := preload("res://src/core/run/run_model.gd")
+	var d := db()
+	for id in ["w1_lunch_friends", "skip_theo", "skip_mara", "skip_dex", "skip_priya"]:
+		check(not CS.find(d, id).is_empty() and CS.problems(d, CS.find(d, id)).is_empty(), "%s exists and checks out" % id)
+	var lunch: Array = d["story/school_calendar"]["stories"].filter(func(s) -> bool: return str(s["id"]) == "w1_lunch_friends")
+	check(lunch.size() == 1 and int(lunch[0]["trigger"]["week"]) == 1 and str(lunch[0]["trigger"]["part"]) == "lunch", "the week 1 lunch scene is on the calendar")
+	# Daytime scenes: once, only during school hours.
+	var run := run_()
+	for n in ["officer_pruitt", "rae", "walt", "mo", "mr_ellis"]:
+		var rec: Dictionary = d["npcs/" + n]
+		check(not CS.find(d, str(rec.get("daytimeScene", ""))).is_empty(), "%s has a daytime scene" % n)
+		check(Truancy.daytime_scene(d, run, rec, "after_school") == "", "not after school")
+		check(Truancy.daytime_scene(d, run, rec, "period_2") == "day_" + n, "during school hours")
+		check(Truancy.daytime_scene(d, run, rec, "period_3") == "", "only once")
+	# Skip invites.
+	run = run_()
+	run["bonds"] = { "dex": 50.0 }
+	var got := false
+	for day in 40:
+		Phone.night_texts(d, run, day, seeded(day))
+		if not run.get("texts", []).filter(func(t) -> bool: return bool(t.get("skipInvite", false))).is_empty():
+			got = true
+			Phone.accept_skip(run, "dex", day)
+			check(Phone.skip_invite_today(run, day) == "", "not today")
+			check(Phone.skip_invite_today(run, day + 1) == "dex", "Dex waits tomorrow")
+			var b0 := RM.bond(run, "dex")
+			check(Phone.skip_with(d, run, "dex") == "skip_dex" and RM.bond(run, "dex") > b0, "skipping with Dex plays his scene and raises Bond")
+			check(Phone.skip_invite_today(run, day + 1) == "", "the invite is used up")
+			break
+	check(got, "a Friend-Bond Core Four member asks you to skip")
+	run = run_()
+	run["bonds"] = { "dex": 20.0 }
+	for day in 40:
+		Phone.night_texts(d, run, day, seeded(day))
+	check(run.get("texts", []).filter(func(t) -> bool: return bool(t.get("skipInvite", false))).is_empty(), "not below Friend Bond")
+	Phone.accept_skip(run, "mara", 3)
+	check(Phone.skip_invite_today(run, 6) == "" and not run["skipInvites"].has("mara"), "old invites lapse")
+
+
+func test_combat_stubs() -> void:
+	const StateScript := preload("res://src/core/combat/combat_state.gd")
+	var run := run_()
+	var ch: Dictionary = run["player"].duplicate(true)
+	var idx := DT.index_under(db(), "enemies/", "enemies")
+	for id in ["skulker", "watcher_eye"]:
+		check(idx.has(id) and bool(idx[id].get("startsHidden", false)), "%s starts hidden" % id)
+	# Hidden: untargetable from afar, shown by standing next to it, Light, Reveal or attacking.
+	var st := StateScript.new(db(), seeded(3), { "layout": { "map": ["P...E"] }, "party": [{ "char": ch.duplicate(true) }], "enemies": [idx["skulker"].duplicate(true)] })
+	var me = st.unit_by_id("player")
+	var sk = st.units.filter(func(u) -> bool: return u.team == "enemy")[0]
+	check(st.hidden(sk), "the Skulker is hidden")
+	st.current = me
+	me.actions_left = 2
+	check(not st.cantrip_targets(me).has(sk.cell), "and can't be targeted")
+	var next_to: Vector2i = sk.cell + Vector2i(-1, 0)
+	var old: Vector2i = me.cell
+	me.cell = next_to
+	check(not st.hidden(sk), "standing next to it shows it")
+	me.cell = old
+	check(st.hidden(sk), "step away and it's gone again")
+	st._effects_script().run(st, me, { "name": "Reveal", "vectors": { "light": 1.0 }, "effects": [{ "op": "reveal", "turns": 1 }] }, me.cell, [])
+	check(not st.hidden(sk) and not sk.statuses.has("hidden"), "Reveal shows it for good")
+	# Constructs that act.
+	var st2 := StateScript.new(db(), seeded(4), { "layout": { "map": ["P....", ".....", "....E"] }, "party": [{ "char": ch.duplicate(true) }], "enemies": [idx["pom_pom_wisp"].duplicate(true)] })
+	var me2 = st2.unit_by_id("player")
+	var foe = st2.units.filter(func(u) -> bool: return u.team == "enemy")[0]
+	check(st2.construct_mode({ "vectors": { "heat": 1.0 } }) == "turret", "Heat builds a turret")
+	check(st2.construct_mode({ "vectors": { "motion": 1.0 } }) == "decoy", "Motion builds a decoy")
+	check(st2.construct_mode({ "vectors": { "force": 1.0 } }) == "wall", "Force builds a wall")
+	var spec := { "name": "Ember Construct", "vectors": { "heat": 1.0 }, "form": st2.form_rec("construct"), "power": 10.0, "mult": 1.0, "heal": false, "ranged": true, "kind": "spell" }
+	st2._resolve_spec(me2, spec, foe.cell + Vector2i(-2, 0))
+	var turret = st2.unit_at(foe.cell + Vector2i(-2, 0))
+	check(turret != null and turret.is_prop() and str(st2.construct_info.get(turret, {}).get("mode", "")) == "turret", "the turret is placed")
+	var hp0: int = foe.hp
+	st2._construct_turns()
+	check(foe.hp < hp0, "the turret fires at the end of the round")
+	var dspec := spec.duplicate()
+	dspec["vectors"] = { "motion": 1.0 }
+	st2._resolve_spec(me2, dspec, Vector2i(1, 0))
+	var decoy = st2.unit_at(Vector2i(1, 0))
+	check(decoy != null and str(st2.construct_info.get(decoy, {}).get("mode", "")) == "decoy", "the decoy is placed")
+	st2.refresh_intents()
+	check(st2.construct_info.has(decoy), "the decoy keeps drawing plans after enemies re-plan")
+
+
+func test_goal_tracker() -> void:
+	const Goals := preload("res://src/core/town/goals.gd")
+	const Phone := preload("res://src/core/social/phone.gd")
+	const Gear := preload("res://src/core/items/gear.gd")
+	const Fx := preload("res://src/core/run/effects.gd")
+	var d := db()
+	var run := run_()
+	var g := Goals.build(d, run, { "week": 1, "day": "tue", "part": "period_2", "day_count": 1 })
+	for s in Goals.SECTIONS:
+		check(g.has(s) and g[s] is Array, "section %s" % s)
+	check(not g["places"].is_empty(), "something is open during period 2")
+	var after := Goals.build(d, run, { "week": 1, "day": "tue", "part": "night", "day_count": 1 })
+	check(str(after["places"]) != str(g["places"]), "open places change with the part")
+	check(not g["favors"].is_empty() or not Goals.favors(d, run, 1, "after_school", 1).is_empty(), "the favor board shows up")
+	# Leads: two clues that make a deduction.
+	var ded: Dictionary = d["mystery"]["deductions"][0]
+	run["clues"] = ded["clues"].duplicate()
+	check(str(Goals.leads(d, run)).contains("deduction"), "a ready deduction is a lead")
+	# Bonds: a skip invite today and a friend near a tier.
+	Phone.accept_skip(run, "dex", 1)
+	run["bonds"]["kelly"] = 38.0
+	var b := Goals.bonds(d, run, 2)
+	check(str(b).contains("Dex") and str(b).contains("Kelly"), "Dex waits to skip; Kelly is close to Friend")
+	# Gear: an order, loose gear, a broken piece.
+	run["orders"] = [{ "item": "garys_cleaver", "ready": 5 }]
+	Fx.add_item(run, "windbreaker", 1)
+	Gear.state(run, "iron_knuckles")["durability"] = 0
+	var gl := str(Goals.gear(d, run, 3))
+	check(gl.contains("2 day") and gl.contains("bag") and gl.contains("broken"), "orders, loose gear and broken gear")
+	# Run-end summary.
+	run["attendance"] = { "math": 3, "pe": 2 }
+	run["skips_total"] = 4
+	run["skippedWith"] = ["dex", "dex", "theo"]
+	run["flags"]["seen_day_walt"] = true
+	var ch: Dictionary = run["player"]
+	Fx.add_item(run, "windbreaker", 1)
+	Gear.equip(d, run, ch, "windbreaker")
+	var sm := "\n".join(PackedStringArray(Goals.run_summary(d, run, [ch])))
+	check(sm.contains("attended 5") and sm.contains("skipped 4"), "attendance vs skips")
+	check(sm.contains("Dex, Theo") and sm.contains("met while skipping: 1"), "what the skips bought")
+	check(sm.contains("Windbreaker"), "the gear you finished with")

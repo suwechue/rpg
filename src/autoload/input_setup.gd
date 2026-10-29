@@ -22,6 +22,7 @@ const KEYS := {
 	"card_next": [KEY_TAB],
 	"fast_forward": [KEY_SHIFT],
 	"threat_view": [KEY_T],
+	"goals": [KEY_G],
 }
 
 const PAD_BUTTONS := {

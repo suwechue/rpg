@@ -58,5 +58,6 @@
   },
   "hangouts": [
     "You sit with Walt for a while. Nobody asks why you're not in school."
-  ]
+  ],
+  "daytimeScene": "day_walt"
 }

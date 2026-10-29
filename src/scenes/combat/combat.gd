@@ -198,7 +198,7 @@ func _sync_views() -> void:
 		v.statuses = state.status_list(u)
 		v.intent_icon = _intent_icon(u)
 		v.affixes = u.source.get("affixes", [])
-		v.burrowed = u.statuses.has("burrowed")
+		v.burrowed = u.statuses.has("burrowed") or (u.team == "enemy" and u.statuses.has("hidden") and state.hidden(u))
 		v.charge = int(u.intent.get("charge", 0))
 		v.friend_link = false
 		if u.team == "party" and u.alive():
@@ -372,6 +372,7 @@ func _build_ui() -> void:
 			["wheel", "Wheel", Strings.t("combat.vector_wheel_improvise_a_spell_2")], ["flee", "Flee", Strings.t("combat.flee_when_everyone_stands_on")],
 			["undo", "Undo", Strings.t("combat.undo_this_turn_s_move")], ["cantrip", Strings.t("combat.cantrip"), Strings.t("combat.cantrip_tip")],
 			["hold", Strings.t("combat.hold"), Strings.t("combat.hold_tip")], ["party", Strings.t("combat.party"), Strings.t("combat.party_tip")],
+			["together", Strings.t("combat.together"), Strings.t("combat.together_tip")],
 			["backpack", Strings.t("combat.backpack"), Strings.t("combat.backpack_tip")]]:
 		var key: String = spec[0]
 		var b := UiTheme.button(spec[1], func() -> void: _on_button(key))
@@ -526,6 +527,7 @@ func _refresh_hud() -> void:
 	_buttons["undo"].tooltip_text = Strings.t("combat.undo_this_turn_s_move") if u == null or state.can_undo_move(u) else Strings.t("combat.undo_locked") % state.undo_reason(u)
 	_buttons["cantrip"].disabled = not player_turn or act_block != "" or state.cantrip_targets(u).is_empty()
 	_buttons["hold"].disabled = not player_turn or state.hold_block(u) != ""
+	_buttons["together"].disabled = not player_turn or state.together_targets(u).is_empty()
 	_pips.visible = u != null and state.uses_actions(u)
 	if _pips.visible:
 		for i in _pips.get_child_count():
@@ -794,6 +796,8 @@ func _refresh_overlays() -> void:
 				field.target_cells = state._adjacent_hostiles(u, 1) + state.adjacent_walls(u)
 			"cantrip":
 				field.target_cells = state.cantrip_targets(u)
+			"together":
+				field.target_cells = state.together_targets(u)
 			"wheel_target":
 				var card := _wheel_card()
 				field.target_cells = state.card_targets(u, card)
@@ -923,6 +927,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			_on_button("cantrip")
 		elif k == KEY_H:
 			_on_button("hold")
+		elif k == KEY_Y:
+			_on_button("together")
 		elif k == KEY_V:
 			_on_button("wheel")
 		elif k == KEY_F:
@@ -1142,6 +1148,13 @@ func _on_button(key: String) -> void:
 				mode = "hold"
 				_info.text = Strings.t("combat.pick_card_to_hold")
 				_refresh_hud()
+		"together":
+			if not state.together_targets(u).is_empty():
+				mode = "together"
+				_refresh_overlays()
+				_refresh_hud()
+			else:
+				_info.text = Strings.t("combat.together_none")
 		"cantrip":
 			if state.act_block(u) == "" and not state.cantrip_targets(u).is_empty():
 				mode = "cantrip"
@@ -1177,6 +1190,12 @@ func _click_cell(c: Vector2i) -> void:
 		"strike":
 			if state.strike(u, c):
 				_lesson_event("struck")
+				mode = "idle"
+				_after_action()
+			else:
+				_cancel()
+		"together":
+			if state.cast_together(u, c):
 				mode = "idle"
 				_after_action()
 			else:

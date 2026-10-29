@@ -39,6 +39,7 @@ Players can **skip** (Esc or the Skip button; choices take their first option, f
 ## Where cutscenes play
 
 - **Story:** a step `{ "type": "cutscene", "id": "..." }` in any story (`data/story/*.json`).
+- **Townsfolk:** an NPC's `daytimeScene` plays the first time you talk to them during school hours (TL Part 5; `data/cutscenes/town_life.json`). Skipping with a friend plays `skip_<id>`.
 - **Combat:** an enemy record's `"cutscenes": { "start": "...", "phase2": "..." }` (bosses).
 - **Arena:** `arena_first`, `arena_boss_first`, `arena_new_best` play automatically.
 - **Intro:** `intro_moving_day` and `intro_night` frame character creation; `day1_*` play through week 1 Monday.

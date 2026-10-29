@@ -43,6 +43,8 @@ var xp_total := 0
 var money_total := 0
 var wild_surges := 0
 var combos_cast: Array = []         # combo ids the party cast this fight (VD Part 2)
+var together_used: Array = []       # TL Part 5: pairs that cast a party combo this fight
+var construct_info: Dictionary = {} # TL Part 6: Construct prop -> { mode, spec, caster }
 var support_log: Dictionary = {}
 var help_calls: Array = []
 var forms: Dictionary = {}
@@ -197,6 +199,8 @@ func _add_unit(u: UnitScript) -> void:
 		n += 1
 	u.spawn_index = _spawn_counter
 	_spawn_counter += 1
+	if u.team == "enemy" and bool(u.source.get("startsHidden", false)):
+		u.statuses["hidden"] = 99
 	units.append(u)
 
 
@@ -559,6 +563,7 @@ func _end_round() -> void:
 					_hit_unit(caster, t, d["spec"], false)
 			_check_end()
 	revealed = maxi(0, revealed - 1)
+	_construct_turns()
 	_conveyors()
 	if bool(mutator_rules().get("fireSpreads", false)):
 		_spread_fire()
@@ -579,6 +584,10 @@ func _start_turn(u: UnitScript) -> void:
 	u.turns_taken += 1
 	u.last_turn_round = round_num
 	u.actions_left = 1 if u.statuses.has("encore") else actions_per_turn()
+	# TL Part 5: an Action spent on a partner's party combo comes out of this turn.
+	if u.links.has("owedAction"):
+		u.actions_left = maxi(0, u.actions_left - 1)
+		u.links.erase("owedAction")
 	if u.team == "enemy" and u.alive():
 		_gimmick_turn(u)
 	if u.statuses.has("burning") and u.alive():
@@ -915,9 +924,25 @@ func _fall(u: UnitScript) -> void:
 	_damage(u, maxi(1, roundi(float(u.max_hp) * float(cfg.get("pitDamagePct", 0.35)))), null, "", "hazard")
 
 
-## Units standing in darkness can't be picked as targets by the other side.
+## Units standing in darkness can't be picked as targets by the other side,
+## nor can a hidden unit (TL Part 6) until a foe stands next to it.
 func hidden(t: UnitScript) -> bool:
-	return grid.is_dark(t.cell)
+	if grid.is_dark(t.cell):
+		return true
+	if not t.statuses.has("hidden"):
+		return false
+	for o in units:
+		if o.alive() and not o.is_prop() and o.team != t.team and GridScript.manhattan(o.cell, t.cell) == 1:
+			return false
+	return true
+
+
+## TL Part 6: a hidden unit steps out (it attacked, or Light found it).
+func unhide(t: UnitScript, key: String = "combat_state.found") -> void:
+	if t.statuses.has("hidden"):
+		t.statuses.erase("hidden")
+		_emit({ "t": "log", "text": Str.t(db, key) % t.name })
+		_emit({ "t": "status", "unit": t.id, "status": "revealed" })
 
 
 ## Hazard makers (data "trail") leave fire, ice or glyphs behind them.
@@ -1097,6 +1122,10 @@ func _spell_targets(u: UnitScript, form: Dictionary, heals: bool) -> Array:
 	cells = cells.filter(func(c: Vector2i) -> bool:
 		var o := unit_at(c)
 		return o == null or not o.statuses.has("shadowed") or o.team == u.team or GridScript.manhattan(c, u.cell) <= far)
+	# TL Part 6: a hidden foe's cell can't be picked (areas can still catch it).
+	cells = cells.filter(func(c: Vector2i) -> bool:
+		var o := unit_at(c)
+		return o == null or o.team == u.team or not o.statuses.has("hidden") or not hidden(o))
 	var kind := str(form.get("target", "any"))
 	if kind == "ally":
 		var out: Array = []
@@ -1340,6 +1369,11 @@ func _new_vector_effects(u: UnitScript, spec: Dictionary, cells: Array, hit: Arr
 		for t in hit:
 			add_status(t, "marked", 1)
 		revealed = maxi(revealed, 2)
+	if v.has("light"):
+		for c in cells:
+			var o := unit_at(c)
+			if o != null:
+				unhide(o)
 	if v.has("void"):
 		for c in cells:
 			var o := unit_at(c)
@@ -1982,9 +2016,17 @@ func _resolve_spec(u: UnitScript, spec: Dictionary, target: Vector2i) -> void:
 			hp_value = roundi(float(hp_value) * (1.0 + float(u.mods.get("combat", {}).get("constructHpPct", 0.0))))
 			var prop := UnitScript.make_prop("construct", hp_value, int(form.get("turns", 3)) + (2 if u.perk == "constructor" else 0) + int(u.mods.get("combat", {}).get("constructGlyphTurns", 0)))
 			prop.cell = target
+			var mode := construct_mode(spec)
 			prop.name = Str.t(db, "combat_state.construct") % str(spec["name"]).split(" ")[0]
+			if mode == "turret":
+				prop.name = "%s %s" % [str(spec["name"]).split(" ")[0], Str.t(db, "combat_state.turret")]
+			elif mode == "decoy":
+				prop.name = "%s %s" % [str(spec["name"]).split(" ")[0], Str.t(db, "combat_state.decoy_construct")]
 			_add_unit(prop)
+			construct_info[prop] = { "mode": mode, "spec": spec, "caster": u }
 			_emit({ "t": "spawn", "unit": prop.id, "cell": target, "prop": true })
+			if mode == "decoy":
+				draw_telegraphs(target, int(constructs_cfg().get("decoyRadius", 2)))
 			return
 		"glyph":
 			glyphs.append({ "cell": target, "spec": spec, "team": u.team, "caster": u, "turns": int(form.get("turns", 6)) + int(u.mods.get("combat", {}).get("constructGlyphTurns", 0)) })
@@ -2597,6 +2639,7 @@ func perform_action(u: UnitScript, action: Dictionary, target: Vector2i) -> bool
 	if not action_targets(u, action, u.cell).has(target):
 		return false
 	spend_action(u)
+	unhide(u, "combat_state.leaps_out")
 	var spec := action_spec(u, action)
 	_emit({ "t": "cast", "unit": u.id, "name": spec["name"], "target": target, "improvised": false })
 	if str(spec["kind"]) == "strike":
@@ -2635,6 +2678,59 @@ func _ai_script() -> GDScript:
 	return _ai
 
 
+## TL Part 6: Constructs that act. Mode by the spell's strongest Vector.
+func constructs_cfg() -> Dictionary:
+	return db.get("combat_rules", {}).get("constructs", {})
+
+
+func construct_mode(spec: Dictionary) -> String:
+	if spec.has("construct"):
+		return str(spec["construct"])
+	var axes := CardRules.ordered_vectors(db, spec.get("vectors", {}))
+	var top := str(axes[0]) if not axes.is_empty() else ""
+	for mode in ["turret", "decoy"]:
+		if constructs_cfg().get(mode, []).has(top):
+			return mode
+	return "wall"
+
+
+## End of a round: each turret fires at the nearest enemy it can see in range.
+func _construct_turns() -> void:
+	var cfg := constructs_cfg()
+	for prop in construct_info.keys():
+		var p: UnitScript = prop
+		var info: Dictionary = construct_info[prop]
+		if p.dead or not p.alive():
+			construct_info.erase(prop)
+			continue
+		if str(info["mode"]) != "turret" or result != "":
+			continue
+		var caster: UnitScript = info["caster"]
+		var best: UnitScript = null
+		for o in units:
+			if not o.alive() or o.is_prop() or o.team == caster.team or o.team == "prop" or hidden(o):
+				continue
+			var dist := GridScript.manhattan(o.cell, p.cell)
+			if dist <= int(cfg.get("turretRange", 3)) and (best == null or dist < GridScript.manhattan(best.cell, p.cell)):
+				best = o
+		if best == null:
+			continue
+		var spec: Dictionary = (info["spec"] as Dictionary).duplicate()
+		spec["power"] = float(spec["power"]) * float(cfg.get("turretShare", 0.5))
+		_emit({ "t": "log", "text": Str.t(db, "combat_state.turret_fires") % p.name })
+		_emit({ "t": "area", "cells": [best.cell], "vectors": spec["vectors"] })
+		_hit_unit(caster, best, spec, false)
+		_check_end()
+
+
+## Decoy Constructs keep pulling fresh enemy plans onto themselves.
+func _decoys_draw() -> void:
+	for prop in construct_info.keys():
+		var p: UnitScript = prop
+		if str(construct_info[prop]["mode"]) == "decoy" and p.alive() and not p.dead:
+			draw_telegraphs(p.cell, int(constructs_cfg().get("decoyRadius", 2)))
+
+
 ## Enemies without an intent pick one now: the given ones, or every enemy.
 ## Telegraphs are just in time (docs/COMBAT_TUNING.md Part 2): a party turn
 ## reveals the plans of the enemies acting between it and the next party turn.
@@ -2645,6 +2741,7 @@ func refresh_intents(only: Array = []) -> void:
 			u.intent = _ai_script().plan_intent(self, u)
 			if not u.intent.is_empty():
 				_emit({ "t": "intent", "unit": u.id, "kind": str(u.intent.get("kind", "")) })
+	_decoys_draw()
 
 
 # --- Two Actions, Quicks, Cantrip, Hold and Undo (PT Parts 1 and 2) -------------
@@ -2797,6 +2894,93 @@ func cast_cantrip(u: UnitScript, target: Vector2i) -> bool:
 	_emit({ "t": "cast", "unit": u.id, "name": spec["name"], "target": target, "improvised": false })
 	_emit({ "t": "area", "cells": [target], "vectors": spec["vectors"] })
 	_hit_unit(u, t, spec, true)
+	_check_end()
+	_after_step(u)
+	return true
+
+
+## TL Part 5: party combos at Close Bond (data/combos.json "party").
+func together_cfg() -> Dictionary:
+	return db.get("combos", {}).get("party", {})
+
+
+## Partners `u` can cast a party combo with now: [{ ally, combo, vectors }].
+func together_options(u: UnitScript) -> Array:
+	var out: Array = []
+	if u == null or u.team != "party" or not u.alive() or act_block(u) != "":
+		return out
+	var cfg := together_cfg()
+	for a in allies_of(u):
+		if a == u or not a.alive() or a.downed or a.team != "party":
+			continue
+		var bond := float(u.source.get("partyBonds", {}).get(a.id if u.id == "player" else "player", 0)) if (u.id == "player" or a.id == "player") else 0.0
+		if bond < float(cfg.get("bond", 71)) or together_used.has(_pair_key(u, a)):
+			continue
+		if GridScript.manhattan(a.cell, u.cell) > int(cfg.get("allyRange", 3)):
+			continue
+		for va in u.known_vectors:
+			for vb in a.known_vectors:
+				if str(va) == str(vb):
+					continue
+				var c := Combos.for_pair(db, str(va), str(vb))
+				if not c.is_empty():
+					out.append({ "ally": a, "combo": c, "vectors": { str(va): 1.0, str(vb): 1.0 } })
+					break
+			if not out.is_empty() and out[-1]["ally"] == a:
+				break
+	return out
+
+
+func _pair_key(a: UnitScript, b: UnitScript) -> String:
+	var ids := [a.id, b.id]
+	ids.sort()
+	return "+".join(PackedStringArray(ids))
+
+
+func together_spec(u: UnitScript, opt: Dictionary) -> Dictionary:
+	var form := form_rec("bolt").duplicate()
+	form["range"] = int(together_cfg().get("range", 4))
+	return { "name": str(opt["combo"].get("name", "")), "vectors": opt["vectors"], "form": form,
+		"power": float(together_cfg().get("power", 9)), "mult": 1.0, "heal": false, "ranged": true, "kind": "spell", "together": true }
+
+
+func together_targets(u: UnitScript) -> Array:
+	var opts := together_options(u)
+	if opts.is_empty():
+		return []
+	return _spell_targets(u, together_spec(u, opts[0])["form"], false).filter(func(c: Vector2i) -> bool:
+		var t := unit_at(c)
+		return t != null and t.alive() and is_hostile(u, t))
+
+
+## Cast the first available party combo at `target`: your Action now, the
+## partner's from their next turn.
+func cast_together(u: UnitScript, target: Vector2i) -> bool:
+	if result != "" or u != current or not u.alive() or act_block(u) != "" or not together_targets(u).has(target):
+		return false
+	var opt: Dictionary = together_options(u)[0]
+	var ally: UnitScript = opt["ally"]
+	_push_undo(u)
+	u.undo_ok = false
+	spend_action(u)
+	if ally.actions_left > 0 and ally == current:
+		spend_action(ally)
+	else:
+		ally.links["owedAction"] = "1"
+	together_used.append(_pair_key(u, ally))
+	var spec := together_spec(u, opt)
+	var c: Dictionary = opt["combo"]
+	var id := str(c.get("id", ""))
+	if not combos_cast.has(id):
+		combos_cast.append(id)
+	_face_toward(u, target)
+	_emit({ "t": "cast", "unit": u.id, "name": spec["name"], "target": target, "improvised": false, "vfx": str(c.get("vfx", "")) })
+	_emit({ "t": "combo", "unit": u.id, "id": id, "name": str(c.get("name", "")), "text": Str.t(db, "combat_state.together") % [str(ally.source.get("name", ally.id)), str(c.get("name", ""))], "party": true })
+	_emit({ "t": "area", "cells": [target], "vectors": spec["vectors"] })
+	var t := unit_at(target)
+	_hit_unit(u, t, spec, false)
+	if result == "" and u.alive():
+		_effects_script().run(self, u, { "name": spec["name"], "vectors": spec["vectors"], "effects": c.get("effects", []) }, target, [target])
 	_check_end()
 	_after_step(u)
 	return true

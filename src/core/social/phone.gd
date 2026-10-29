@@ -42,12 +42,53 @@ static func night_texts(db: Dictionary, run: Dictionary, day_count: int, rng: Ra
 		elif not pool.is_empty():
 			_send(run, id, str(pool[rng.randi_range(0, pool.size() - 1)]), day_count)
 		sent += 1
+	_skip_invite(c, run, friends, day_count, rng)
 	for r in c.get("reactions", []):
 		var key := "texted_" + str(r.get("flag", ""))
 		if RM.flag(run, str(r.get("flag", ""))) and not RM.flag(run, key):
 			RM.set_flag(run, key)
 			_send(run, str(r.get("from", "")), str(r.get("text", "")), day_count)
 	return run.get("texts", []).slice(before)
+
+
+## TL Part 5: a Core Four friend at Friend Bond may ask you to skip with them.
+static func _skip_invite(c: Dictionary, run: Dictionary, friends: Array, day_count: int, rng: RandomNumberGenerator) -> void:
+	var si: Dictionary = c.get("skipInvite", {})
+	if si.is_empty() or not run.get("skipInvites", {}).is_empty():
+		return
+	for id in friends:
+		if not si.get("from", []).has(id) or RM.bond(run, str(id)) < float(si.get("minBond", 41)):
+			continue
+		if rng.randf() < float(si.get("chance", 0.2)):
+			_send(run, str(id), str(si.get("text", "")), day_count)
+			run["texts"][-1]["skipInvite"] = true
+		return
+
+
+## Say yes to skipping with them tomorrow.
+static func accept_skip(run: Dictionary, from: String, day_count: int) -> void:
+	var inv: Dictionary = run.get("skipInvites", {})
+	inv[from] = day_count + 1
+	run["skipInvites"] = inv
+
+
+## Who's waiting by the back door today ("" if nobody). Invites from past days lapse.
+static func skip_invite_today(run: Dictionary, day_count: int) -> String:
+	var inv: Dictionary = run.get("skipInvites", {})
+	for id in inv.keys():
+		if int(inv[id]) < day_count:
+			inv.erase(id)
+		elif int(inv[id]) == day_count:
+			return str(id)
+	return ""
+
+
+## You skipped with them: Bond, and their scene id (skip_<id>).
+static func skip_with(db: Dictionary, run: Dictionary, id: String) -> String:
+	run.get("skipInvites", {}).erase(id)
+	Fx.change_bond(db, run, id, float(cfg(db).get("skipInvite", {}).get("bond", 10)), [])
+	run["skippedWith"] = run.get("skippedWith", []) + [id]
+	return "skip_" + id
 
 
 ## Accept an invite: the friend expects you tomorrow after school.

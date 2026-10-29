@@ -39,6 +39,12 @@ func _refresh() -> void:
 				var t: Dictionary = texts[i]
 				var who := str(DataDB.table("npcs/" + str(t["from"])).get("name", t["from"]))
 				text(Strings.t("phone.text_row") % [who, str(t["text"])], UiTheme.TEXT if int(t["day"]) == dc else UiTheme.DIM)
+				if bool(t.get("skipInvite", false)) and int(t["day"]) == dc and not GameState.run.get("skipInvites", {}).has(str(t["from"])):
+					var pal := str(t["from"])
+					add_button(Strings.t("phone.accept"), func() -> void:
+						Phone.accept_skip(GameState.run, pal, dc)
+						Narrator.say(Strings.t("phone.skip_accepted") % who)
+						_refresh())
 				if bool(t.get("invite", false)) and int(t["day"]) == dc and not GameState.run.get("invites", {}).has(str(t["from"])):
 					var from := str(t["from"])
 					add_button(Strings.t("phone.accept"), func() -> void:

@@ -4,6 +4,7 @@ extends "res://src/scenes/ui/modal.gd"
 const School := preload("res://src/core/run/school.gd")
 const Fx := preload("res://src/core/run/effects.gd")
 const SchoolScenes := preload("res://src/core/run/school_scenes.gd")
+const Phone := preload("res://src/core/social/phone.gd")
 
 var period := 1
 var cls: Dictionary = {}
@@ -24,6 +25,11 @@ func _ready() -> void:
 		text(Strings.t("exam.test_week_note"), UiTheme.ACCENT)
 	add_button(Strings.t("class.attend_takes_the_whole_period"), _attend)
 	add_button(Strings.t("class.skip_free_2_ap_part"), _skip)
+	var pal := Phone.skip_invite_today(GameState.run, int(GameState.run.get("day_count", 0)))
+	if pal != "":
+		add_button(Strings.t("class.skip_with") % str(DataDB.table("npcs/" + pal).get("name", pal)), func() -> void:
+			GameState.run["skipScene"] = Phone.skip_with(DataDB.all(), GameState.run, pal)
+			_skip())
 	focus_first()
 	Audio.play_music("school")
 

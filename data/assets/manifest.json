@@ -6522,6 +6522,40 @@
       ],
       "anchor": "top left",
       "notes": "Face and shoulders, readable at 1x."
+    },
+    "enemy_skulker": {
+      "type": "enemies",
+      "kind": "walker",
+      "source": "res://assets/packs/ninja_adventure/Actor/Monster/MouseBlack/SpriteSheet.png",
+      "native": [
+        64,
+        64
+      ],
+      "scale": 2,
+      "frame": [
+        32,
+        32
+      ],
+      "layout": "4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored",
+      "anchor": "bottom center (feet)"
+    },
+    "enemy_watcher_eye": {
+      "type": "enemies",
+      "kind": "walker",
+      "source": "res://assets/packs/ninja_adventure/Actor/Monster/Eye/Eye.png",
+      "native": [
+        64,
+        64
+      ],
+      "scale": 2,
+      "frame": [
+        32,
+        32
+      ],
+      "layout": "4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored",
+      "anchor": "bottom center (feet)",
+      "tint": "#8a7ab8",
+      "notes": "Palette swap of the pack sprite (tint #8a7ab8) until you draw your own."
     }
   }
 }

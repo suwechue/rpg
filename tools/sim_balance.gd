@@ -2,7 +2,7 @@
 ## Part 1), computed from the real damage formulas (expected values, no
 ## crits, neutral matchups, no flanking) and checked against
 ## data/combat_rules.json "balanceTargets".
-## Run: godot --headless --path . -s res://tools/sim_balance.gd [-- --week=1 --level=2 --difficulty=normal]
+## Run: godot --headless --path . -s res://tools/sim_balance.gd [-- --week=1 --level=2 --difficulty=normal --gear=0]
 extends SceneTree
 
 const DT := preload("res://src/core/data_tables.gd")
@@ -18,6 +18,7 @@ func _initialize() -> void:
 	var week := 1
 	var level := 2
 	var diff := "normal"
+	var gear := 0
 	for a in OS.get_cmdline_user_args():
 		var kv := str(a).trim_prefix("--").split("=")
 		match kv[0]:
@@ -27,7 +28,9 @@ func _initialize() -> void:
 				level = int(kv[1])
 			"difficulty":
 				diff = kv[1]
-	var r := Report.measure(db, week, level, diff)
+			"gear":
+				gear = int(kv[1])
+	var r := Report.measure(db, week, level, diff, gear)
 	for line in Report.lines(db, r):
 		print(line)
 	quit()

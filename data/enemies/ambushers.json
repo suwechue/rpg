@@ -1,0 +1,124 @@
+{
+  "comment": "TL Part 6: enemies that start hidden (startsHidden). A hidden enemy can't be targeted until a hostile stands next to it, it attacks, Light touches it or Reveal shows everything. It draws see-through.",
+  "enemies": [
+    {
+      "id": "skulker",
+      "name": "Skulker",
+      "tier": "normal",
+      "weeks": [
+        2,
+        3
+      ],
+      "text": "Starts hidden. Waits until you're close, then grabs. Light or Reveal shows it; so does standing next to it.",
+      "hp": 18,
+      "movement": 3,
+      "initiative": 7,
+      "physDefense": 0,
+      "magicResist": 1,
+      "stability": 5,
+      "stats": {
+        "str": 7,
+        "dex": 7
+      },
+      "weakTo": [
+        "light"
+      ],
+      "strongAgainst": [
+        "shadow"
+      ],
+      "signature": {
+        "shadow": 0.6,
+        "binding": 0.4
+      },
+      "disposition": {
+        "courage": 40,
+        "curiosity": 40
+      },
+      "startsHidden": true,
+      "actions": [
+        {
+          "id": "snatch",
+          "name": "Snatch",
+          "kind": "strike",
+          "damage": 13
+        },
+        {
+          "id": "snare",
+          "name": "Snare",
+          "form": "bolt",
+          "magnitude": "minor",
+          "vectors": {
+            "binding": 1
+          },
+          "damage": 6,
+          "statusAfter": "root"
+        }
+      ],
+      "xp": 10,
+      "money": 4,
+      "sprite": "enemy_skulker"
+    },
+    {
+      "id": "watcher_eye",
+      "name": "Watcher Eye",
+      "tier": "normal",
+      "weeks": [
+        4,
+        5
+      ],
+      "text": "Starts hidden and watches from afar, marking a target before it strikes. Light or Reveal shows it.",
+      "hp": 16,
+      "movement": 2,
+      "initiative": 6,
+      "physDefense": 0,
+      "magicResist": 3,
+      "stability": 6,
+      "stats": {
+        "str": 4,
+        "dex": 6
+      },
+      "weakTo": [
+        "light"
+      ],
+      "strongAgainst": [
+        "cognition"
+      ],
+      "signature": {
+        "shadow": 0.5,
+        "cognition": 0.5
+      },
+      "disposition": {
+        "courage": 30,
+        "curiosity": 70
+      },
+      "startsHidden": true,
+      "actions": [
+        {
+          "id": "stare",
+          "name": "Stare",
+          "form": "bolt",
+          "magnitude": "minor",
+          "vectors": {
+            "shadow": 1
+          },
+          "damage": 9,
+          "statusAfter": "marked"
+        },
+        {
+          "id": "blink_glare",
+          "name": "Glare",
+          "form": "cone",
+          "magnitude": "minor",
+          "vectors": {
+            "shadow": 1
+          },
+          "damage": 6,
+          "statusAfter": "blind"
+        }
+      ],
+      "xp": 10,
+      "money": 4,
+      "sprite": "enemy_watcher_eye"
+    }
+  ]
+}

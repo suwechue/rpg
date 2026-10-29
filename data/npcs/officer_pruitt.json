@@ -69,5 +69,6 @@
   },
   "hangouts": [
     "You sit with Officer for a while. Nobody asks why you're not in school."
-  ]
+  ],
+  "daytimeScene": "day_officer_pruitt"
 }

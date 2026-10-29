@@ -11,11 +11,12 @@ const CardRules := preload("res://src/core/card.gd")
 const Lv := preload("res://src/core/progression/leveling.gd")
 const StateScript := preload("res://src/core/combat/combat_state.gd")
 const EnemyMods := preload("res://src/core/combat/enemy_mods.gd")
+const Gear := preload("res://src/core/items/gear.gd")
 
 const CLASSES := ["mage", "fighter", "rogue", "healer", "bard"]
 
 
-static func _party(db: Dictionary, level: int) -> Array:
+static func _party(db: Dictionary, level: int, gear_tier: int = 0) -> Array:
 	var out: Array = []
 	for i in CLASSES.size():
 		var rng := RandomNumberGenerator.new()
@@ -23,9 +24,26 @@ static func _party(db: Dictionary, level: int) -> Array:
 		var ch := Char.create(db, CLASSES[i], rng, { "id": "b_" + CLASSES[i] })
 		while int(ch["level"]) < level:
 			Lv.add_xp(db, ch, Lv.xp_to_next(db, int(ch["level"])), rng)
+		_wear(db, ch, gear_tier)
 		Char.full_restore(db, ch)
 		out.append(ch)
 	return out
+
+
+## TL: dress a sim character in gear tier N (data/gear.json simTiers).
+static func _wear(db: Dictionary, ch: Dictionary, tier: int) -> void:
+	var tiers: Array = db.get("gear", {}).get("simTiers", [])
+	if tier <= 0 or tier >= tiers.size():
+		return
+	var t: Dictionary = tiers[tier]
+	var run := { "inventory": {}, "gear": {} }
+	for slot in ["weapon", "armor"]:
+		var id := str(t.get(slot, ""))
+		if id == "":
+			continue
+		run["inventory"][id] = 1
+		Gear.state(run, id)["level"] = int(t.get("level", 0))
+		Gear.equip(db, run, ch, id)
 
 
 ## A fight with one party member and one enemy side by side (no back attack).
@@ -54,8 +72,8 @@ static func player_hit(db: Dictionary, st: StateScript) -> float:
 
 
 ## Per-tier numbers for a week: { tiers: { tier: { actions, n } }, hits: { kind: { pct, n } } }.
-static func measure(db: Dictionary, week: int, level: int, diff: String) -> Dictionary:
-	var party := _party(db, level)
+static func measure(db: Dictionary, week: int, level: int, diff: String, gear_tier: int = 0) -> Dictionary:
+	var party := _party(db, level, gear_tier)
 	var scales: Array = db.get("dungeon", {}).get("weekScale", [1.0])
 	var scale := float(scales[mini(week, scales.size() - 1)])
 	var tiers := {}

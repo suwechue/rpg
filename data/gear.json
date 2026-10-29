@@ -138,5 +138,25 @@
       ]
     }
   },
-  "forgeGood": 0.8
+  "forgeGood": 0.8,
+  "simTiers": [
+    {
+      "comment": "TL: gear tiers for tools/sim_balance.gd --gear=N (0 = none). Each party member wears this weapon and armor at this upgrade level."
+    },
+    {
+      "weapon": "iron_knuckles",
+      "armor": "padded_jacket",
+      "level": 0
+    },
+    {
+      "weapon": "forged_baton",
+      "armor": "riveted_vest",
+      "level": 1
+    },
+    {
+      "weapon": "smith_hammer",
+      "armor": "chainmail_hoodie",
+      "level": 3
+    }
+  ]
 }

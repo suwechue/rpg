@@ -71,5 +71,18 @@
     "Cafeteria pizza confirmed soup by the debate club.",
     "Who keeps leaving the gym lights on at night??",
     "PSA: the vending machine on floor 2 gives two sodas if you kick it."
-  ]
+  ],
+  "skipInvite": {
+    "comment": "TL Part 5: a Core Four friend at Friend Bond may text you to skip a period with them tomorrow. Accept on the phone; the class screen then offers 'Skip with them' (the usual skip, plus their skip_<id> scene and bond).",
+    "from": [
+      "theo",
+      "mara",
+      "dex",
+      "priya"
+    ],
+    "minBond": 41,
+    "chance": 0.2,
+    "bond": 10,
+    "text": "skip class with me tomorrow? i'll be by the back door."
+  }
 }

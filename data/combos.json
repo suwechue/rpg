@@ -450,5 +450,12 @@
       "art": "card_art_crystal_prison",
       "narrator": "A beautiful cell. Nobody asked to stay."
     }
-  ]
+  ],
+  "party": {
+    "comment": "TL Part 5: party combos at Close Bond. The player and a party member with Close Bond (71+) within allyRange cast a pair combo together: one known Vector each, a bolt of `power` at `range`, then the combo's effects. It spends one of your Actions and one of theirs (taken from their next turn). Once per pair per fight.",
+    "bond": 71,
+    "allyRange": 3,
+    "range": 4,
+    "power": 9
+  }
 }

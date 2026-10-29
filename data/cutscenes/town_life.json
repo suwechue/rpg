@@ -1,0 +1,400 @@
+{
+  "comment": "TL Part 5: the week 1 lunch (school_calendar story w1_lunch_friends), daytime scenes for the school-hours townsfolk (their npc daytimeScene, played the first time you talk to them during school hours) and skip hangouts with the Core Four (skip_<id>, from a 'skip with me?' text).",
+  "cutscenes": [
+    {
+      "id": "w1_lunch_friends",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Lunch",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "The cafeteria is loud. Two seats are open: one next to Dex, one across from Theo."
+        },
+        {
+          "type": "say",
+          "speaker": "dex",
+          "text": "Okay, new kid. Important question. Is the mystery meat chicken? I say it's a philosophy.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "theo",
+          "text": "It's turkey. Statistically. I checked the delivery labels... that's a weird thing to say out loud, isn't it.",
+          "side": "right"
+        },
+        {
+          "type": "choice",
+          "text": "Where do you sit?",
+          "options": [
+            {
+              "label": "Next to Dex",
+              "effects": {
+                "bond": {
+                  "dex": 6
+                }
+              },
+              "steps": [
+                {
+                  "type": "say",
+                  "speaker": "dex",
+                  "text": "Excellent choice. You get the seat with the wobbly leg. It builds character.",
+                  "side": "right"
+                },
+                {
+                  "type": "narrator",
+                  "text": "Dex spends lunch teaching you three ways to flick a grape. Two of them work."
+                }
+              ]
+            },
+            {
+              "label": "Across from Theo",
+              "effects": {
+                "bond": {
+                  "theo": 6
+                }
+              },
+              "steps": [
+                {
+                  "type": "say",
+                  "speaker": "theo",
+                  "text": "Oh. Hi. You can, um. Sit. Do you want to see a diagram? You don't have to see the diagram.",
+                  "side": "right"
+                },
+                {
+                  "type": "narrator",
+                  "text": "The diagram is about why the hallway lights flicker on the third floor. It's a good diagram."
+                }
+              ]
+            },
+            {
+              "label": "Pull the tables together",
+              "effects": {
+                "bond": {
+                  "dex": 3,
+                  "theo": 3
+                }
+              },
+              "steps": [
+                {
+                  "type": "say",
+                  "speaker": "dex",
+                  "text": "A merger! Theo, you're our treasurer now.",
+                  "side": "right"
+                },
+                {
+                  "type": "say",
+                  "speaker": "theo",
+                  "text": "I don't... okay. I'd be a good treasurer, actually.",
+                  "side": "right"
+                },
+                {
+                  "type": "narrator",
+                  "text": "For one lunch, the three of you take up way too much room."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "day_officer_pruitt",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Officer Pruitt",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "A woman in a pressed uniform checks her clipboard, then checks you."
+        },
+        {
+          "type": "say",
+          "speaker": "officer_pruitt",
+          "text": "School hours. You know what that means, and so do I.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "officer_pruitt",
+          "text": "I'm not here to ruin your life. I'm here so nobody wanders into the woods in the middle of a Tuesday. People do, around here.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "officer_pruitt",
+          "text": "Go on. I didn't see you. Once.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "day_rae",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Rae",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "The corner store bell jingles. The clerk doesn't look up from her magazine."
+        },
+        {
+          "type": "say",
+          "speaker": "rae",
+          "text": "Skipping? Same. Well, I skipped permanently. Two years ago.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "rae",
+          "text": "Want the real news? Every kid who went missing was last seen by the woods. Nobody at school will say it. I'll say it.",
+          "side": "right"
+        },
+        {
+          "type": "give",
+          "effects": {
+            "clue": "woods_last_seen"
+          }
+        }
+      ]
+    },
+    {
+      "id": "day_walt",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Walt",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "An old man tosses bread crumbs to pigeons that seem to know him."
+        },
+        {
+          "type": "say",
+          "speaker": "walt",
+          "text": "You've got the look. Same look I had, thirty years back, the night the fountain ran.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "walt",
+          "text": "Water came up red as a sunset. Next morning the last train left, and it never came back.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "walt",
+          "text": "Nobody believes me. Pigeons do.",
+          "side": "right"
+        },
+        {
+          "type": "give",
+          "effects": {
+            "clue": "thirty_year_train"
+          }
+        }
+      ]
+    },
+    {
+      "id": "day_mo",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Mo",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "A delivery van idles at the curb. The driver waves you over."
+        },
+        {
+          "type": "say",
+          "speaker": "mo",
+          "text": "I drive every street in this town, every day. You notice things.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "mo",
+          "text": "Like the Mayor's car parked behind the school after hours. Every week. Same night.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "mo",
+          "text": "Didn't hear it from me. Need a ride sometime, I take snacks as payment.",
+          "side": "right"
+        },
+        {
+          "type": "give",
+          "effects": {
+            "clue": "mayor_meetings"
+          }
+        }
+      ]
+    },
+    {
+      "id": "day_mr_ellis",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Mr. Ellis",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "A man with a teacher's lanyard is hiding behind a newspaper. He lowers it, sees you, and sighs."
+        },
+        {
+          "type": "say",
+          "speaker": "mr_ellis",
+          "text": "Ah. You're supposed to be in class. I'm supposed to be subbing it.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "mr_ellis",
+          "text": "Tell you what. If anyone asks, you were with me on an educational errand. Once. I'm a sub, not a saint.",
+          "side": "right"
+        },
+        {
+          "type": "set_flag",
+          "flag": "ellis_covers"
+        }
+      ]
+    },
+    {
+      "id": "skip_theo",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Skipping with Theo",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Theo leads you to the roof access stairs, where the hallway lights don't reach."
+        },
+        {
+          "type": "say",
+          "speaker": "theo",
+          "text": "I've never skipped before. My heart rate is... significant.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "theo",
+          "text": "But I wanted to show you this. The dust up here doesn't fall. It just hangs. Something holds it up.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "theo",
+          "text": "I have several working theories. You're the first person I've told any of them to.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "skip_mara",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Skipping with Mara",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Mara finds a bench by the park pond and opens her sketchbook between you."
+        },
+        {
+          "type": "say",
+          "speaker": "mara",
+          "text": "I couldn't sit in that room today. Everything was too loud.",
+          "side": "right"
+        },
+        {
+          "type": "narrator",
+          "text": "She draws the pond, the ducks, and then, quietly, you."
+        },
+        {
+          "type": "say",
+          "speaker": "mara",
+          "text": "It's not finished. Here. You can keep it anyway.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "skip_dex",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Skipping with Dex",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Dex sneaks you out the side door and straight to the arcade, which is, technically, closed."
+        },
+        {
+          "type": "say",
+          "speaker": "dex",
+          "text": "Okay but hear me out: the owner owes me a favor. Big favor. Medium favor. He knows my face.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "dex",
+          "text": "Here's the thing. I joke a lot. You noticed. Sometimes it's because the real stuff is... a lot.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "dex",
+          "text": "Anyway! Two tokens. Loser buys fries.",
+          "side": "right"
+        }
+      ]
+    },
+    {
+      "id": "skip_priya",
+      "steps": [
+        {
+          "type": "title_card",
+          "text": "Skipping with Priya",
+          "seconds": 0.9
+        },
+        {
+          "type": "narrator",
+          "text": "Priya meets you at the library's back table, armed with three highlighters and a plan."
+        },
+        {
+          "type": "say",
+          "speaker": "priya",
+          "text": "I'm not skipping. I'm conducting independent research. There's a difference, and I can argue it.",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "priya",
+          "text": "I wanted thirty minutes where nobody expects me to be impressive. You don't, do you?",
+          "side": "right"
+        },
+        {
+          "type": "say",
+          "speaker": "priya",
+          "text": "Good. Then help me with this crossword.",
+          "side": "right"
+        }
+      ]
+    }
+  ]
+}

@@ -326,6 +326,9 @@ func _choice(st: Dictionary) -> int:
 		(_choices.get_child(0) as Control).grab_focus()
 	while _picked < 0 and not _skip:
 		await get_tree().process_frame
+		# Autoplay (smoke tests, demo capture) takes the first option.
+		if GameState.dev_autoplay:
+			_picked = 0
 	for c in _choices.get_children():
 		c.queue_free()
 	_box.visible = false

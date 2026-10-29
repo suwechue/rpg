@@ -53,5 +53,6 @@
   },
   "hangouts": [
     "You sit with Mo for a while. Nobody asks why you're not in school."
-  ]
+  ],
+  "daytimeScene": "day_mo"
 }

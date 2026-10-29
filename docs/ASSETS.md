@@ -18,7 +18,7 @@ Sizes: tiles 32x32, characters 32x32 (up to 32x48 for tall ones), portraits 64x6
 
 Pack art is a placeholder: the 16x16 packs are scaled up 2x (nearest neighbour) to fit the 32x32 grid until you replace them.
 
-Replaced so far: Characters (walk sheets) 0/54, Portraits 0/40, Enemies and bosses 0/76, Tilesets 0/4, Single tiles 0/120, UI 0/20, Icons 0/42, Card art 0/24, VFX 0/38, Music 0/30, Sound effects 0/40, Ambience 0/9, Voice blips 0/10.
+Replaced so far: Characters (walk sheets) 0/54, Portraits 0/40, Enemies and bosses 0/78, Tilesets 0/4, Single tiles 0/120, UI 0/20, Icons 0/42, Card art 0/24, VFX 0/38, Music 0/30, Sound effects 0/40, Ambience 0/9, Voice blips 0/10.
 
 ## Characters (walk sheets) (54)
 
@@ -128,7 +128,7 @@ Faces shown when you talk to someone.
 | [ ] | `portrait_mo` | 64x64 | - | top left | pack: ninja_adventure | Face and shoulders, readable at 1x. |
 | [ ] | `portrait_mr_ellis` | 64x64 | - | top left | pack: ninja_adventure | Face and shoulders, readable at 1x. |
 
-## Enemies and bosses (76)
+## Enemies and bosses (78)
 
 Walk sheets: 4 columns (facing down, up, left, right), 4 rows (the walk cycle), each frame the target size, feet at the bottom center. Bosses are one row of idle frames.
 
@@ -210,6 +210,8 @@ Walk sheets: 4 columns (facing down, up, left, right), 4 rows (the walk cycle), 
 | [ ] | `enemy_bandage_wisp` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure | Palette swap of the pack sprite (tint #f2f2e6) until you draw your own. |
 | [ ] | `enemy_glass_shard` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure | Palette swap of the pack sprite (tint #b8f0ff) until you draw your own. |
 | [ ] | `enemy_echo_kid` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure |  |
+| [ ] | `enemy_skulker` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure |  |
+| [ ] | `enemy_watcher_eye` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure | Palette swap of the pack sprite (tint #8a7ab8) until you draw your own. |
 
 ## Tilesets (4)
 

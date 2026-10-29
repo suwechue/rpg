@@ -149,6 +149,12 @@ func _next() -> void:
 			var r: Variant = await s.closed
 			if str(r) == "skipped":
 				Calendar.set_ap(int(DataDB.table("school_classes").get("rules", {}).get("skipAp", 2)))
+				# TL Part 5: skipping with a friend plays their scene.
+				if GameState.run.has("skipScene"):
+					var sid := str(GameState.run["skipScene"])
+					GameState.run.erase("skipScene")
+					await Cutscenes.play(sid, get_tree().current_scene)
+					await play_pending_friend_scenes()
 				_queue.clear()
 				_busy = false
 				_hud.refresh()
@@ -460,6 +466,7 @@ func _on_run_ended(cause: String) -> void:
 	var p: Dictionary = GameState.player
 	var summary := Strings.t("flow.week_level_days_survived_roster") % [Calendar.week(), Calendar.day_name().capitalize(),
 		int(p.get("level", 1)), str(p.get("class", "")).capitalize(), int(GameState.run.get("day_count", 0)), GameState.roster.size(), int(GameState.run.get("kelly_risk", 0))]
+	summary += "\n" + "\n".join(PackedStringArray(preload("res://src/core/town/goals.gd").run_summary(DataDB.all(), GameState.run, [GameState.player] + GameState.roster)))
 	var jr: Dictionary = Journal.data
 	var journal_line := Strings.t("flow.the_narrator_s_journal_now") % [jr.get("lore", {}).size(), jr.get("enemies", {}).size(), int(jr.get("runs", 0))]
 	await show_event({ "title": Strings.t("flow.the_end_of_this_run"), "text": "%s

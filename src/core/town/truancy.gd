@@ -64,6 +64,20 @@ static func caught(db: Dictionary, run: Dictionary) -> void:
 	change_trust(db, run, int(cc.get("trust", -10)))
 
 
+## TL Part 5: the npc's daytimeScene the first time you talk to them during school
+## hours (marks it seen), or "".
+static func daytime_scene(db: Dictionary, run: Dictionary, npc: Dictionary, part: String) -> String:
+	var sid := str(npc.get("daytimeScene", ""))
+	if sid == "" or not str(part).begins_with("period_"):
+		return ""
+	var flags: Dictionary = run.get("flags", {})
+	if bool(flags.get("seen_" + sid, false)):
+		return ""
+	flags["seen_" + sid] = true
+	run["flags"] = flags
+	return sid
+
+
 static func trust(db: Dictionary, run: Dictionary) -> int:
 	return int(run.get("parentTrust", cfg(db).get("trustStart", 50)))
 

@@ -293,6 +293,7 @@ static func _op(st, u: UnitScript, card: Dictionary, fx: Dictionary, target: Vec
 		"reveal":
 			st.revealed = turns
 			for o in st.units:
+				st.unhide(o)
 				if o.statuses.has("burrowed"):
 					o.statuses.erase("burrowed")
 					st._emit({ "t": "log", "text": Str.t(st.db, "card_effects.is_dragged_into_the_light") % o.name })

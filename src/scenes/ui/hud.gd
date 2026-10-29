@@ -32,6 +32,7 @@ func _ready() -> void:
 		if not Flow.is_busy():
 			Flow.show_modal(preload("res://src/scenes/ui/phone_screen.gd").new()))
 	h.add_child(_phone)
+	h.add_child(UiTheme.button(Strings.t("hud.goals"), func() -> void: open_goals()))
 	h.add_child(_end)
 	var bottom := PanelContainer.new()
 	bottom.position = Vector2(0, Display.base.y - 26)
@@ -71,3 +72,30 @@ func _unhandled_input(event: InputEvent) -> void:
 	if visible and event.is_action_pressed("end_part") and not Flow.is_busy():
 		Flow.end_part()
 		get_viewport().set_input_as_handled()
+	elif visible and event.is_action_pressed("goals") and not Flow.is_busy():
+		get_viewport().set_input_as_handled()
+		open_goals()
+	elif visible and event.is_action_pressed("pause") and not Flow.is_busy():
+		get_viewport().set_input_as_handled()
+		_town_pause()
+
+
+## TL Part 7: the goal tracker.
+func open_goals() -> void:
+	if not Flow.is_busy() and GameState.has_run():
+		await Flow.show_modal(preload("res://src/scenes/ui/goals_screen.gd").new())
+
+
+## TL Part 7: the town pause menu.
+func _town_pause() -> void:
+	var r: Variant = await Flow.show_modal(preload("res://src/scenes/ui/town_pause.gd").new())
+	match str(r):
+		"goals":
+			await open_goals()
+		"party":
+			await Flow.show_modal(preload("res://src/scenes/ui/party_panel.gd").new())
+		"options":
+			await Flow.show_modal(preload("res://src/scenes/ui/options_modal.gd").new())
+		"save":
+			if SaveSystem.save_run():
+				Narrator.say(Strings.t("pause.saved_town"))
