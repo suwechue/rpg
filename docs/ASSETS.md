@@ -18,9 +18,9 @@ Sizes: tiles 32x32, characters 32x32 (up to 32x48 for tall ones), portraits 64x6
 
 Pack art is a placeholder: the 16x16 packs are scaled up 2x (nearest neighbour) to fit the 32x32 grid until you replace them.
 
-Replaced so far: Characters (walk sheets) 0/39, Portraits 0/35, Enemies and bosses 0/76, Tilesets 0/4, Single tiles 0/120, UI 0/20, Icons 0/42, Card art 0/24, VFX 0/38, Music 0/30, Sound effects 0/40, Ambience 0/9, Voice blips 0/10.
+Replaced so far: Characters (walk sheets) 0/49, Portraits 0/35, Enemies and bosses 0/76, Tilesets 0/4, Single tiles 0/120, UI 0/20, Icons 0/42, Card art 0/24, VFX 0/38, Music 0/30, Sound effects 0/40, Ambience 0/9, Voice blips 0/10.
 
-## Characters (walk sheets) (39)
+## Characters (walk sheets) (49)
 
 Walk sheets: 4 columns (facing down, up, left, right), 4 rows (the walk cycle), each frame the target size, feet at the bottom center. Bosses are one row of idle frames.
 
@@ -65,6 +65,16 @@ Walk sheets: 4 columns (facing down, up, left, right), 4 rows (the walk cycle), 
 | [ ] | `debug_ally_walk` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure | Debug-menu party members. |
 | [ ] | `dungeon_event_walk` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure | Event figure in Upside-Down rooms. |
 | [ ] | `dungeon_merchant_walk` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure | The Upside-Down merchant. |
+| [ ] | `crowd_student_eggboy_walk` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure | M17 generated townsfolk (student). Tinted per person for variety. |
+| [ ] | `crowd_student_cavegirl_walk` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure | M17 generated townsfolk (student). Tinted per person for variety. |
+| [ ] | `crowd_student_ninjagreen_walk` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure | M17 generated townsfolk (student). Tinted per person for variety. |
+| [ ] | `crowd_student_ninjayellow_walk` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure | M17 generated townsfolk (student). Tinted per person for variety. |
+| [ ] | `crowd_adult_villager3_walk` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure | M17 generated townsfolk (adult). Tinted per person for variety. |
+| [ ] | `crowd_adult_oldman_walk` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure | M17 generated townsfolk (adult). Tinted per person for variety. |
+| [ ] | `crowd_adult_oldman2_walk` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure | M17 generated townsfolk (adult). Tinted per person for variety. |
+| [ ] | `crowd_adult_oldman3_walk` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure | M17 generated townsfolk (adult). Tinted per person for variety. |
+| [ ] | `crowd_adult_inspector_walk` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure | M17 generated townsfolk (adult). Tinted per person for variety. |
+| [ ] | `crowd_adult_mangreen_walk` | 32x32 frames (sheet 128x128) | 4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored | bottom center (feet) | pack: ninja_adventure | M17 generated townsfolk (adult). Tinted per person for variety. |
 
 ## Portraits (35)
 

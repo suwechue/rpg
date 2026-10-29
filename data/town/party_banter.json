@@ -1,0 +1,57 @@
+{
+  "comment": "M17: party members in town comment on zones and chat in pairs. 'zones' by member (or 'default'); 'pairs' unlock at minBond with each other's Bond to the player; one line every banterSteps steps at most.",
+  "banterSteps": 40,
+  "zones": {
+    "default": {
+      "downtown": "Downtown's busy today.",
+      "residential": "Quiet street. Too quiet?",
+      "outskirts": "I don't love it out here.",
+      "school": "Back here again."
+    },
+    "kelly": {
+      "downtown": "If anyone from the squad sees me with you, I'm saying you're my tutor.",
+      "school": "Walk faster. People are looking."
+    },
+    "dex": {
+      "downtown": "Arcade's open. Just saying.",
+      "outskirts": "The old factory's got the best echo. Try it."
+    },
+    "theo": {
+      "school": "I counted the lockers. There's one more than yesterday.",
+      "outskirts": "The woods are louder at this time of day."
+    },
+    "mara": {
+      "residential": "That house had a door on the other side last week.",
+      "outskirts": "I want to draw the water tower. From far away."
+    },
+    "priya": {
+      "downtown": "The library has a whole shelf nobody checks out. I checked."
+    }
+  },
+  "pairs": [
+    {
+      "a": "dex",
+      "b": "theo",
+      "minBond": 20,
+      "lines": [
+        "Dex: \"Theo, you blinked first.\" Theo: \"I didn't know we were playing.\""
+      ]
+    },
+    {
+      "a": "kelly",
+      "b": "mara",
+      "minBond": 25,
+      "lines": [
+        "Kelly: \"Your drawings are creepy.\" Mara: \"Thanks.\" Kelly: \"...That was a compliment.\""
+      ]
+    },
+    {
+      "a": "priya",
+      "b": "theo",
+      "minBond": 20,
+      "lines": [
+        "Priya: \"Statistically we should be dead.\" Theo: \"Statistically, so should everyone.\""
+      ]
+    }
+  ]
+}

@@ -1,0 +1,257 @@
+{
+  "comment": "M17 generated townsfolk: names, base sprites (tinted per person), a rolled disposition and trait, a rumor about the week's Upside-Down signature, an occasional small favor, and barks. 'spawn' says how many appear per zone and day part (student/adult). They wander and never stand on doors, spots or each other.",
+  "first": [
+    "Alex",
+    "Sam",
+    "Jordan",
+    "Riley",
+    "Casey",
+    "Morgan",
+    "Taylor",
+    "Jamie",
+    "Avery",
+    "Quinn",
+    "Drew",
+    "Rowan",
+    "Skyler",
+    "Reese",
+    "Parker",
+    "Emery",
+    "Hayden",
+    "Logan",
+    "Peyton",
+    "Dakota"
+  ],
+  "last": [
+    "Abbott",
+    "Barnes",
+    "Cole",
+    "Dalton",
+    "Ellis",
+    "Foster",
+    "Gray",
+    "Hale",
+    "Ingram",
+    "Jensen",
+    "Keller",
+    "Lowe",
+    "Mercer",
+    "Nash",
+    "Ortiz",
+    "Pryor",
+    "Quill",
+    "Rhodes",
+    "Sloane",
+    "Tate"
+  ],
+  "sprites": {
+    "student": [
+      "crowd_student_eggboy_walk",
+      "crowd_student_cavegirl_walk",
+      "crowd_student_ninjagreen_walk",
+      "crowd_student_ninjayellow_walk"
+    ],
+    "adult": [
+      "crowd_adult_villager3_walk",
+      "crowd_adult_oldman_walk",
+      "crowd_adult_oldman2_walk",
+      "crowd_adult_oldman3_walk",
+      "crowd_adult_inspector_walk",
+      "crowd_adult_mangreen_walk"
+    ]
+  },
+  "tints": [
+    "#ffffff",
+    "#ffd8c8",
+    "#c8dcff",
+    "#d8ffd0",
+    "#ffeaa8",
+    "#e6d0ff",
+    "#ffcfe6",
+    "#d0f0f0"
+  ],
+  "traits": [
+    {
+      "id": "nervous",
+      "text": "keeps glancing at the woods"
+    },
+    {
+      "id": "chatty",
+      "text": "won't stop talking"
+    },
+    {
+      "id": "sleepy",
+      "text": "is half asleep"
+    },
+    {
+      "id": "nosy",
+      "text": "knows everybody's business"
+    },
+    {
+      "id": "cheerful",
+      "text": "is in a suspiciously good mood"
+    },
+    {
+      "id": "grumpy",
+      "text": "is mad at the weather"
+    }
+  ],
+  "spawn": {
+    "school": {
+      "before_school": {
+        "student": 6
+      },
+      "lunch": {
+        "student": 5
+      },
+      "after_school": {
+        "student": 5
+      }
+    },
+    "downtown": {
+      "after_school": {
+        "student": 2,
+        "adult": 3
+      },
+      "evening": {
+        "adult": 3
+      },
+      "morning": {
+        "adult": 6,
+        "student": 3
+      },
+      "midday": {
+        "adult": 7,
+        "student": 4
+      },
+      "afternoon": {
+        "adult": 6,
+        "student": 3
+      }
+    },
+    "residential": {
+      "before_school": {
+        "adult": 2
+      },
+      "after_school": {
+        "student": 3,
+        "adult": 2
+      },
+      "morning": {
+        "adult": 3,
+        "student": 2
+      },
+      "midday": {
+        "adult": 3,
+        "student": 3
+      },
+      "afternoon": {
+        "adult": 2,
+        "student": 3
+      }
+    },
+    "outskirts": {
+      "after_school": {
+        "adult": 2
+      },
+      "midday": {
+        "adult": 3,
+        "student": 1
+      },
+      "afternoon": {
+        "adult": 2,
+        "student": 2
+      }
+    }
+  },
+  "rumors": {
+    "heat": [
+      "My cousin says the old furnace in the school basement turned itself on.",
+      "Somebody saw smoke coming out of the woods. No fire, just smoke."
+    ],
+    "cold": [
+      "The lake froze overnight. It's not even cold out.",
+      "My breath fogged inside the library. Inside!"
+    ],
+    "force": [
+      "A car got pushed half a block. Nobody touched it.",
+      "The mailbox on Elm is bent flat. Like something leaned on it."
+    ],
+    "motion": [
+      "The weathervane on town hall spins backwards at night.",
+      "My bike was on the other side of the street this morning."
+    ],
+    "binding": [
+      "All the shoelaces in the gym were tied together. All of them.",
+      "The vines on the old mansion grew a foot overnight."
+    ],
+    "light": [
+      "The streetlights flicker in a pattern. Like Morse code.",
+      "Something glows under the bleachers after dark."
+    ],
+    "default": [
+      "Weird week, right? Everybody says so.",
+      "My grandma says the town gets like this every thirty years."
+    ]
+  },
+  "favors": [
+    {
+      "text": "\"Can you help me carry these boxes to the post office? Takes a sec.\"",
+      "ap": 1,
+      "effects": {
+        "money": 8,
+        "narratorBond": 1
+      }
+    },
+    {
+      "text": "\"I lost my cat. Can you help me look? Ten minutes, tops.\"",
+      "ap": 1,
+      "effects": {
+        "money": 5,
+        "statXp": {
+          "per": 2
+        }
+      }
+    },
+    {
+      "text": "\"Help me fix this bike chain? You look like you know stuff.\"",
+      "ap": 1,
+      "effects": {
+        "money": 6,
+        "statXp": {
+          "dex": 2
+        }
+      }
+    }
+  ],
+  "favorChance": 0.25,
+  "barks": {
+    "student": [
+      "Did you do the reading?",
+      "Ugh, Mondays.",
+      "Is it true you go in the woods at night?",
+      "Nice shoes.",
+      "Have you seen Kelly today?",
+      "I'm so tired."
+    ],
+    "adult": [
+      "Lovely day. For now.",
+      "Kids these days.",
+      "Mind the step.",
+      "Have you seen the fountain lately?",
+      "Don't stay out after dark.",
+      "Morning."
+    ],
+    "named": [
+      "Hey.",
+      "Oh, it's you.",
+      "What's up?",
+      "Busy day.",
+      "See you around."
+    ]
+  },
+  "barkSeconds": 2.0,
+  "barkCooldown": 4.0,
+  "wanderSeconds": 1.6,
+  "wanderRadius": 2
+}

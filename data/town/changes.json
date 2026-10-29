@@ -1,0 +1,120 @@
+{
+  "comment": "M17 'a town that remembers': visual changes from choices and story, drawn on the map. Each: zone, loc (its door or spot) plus offset, cond (event conditions: flag, notFlag, minWeek, maxWeek), kind (poster, flyer, smoke, cold, crater, banner) and text (read with E).",
+  "changes": [
+    {
+      "id": "forge_relit",
+      "zone": "outskirts",
+      "loc": "forge",
+      "offset": [
+        1,
+        -1
+      ],
+      "cond": {
+        "flag": "forge_relit"
+      },
+      "kind": "smoke",
+      "text": "The forge chimney smokes again. The blacksmith waves."
+    },
+    {
+      "id": "forge_cold",
+      "zone": "outskirts",
+      "loc": "forge",
+      "offset": [
+        1,
+        -1
+      ],
+      "cond": {
+        "flag": "forge_cold"
+      },
+      "kind": "cold",
+      "text": "The forge is dark. A sign on the door: BACK SOMETIME."
+    },
+    {
+      "id": "poster_pep",
+      "zone": "school",
+      "loc": "front_steps",
+      "offset": [
+        -2,
+        0
+      ],
+      "cond": {
+        "minWeek": 1,
+        "maxWeek": 2
+      },
+      "kind": "poster",
+      "text": "PEP RALLY, WEEK 2! GO HOLLOWS! (Someone crossed out HOLLOWS and wrote NO.)"
+    },
+    {
+      "id": "poster_clubs",
+      "zone": "school",
+      "loc": "front_steps",
+      "offset": [
+        2,
+        0
+      ],
+      "cond": {
+        "minWeek": 2,
+        "maxWeek": 3
+      },
+      "kind": "poster",
+      "text": "CLUB FAIR, MONDAY LUNCH. Join something. Anything. Please. - Student Council"
+    },
+    {
+      "id": "poster_dance",
+      "zone": "downtown",
+      "loc": "town_square",
+      "offset": [
+        2,
+        -1
+      ],
+      "cond": {
+        "minWeek": 4,
+        "maxWeek": 5
+      },
+      "kind": "poster",
+      "text": "SCHOOL DANCE, FRIDAY OF WEEK 5. Theme: Under the Sea."
+    },
+    {
+      "id": "missing_flyers",
+      "zone": "downtown",
+      "loc": "town_square",
+      "offset": [
+        -2,
+        -1
+      ],
+      "cond": {
+        "minWeek": 3
+      },
+      "kind": "flyer",
+      "text": "MISSING: three students. Last seen near the woods. If found, call the school office. (The office number has been torn off.)"
+    },
+    {
+      "id": "fountain_crater",
+      "zone": "downtown",
+      "loc": "town_square",
+      "offset": [
+        0,
+        0
+      ],
+      "cond": {
+        "flag": "dance_interrupted"
+      },
+      "kind": "crater",
+      "text": "Where the fountain stood: a crater full of water that doesn't reflect anything."
+    },
+    {
+      "id": "banner_upside",
+      "zone": "school",
+      "loc": "front_steps",
+      "offset": [
+        0,
+        -1
+      ],
+      "cond": {
+        "flag": "w1_banner_fixed"
+      },
+      "kind": "banner",
+      "text": "The pep banner, fixed. PEP RALLY, the right way up."
+    }
+  ]
+}

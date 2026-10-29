@@ -833,6 +833,14 @@
     "exam.row": "%s: %s (%d)",
     "exam.gpa": "GPA %.1f",
     "exam.continue": "Continue",
-    "exam.test_week_note": "Test week: exams in every class."
+    "exam.test_week_note": "Test week: exams in every class.",
+    "crowd.talk_title": "%s",
+    "crowd.intro": "%s %s.",
+    "crowd.rumor": "\"%s\"",
+    "crowd.favor_help": "Help (%d AP)",
+    "crowd.favor_no": "Not now",
+    "crowd.bye": "See you",
+    "town.e_talk_to_crowd": "[E] Talk to %s",
+    "town.e_look_at": "[E] Look"
   }
 }

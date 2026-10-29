@@ -30,7 +30,8 @@ var room_doors: Dictionary = {}    # school hall: cell -> room loc id
 var lit: Array = []                # loc ids with someone home
 var shut: Dictionary = {}          # loc id -> "closed" | "story" (drawn boards)
 var buildings: Array = []
-var camera_rect := Rect2i()          # M12 CameraBounds marker (empty = the whole zone)
+var camera_rect := Rect2i()
+var marks: Dictionary = {}           # M17 town changes: cell -> poster, flyer, smoke, cold, crater, banner          # M12 CameraBounds marker (empty = the whole zone)
 
 var _ground: TileMapLayer
 var _decor: TileMapLayer             # M12b decorations (never block)
@@ -441,10 +442,36 @@ func _draw_overlay() -> void:
 					_overlay.draw_rect(Rect2(Vector2((r.position.x + dx) * TILE, (r.end.y - 1) * TILE) + Vector2(4, 4) * d, Vector2(8, 6) * d), Color(1.0, 0.85, 0.4, 0.45))
 		if shut.has(loc):
 			_draw_boards(door)
+	for c in marks:
+		_draw_mark(c, str(marks[c]), t)
 	for l in _labels:
 		var p: Vector2 = l["pos"]
 		_overlay.draw_string(font, p + Vector2(1, 1), str(l["text"]), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, Color(0, 0, 0, 0.7))
 		_overlay.draw_string(font, p, str(l["text"]), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, l["color"])
+
+
+## M17: a town change on a tile.
+func _draw_mark(c: Vector2i, kind: String, t: float) -> void:
+	var o := Vector2(c * TILE)
+	var d := Display.detail
+	match kind:
+		"poster":
+			_overlay.draw_rect(Rect2(o + Vector2(3, 2) * d, Vector2(10, 12) * d), Color("f4e3b5"))
+			_overlay.draw_rect(Rect2(o + Vector2(4, 4) * d, Vector2(8, 3) * d), Color("c0392b"))
+		"flyer":
+			_overlay.draw_rect(Rect2(o + Vector2(4, 3) * d, Vector2(8, 10) * d), Color("ffffff"))
+			_overlay.draw_rect(Rect2(o + Vector2(5, 5) * d, Vector2(6, 4) * d), Color("555555"))
+		"banner":
+			_overlay.draw_rect(Rect2(o + Vector2(0, 3) * d, Vector2(TILE, 5 * d)), Color("2e86de"))
+		"smoke":
+			for i in 3:
+				var rise := fmod(t * 6.0 + float(i) * 5.0, 15.0)
+				_overlay.draw_circle(o + Vector2(8, 12 - rise) * d, (2.0 + rise * 0.2) * d, Color(0.75, 0.75, 0.75, 0.6 - rise * 0.035))
+		"cold":
+			_overlay.draw_rect(Rect2(o, Vector2(TILE, TILE)), Color(0.2, 0.25, 0.4, 0.35))
+		"crater":
+			_overlay.draw_circle(o + Vector2(TILE, TILE) / 2.0, TILE * 0.9, Color("2a2a33"))
+			_overlay.draw_circle(o + Vector2(TILE, TILE) / 2.0, TILE * 0.6, Color(0.24, 0.45, 0.75, 0.9 + 0.05 * sin(t)))
 
 
 ## Boarded-up door: two planks and a CLOSED tag. Never an invisible wall.

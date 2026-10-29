@@ -12,6 +12,7 @@ const ShopScreen := preload("res://src/scenes/town/shop_screen.gd")
 const Locs := preload("res://src/core/town/locations.gd")
 const Sched := preload("res://src/core/town/schedule.gd")
 const StoryRules := preload("res://src/core/story/story.gd")
+const Crowd := preload("res://src/core/town/crowd.gd")
 var _light: CanvasModulate
 var _particles: CPUParticles2D
 var TILE: int:
@@ -29,6 +30,12 @@ var facing := Vector2i.DOWN
 var player: Walker
 var npcs: Dictionary = {}     # cell -> npc id
 var _npc_nodes: Array = []
+var crowd: Dictionary = {}    # cell -> generated person (M17)
+var _followers: Array = []    # party walkers following the player (M17)
+var _trail: Array = []        # the player's last cells, newest first
+var _wander_t := 0.0
+var _steps := 0
+var _bark_until: Dictionary = {}  # walker instance id -> time a bark may play again
 var _camera: Camera2D
 var _moving := false
 var _prompt: Label
@@ -101,6 +108,23 @@ func _locker() -> void:
 			LockerRules.store(GameState.run, str(r[1]))
 
 
+## M17: a generated person: who they are, a rumor, and maybe a small favor.
+func _talk_crowd(p: Dictionary) -> void:
+	var db: Dictionary = DataDB.all()
+	var lines: Array = [Strings.t("crowd.intro") % [str(p.get("name", "")), str(p.get("trait", {}).get("text", ""))], Strings.t("crowd.rumor") % str(p.get("rumor", ""))]
+	var favor: Dictionary = DataDB.table("town/crowd").get("favors", [])[int(p["favor"])] if int(p.get("favor", -1)) >= 0 else {}
+	var choices: Array = []
+	if not favor.is_empty():
+		lines.append(str(favor.get("text", "")))
+		choices.append({ "label": Strings.t("crowd.favor_help") % int(favor.get("ap", 1)), "cond": { "minAp": int(favor.get("ap", 1)) },
+			"effects": favor.get("effects", {}).merged({ "ap": -int(favor.get("ap", 1)) }) })
+		choices.append({ "label": Strings.t("crowd.favor_no"), "effects": {} })
+	var r: Variant = await Flow.show_event({ "title": Strings.t("crowd.talk_title") % str(p.get("name", "")), "text": "\n".join(PackedStringArray(lines)), "choices": choices })
+	# Helping uses the favor up (the helping choice is the one that costs AP).
+	if not favor.is_empty() and r is Dictionary and (r as Dictionary).get("effects", {}).has("ap"):
+		p["favor"] = -1
+
+
 ## Stories tied to a place play when the player gets there (within reach of
 ## the location's door or spot, or anywhere in its zone).
 func _check_place_stories() -> void:
@@ -167,6 +191,7 @@ func _load_map(id: String, is_int: bool, loc: String, at: Vector2i) -> void:
 		_camera.limit_bottom = cb.end.y * TILE + TILE
 	_camera.make_current()
 	_apply_light()
+	_spawn_followers()
 	_refresh_people()
 	_save_pos()
 	var late := Calendar.part_id() in ["evening", "night"]
@@ -309,6 +334,7 @@ func _refresh_people() -> void:
 		n.queue_free()
 	_npc_nodes.clear()
 	npcs.clear()
+	crowd.clear()
 	if map == null:
 		return
 	var db: Dictionary = DataDB.all()
@@ -328,7 +354,9 @@ func _refresh_people() -> void:
 		for loc in map.spots:
 			var anchor: Vector2i = map.spots[loc]
 			for id in Sched.people_at(db, run, str(loc), day, part, dc):
-				_place_npc(str(id), _free_near(anchor))
+				_place_npc(str(id), _spread_near(anchor))
+		_spawn_crowd()
+		_show_changes()
 		map.lit = []
 		map.shut = {}
 		for b in map.buildings:
@@ -360,6 +388,27 @@ func _free_near(anchor: Vector2i) -> Vector2i:
 	return anchor
 
 
+## M17: a free tile near a spot with nobody right next to it, so a crowd
+## spreads out instead of clumping (falls back to any free tile).
+func _spread_near(anchor: Vector2i) -> Vector2i:
+	for r in range(0, 6):
+		for dy in range(-r, r + 1):
+			for dx in range(-r, r + 1):
+				if maxi(absi(dx), absi(dy)) != r:
+					continue
+				var c := anchor + Vector2i(dx, dy)
+				if not map.walkable(c) or npcs.has(c) or crowd.has(c) or c == cell:
+					continue
+				var crowded := false
+				for oy in range(-1, 2):
+					for ox in range(-1, 2):
+						if npcs.has(c + Vector2i(ox, oy)) or crowd.has(c + Vector2i(ox, oy)):
+							crowded = true
+				if not crowded:
+					return c
+	return _free_near(anchor)
+
+
 func _place_npc(id: String, at: Vector2i) -> void:
 	var rec: Dictionary = DataDB.table("npcs/" + id)
 	var w := Walker.new(str(rec.get("sprite", "")))
@@ -369,12 +418,163 @@ func _place_npc(id: String, at: Vector2i) -> void:
 	map.add_child(w)
 	_npc_nodes.append(w)
 	npcs[at] = id
+	w.set_meta("cell", at)
+	w.set_meta("anchor", at)
+	w.set_meta("kind", "named")
 	var tag := UiTheme.world_label(str(rec.get("name", id)).split(" ")[0], UiTheme.LABEL)
 	tag.position = Vector2((w.frame_size.x - tag.get_minimum_size().x) / 2.0, -w.frame_size.y - UiTheme.FONT_SIZE - 3)
 	w.add_child(tag)
 
 
 # --- Movement -------------------------------------------------------------------------------
+
+## M17: generated students and townsfolk for this zone and part (seeded per day).
+func _spawn_crowd() -> void:
+	var db: Dictionary = DataDB.all()
+	var rng := Sched.day_rng(GameState.run, "crowd:%s:%s" % [map.map_id, Calendar.part_id()], int(GameState.run.get("day_count", 0)))
+	var keep := {}
+	for d in map.doors:
+		keep[map.doors[d]["approach"]] = true
+	for s in map.spots:
+		keep[map.spots[s]] = true
+	for person in Crowd.generate(db, GameState.run, map.map_id, Calendar.part_id(), Calendar.week(), rng):
+		for tries in 30:
+			var c := Vector2i(rng.randi_range(1, map.size.x - 2), rng.randi_range(1, map.size.y - 2))
+			if map.walkable(c) and not npcs.has(c) and not crowd.has(c) and not keep.has(c) and c != cell:
+				_place_crowd(person, c)
+				break
+
+
+func _place_crowd(person: Dictionary, at: Vector2i) -> void:
+	var w := Walker.new(str(person.get("sprite", "")))
+	w.position = _cell_pos(at)
+	w.z_index = 4
+	w.modulate = Color(str(person.get("tint", "#ffffff")))
+	w.face(Vector2i.DOWN)
+	map.add_child(w)
+	_npc_nodes.append(w)
+	crowd[at] = person
+	w.set_meta("cell", at)
+	w.set_meta("anchor", at)
+	w.set_meta("kind", str(person.get("kind", "adult")))
+	var tag := UiTheme.world_label(str(person.get("name", "")).split(" ")[0], UiTheme.DIM)
+	tag.position = Vector2((w.frame_size.x - tag.get_minimum_size().x) / 2.0, -w.frame_size.y - UiTheme.FONT_SIZE - 3)
+	w.add_child(tag)
+
+
+## Someone takes a step near where they belong (named people and the crowd).
+func _wander_one() -> void:
+	if map == null or _npc_nodes.is_empty() or _moving:
+		return
+	var rng := Rng.stream("npc")
+	var w: Node2D = _npc_nodes[rng.randi_range(0, _npc_nodes.size() - 1)]
+	if not is_instance_valid(w) or not w.has_meta("cell"):
+		return
+	var at: Vector2i = w.get_meta("cell")
+	var anchor: Vector2i = w.get_meta("anchor")
+	var dirs := [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]
+	var d: Vector2i = dirs[rng.randi_range(0, 3)]
+	var to := at + d
+	var r := int(DataDB.table("town/crowd").get("wanderRadius", 2))
+	if not map.walkable(to) or npcs.has(to) or crowd.has(to) or to == cell or absi(to.x - anchor.x) > r or absi(to.y - anchor.y) > r or map.doors.has(to - Vector2i(0, 1)):
+		return
+	if npcs.has(at):
+		npcs[to] = npcs[at]
+		npcs.erase(at)
+	elif crowd.has(at):
+		crowd[to] = crowd[at]
+		crowd.erase(at)
+	else:
+		return
+	w.set_meta("cell", to)
+	w.face(d)
+	var tw := create_tween()
+	tw.tween_property(w, "position", _cell_pos(to), 0.3)
+	w.play_walk(0.3)
+
+
+## After the player steps: followers move up the trail, people nearby bark,
+## and party members sometimes banter.
+func _after_step() -> void:
+	_trail.push_front(cell)
+	_trail.resize(mini(_trail.size(), 8))
+	for i in _followers.size():
+		var f: Node2D = _followers[i]
+		var idx := mini(i + 1, _trail.size() - 1)
+		var tw := create_tween()
+		tw.tween_property(f, "position", _cell_pos(_trail[idx]), STEP_TIME)
+		f.play_walk(STEP_TIME)
+	var now := Time.get_ticks_msec() / 1000.0
+	var cfg: Dictionary = DataDB.table("town/crowd")
+	for w in _npc_nodes:
+		if not is_instance_valid(w) or not w.has_meta("cell"):
+			continue
+		var c: Vector2i = w.get_meta("cell")
+		if (c - cell).length() <= 1.0 and now >= float(_bark_until.get(w.get_instance_id(), 0.0)):
+			_bark_until[w.get_instance_id()] = now + float(cfg.get("barkCooldown", 4.0))
+			_bubble(w, Crowd.bark(DataDB.all(), str(w.get_meta("kind")), Rng.stream("npc")))
+			break
+	_steps += 1
+	if _steps % int(DataDB.table("town/party_banter").get("banterSteps", 40)) == 0 and _followers.size() >= 2:
+		var line := Crowd.pair_line(DataDB.all(), GameState.run, GameState.party_ids, Rng.stream("npc"))
+		if line != "":
+			Narrator.say(line)
+
+
+## A short speech bubble above someone.
+func _bubble(w: Node2D, text: String) -> void:
+	if text == "":
+		return
+	var l := UiTheme.world_label(text, UiTheme.TEXT)
+	l.position = w.position + Vector2(-l.get_minimum_size().x / 2.0 + TILE / 2.0, -TILE * 2.0)
+	l.z_index = 30
+	map.add_child(l)
+	var tw := create_tween()
+	tw.tween_interval(float(DataDB.table("town/crowd").get("barkSeconds", 2.0)))
+	tw.tween_property(l, "modulate:a", 0.0, 0.4)
+	tw.tween_callback(l.queue_free)
+
+
+## M17: party members follow you outdoors and comment on where you arrive.
+func _spawn_followers() -> void:
+	for f in _followers:
+		if is_instance_valid(f):
+			f.queue_free()
+	_followers.clear()
+	_trail.clear()
+	if interior:
+		return
+	var first := true
+	for id in GameState.party_ids:
+		var rec: Dictionary = DataDB.table("npcs/" + str(id))
+		if rec.is_empty():
+			continue
+		var w := Walker.new(str(rec.get("sprite", "")))
+		w.position = _cell_pos(cell)
+		w.z_index = 4
+		map.add_child(w)
+		_followers.append(w)
+		if first:
+			first = false
+			var line := Crowd.zone_comment(DataDB.all(), str(id), map.map_id)
+			if line != "":
+				_bubble(w, line)
+
+
+## M17: the town's visible changes (posters, flyers, the forge, the crater).
+func _show_changes() -> void:
+	map.marks = {}
+	for ch in Crowd.changes(DataDB.all(), GameState.run, GameState.ctx(), map.map_id):
+		var loc := str(ch.get("loc", ""))
+		var base: Variant = map.door_by_loc.get(loc, map.spots.get(loc, null))
+		if base == null:
+			continue
+		var off: Array = ch.get("offset", [0, 0])
+		var c: Vector2i = (base as Vector2i) + Vector2i(int(off[0]), int(off[1]))
+		map.marks[c] = str(ch.get("kind", "poster"))
+		map.signs[c] = str(ch.get("text", ""))
+	map.refresh_overlay()
+
 
 func _process(_delta: float) -> void:
 	# Only the closest person within reach shows a name tag, so crowds stay readable.
@@ -388,6 +588,10 @@ func _process(_delta: float) -> void:
 	for w in _npc_nodes:
 		if w.get_child_count() > 0:
 			w.get_child(w.get_child_count() - 1).visible = w == nearest
+	_wander_t += _delta
+	if _wander_t >= float(DataDB.table("town/crowd").get("wanderSeconds", 1.6)) and not Flow.is_busy():
+		_wander_t = 0.0
+		_wander_one()
 	if _moving or Flow.is_busy() or map == null:
 		_update_prompt()
 		return
@@ -421,7 +625,7 @@ func step(dir: Vector2i) -> void:
 	if interior and cell == map.interior_exit and dir == Vector2i.DOWN:
 		_leave_interior()
 		return
-	if not map.walkable(next) or npcs.has(next):
+	if not map.walkable(next) or npcs.has(next) or crowd.has(next):
 		return
 	_moving = true
 	cell = next
@@ -433,6 +637,7 @@ func step(dir: Vector2i) -> void:
 	_moving = false
 	if not Input.is_anything_pressed():
 		player.stop()
+	_after_step()
 	_check_place_stories()
 
 
@@ -461,7 +666,9 @@ func _update_prompt() -> void:
 		return
 	var f := _front()
 	var text := ""
-	if npcs.has(f):
+	if crowd.has(f):
+		text = Strings.t("town.e_talk_to_crowd") % str(crowd[f].get("name", "")).split(" ")[0]
+	elif npcs.has(f):
 		text = Strings.t("town.e_talk_to") % DataDB.table("npcs/" + str(npcs[f])).get("name", "")
 	elif map.doors.has(f):
 		text = "[E] %s" % Locs.rec(DataDB.all(), str(map.doors[f]["loc"])).get("name", "Door")
@@ -494,6 +701,9 @@ func _spot_here() -> String:
 func interact() -> void:
 	var db: Dictionary = DataDB.all()
 	var f := _front()
+	if crowd.has(f):
+		await _talk_crowd(crowd[f])
+		return
 	if npcs.has(f):
 		await Social.talk(str(npcs[f]))
 		_refresh_people()

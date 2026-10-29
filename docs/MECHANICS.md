@@ -501,6 +501,10 @@ Change these in `data/social.json`, `data/bonds.json` and `data/npcs/*.json`.
 
 ## C6. The town
 
+- **The living town** (M17): generated students and townsfolk appear by zone and day part (the weekend square: 7 adults and 4 students; the school halls before school, at lunch and after school). Each has a name, a tinted base sprite, a trait, a rumor that hints at the week's dominant Upside-Down Vector, and a 25% chance of a small favor (1 AP for a little money or stat XP). Everyone wanders within 2 tiles of where they belong, nobody overlaps, and people at the same place spread out. Walking past someone may get a short bark. `data/town/crowd.json`.
+- **Party in town:** party members follow you outdoors, comment when you arrive in a zone, and pairs banter every 40 steps once both have enough Bond. `data/town/party_banter.json`.
+- **The town remembers:** posters for the pep rally, club fair and dance, missing flyers from week 3, the forge smoking (relit) or dark (left cold), the fixed pep banner, and the fountain crater after the dance. Press E to read them. `data/town/changes.json`.
+
 - **Four zones:** school, downtown, residential (Hillside, Elm Street, Maple Street) and outskirts. There are 72 locations, each marked **open**, **exterior** (door only), **closed** or **story**.
 - Every named character has a home and a schedule. Doorstep talks happen at exterior homes.
 - **Shops** (deli, forge, hospital, corner store): price = base x (1 + keeper Greed/200) x (1 − (CHA − 5) x 0.02). New gear auto-equips.

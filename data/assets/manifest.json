@@ -6197,6 +6197,176 @@
       "kind": "sfx",
       "source": "res://assets/packs/ninja_adventure/Audio/Sounds/Alert/Alert2.wav",
       "notes": "The school bell between periods (M13). Short one-shot (.wav or .ogg)."
+    },
+    "crowd_student_eggboy_walk": {
+      "type": "characters",
+      "kind": "walker",
+      "source": "res://assets/packs/ninja_adventure/Actor/Character/EggBoy/SpriteSheet.png",
+      "native": [
+        64,
+        112
+      ],
+      "scale": 2,
+      "frame": [
+        32,
+        32
+      ],
+      "layout": "4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored",
+      "anchor": "bottom center (feet)",
+      "notes": "M17 generated townsfolk (student). Tinted per person for variety."
+    },
+    "crowd_student_cavegirl_walk": {
+      "type": "characters",
+      "kind": "walker",
+      "source": "res://assets/packs/ninja_adventure/Actor/Character/Cavegirl/SpriteSheet.png",
+      "native": [
+        64,
+        112
+      ],
+      "scale": 2,
+      "frame": [
+        32,
+        32
+      ],
+      "layout": "4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored",
+      "anchor": "bottom center (feet)",
+      "notes": "M17 generated townsfolk (student). Tinted per person for variety."
+    },
+    "crowd_student_ninjagreen_walk": {
+      "type": "characters",
+      "kind": "walker",
+      "source": "res://assets/packs/ninja_adventure/Actor/Character/NinjaGreen/SpriteSheet.png",
+      "native": [
+        64,
+        112
+      ],
+      "scale": 2,
+      "frame": [
+        32,
+        32
+      ],
+      "layout": "4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored",
+      "anchor": "bottom center (feet)",
+      "notes": "M17 generated townsfolk (student). Tinted per person for variety."
+    },
+    "crowd_student_ninjayellow_walk": {
+      "type": "characters",
+      "kind": "walker",
+      "source": "res://assets/packs/ninja_adventure/Actor/Character/NinjaYellow/SpriteSheet.png",
+      "native": [
+        64,
+        112
+      ],
+      "scale": 2,
+      "frame": [
+        32,
+        32
+      ],
+      "layout": "4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored",
+      "anchor": "bottom center (feet)",
+      "notes": "M17 generated townsfolk (student). Tinted per person for variety."
+    },
+    "crowd_adult_villager3_walk": {
+      "type": "characters",
+      "kind": "walker",
+      "source": "res://assets/packs/ninja_adventure/Actor/Character/Villager3/SpriteSheet.png",
+      "native": [
+        64,
+        112
+      ],
+      "scale": 2,
+      "frame": [
+        32,
+        32
+      ],
+      "layout": "4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored",
+      "anchor": "bottom center (feet)",
+      "notes": "M17 generated townsfolk (adult). Tinted per person for variety."
+    },
+    "crowd_adult_oldman_walk": {
+      "type": "characters",
+      "kind": "walker",
+      "source": "res://assets/packs/ninja_adventure/Actor/Character/OldMan/SpriteSheet.png",
+      "native": [
+        64,
+        112
+      ],
+      "scale": 2,
+      "frame": [
+        32,
+        32
+      ],
+      "layout": "4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored",
+      "anchor": "bottom center (feet)",
+      "notes": "M17 generated townsfolk (adult). Tinted per person for variety."
+    },
+    "crowd_adult_oldman2_walk": {
+      "type": "characters",
+      "kind": "walker",
+      "source": "res://assets/packs/ninja_adventure/Actor/Character/OldMan2/SpriteSheet.png",
+      "native": [
+        64,
+        112
+      ],
+      "scale": 2,
+      "frame": [
+        32,
+        32
+      ],
+      "layout": "4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored",
+      "anchor": "bottom center (feet)",
+      "notes": "M17 generated townsfolk (adult). Tinted per person for variety."
+    },
+    "crowd_adult_oldman3_walk": {
+      "type": "characters",
+      "kind": "walker",
+      "source": "res://assets/packs/ninja_adventure/Actor/Character/OldMan3/SpriteSheet.png",
+      "native": [
+        64,
+        112
+      ],
+      "scale": 2,
+      "frame": [
+        32,
+        32
+      ],
+      "layout": "4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored",
+      "anchor": "bottom center (feet)",
+      "notes": "M17 generated townsfolk (adult). Tinted per person for variety."
+    },
+    "crowd_adult_inspector_walk": {
+      "type": "characters",
+      "kind": "walker",
+      "source": "res://assets/packs/ninja_adventure/Actor/Character/Inspector/SpriteSheet.png",
+      "native": [
+        64,
+        112
+      ],
+      "scale": 2,
+      "frame": [
+        32,
+        32
+      ],
+      "layout": "4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored",
+      "anchor": "bottom center (feet)",
+      "notes": "M17 generated townsfolk (adult). Tinted per person for variety."
+    },
+    "crowd_adult_mangreen_walk": {
+      "type": "characters",
+      "kind": "walker",
+      "source": "res://assets/packs/ninja_adventure/Actor/Character/ManGreen/SpriteSheet.png",
+      "native": [
+        64,
+        112
+      ],
+      "scale": 2,
+      "frame": [
+        32,
+        32
+      ],
+      "layout": "4 columns (down, up, left, right) x 4 rows (walk cycle); extra rows are ignored",
+      "anchor": "bottom center (feet)",
+      "notes": "M17 generated townsfolk (adult). Tinted per person for variety."
     }
   }
 }

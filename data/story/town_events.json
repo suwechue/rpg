@@ -28,7 +28,10 @@
                   },
                   "signature": {
                     "light": -2
-                  }
+                  },
+                  "flag": [
+                    "w1_banner_fixed"
+                  ]
                 },
                 "result": "Right side up. Kara thanks you three times. The air feels a bit less glaring."
               },
@@ -174,7 +177,8 @@
                   "signature": {
                     "heat": 3,
                     "binding": -1
-                  }
+                  },
+                  "flag": "forge_relit"
                 },
                 "result": "It catches. The blacksmith grunts. It's the most grateful grunt you've ever heard."
               },
@@ -184,7 +188,10 @@
                   "signature": {
                     "binding": 2
                   },
-                  "flag": "lore_forge"
+                  "flag": [
+                    "lore_forge",
+                    "forge_cold"
+                  ]
                 },
                 "result": "\"It went cold for a reason once. Now it's remembering.\""
               }
