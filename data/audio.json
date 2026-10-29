@@ -232,6 +232,12 @@
       "volumeDb": 0,
       "loop": false,
       "crossfade": 0.0
+    },
+    "arena_campfire": {
+      "id": "music_night",
+      "volumeDb": -2,
+      "loop": true,
+      "crossfade": 1.0
     }
   },
   "ambience": {
@@ -243,6 +249,7 @@
     "upside_down_week3": "amb_upside_down_week3",
     "upside_down_week4": "amb_upside_down_week4",
     "upside_down_week5": "amb_upside_down_week5",
-    "arena": "amb_rift"
+    "arena": "amb_rift",
+    "campfire": "amb_town_night"
   }
 }

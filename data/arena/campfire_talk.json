@@ -1,0 +1,98 @@
+{
+  "comment": "AC campfire talk: lines per member id (or class id, then 'default'). Reaction lines need their 'when' to hold: downed (they went down last wave), bestHit (they landed the best hit), mutator (a mutator is active), deckVector (most of their deck is this Vector), depth (wave at least N). No repeats until a member's lines run out.",
+  "lines": {
+    "default": [
+      {
+        "text": "Feels weird to sit still."
+      },
+      {
+        "text": "How deep do you think this goes?"
+      },
+      {
+        "text": "I could sleep for a week. I won't. But I could."
+      },
+      {
+        "when": {
+          "downed": true
+        },
+        "text": "Sorry about last wave. I'll keep my feet next time."
+      },
+      {
+        "when": {
+          "bestHit": true
+        },
+        "text": "Did you see that hit? I saw that hit."
+      },
+      {
+        "when": {
+          "mutator": true
+        },
+        "text": "Whatever we agreed to at the gate, I hate it."
+      },
+      {
+        "when": {
+          "deckVector": "cold"
+        },
+        "text": "I've got three Cold cards and no idea why."
+      },
+      {
+        "when": {
+          "depth": 20
+        },
+        "text": "Twenty waves. Nobody at school will believe this."
+      }
+    ],
+    "kelly": [
+      {
+        "text": "If you tell anyone I like campfires, you're dead."
+      },
+      {
+        "text": "The squad would never last down here. That's a compliment to us."
+      },
+      {
+        "when": {
+          "downed": true
+        },
+        "text": "Don't look at me like that. I got up, didn't I?"
+      }
+    ],
+    "theo": [
+      {
+        "text": "The fire burns at the same height every time. Every single time."
+      },
+      {
+        "when": {
+          "depth": 10
+        },
+        "text": "I've been counting waves in base 12. It helps."
+      }
+    ],
+    "dex": [
+      {
+        "text": "Marshmallows. That's all I ask. One marshmallow."
+      },
+      {
+        "when": {
+          "bestHit": true
+        },
+        "text": "Best hit. Me. Write it down. Somebody write it down."
+      }
+    ],
+    "mara": [
+      {
+        "text": "I'm drawing the camp. It looks different on paper."
+      },
+      {
+        "when": {
+          "downed": true
+        },
+        "text": "Let me see your hands. ...Okay. Okay, you're fine."
+      }
+    ],
+    "priya": [
+      {
+        "text": "Statistically, we're doing very well. I'd like it on record."
+      }
+    ]
+  }
+}

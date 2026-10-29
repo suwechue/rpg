@@ -83,11 +83,46 @@ func _refresh() -> void:
 		var mode := str(modes.get(str(GameState.run.get("runMode", "permadeath")), {}).get("name", "-"))
 		var diff := str(DataDB.table("combat_rules").get("difficulties", {}).get(GameState.combat_difficulty, {}).get("name", GameState.combat_difficulty))
 		text(Strings.t("options.this_run") % [mode, diff], UiTheme.DIM)
+	add_button(Strings.t("options.clear_data"), _clear_data)
 	add_button(Strings.t("feedback.button"), func() -> void:
 		finish(null)
 		Feedback.send_feedback.call_deferred())
 	add_button(Strings.t("party_panel.close"), func() -> void: finish(null))
 	focus_first()
+
+
+## Wipe saved data, with a confirmation: the Journal (unlocks, achievements,
+## records), the settings, the current save, or everything.
+func _clear_data() -> void:
+	var m := preload("res://src/scenes/ui/modal.gd").new()
+	m.build(Strings.t("options.clear_title"), Display.base.x * 0.5)
+	m.text(Strings.t("options.clear_warning"), UiTheme.BAD)
+	for k in ["journal", "settings", "save", "all"]:
+		var key: String = k
+		m.add_button(Strings.t("options.clear_" + key), func() -> void: m.finish(key))
+	m.add_button(Strings.t("options.back"), func() -> void: m.finish(null))
+	var pick: Variant = await Flow.show_modal(m)
+	if pick == null:
+		return
+	var confirm := preload("res://src/scenes/ui/modal.gd").new()
+	confirm.build(Strings.t("options.clear_sure"), Display.base.x * 0.45)
+	confirm.add_button(Strings.t("options.clear_yes"), func() -> void: confirm.finish(true))
+	confirm.add_button(Strings.t("options.back"), func() -> void: confirm.finish(false))
+	if not bool(await Flow.show_modal(confirm)):
+		return
+	var what := str(pick)
+	if what in ["journal", "all"]:
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(Journal.PATH))
+		Journal.load_journal()
+	if what in ["settings", "all"]:
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(SETTINGS))
+		Audio.apply_volumes()
+	if what in ["save", "all"]:
+		SaveSystem.delete_save()
+	if what == "all" and FileAccess.file_exists(PlayLog.path):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(PlayLog.path))
+	Narrator.say(Strings.t("options.cleared"))
+	_refresh()
 
 
 func _keys() -> void:

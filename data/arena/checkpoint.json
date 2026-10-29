@@ -3,6 +3,27 @@
   "every": 5,
   "apPerCheckpoint": 3,
   "restPct": 0.5,
-  "costs": { "swapCard": 1, "removeCard": 1, "craftCard": 2, "swapTeammate": 2, "changeEquipment": 1, "rest": 2, "rerollMutators": 1 },
-  "mutatorChoices": 3
+  "costs": {
+    "swapCard": 1,
+    "removeCard": 1,
+    "craftCard": 2,
+    "swapTeammate": 2,
+    "changeEquipment": 1,
+    "rest": 2,
+    "rerollMutators": 1
+  },
+  "mutatorChoices": 3,
+  "tickets": {
+    "comment": "AC Deli Tickets per wave cleared (arena only; reset when the run ends).",
+    "perWave": 2,
+    "elite": 3,
+    "boss": 5,
+    "noDamage": 2
+  },
+  "training": {
+    "comment": "AC training room: 1 AP a session, once per member per camp, at most capPerRun stat points per member per run; a minigame score of 'good' or better gives +1.",
+    "cost": 1,
+    "capPerRun": 3,
+    "good": 0.5
+  }
 }

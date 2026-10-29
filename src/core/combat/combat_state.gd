@@ -134,6 +134,14 @@ func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) ->
 			u.shield = roundi(float(u.max_hp) * float(rec["startShieldPct"]))
 			u.shield_turns = 99
 	_formation(str(setup.get("formation", "default")))
+	# AC meals: more max HP for the party until the next camp.
+	var hp_pct := float(mutator_rules().get("partyMaxHpPct", 0.0))
+	if hp_pct > 0.0:
+		for u in units:
+			if u.team == "party" and not u.is_prop():
+				var bonus_hp := roundi(float(u.max_hp) * hp_pct)
+				u.max_hp += bonus_hp
+				u.hp += bonus_hp
 	backpack = setup.get("backpack", []).duplicate()
 	if not setup.get("reinforcements", {}).is_empty():
 		reinforcements = setup["reinforcements"].duplicate()
@@ -2630,6 +2638,8 @@ func move_budget(u: UnitScript) -> int:
 	if u.statuses.has("root"):
 		return 0
 	var b := u.movement + int(u.statuses.get("haste_amount", 0)) - (1 if u.statuses.has("slow") else 0) - (2 if u.statuses.has("slowed2") else 0)
+	if u.team == "party":
+		b += int(mutator_rules().get("partyMovement", 0))
 	if u.statuses.has("haste_full"):
 		b += int(Res.combat_cfg(db).get("hasteMoveBonus", 2))
 	return maxi(0, b)

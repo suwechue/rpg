@@ -6,6 +6,7 @@
 extends RefCounted
 
 const Crafting := preload("res://src/core/progression/crafting.gd")
+const Camp := preload("res://src/core/arena/camp.gd")
 const CardRules := preload("res://src/core/card.gd")
 const Str := preload("res://src/core/strings.gd")
 
@@ -199,7 +200,7 @@ static func wave_enemies(db: Dictionary, arena: Dictionary, wave: int) -> Dictio
 static func setup_for_wave(db: Dictionary, arena: Dictionary, wave: int) -> Dictionary:
 	var we := wave_enemies(db, arena, wave)
 	return { "layout": layout_for(db, arena, wave), "enemies": we["enemies"], "roles": we["roles"], "formation": we["formation"],
-		"boss": bool(we["boss"]), "fleeAllowed": false, "context": "arena", "mutators": arena.get("mutators", []) }
+		"boss": bool(we["boss"]), "fleeAllowed": false, "context": "arena", "mutators": arena.get("mutators", []) + Camp.meal_mutators(arena) }
 
 
 ## Merged mutator effects (same rules as in combat).
@@ -236,6 +237,8 @@ static func wave_won(db: Dictionary, arena: Dictionary, stats: Dictionary) -> Ar
 	points = roundi(float(points) * float(mutator_effect(arena, "scoreMul", 1.0)))
 	arena["score"] = int(arena["score"]) + points
 	arena["cleared"] = wave
+	# AC: Deli Tickets for the camp's deli.
+	arena["tickets"] = int(arena.get("tickets", 0)) + Camp.tickets_for(db, is_boss(db, wave), is_elite(db, wave), int(stats.get("damageTaken", 1)) == 0)
 	var mul := float(mutator_effect(arena, "rewardMul", 1.0))
 	var rw: Dictionary = w.get("rewards", {})
 	var p: Dictionary = arena["pending"]
@@ -451,6 +454,8 @@ static func checkpoint(db: Dictionary, arena: Dictionary) -> Dictionary:
 	arena["pending"] = { "xp": 0, "money": 0, "shards": 0, "cards": [] }
 	arena["noRest"] = bool(mutator_effect(arena, "noRest", false))
 	arena["mutators"] = []
+	arena.erase("meal")
+	arena["campDone"] = []
 	offer_mutators(db, arena, 0)
 	return banked
 

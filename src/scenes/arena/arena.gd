@@ -8,6 +8,7 @@ extends Node2D
 
 const Inv := preload("res://src/core/items/inventory.gd")
 const Arena := preload("res://src/core/arena/arena.gd")
+const Camp := preload("res://src/core/arena/camp.gd")
 const Party := preload("res://src/core/arena/arena_party.gd")
 const Night := preload("res://src/core/dungeon/night.gd")
 const Sig := preload("res://src/core/dungeon/signature.gd")
@@ -27,6 +28,7 @@ var _box: VBoxContainer
 var _t := 0.0
 var _busy := false
 var _strip: VBoxContainer
+var _camp: Node2D            # AC: the walkable camp at checkpoints
 
 
 func _ready() -> void:
@@ -102,6 +104,9 @@ func _center() -> void:
 
 
 func _refresh() -> void:
+	if _camp != null and is_instance_valid(_camp):
+		_camp.call("refresh")
+		return
 	_clear()
 	if _strip != null:
 		_strip.refresh()
@@ -304,6 +309,9 @@ func _leave() -> void:
 
 func _checkpoint() -> void:
 	var db: Dictionary = DataDB.all()
+	if bool(Camp.cfg(db).get("enabled", true)) and not GameState.dev_autoplay:
+		_open_camp.call_deferred()
+		return
 	var costs: Dictionary = Arena.checkpoint_cfg(db).get("costs", {})
 	_text(Strings.t("arena.checkpoint_arena_ap_unspent_ap") % int(arena["ap"]), UiTheme.ACCENT)
 	var hz := Arena.hazard_set(db, int(arena["wave"]) + 1, arena)
@@ -372,6 +380,261 @@ func _arena_cutscenes() -> void:
 	if bool(arena.get("newBest", false)) and str(arena.get("phase", "")) == "over" and not bool(arena.get("bestShown", false)):
 		arena["bestShown"] = true
 		await Cutscenes.play("arena_new_best", self)
+
+
+## AC: the walkable camp replaces the checkpoint menu.
+func _open_camp() -> void:
+	if _camp != null and is_instance_valid(_camp):
+		return
+	var db: Dictionary = DataDB.all()
+	_panel.visible = false
+	_camp = preload("res://src/scenes/arena/camp_view.gd").new()
+	_camp.set("host", self)
+	_camp.set("story", story)
+	_camp.set("wave", int(arena["wave"]))
+	add_child(_camp)
+	Audio.play_music_first([str(Camp.cfg(db).get("music", "")), "arena"])
+	Audio.play_ambience(str(Camp.cfg(db).get("ambience", "")))
+	if not bool(Journal.data.get("arena_camp_seen", false)):
+		Journal.data["arena_camp_seen"] = true
+		Journal.save_journal()
+		await Cutscenes.play("arena_camp_first", self)
+	await Cutscenes.play_steps([{ "type": "title_card", "text": Strings.t("camp.arrived") % int(arena["wave"]), "seconds": 1.0 }], self, "camp_arrival")
+	for u in Camp.upgrades(db, int(arena["wave"])):
+		if int(u.get("minWave", 0)) == int(arena["wave"]):
+			Narrator.say(str(u.get("text", "")))
+	SaveSystem.save_run(true)
+
+
+func _close_camp() -> void:
+	if _camp != null and is_instance_valid(_camp):
+		_camp.queue_free()
+	_camp = null
+	_panel.visible = true
+
+
+func _mark_done(id: String) -> void:
+	var d: Array = arena.get("campDone", [])
+	if not d.has(id):
+		d.append(id)
+	arena["campDone"] = d
+
+
+## What a camp station does (docs/ARENA_CAMPFIRE.md Part 2).
+func camp_action(st: Dictionary) -> void:
+	var db: Dictionary = DataDB.all()
+	var costs: Dictionary = Arena.checkpoint_cfg(db).get("costs", {})
+	var id := str(st.get("id", ""))
+	match str(st.get("kind", "")):
+		"campfire":
+			var m := Modal.new()
+			m.build(Strings.t("camp.campfire"), 340)
+			m.text(Strings.t("camp.summary") % [int(arena.get("cleared", 0)), int(arena.get("score", 0)), int(arena.get("bestHit", 0)), arena.get("picked", []).size()], UiTheme.DIM)
+			m.text(Narrator.line("arena"), UiTheme.TEXT)
+			m.add_button(Strings.t("camp.rest") % int(costs.get("rest", 2)), func() -> void: m.finish("rest"), int(arena["ap"]) < int(costs.get("rest", 2)) or bool(arena.get("noRest", false)))
+			m.add_button(Strings.t("camp.close"), func() -> void: m.finish(null))
+			if str(await Flow.show_modal(m)) == "rest" and Arena.spend(db, arena, "rest"):
+				Arena.rest(db, Party.party(GameState.run))
+				_mark_done(id)
+		"companions":
+			await _companions()
+		"deli":
+			await _deli()
+		"workbench":
+			var m := Modal.new()
+			m.build(Strings.t("camp.workbench_title"), 320)
+			m.add_button(Strings.t("forge.title"), func() -> void: m.finish("forge"))
+			m.add_button(Strings.t("arena.swap_cards_in_a_deck") % int(costs.get("swapCard", 1)), func() -> void: m.finish("swap"))
+			m.add_button(Strings.t("arena.craft_a_card_ap") % int(costs.get("craftCard", 2)), func() -> void: m.finish("craft"), int(arena["ap"]) < int(costs.get("craftCard", 2)))
+			m.add_button(Strings.t("camp.close"), func() -> void: m.finish(null))
+			match str(await Flow.show_modal(m)):
+				"forge":
+					var fs := preload("res://src/scenes/ui/forge_screen.gd").new()
+					fs.spend_ap = _arena_spend
+					fs.ap_left = func() -> int: return int(arena["ap"])
+					await Flow.show_modal(fs)
+				"swap":
+					await _workbench(0, int(costs.get("removeCard", costs.get("swapCard", 1))))
+				"craft":
+					await _workbench(int(costs.get("craftCard", 2)), 0)
+			_mark_done(id)
+		"rack":
+			await _equipment()
+		"blacksmith":
+			Narrator.say(Strings.t("camp.blacksmith_note"))
+		"training":
+			await _training()
+		"merchant":
+			await _merchant()
+		"gate":
+			await _gate()
+		"home":
+			_close_camp()
+			_leave()
+
+
+func _companions() -> void:
+	var db: Dictionary = DataDB.all()
+	var m := Modal.new()
+	m.build(Strings.t("camp.companions"), 350)
+	var members: Array = [GameState.player] + GameState.roster
+	for ch in members:
+		var c: Dictionary = ch
+		var cid := str(c.get("id", "player"))
+		if cid == "player":
+			continue
+		var benched := not GameState.party_ids.has(cid)
+		m.add_button(Strings.t("camp.talk_to") % (Strings.t("camp.on_bench") % str(c.get("name", "?")) if benched else str(c.get("name", "?"))), func() -> void: m.finish({ "talk": c }))
+		if benched:
+			m.add_button(Strings.t("camp.join") % [str(c.get("name", "?")), int(Arena.checkpoint_cfg(db).get("costs", {}).get("swapTeammate", 2))], func() -> void: m.finish({ "swap": true }))
+	m.add_button(Strings.t("camp.close"), func() -> void: m.finish(null))
+	var r: Variant = await Flow.show_modal(m)
+	if not (r is Dictionary):
+		return
+	if r.has("swap"):
+		await _swap_teammate()
+		return
+	var who: Dictionary = r["talk"]
+	var ctx := { "depth": int(arena.get("wave", 0)), "mutator": not arena.get("mutators", []).is_empty(),
+		"downed": arena.get("lastDowned", []).has(str(who.get("id", ""))), "bestHit": str(arena.get("bestHitBy", "")) == str(who.get("id", "")) }
+	var line := Camp.talk_line(db, arena, who, ctx, Rng.stream("npc"))
+	if story and not arena.get("talkedAt", {}).has(str(who.get("id", ""))) and not db.get("npcs/" + str(who.get("id", "")), {}).is_empty():
+		var talked: Dictionary = arena.get("talkedAt", {})
+		talked[str(who.get("id", ""))] = int(arena["wave"])
+		arena["talkedAt"] = talked
+		preload("res://src/core/run/effects.gd").change_bond(db, GameState.run, str(who.get("id", "")), 2.0)
+	await Flow.show_event({ "title": str(who.get("name", "")), "text": "\"%s\"" % line })
+
+
+func _deli() -> void:
+	var db: Dictionary = DataDB.all()
+	if int(arena.get("stockWave", -1)) != int(arena["wave"]):
+		arena["stockWave"] = int(arena["wave"])
+		arena["campStock"] = Camp.stock(db, int(arena["wave"]), Arena.rng_for(arena, int(arena["wave"]), "deli"))
+	while true:
+		var m := Modal.new()
+		m.build(Strings.t("camp.deli_title"), 400)
+		m.text(Strings.t("camp.deli_hello") % [int(arena["wave"]), int(arena.get("tickets", 0))], UiTheme.DIM)
+		if arena.has("meal"):
+			m.text(Strings.t("camp.meal_active") % str(arena["meal"].get("name", "")), UiTheme.GOOD)
+		for iid in arena.get("campStock", []):
+			var it := Camp.item(db, str(iid))
+			var item_id := str(iid)
+			m.add_button(Strings.t("camp.buy") % [str(it.get("name", iid)), int(it.get("price", 0)), str(it.get("text", ""))], func() -> void: m.finish(item_id), int(arena.get("tickets", 0)) < int(it.get("price", 0)))
+		m.add_button(Strings.t("camp.close"), func() -> void: m.finish(null))
+		var pick: Variant = await Flow.show_modal(m)
+		if pick == null:
+			return
+		var err := Camp.buy(db, arena, GameState.run, str(pick))
+		if err != "":
+			Narrator.say(Strings.t("camp.no_tickets") if err == "tickets" else Strings.t("merchant.backpack_full") % int(Inv.cfg(db).get("backpackSize", 6)))
+			continue
+		arena["campStock"].erase(str(pick))
+		Audio.event("coin")
+		Narrator.say(Strings.t("camp.bought") % str(Camp.item(db, str(pick)).get("name", pick)))
+		_mark_done("deli")
+		if bool(arena.get("dealPack", false)):
+			arena.erase("dealPack")
+			await _pack_pick()
+
+
+## The deli's card pack: 1 of 3 cards, then who gets it.
+func _pack_pick() -> void:
+	var db: Dictionary = DataDB.all()
+	var m := Modal.new()
+	m.build(Strings.t("arena.pick_a_card"), 350)
+	for id in Arena.card_offer(db, arena, Party.party(GameState.run), int(arena["wave"]) + 50):
+		var cid := str(id)
+		var card := preload("res://src/core/card.gd").resolve(db, cid, GameState.cards)
+		m.add_button("%s: %s" % [str(card.get("name", cid)), preload("res://src/core/card.gd").describe(db, card)], func() -> void: m.finish(cid))
+	var cid: Variant = await Flow.show_modal(m)
+	if cid == null:
+		return
+	var op := preload("res://src/scenes/ui/owner_pick.gd").new()
+	op.card_id = str(cid)
+	op.active_ids = ["player"] + GameState.party_ids
+	var who: Variant = await Flow.show_modal(op)
+	if who != null:
+		Arena.pick_card(db, arena, GameState.run, str(cid), str(who))
+
+
+## The training ring: the Technique pick, and stat training through a minigame.
+func _training() -> void:
+	var db: Dictionary = DataDB.all()
+	var t: Dictionary = Arena.checkpoint_cfg(db).get("training", {})
+	var m := Modal.new()
+	m.build(Strings.t("camp.train_title"), 380)
+	m.add_button(Strings.t("camp.technique"), func() -> void: m.finish("technique"), int(arena.get("perkPicked", -1)) == int(arena["wave"]))
+	for ch in Party.party(GameState.run):
+		var c: Dictionary = ch
+		var stats: Dictionary = c.get("stats", {})
+		var low: Array = stats.keys()
+		low.sort_custom(func(a: Variant, b: Variant) -> bool: return int(stats[a]) < int(stats[b]))
+		for s in low.slice(0, 2):
+			var stat := str(s)
+			m.add_button(Strings.t("camp.train_pick") % [str(c.get("name", "?")).split(" ")[0], stat.to_upper(), int(t.get("cost", 1))], func() -> void: m.finish({ "ch": c, "stat": stat }), int(arena["ap"]) < int(t.get("cost", 1)))
+	m.add_button(Strings.t("camp.close"), func() -> void: m.finish(null))
+	var r: Variant = await Flow.show_modal(m)
+	if str(r) == "technique":
+		await _perk_pick()
+		_mark_done("training")
+		return
+	if not (r is Dictionary):
+		return
+	var who: Dictionary = r["ch"]
+	var pre := Camp.train(db, arena, who, str(r["stat"]), -1.0)
+	if not bool(pre["ok"]):
+		Narrator.say((Strings.t("camp.train_used") if pre["why"] == "used" else Strings.t("camp.train_cap")) % str(who.get("name", "?")))
+		return
+	# Undo the probe's bookkeeping, then play the minigame for real.
+	arena["ap"] = int(arena["ap"]) + int(t.get("cost", 1))
+	arena["trainedAt"].erase(str(who.get("id", "player")))
+	var rec := DataDB.record("minigames", "precision")
+	var mg: Control = (load(str(rec.get("script", "res://src/scenes/minigames/precision_minigame.gd"))) as GDScript).new()
+	mg.set("archetype", "precision")
+	mg.set("title", Strings.t("camp.train_title"))
+	mg.set("hint", str(rec.get("text", "")))
+	_ui.add_child(mg)
+	var perf: float = await mg.finished
+	var res := Camp.train(db, arena, who, str(r["stat"]), perf)
+	Narrator.say(Strings.t("camp.train_done") % [str(who.get("name", "?")), str(r["stat"]).to_upper()] if int(res.get("gain", 0)) > 0 else Strings.t("camp.train_miss"))
+	_mark_done("training")
+
+
+## The gate: the mutator choice, the next five waves, then out into the arena.
+func _gate() -> void:
+	var db: Dictionary = DataDB.all()
+	var costs: Dictionary = Arena.checkpoint_cfg(db).get("costs", {})
+	while true:
+		var m := Modal.new()
+		m.build(Strings.t("camp.gate_title"), 400)
+		var names: Array = []
+		var w0 := int(arena["wave"]) + 1
+		for w in range(w0, w0 + 5):
+			names.append("%d %s" % [w, str(Arena.hazard_set(db, w, arena).get("name", "plain"))])
+			if Arena.is_boss(db, w):
+				m.text(Strings.t("camp.gate_boss") % w, UiTheme.BAD)
+		m.text(Strings.t("camp.gate_next") % ", ".join(PackedStringArray(names)), UiTheme.DIM)
+		if arena.get("mutators", []).is_empty():
+			for mu in arena.get("offered", []):
+				var mid := str(mu["id"])
+				m.add_button("%s: %s" % [mu.get("name", mid), mu.get("text", "")], func() -> void: m.finish({ "mutator": mid }))
+			m.add_button(Strings.t("arena.reroll_the_choices_ap") % int(costs.get("rerollMutators", 1)), func() -> void: m.finish("reroll"), int(arena["ap"]) < int(costs.get("rerollMutators", 1)))
+		m.add_button(Strings.t("camp.gate_go") % w0, func() -> void: m.finish("go"))
+		m.add_button(Strings.t("camp.close"), func() -> void: m.finish(null))
+		var r: Variant = await Flow.show_modal(m)
+		if r == null:
+			return
+		if r is Dictionary:
+			Arena.choose_mutator(arena, str(r["mutator"]))
+		elif str(r) == "reroll":
+			if Arena.spend(db, arena, "rerollMutators"):
+				Arena.offer_mutators(db, arena, int(arena.get("rerolls", 0)) + 1)
+		elif str(r) == "go":
+			arena["phase"] = "ready"
+			_close_camp()
+			_start_wave()
+			return
 
 
 ## Arena coins: the banked money.
@@ -586,6 +849,17 @@ func _autoplay() -> void:
 			var db: Dictionary = DataDB.all()
 			if Arena.spend(db, arena, "rest"):
 				Arena.rest(db, Party.party(GameState.run))
+			# AC autoplay: the cheapest meal, then train the lowest stat.
+			var meals: Array = DataDB.table("arena/deli_stock").get("items", []).filter(func(it: Dictionary) -> bool: return str(it.get("kind", "")) == "meal" and int(arena["wave"]) >= int(it.get("minWave", 0)))
+			meals.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return int(a.get("price", 0)) < int(b.get("price", 0)))
+			if not meals.is_empty():
+				Camp.buy(db, arena, GameState.run, str(meals[0]["id"]))
+			var lead: Dictionary = Party.party(GameState.run)[0]
+			var st: Dictionary = lead.get("stats", {})
+			var low: Array = st.keys()
+			low.sort_custom(func(a: Variant, b: Variant) -> bool: return int(st[a]) < int(st[b]))
+			if not low.is_empty():
+				Camp.train(db, arena, lead, str(low[0]), 1.0)
 			if not arena.get("offered", []).is_empty():
 				# Autoplay takes the safest mutator on offer (no extra enemy HP or damage, no rest ban).
 				var safest: Dictionary = arena["offered"][0]

@@ -301,6 +301,7 @@ Advanced classes (Class Change at levels 5 and 12): Elementalist, Kinetic Logici
 
 ## B12. The Endless Arena
 
+- **The Arena Campfire** (AC): every checkpoint is a small walkable camp. Stations: the campfire (rest for 2 AP, the run summary, a narrator line), companions (talk; benched members can join for 2 AP; in the Rift a talk gives +2 Bond once per camp), Gary's Deli (Deli Tickets: 2 a wave, 3 elite, 5 boss, +2 with no damage taken; snacks for the backpack, one meal at a time that lasts until the next camp: +10% max HP, +1 Movement or +1 MP regen; a card pack from wave 10), the workbench (forge, swap, craft), the equipment rack, the training ring (the Technique pick, and stat training: 1 AP, a minigame score of 50%+ gives +1, once per member per camp, 3 per member per run), the merchant, the closed blacksmith, the gate (mutators, reroll, the next 5 waves' hazards and bosses, then go), and in the Rift the path home. The camp gains lights and props at waves 10, 20 and 30. `data/arena/campfire.json`, `campfire_talk.json`, `deli_stock.json`, `checkpoint.json`.
 - **Bosses every 5th wave** (elites every 4th), each with a **gimmick** announced before the wave: Thorned Hide (hits hurt the attacker for 3), Rising Fury (+15% damage per round), Regrowing Shell (shield of 10% HP each turn), Calls the Pack (2 minions every 2 rounds), Last Stand (a 35% HP shield at half HP), Too Fast (hasted). `data/arena/gimmicks.json`.
 - **The loop:** after wave 50 the arena starts over (weeks, themes, bosses, gimmicks) with everything 1.25x stronger per loop. `data/arena/waves.json` loopAt, loopMul.
 - **The merchant** at checkpoints sells relics, backpack potions and deck items for arena coins (the banked money): 5 goods per checkpoint, weighted by rarity. A cutscene introduces her the first time.
@@ -586,6 +587,7 @@ Change these in `data/combos.json`, `data/sparks.json`, `data/intro/spark_quiz.j
 ## E1. Options and the Journal (M22)
 
 - **Options** (title, pause menu): music, sounds, ambience and voice volumes (3 dB steps, -30 to +6 on top of data/audio.json), text speed (25, 45, 90 or instant), screen shake on or off, fullscreen and window size (1x to 3x), the colorblind palette, Easy minigames, key rebinding for every action (saved; controller buttons keep their defaults), and this run's mode and fight difficulty. Saved in user://settings.cfg.
+- **Clear saved data** (Options): wipe the Narrator's Journal, the settings, the current save, or everything, after a confirmation.
 - **Continue** on the title says which week and day the save is at, its mode and when it was saved (hover).
 - **Achievements** in the Narrator's Journal: an ending, finishing Act 1 (unlocks alternate narrator lines), 5 and all 38 friendship scenes, one and all 5 deductions, 10 combos, arena wave 20, 5 runs. `data/achievements.json`.
 

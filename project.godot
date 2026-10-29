@@ -43,6 +43,10 @@ Feedback="*res://src/autoload/feedback.gd"
 DebugMenu="*res://src/autoload/debug_menu.gd"
 PlayLog="*res://src/autoload/play_log.gd"
 
+[debug]
+
+file_logging/enable_file_logging=true
+
 [display]
 
 window/size/viewport_width=640
@@ -61,8 +65,3 @@ theme/custom="res://assets/ui/theme.tres"
 textures/canvas_textures/default_texture_filter=0
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
-
-[debug]
-
-file_logging/enable_file_logging=true
-file_logging/max_log_files=5

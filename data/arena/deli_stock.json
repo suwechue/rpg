@@ -1,0 +1,69 @@
+{
+  "comment": "AC: Gary's Deli, Arena Branch. Prices in Deli Tickets (earned per wave; story-mode Rift runs pay money instead). Snacks go in the backpack (combat Quick); a meal buffs the party until the next camp (one at a time; mutator-style effects); the special is a card pack (choose 1 of 3, then the owner). stockSize items per camp; minWave gates better stock.",
+  "stockSize": 4,
+  "items": [
+    {
+      "id": "snack_sandwich",
+      "kind": "snack",
+      "name": "Gary's Sandwich",
+      "card": "card_potion_heal",
+      "price": 3,
+      "text": "Backpack: heal 15 (Quick)."
+    },
+    {
+      "id": "snack_soda",
+      "kind": "snack",
+      "name": "Fizzy Soda",
+      "card": "card_potion_mana",
+      "price": 3,
+      "text": "Backpack: +6 MP (Quick)."
+    },
+    {
+      "id": "snack_pickle",
+      "kind": "snack",
+      "name": "Big Pickle",
+      "card": "card_cleansing_salts",
+      "price": 4,
+      "text": "Backpack: cleanse and heal 4 (Quick)."
+    },
+    {
+      "id": "meal_hero",
+      "kind": "meal",
+      "name": "The Hero Sub",
+      "price": 6,
+      "effects": {
+        "partyMaxHpPct": 0.1
+      },
+      "text": "Until the next camp: +10% max HP for everyone."
+    },
+    {
+      "id": "meal_runner",
+      "kind": "meal",
+      "name": "Runner's Wrap",
+      "price": 6,
+      "effects": {
+        "partyMovement": 1
+      },
+      "text": "Until the next camp: +1 Movement for everyone."
+    },
+    {
+      "id": "meal_brain",
+      "kind": "meal",
+      "name": "Brain Food Platter",
+      "price": 7,
+      "minWave": 10,
+      "effects": {
+        "mpRegen": 1
+      },
+      "text": "Until the next camp: +1 MP regen for everyone."
+    },
+    {
+      "id": "special_pack",
+      "kind": "pack",
+      "name": "Mystery Card Pack",
+      "price": 8,
+      "minWave": 10,
+      "text": "Choose 1 of 3 cards, then who gets it."
+    }
+  ]
+}

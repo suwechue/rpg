@@ -116,6 +116,23 @@
           "text": "Read what it does before you swing. The narrator will tell you. Once."
         }
       ]
+    },
+    {
+      "id": "arena_camp_first",
+      "steps": [
+        {
+          "type": "narrator",
+          "text": "Past the last wave, the arena opens onto a clearing. A fire is already burning. Nobody lit it."
+        },
+        {
+          "type": "narrator",
+          "text": "There's a cart with a deli sign, a training ring, a rack of gear, and a gate on the far side that hums when you look at it."
+        },
+        {
+          "type": "narrator",
+          "text": "Rest. Talk. Spend what you've got. The gate will wait. Mostly."
+        }
+      ]
     }
   ]
 }

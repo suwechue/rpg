@@ -1,0 +1,229 @@
+{
+  "comment": "AC: the walkable camp the party reaches at each checkpoint (every 5 waves). 'zone' is built like a town zone (TownMap.build_custom). Stations are tiles you press E next to; each runs a checkpoint action. 'upgrades' add props at deeper camps (minWave). Music and ambience are audio situations.",
+  "enabled": true,
+  "music": "arena_campfire",
+  "ambience": "campfire",
+  "spawn": [
+    10,
+    9
+  ],
+  "zone": {
+    "id": "arena_camp",
+    "size": [
+      20,
+      12
+    ],
+    "ground": "grass",
+    "fills": [
+      {
+        "ground": "path",
+        "rect": [
+          3,
+          5,
+          14,
+          2
+        ]
+      },
+      {
+        "ground": "dirt",
+        "rect": [
+          8,
+          3,
+          4,
+          5
+        ]
+      }
+    ],
+    "props": [
+      {
+        "kind": "well",
+        "at": [
+          10,
+          5
+        ]
+      },
+      {
+        "kind": "trees",
+        "rect": [
+          0,
+          0,
+          20,
+          2
+        ],
+        "step": 2
+      },
+      {
+        "kind": "trees",
+        "rect": [
+          0,
+          10,
+          20,
+          2
+        ],
+        "step": 3
+      },
+      {
+        "kind": "bench",
+        "at": [
+          7,
+          7
+        ]
+      },
+      {
+        "kind": "bench",
+        "at": [
+          13,
+          7
+        ]
+      }
+    ]
+  },
+  "stations": [
+    {
+      "id": "campfire",
+      "kind": "campfire",
+      "cell": [
+        10,
+        6
+      ],
+      "label": "camp.campfire"
+    },
+    {
+      "id": "companions",
+      "kind": "companions",
+      "cell": [
+        8,
+        7
+      ],
+      "label": "camp.companions"
+    },
+    {
+      "id": "deli",
+      "kind": "deli",
+      "cell": [
+        4,
+        4
+      ],
+      "label": "camp.deli"
+    },
+    {
+      "id": "workbench",
+      "kind": "workbench",
+      "cell": [
+        4,
+        8
+      ],
+      "label": "camp.workbench"
+    },
+    {
+      "id": "rack",
+      "kind": "rack",
+      "cell": [
+        6,
+        9
+      ],
+      "label": "camp.rack"
+    },
+    {
+      "id": "blacksmith",
+      "kind": "blacksmith",
+      "cell": [
+        15,
+        3
+      ],
+      "label": "camp.blacksmith"
+    },
+    {
+      "id": "training",
+      "kind": "training",
+      "cell": [
+        15,
+        8
+      ],
+      "label": "camp.training"
+    },
+    {
+      "id": "merchant",
+      "kind": "merchant",
+      "cell": [
+        12,
+        3
+      ],
+      "label": "camp.merchant"
+    },
+    {
+      "id": "gate",
+      "kind": "gate",
+      "cell": [
+        18,
+        6
+      ],
+      "label": "camp.gate"
+    },
+    {
+      "id": "path_home",
+      "kind": "home",
+      "cell": [
+        1,
+        6
+      ],
+      "label": "camp.path_home",
+      "storyOnly": true
+    }
+  ],
+  "upgrades": [
+    {
+      "minWave": 10,
+      "props": [
+        {
+          "kind": "lamp",
+          "at": [
+            7,
+            4
+          ]
+        },
+        {
+          "kind": "lamp",
+          "at": [
+            13,
+            4
+          ]
+        }
+      ],
+      "text": "Someone strung lanterns between the trees."
+    },
+    {
+      "minWave": 20,
+      "props": [
+        {
+          "kind": "planter",
+          "at": [
+            5,
+            6
+          ]
+        },
+        {
+          "kind": "lamp",
+          "at": [
+            16,
+            9
+          ]
+        }
+      ],
+      "text": "The camp has flowers now. Nobody admits to planting them."
+    },
+    {
+      "minWave": 30,
+      "props": [
+        {
+          "kind": "busstop",
+          "at": [
+            2,
+            9
+          ]
+        }
+      ],
+      "text": "A bus stop. In the Rift. It even has a timetable."
+    }
+  ]
+}
