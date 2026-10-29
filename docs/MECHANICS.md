@@ -523,6 +523,9 @@ Change these in `data/town/*.json` and `docs/TOWN.md`.
 
 ## C7. The Upside-Down (story dungeon)
 
+- **Mirror rooms** (M20): 35% of fight rooms are a twisted version of a real place (the Frozen Deli, the Breathing Hall, the Furnace Maze, the Endless Ward, the Upside Gym, the Silent Library), 3x likelier for places you went into that week or whose story beat you saw. Each has its own look and an entry line. `data/rooms/mirror_rooms.json`.
+- **The look:** floors get a screen shader tinted toward the week's dominant Vector, with a slight wobble and a vignette (`data/display.json` upsideDown). In combat, big hits pause for a moment before the shake, downed units slump and grey out, and the dead flash, drop and fade.
+
 - **Leaving early:** the exit is open whenever the boss room (if the floor has one) is beaten; other fights are optional (user request, Oct 28; `data/dungeon.json` sealExitUntilCleared).
 
 - **Each week** has a **Vector signature**, shaped by town events, that decides which enemies and loot appear.

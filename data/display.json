@@ -61,5 +61,13 @@
       "amount": 18,
       "day": false
     }
+  },
+  "upsideDown": {
+    "comment": "M20: the Upside-Down screen shader (dungeon floors). layer sits under the UI layers.",
+    "enabled": true,
+    "layer": 1,
+    "tintStrength": 0.25,
+    "wobble": 0.002,
+    "vignette": 0.45
   }
 }

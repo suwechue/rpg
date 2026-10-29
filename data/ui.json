@@ -462,5 +462,6 @@
   ],
   "coverIcon": "icon_status_guard",
   "areaFlashSeconds": 0.6,
-  "tooltipChars": 56
+  "tooltipChars": 56,
+  "hitPauseSeconds": 0.07
 }

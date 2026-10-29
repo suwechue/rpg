@@ -747,6 +747,14 @@ func interact() -> void:
 func _use_door(loc: String, approach: Vector2i) -> void:
 	var db: Dictionary = DataDB.all()
 	var d := Locs.door(db, GameState.run, loc, Calendar.week(), Calendar.day_name(), Calendar.part_id(), int(GameState.run.get("day_count", 0)))
+	if str(d["kind"]) in ["enter", "walkup"]:
+		# M20: the week's mirror rooms lean toward places you went.
+		var visited: Dictionary = GameState.run.get("visited", {})
+		var wk: Array = visited.get(str(Calendar.week()), [])
+		if not wk.has(loc):
+			wk.append(loc)
+		visited[str(Calendar.week())] = wk
+		GameState.run["visited"] = visited
 	match str(d["kind"]):
 		"enter":
 			if Locs.rec(db, loc).get("interior", "") != "":

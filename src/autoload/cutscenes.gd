@@ -361,15 +361,17 @@ func _until_advance() -> void:
 	while not _advance and not _skip:
 		await get_tree().process_frame
 		t += get_process_delta_time()
-		if GameState.dev_autoplay and t > 0.2:
+		if GameState.dev_autoplay and t > 0.05:
 			break
 
 
 func _wait(seconds: float) -> void:
 	var t := 0.0
+	# Autoplay (tests) runs cutscene waits ten times faster.
+	var speed := (4.0 if _fast else 1.0) * (10.0 if GameState.dev_autoplay else 1.0)
 	while t < seconds and not _skip:
 		await get_tree().process_frame
-		t += get_process_delta_time() * (4.0 if _fast else 1.0)
+		t += get_process_delta_time() * speed
 
 
 func _settings_speed() -> int:

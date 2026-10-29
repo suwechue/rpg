@@ -1520,6 +1520,8 @@ func _play_event(e: Dictionary) -> void:
 				v.modulate = Color(2, 2, 2)
 				tw.tween_property(v, "modulate", Color.WHITE, _dur(0.15))
 			if amt >= 10 or bool(e.get("crit", false)):
+				# M20: a short hit pause, then the shake.
+				await get_tree().create_timer(_dur(float(DataDB.table("ui").get("hitPauseSeconds", 0.07))), true, false, true).timeout
 				await _shake(3.0)
 			else:
 				await _wait(0.15)
@@ -1545,6 +1547,13 @@ func _play_event(e: Dictionary) -> void:
 			await _shake(2.0)
 		"down":
 			_note(Strings.t("combat.is_down") % _uname(str(e["unit"])))
+			# M20: a clear downed look: the unit slumps and greys out.
+			var dv := _view_for_id(str(e["unit"]))
+			if dv != null:
+				var tw := create_tween()
+				tw.tween_property(dv, "rotation", 0.35, _dur(0.2))
+				tw.parallel().tween_property(dv, "modulate", Color(0.55, 0.55, 0.6), _dur(0.2))
+				await tw.finished
 		"out":
 			_say_banner(Strings.t("combat_state.is_out") % _uname(str(e["unit"])))
 		"perk":
@@ -1561,7 +1570,11 @@ func _play_event(e: Dictionary) -> void:
 					_note(Strings.t("combat.is_defeated") % u.name)
 				var v: Node2D = views[u]
 				var tw := create_tween()
-				tw.tween_property(v, "modulate", Color(1, 1, 1, 0), _dur(0.25))
+				# M20: a white flash, a drop, then fade.
+				v.modulate = Color(3, 3, 3)
+				tw.tween_property(v, "modulate", Color(1, 0.6, 0.6), _dur(0.1))
+				tw.tween_property(v, "position:y", v.position.y + 6.0, _dur(0.15))
+				tw.parallel().tween_property(v, "modulate", Color(1, 1, 1, 0), _dur(0.25))
 				await tw.finished
 				v.queue_free()
 				views.erase(u)

@@ -100,6 +100,11 @@ static func _fill_room(db: Dictionary, run: Dictionary, week: int, day: String, 
 			for k in ["enemies", "roles", "affixes", "formation", "reinforcements", "template"]:
 				r[k] = enc[k]
 			r["layout"] = pick_layout(db, str(Sig.week_rec(db, week).get("theme", "school")), rng, bool(enc["big"]), str(enc["layoutTag"]))
+			# M20: sometimes a mirror of a real place, likelier for places touched this week.
+			var mirror := pick_mirror(db, run, week, rng)
+			if not mirror.is_empty():
+				r["mirror"] = str(mirror["id"])
+				r["layout"] = pick_layout(db, str(mirror.get("theme", "school")), rng, bool(enc["big"]), str(enc["layoutTag"]))
 		"event":
 			var evs: Array = []
 			for e in db.get("events/dungeon_events", {}).get("events", []):
@@ -111,6 +116,32 @@ static func _fill_room(db: Dictionary, run: Dictionary, week: int, day: String, 
 					evs.append(str(e["id"]))
 			if not evs.is_empty():
 				r["event"] = evs[rng.randi_range(0, evs.size() - 1)]
+
+
+## A mirror room for a fight room, or {} (data/rooms/mirror_rooms.json):
+## mirrorChance, then weighted toward places visited this week and story beats seen.
+static func pick_mirror(db: Dictionary, run: Dictionary, week: int, rng: RandomNumberGenerator) -> Dictionary:
+	var m: Dictionary = db.get("rooms/mirror_rooms", {})
+	if m.get("rooms", []).is_empty() or rng.randf() >= float(m.get("mirrorChance", 0.35)):
+		return {}
+	var visited: Array = run.get("visited", {}).get(str(week), [])
+	var weights := {}
+	var order: Array = []
+	for r in m["rooms"]:
+		var w := 1.0
+		if visited.has(str(r.get("of", ""))):
+			w *= float(m.get("visitedWeight", 3.0))
+		for f in r.get("storyFlags", []):
+			if bool(run.get("flags", {}).get(str(f), false)):
+				w *= float(m.get("storyWeight", 3.0))
+				break
+		weights[str(r["id"])] = w
+		order.append(str(r["id"]))
+	var pick := VO.sample(weights, rng, order)
+	for r in m["rooms"]:
+		if str(r["id"]) == pick:
+			return r
+	return {}
 
 
 ## A combat layout for a theme (weighted), falling back to any. `big` asks for

@@ -7,6 +7,7 @@ extends Node2D
 
 const Night := preload("res://src/core/dungeon/night.gd")
 const Gen := preload("res://src/core/dungeon/floor_generator.gd")
+const UpsideDownLook := preload("res://src/scenes/common/upside_down_look.gd")
 const Sig := preload("res://src/core/dungeon/signature.gd")
 const Walker := preload("res://src/scenes/common/walker_sprite.gd")
 const Modal := preload("res://src/scenes/ui/modal.gd")
@@ -64,6 +65,7 @@ func _ready() -> void:
 	_prompt = UiTheme.world_label("", UiTheme.ACCENT)
 	_prompt.position = Vector2(4, Display.base.y - 18)
 	ui.add_child(_prompt)
+	UpsideDownLook.add_to(self, Calendar.week())
 	Audio.play_music_first(["dungeon_boss_floor"] if bool(floor_data.get("boss", false)) else ["upside_down_week%d" % Calendar.week(), "dungeon"])
 	Audio.play_ambience("upside_down_week%d" % Calendar.week())
 	if GameState.run.has("floor_fight"):
@@ -270,6 +272,10 @@ func _on_enter(c: Vector2i) -> void:
 		room["visited"] = true
 		_overlay.queue_redraw()
 	var t := str(room["type"])
+	if room.has("mirror") and not bool(room.get("cleared", false)):
+		for mr in DataDB.table("rooms/mirror_rooms").get("rooms", []):
+			if str(mr["id"]) == str(room["mirror"]):
+				Narrator.say("%s. %s" % [str(mr.get("name", "")), str(mr.get("text", ""))])
 	if t in ["combat", "elite", "boss"] and not bool(room.get("cleared", false)):
 		_start_fight(room)
 

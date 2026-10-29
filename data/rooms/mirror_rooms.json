@@ -1,0 +1,66 @@
+{
+  "comment": "M20 mirror rooms: twisted versions of real places. Fight rooms on a floor become one of these with mirrorChance (higher for places the player visited this week or the story touched via storyFlags). 'theme' picks the look and layouts (data/rooms/themes.json); 'text' is said on entering.",
+  "mirrorChance": 0.35,
+  "visitedWeight": 3.0,
+  "storyWeight": 3.0,
+  "rooms": [
+    {
+      "id": "frozen_deli",
+      "of": "garys_deli",
+      "name": "The Frozen Deli",
+      "theme": "deli",
+      "storyFlags": [
+        "story_done_t2_freezer"
+      ],
+      "text": "Sausages hang from the ceiling like icicles. The bell over the door rings on its own, slowly."
+    },
+    {
+      "id": "breathing_hall",
+      "of": "hallways",
+      "name": "The Breathing Hall",
+      "theme": "school",
+      "storyFlags": [
+        "story_done_s3_coverup"
+      ],
+      "text": "The hallway goes on too long. The lockers open and close, in and out, like lungs."
+    },
+    {
+      "id": "furnace_maze",
+      "of": "forge",
+      "name": "The Furnace Maze",
+      "theme": "forge",
+      "storyFlags": [
+        "story_done_t3_forge"
+      ],
+      "text": "The forge has grown into a maze of anvils and chimneys. Every wall is warm."
+    },
+    {
+      "id": "endless_ward",
+      "of": "hospital",
+      "name": "The Endless Ward",
+      "theme": "hospital",
+      "storyFlags": [
+        "story_done_t4_wing"
+      ],
+      "text": "Corridor, door, corridor, door. The number on every room is the same."
+    },
+    {
+      "id": "upside_gym",
+      "of": "gym",
+      "name": "The Upside Gym",
+      "theme": "school",
+      "storyFlags": [
+        "story_done_cal_w2_pep_rally"
+      ],
+      "text": "The bleachers hang from the ceiling. The scoreboard counts down to something."
+    },
+    {
+      "id": "silent_library",
+      "of": "library",
+      "name": "The Silent Library",
+      "theme": "school",
+      "storyFlags": [],
+      "text": "Every book is open to the same page. The page is blank until you look away."
+    }
+  ]
+}

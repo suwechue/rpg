@@ -27,7 +27,8 @@ func _run() -> void:
 	await _smoke_combat()
 	for m in get_script().get_script_method_list():
 		var n := str(m["name"])
-		if n.begins_with("smoke_"):
+		# SMOKE_ONLY=smoke_name runs one smoke test (debugging).
+		if n.begins_with("smoke_") and (not OS.has_environment("SMOKE_ONLY") or OS.get_environment("SMOKE_ONLY") == n):
 			await call(n)
 	print("smoke: %d passed, %d failed" % [_passes, _failures])
 	quit(1 if _failures > 0 else 0)
@@ -178,6 +179,9 @@ func smoke_week_of_school() -> void:
 	while int(cal.call("week")) == 1 and Time.get_ticks_msec() - start < 900000:
 		guard += 1
 		await process_frame
+		if OS.has_environment("SMOKE_TRACE") and guard % 600 == 0:
+			var tm := _top_modal()
+			print("[week] %s scene=%s modal=%s busy=%s" % [cal.call("label"), current_scene.name if current_scene else "-", tm.get_script().resource_path.get_file() if tm != null else "-", flow.call("is_busy")])
 		if not recruited and gs.call("flag", "story_done_w1_evening"):
 			recruited = true
 			for id in ["theo", "mara"]:
