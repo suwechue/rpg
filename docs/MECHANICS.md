@@ -446,7 +446,7 @@ Change these in `data/leveling.json`, `data/stats.json` and `data/classes.json`.
 | Technique | Active now | Effect |
 | --- | --- | --- |
 | Runic Toolkit | Yes | Learn Construct; Constructs +50% HP |
-| Efficient Forging, Lasting Rune | Lasting Rune yes | Constructs and Glyphs last +2 rounds (the cost cut is data, not wired yet) |
+| Efficient Forging, Lasting Rune | Yes | Efficient Forging: Constructs and Glyphs cost 1 less MP. Lasting Rune: they last +2 rounds |
 | Vector Redirection, Perfect Counter | Yes | Reaction, 2 MP (0 with Perfect Counter): a single-target attack on you goes to another enemy within 3 |
 | Reactive Casting | Data | Cantrip at enemies stepping next to you |
 | Conversion Reflex | Yes | Reaction, 1 MP: a known Vector's damage is reduced by INT/2 + level/2 |
@@ -456,7 +456,16 @@ Change these in `data/leveling.json`, `data/stats.json` and `data/classes.json`.
 | Meditative Reserve | Yes | +3 MP at rest rooms and arena checkpoints |
 | Internal Casting | Yes | Hazards don't hurt you on your own turn while you have 1+ MP |
 | One With the Formula | Yes | Instability thresholds +3 |
-| Modular Imbuement, Overcharged Construct, Living Foundry, all Alchemy, Deep Calculation | Planned | Listed greyed out until potions, acting constructs and once-per-night actions exist |
+| Modular Imbuement | Yes | Weapon Infusion stores a Glyph; your next Strike leaves it on the target's tile |
+| Overcharged Construct | Yes | Constructs pulse 40% of their power at adjacent enemies each round |
+| Living Foundry | Yes | Your first Construct each fight is a turret whatever its Vector, lasts 2 rounds longer, fires at double power |
+| Stored Formula | Yes | Once a night (night menu), brew a spell from your deck into a backpack potion: anyone, as a Quick, no MP, aimed at the nearest enemy (healing ones at the user). `src/core/items/alchemy.gd`, `data/alchemy.json` |
+| Reactive Terrain | Yes | Adds Saturate: once a fight, 2 MP, soak 3x3 for 3 rounds (Heat burns, Cold freezes, others toxic) |
+| Volatile Brewing | Yes | Potions a Magnitude higher, with a 1-in-6 chance of backfiring for half their power |
+| Damage Type Fluency | Yes | Once a turn, your first single-Vector spell switches to the known Vector that hits its target hardest |
+| Grand Reagent | Yes | Once a week, brew a potion at top Magnitude |
+| Mutation Mastery | Yes | Potions never backfire |
+| Deep Calculation | Yes | Adds Deep Calculation: once a fight, restore full MP |
 
 Reactions use Options "reactions" (auto by default; "ask" acts like auto until the prompt is built; never). **Advanced classes** added: **Alchemist** (from Mage or Healer; needs Stored Formula) and **Runesmith** (from Mage or Fighter; needs Runic Toolkit); Smith-Mage is now the hidden upgraded Runesmith. Change them in `data/techniques.json` and `data/classes.json`.
 

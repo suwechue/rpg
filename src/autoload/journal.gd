@@ -4,7 +4,9 @@
 ## written atomically like the run save.
 extends Node
 
-const PATH := "user://journal.json"
+const UserPaths := preload("res://src/core/user_paths.gd")
+
+var PATH := UserPaths.of("journal.json")
 
 var data: Dictionary = {}
 

@@ -5,10 +5,12 @@
 ## after the week 1 boss: a thanks screen, then the survey (saved the same way).
 extends Node
 
+const UserPaths := preload("res://src/core/user_paths.gd")
+
 const Demo := preload("res://src/core/demo.gd")
 const Modal := preload("res://src/scenes/ui/modal.gd")
 
-const DIR := "user://feedback"
+var DIR := UserPaths.of("feedback")
 
 ## Set by tests and F1 to play the demo ending in a full build.
 var force_demo := false

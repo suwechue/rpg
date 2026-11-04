@@ -81,6 +81,7 @@ var multi_vector_casts := 0           # party spells with two or more Vectors (a
 var cards_played := 0                 # party cards played (gameplay log, VD Part 6)
 var backpack: Array = []              # item card ids in the party's backpack (user request, Oct 28)
 var backpack_used: Array = []
+var highest_hit_by := ""               # who landed it (campfire talk)
 var highest_hit := 0                  # the biggest single party hit (arena score screen, PT Part 6)
 
 
@@ -420,6 +421,8 @@ func card_of(u: UnitScript, hand_index: int) -> Dictionary:
 ## MP cost of a card for this caster (Triage makes heals cheaper on hurt allies).
 func card_cost(u: UnitScript, card: Dictionary, target: Vector2i = Vector2i(-1, -1)) -> int:
 	var c := CardRules.cost(db, card)
+	if str(card.get("form", "")) in ["construct", "glyph"]:
+		c = maxi(0, c + int(u.mods.get("combat", {}).get("constructGlyphCostDelta", 0)))
 	if u.perk == "prism" and CardRules.is_spell(card) and CardRules.ordered_vectors(db, card.get("vectors", {})).size() > 1:
 		c = maxi(0, c - CardRules.fusion_cost(db, card))
 	if (u.perk == "triage" or u.perk == "lifeline") and CardRules.heals(card):
@@ -890,6 +893,10 @@ func move(u: UnitScript, dest: Vector2i) -> bool:
 		u.undo_ok = false
 		_slide(u, slide_dir)
 	_face_nearest(u)
+	_reactive_cantrips(u)
+	if result != "" or not u.alive():
+		_check_end()
+		return true
 	if u.intent.has("move"):
 		u.intent["move"] = u.cell
 	if uses_actions(u):
@@ -1989,7 +1996,8 @@ func _heal_value(u: UnitScript, spec: Dictionary) -> int:
 	return Res.heal_amount(base, u)
 
 
-func _cast(u: UnitScript, card: Dictionary, target: Vector2i, improvised: bool, cost: int, mp_before: int) -> void:
+func _cast(u: UnitScript, card_in: Dictionary, target: Vector2i, improvised: bool, cost: int, mp_before: int) -> void:
+	var card := _fluent(u, card_in, target)
 	var spec := _spell_spec(u, card)
 	for axis in card.get("vectors", {}):
 		u.statuses.erase("empower_" + str(axis))
@@ -2041,6 +2049,30 @@ func _cast(u: UnitScript, card: Dictionary, target: Vector2i, improvised: bool, 
 	_combo(u, card, spec, target)
 
 
+## Damage Type Fluency: once a turn, a single-Vector spell becomes the known
+## Vector that hits its target hardest.
+func _fluent(u: UnitScript, card: Dictionary, target: Vector2i) -> Dictionary:
+	var t := unit_at(target)
+	if not bool(u.mods.get("combat", {}).get("vectorFluency", false)) or t == null or not is_hostile(u, t):
+		return card
+	if card.get("vectors", {}).size() != 1 or str(u.links.get("fluent_turn", "")) == str(u.turns_taken):
+		return card
+	var was := str(card["vectors"].keys()[0])
+	var best := was
+	var best_mul := Res.contest_mult(db, { was: 1.0 }, t)
+	for axis in u.known_vectors:
+		var mul := Res.contest_mult(db, { str(axis): 1.0 }, t)
+		if mul > best_mul:
+			best = str(axis)
+			best_mul = mul
+	if best == was:
+		return card
+	u.links["fluent_turn"] = str(u.turns_taken)
+	var out := card.duplicate()
+	out["vectors"] = { best: card["vectors"][was] }
+	return out
+
+
 ## VD Part 2: a party spell whose top Vectors make a combo runs the combo's
 ## effects after its damage (cards with their own authored effects keep those).
 func _combo(u: UnitScript, card: Dictionary, spec: Dictionary, target: Vector2i) -> void:
@@ -2064,6 +2096,8 @@ func _resolve_spec(u: UnitScript, spec: Dictionary, target: Vector2i) -> void:
 	match fid:
 		"weapon_infusion":
 			u.infusion = { "vectors": spec["vectors"], "power": float(spec["power"]), "strikes": int(form.get("strikes", 2)) + (1 if u.perk == "spellsteel" else 0) }
+			if bool(u.mods.get("combat", {}).get("storeGlyph", false)):
+				u.links["storedGlyph"] = "1"
 			_emit({ "t": "status", "unit": u.id, "status": "infused" })
 			return
 		"shield":
@@ -2099,13 +2133,19 @@ func _resolve_spec(u: UnitScript, spec: Dictionary, target: Vector2i) -> void:
 			var prop := UnitScript.make_prop("construct", hp_value, int(form.get("turns", 3)) + (2 if u.perk == "constructor" else 0) + int(u.mods.get("combat", {}).get("constructGlyphTurns", 0)))
 			prop.cell = target
 			var mode := construct_mode(spec)
+			# Living Foundry: the first Construct each fight is a strong turret.
+			var foundry := bool(u.mods.get("combat", {}).get("livingFoundry", false)) and not u.links.has("foundry_used")
+			if foundry:
+				u.links["foundry_used"] = "1"
+				mode = "turret"
+				prop.expires += 2
 			prop.name = Str.t(db, "combat_state.construct") % str(spec["name"]).split(" ")[0]
 			if mode == "turret":
 				prop.name = "%s %s" % [str(spec["name"]).split(" ")[0], Str.t(db, "combat_state.turret")]
 			elif mode == "decoy":
 				prop.name = "%s %s" % [str(spec["name"]).split(" ")[0], Str.t(db, "combat_state.decoy_construct")]
 			_add_unit(prop)
-			construct_info[prop] = { "mode": mode, "spec": spec, "caster": u }
+			construct_info[prop] = { "mode": mode, "spec": spec, "caster": u, "powerMul": 2.0 if foundry else 1.0 }
 			_emit({ "t": "spawn", "unit": prop.id, "cell": target, "prop": true })
 			if mode == "decoy":
 				draw_telegraphs(target, int(constructs_cfg().get("decoyRadius", 2)))
@@ -2215,7 +2255,20 @@ func _after_hit(u: UnitScript, t: UnitScript, amount: int) -> void:
 		_heal(u, u, maxi(1, roundi(float(amount) * float(u.source["vampiric"]))))
 
 
+## Modular Imbuement: the Strike after an infusion leaves its Glyph on the tile.
+func _place_stored_glyph(u: UnitScript, cell: Vector2i) -> void:
+	if not u.links.has("storedGlyph") or u.infusion.is_empty():
+		return
+	u.links.erase("storedGlyph")
+	var form := form_rec("glyph")
+	var spec := { "name": Str.t(db, "combat_state.stored_glyph"), "vectors": u.infusion["vectors"], "form": form, "power": float(u.infusion["power"]),
+		"mult": float(form.get("multiplier", 1.0)), "heal": false, "ranged": false, "kind": "spell" }
+	glyphs.append({ "cell": cell, "spec": spec, "team": u.team, "caster": u, "turns": int(form.get("turns", 6)) })
+	_emit({ "t": "glyph_set", "cell": cell, "team": u.team })
+
+
 func _basic(u: UnitScript, card: Dictionary, target: Vector2i) -> void:
+	_place_stored_glyph(u, target)
 	if card.get("infuse", {}).is_empty() and not _card_infuse.is_empty():
 		card = card.duplicate()
 		card["infuse"] = _card_infuse
@@ -2538,7 +2591,9 @@ func _damage(t: UnitScript, amount: int, source: UnitScript, vector: String, cau
 	var rest := amount - absorbed
 	t.hp = maxi(0, t.hp - rest)
 	if source != null and source.team == "party" and cause == "hit":
-		highest_hit = maxi(highest_hit, rest + absorbed)
+		if rest + absorbed > highest_hit:
+			highest_hit = rest + absorbed
+			highest_hit_by = source.id if source != null else ""
 	_emit({ "t": "damage", "unit": t.id, "amount": rest, "absorbed": absorbed, "crit": crit, "high": high, "vector": vector, "cause": cause,
 		"source": source.id if source != null else "", "note": _note })
 	_note = ""
@@ -2833,9 +2888,10 @@ func _construct_turns() -> void:
 		if p.dead or not p.alive():
 			construct_info.erase(prop)
 			continue
-		if str(info["mode"]) != "turret" or result != "":
-			continue
 		var caster: UnitScript = info["caster"]
+		_construct_pulse(p, info, caster)
+		if str(info["mode"]) != "turret" or result != "" or not caster.alive():
+			continue
 		var best: UnitScript = null
 		for o in units:
 			if not o.alive() or o.is_prop() or o.team == caster.team or o.team == "prop" or hidden(o):
@@ -2846,11 +2902,24 @@ func _construct_turns() -> void:
 		if best == null:
 			continue
 		var spec: Dictionary = (info["spec"] as Dictionary).duplicate()
-		spec["power"] = float(spec["power"]) * float(cfg.get("turretShare", 0.5))
+		spec["power"] = float(spec["power"]) * float(cfg.get("turretShare", 0.5)) * float(info.get("powerMul", 1.0))
 		_emit({ "t": "log", "text": Str.t(db, "combat_state.turret_fires") % p.name })
 		_emit({ "t": "area", "cells": [best.cell], "vectors": spec["vectors"] })
 		_hit_unit(caster, best, spec, false)
 		_check_end()
+
+
+## Overcharged Construct: a share of the spell's power at each adjacent enemy.
+func _construct_pulse(p: UnitScript, info: Dictionary, caster: UnitScript) -> void:
+	var share := float(caster.mods.get("combat", {}).get("constructPulse", 0.0))
+	if share <= 0.0 or result != "":
+		return
+	var spec: Dictionary = (info["spec"] as Dictionary).duplicate()
+	spec["power"] = float(spec["power"]) * share
+	for o in units.duplicate():
+		if o.team == "enemy" and o.alive() and GridScript.manhattan(o.cell, p.cell) == 1:
+			_hit_unit(caster, o, spec, false)
+	_check_end()
 
 
 ## Decoy Constructs keep pulling fresh enemy plans onto themselves.
@@ -2975,7 +3044,9 @@ func use_backpack(u: UnitScript, index: int) -> bool:
 	backpack_used.append(id)
 	_emit({ "t": "cast", "unit": u.id, "name": str(card.get("name", "")), "target": u.cell, "improvised": false })
 	_emit({ "t": "log", "text": Str.t(db, "combat_state.uses_item") % [u.name, str(card.get("name", id))] })
-	if str(card.get("action", "")) == "effects":
+	if bool(card.get("potion", false)):
+		_use_potion(u, card)
+	elif str(card.get("action", "")) == "effects":
 		_effects_script().run(self, u, card, u.cell, [u.cell])
 	else:
 		_basic(u, card, u.cell)
@@ -2984,8 +3055,51 @@ func use_backpack(u: UnitScript, index: int) -> bool:
 	return true
 
 
+## A brewed potion (src/core/items/alchemy.gd): the spell without MP, aimed at the
+## nearest enemy (a healing one at the user). Volatile ones can backfire.
+func _use_potion(u: UnitScript, card: Dictionary) -> void:
+	var spec := _spell_spec(u, card)
+	var alch: Dictionary = db.get("alchemy", {})
+	if bool(card.get("volatile", false)) and not bool(u.mods.get("combat", {}).get("noBackfire", false)) and rng.randf() < float(alch.get("volatileChance", 0.1667)):
+		_emit({ "t": "log", "text": Str.t(db, "combat_state.potion_backfires") % u.name })
+		_damage(u, maxi(1, roundi(float(spec["power"]) * float(alch.get("backfireShare", 0.5)))), null, "", "backfire")
+		return
+	var at := u.cell
+	if not bool(spec["heal"]):
+		var best := -1
+		for o in units:
+			if o.alive() and is_hostile(u, o) and not hidden(o):
+				var dist := GridScript.manhattan(o.cell, u.cell)
+				if best < 0 or dist < best:
+					best = dist
+					at = o.cell
+		if best < 0:
+			return
+	var c2 := card.duplicate()
+	_cast(u, c2, at, false, 0, u.mp)
+
+
 func cantrip_cfg() -> Dictionary:
 	return db.get("combat_rules", {}).get("cantrip", {})
+
+
+## Reactive Casting: once a round, a Cantrip at an enemy that steps next to you.
+func _reactive_cantrips(mover: UnitScript) -> void:
+	if mover.team != "enemy":
+		return
+	for p in units:
+		if result != "" or not mover.alive():
+			return
+		if p.team != "party" or not p.alive() or GridScript.manhattan(p.cell, mover.cell) != 1:
+			continue
+		if not bool(p.mods.get("combat", {}).get("reactiveCantrip", false)) or str(p.links.get("reactive_round", "")) == str(round_num):
+			continue
+		var spec := cantrip_spec(p)
+		if spec.is_empty():
+			continue
+		p.links["reactive_round"] = str(round_num)
+		_emit({ "t": "log", "text": Str.t(db, "combat_state.reactive_cast") % [p.name, mover.name] })
+		_hit_unit(p, mover, spec, false)
 
 
 ## The built-in Cantrip: a 0 MP single-target Bolt in the first Vector known, or {}.
@@ -4002,7 +4116,7 @@ func finish() -> Dictionary:
 	return {
 		"result": result, "xp": xp_total, "money": money_total, "party": party, "kills": kills,
 		"remaining": remaining, "wildSurges": wild_surges, "support": support_log,
-		"helpAnswered": answered, "helpIgnored": ignored, "rounds": round_num, "multiVector": multi_vector_casts, "combos": combos_cast, "cardsPlayed": cards_played, "backpackUsed": backpack_used, "winFlag": win_flag, "highestHit": highest_hit,
+		"helpAnswered": answered, "helpIgnored": ignored, "rounds": round_num, "multiVector": multi_vector_casts, "combos": combos_cast, "cardsPlayed": cards_played, "backpackUsed": backpack_used, "winFlag": win_flag, "highestHit": highest_hit, "highestHitBy": highest_hit_by,
 	}
 
 

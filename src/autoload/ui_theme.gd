@@ -6,7 +6,9 @@
 ## the color names here. `rebuild()` re-reads everything (F1 > Art reload).
 extends Node
 
-const SETTINGS := "user://settings.cfg"
+const UserPaths := preload("res://src/core/user_paths.gd")
+
+var SETTINGS := UserPaths.of("settings.cfg")
 
 var FONT_SIZE := 9
 var TITLE_SIZE := 18

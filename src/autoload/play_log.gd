@@ -3,8 +3,10 @@
 ## Off in headless runs so tests and smoke runs don't fill it.
 extends Node
 
+const UserPaths := preload("res://src/core/user_paths.gd")
+
 const Log := preload("res://src/core/run/play_log.gd")
-var path := "user://gameplay_log.jsonl"
+var path := UserPaths.of("gameplay_log.jsonl")
 
 var enabled := true
 var _day: Dictionary = {}

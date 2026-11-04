@@ -5,6 +5,8 @@
 ## Party button in combat and the arena.
 extends "res://src/scenes/ui/modal.gd"
 
+const UserPaths := preload("res://src/core/user_paths.gd")
+
 const CharSheet := preload("res://src/scenes/ui/character_sheet.gd")
 const CardRules := preload("res://src/core/card.gd")
 
@@ -22,7 +24,7 @@ func _ready() -> void:
 ## Techniques and lasting effects, each with icon, name, text, source, duration.
 func _effects_page() -> void:
 	var cfg := ConfigFile.new()
-	var easy := cfg.load("user://settings.cfg") == OK and bool(cfg.get_value("minigames", "easy", false))
+	var easy := cfg.load(UserPaths.of("settings.cfg")) == OK and bool(cfg.get_value("minigames", "easy", false))
 	var all := preload("res://src/core/effects.gd").gather(DataDB.all(), GameState.run, { "difficulty": GameState.combat_difficulty, "easyMinigames": easy,
 		"turnOverride": GameState.combat_turn_mode, "dataTurnMode": str(DataDB.table("combat_rules").get("turnMode", "")) })
 	text(Strings.t("party_panel.run_wide"), UiTheme.ACCENT)

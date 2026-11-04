@@ -19,7 +19,7 @@ const OPS := ["burn_tiles", "fire_wall", "empower", "detonate", "self_burn", "st
 	"hit_and_run", "shadow_step", "blind_adjacent", "free_move", "ward", "pull_ally", "sanctuary", "intercept", "encore",
 	"strike_x", "dash_line", "pull_root", "status_target", "status_self", "status_area",
 	"draw", "recall", "seek", "hand_plus",
-	"burn_discard", "shuffle_back", "recall_best", "cycle_hand", "mp_per_discard", "discard_volley"]
+	"saturate", "mp_full", "burn_discard", "shuffle_back", "recall_best", "cycle_hand", "mp_per_discard", "discard_volley"]
 const TARGETING := ["self", "enemy", "ally", "unit", "empty", "any", "dir"]
 
 ## Statuses that count as "bad" for Cleanse.
@@ -456,6 +456,29 @@ static func _op(st, u: UnitScript, card: Dictionary, fx: Dictionary, target: Vec
 						u.deck.draw_pile.remove_at(i)
 						st._emit({ "t": "log", "text": Str.t(st.db, "card_effects.seeks") % [u.name, str(c.get("name", ""))] })
 						break
+		# --- Technique cards ---
+		"saturate":
+			var area: Array = []
+			for dy in range(-1, 2):
+				for dx in range(-1, 2):
+					var sc: Vector2i = target + Vector2i(dx, dy)
+					if grid.in_bounds(sc) and grid.walkable_terrain(sc):
+						area.append(sc)
+			var axis := str(u.known_vectors[0]) if not u.known_vectors.is_empty() else ""
+			var kind := "burning" if axis == "heat" else ("ice" if axis == "cold" else "toxic")
+			for sc in area:
+				match kind:
+					"burning":
+						grid.burning[sc] = turns
+					"ice":
+						if grid.get_terrain(sc) == GridScript.FLOOR or grid.get_terrain(sc) == GridScript.WATER:
+							grid.set_terrain(sc, GridScript.ICE)
+					_:
+						grid.toxic[sc] = turns
+			st._emit({ "t": "tiles", "kind": kind, "cells": area })
+		"mp_full":
+			u.mp = u.max_mp
+			st._emit({ "t": "log", "text": Str.t(st.db, "card_effects.mp_full") % u.name })
 		# --- Discard pile tricks (user request, Oct 29) ---
 		"burn_discard":
 			# Exhaust up to `max` cards from the discard pile (not this one); `per` damage each.

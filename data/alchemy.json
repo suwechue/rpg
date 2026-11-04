@@ -1,0 +1,12 @@
+{
+  "comment": "Potions (src/core/items/alchemy.gd): noBrewForms can't be brewed; a volatile potion backfires at volatileChance for backfireShare of its power.",
+  "noBrewForms": [
+    "construct",
+    "glyph",
+    "weapon_infusion",
+    "aura"
+  ],
+  "potionName": "%s Potion",
+  "volatileChance": 0.1667,
+  "backfireShare": 0.5
+}

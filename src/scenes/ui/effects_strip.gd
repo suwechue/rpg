@@ -4,6 +4,8 @@
 ## details; click to open the Effects page in the Party panel.
 extends VBoxContainer
 
+const UserPaths := preload("res://src/core/user_paths.gd")
+
 const Effects := preload("res://src/core/effects.gd")
 
 var state: Object = null    # a CombatState during a fight (the Party panel shows hands)
@@ -16,7 +18,7 @@ func _ready() -> void:
 
 func _ctx() -> Dictionary:
 	var cfg := ConfigFile.new()
-	var easy := cfg.load("user://settings.cfg") == OK and bool(cfg.get_value("minigames", "easy", false))
+	var easy := cfg.load(UserPaths.of("settings.cfg")) == OK and bool(cfg.get_value("minigames", "easy", false))
 	return { "difficulty": GameState.combat_difficulty, "easyMinigames": easy, "turnOverride": GameState.combat_turn_mode,
 		"dataTurnMode": str(DataDB.table("combat_rules").get("turnMode", "")) }
 

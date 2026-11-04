@@ -2,6 +2,8 @@
 ## E / click / A as the action, and finish(performance 0..1).
 extends Control
 
+const UserPaths := preload("res://src/core/user_paths.gd")
+
 signal finished(performance: float)
 
 var archetype := ""
@@ -20,7 +22,7 @@ static func timing(key: String, fallback: Variant) -> Variant:
 static func time_mul() -> float:
 	var t: Dictionary = DataDB.table("minigames").get("timing", {})
 	var cfg := ConfigFile.new()
-	var easy := cfg.load("user://settings.cfg") == OK and bool(cfg.get_value("minigames", "easy", false))
+	var easy := cfg.load(UserPaths.of("settings.cfg")) == OK and bool(cfg.get_value("minigames", "easy", false))
 	return float(t.get("windowMul", 1.5)) * (float(t.get("easyMul", 1.5)) if easy else 1.0)
 
 

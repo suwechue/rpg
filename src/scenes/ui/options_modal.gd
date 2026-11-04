@@ -3,7 +3,9 @@
 ## mode and difficulty this run uses. Saved in user://settings.cfg.
 extends "res://src/scenes/ui/modal.gd"
 
-const SETTINGS := "user://settings.cfg"
+const UserPaths := preload("res://src/core/user_paths.gd")
+
+var SETTINGS := UserPaths.of("settings.cfg")
 const SR := preload("res://src/core/settings_rules.gd")
 
 var _page := "main"

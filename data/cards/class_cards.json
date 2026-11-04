@@ -294,6 +294,49 @@
           "op": "encore"
         }
       ]
+    },
+    {
+      "id": "card_saturate",
+      "name": "Saturate",
+      "kind": "basic",
+      "rarity": "rare",
+      "minWave": 999,
+      "short": "Soak 3x3",
+      "action": "effects",
+      "cost": 2,
+      "oncePerFight": true,
+      "targeting": {
+        "type": "any",
+        "range": 4
+      },
+      "effects": [
+        {
+          "op": "saturate",
+          "turns": 3
+        }
+      ],
+      "text": "Once per fight. Soak a 3x3 area with your first Vector for 3 rounds: Heat burns, Cold freezes, anything else turns toxic."
+    },
+    {
+      "id": "card_deep_calculation",
+      "name": "Deep Calculation",
+      "kind": "basic",
+      "rarity": "rare",
+      "minWave": 999,
+      "short": "Full MP",
+      "action": "effects",
+      "cost": 0,
+      "oncePerFight": true,
+      "targeting": {
+        "type": "self",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "mp_full"
+        }
+      ],
+      "text": "Once per fight. Restore full MP."
     }
   ]
 }

@@ -259,6 +259,10 @@ static func choose_technique(db: Dictionary, ch: Dictionary, id: String) -> bool
 	ch["pendingTechniques"] = pending
 	ch["techniques"] = ch.get("techniques", []) + [id]
 	var rec: Dictionary = techniques(db).get(id, {})
+	# Some Techniques add a card to the deck.
+	var granted := str(rec.get("grants", {}).get("card", ""))
+	if granted != "" and not ch.get("deck", []).has(granted):
+		ch["deck"] = ch.get("deck", []) + [granted]
 	var form := str(rec.get("grants", {}).get("form", ""))
 	if form != "" and not ch.get("knownForms", []).has(form):
 		ch["knownForms"] = ch.get("knownForms", []) + [form]

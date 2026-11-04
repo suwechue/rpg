@@ -23,8 +23,12 @@
       "category": "forging",
       "tier": 2,
       "minLevel": 3,
-      "text": "Weapon Infusion can store a Glyph: your next Strike places it.",
-      "planned": true
+      "text": "Weapon Infusion stores a Glyph: your next Strike leaves it on the target's tile.",
+      "mods": {
+        "combat": {
+          "storeGlyph": true
+        }
+      }
     },
     {
       "id": "efficient_forging",
@@ -58,8 +62,12 @@
       "category": "forging",
       "tier": 5,
       "minLevel": 14,
-      "text": "Your Constructs pulse their Vector each round.",
-      "planned": true
+      "text": "Your Constructs pulse their Vector at adjacent enemies each round.",
+      "mods": {
+        "combat": {
+          "constructPulse": 0.4
+        }
+      }
     },
     {
       "id": "living_foundry",
@@ -67,8 +75,12 @@
       "category": "forging",
       "tier": 6,
       "minLevel": 18,
-      "text": "Once per fight, a Construct acts as an ally for 3 rounds.",
-      "planned": true
+      "text": "Your first Construct each fight is a turret whatever its Vector, lasts 2 rounds longer and fires at double power.",
+      "mods": {
+        "combat": {
+          "livingFoundry": true
+        }
+      }
     },
     {
       "id": "stored_formula",
@@ -76,8 +88,7 @@
       "category": "alchemy",
       "tier": 1,
       "minLevel": 2,
-      "text": "Once per night, brew a spell card into a one-use Potion any party member can play as a Quick.",
-      "planned": true
+      "text": "Once per night, brew a spell card into a one-use Potion. It goes in the backpack; anyone can use it as a Quick, at no MP."
     },
     {
       "id": "reactive_terrain",
@@ -85,8 +96,10 @@
       "category": "alchemy",
       "tier": 2,
       "minLevel": 3,
-      "text": "Once per fight, saturate a 3x3 area with your Vector for 3 rounds.",
-      "planned": true
+      "text": "Adds Saturate to your deck: once per fight, soak a 3x3 area with your Vector for 3 rounds.",
+      "grants": {
+        "card": "card_saturate"
+      }
     },
     {
       "id": "volatile_brewing",
@@ -94,8 +107,7 @@
       "category": "alchemy",
       "tier": 3,
       "minLevel": 6,
-      "text": "Potions come out one Magnitude higher, with a 1-in-6 Instability chance.",
-      "planned": true
+      "text": "Your potions come out one Magnitude higher, with a 1-in-6 chance of backfiring when used."
     },
     {
       "id": "damage_type_fluency",
@@ -103,8 +115,12 @@
       "category": "alchemy",
       "tier": 4,
       "minLevel": 10,
-      "text": "Once per turn, change a card's Vector to another you know.",
-      "planned": true
+      "text": "Once per turn, your first single-Vector spell switches to whichever Vector you know hits its target hardest.",
+      "mods": {
+        "combat": {
+          "vectorFluency": true
+        }
+      }
     },
     {
       "id": "grand_reagent",
@@ -112,8 +128,7 @@
       "category": "alchemy",
       "tier": 5,
       "minLevel": 14,
-      "text": "Once per week, brew a Grand potion early.",
-      "planned": true
+      "text": "Once per week, brew a potion at top Magnitude."
     },
     {
       "id": "mutation_mastery",
@@ -121,8 +136,12 @@
       "category": "alchemy",
       "tier": 6,
       "minLevel": 18,
-      "text": "Choose the volatile outcome instead of rolling it.",
-      "planned": true
+      "text": "Your potions never backfire.",
+      "mods": {
+        "combat": {
+          "noBackfire": true
+        }
+      }
     },
     {
       "id": "vector_redirection",
@@ -261,8 +280,10 @@
       "category": "meditation",
       "tier": 5,
       "minLevel": 14,
-      "text": "Once per night, restore full MP as an Action.",
-      "planned": true
+      "text": "Adds Deep Calculation to your deck: once per fight, restore full MP as an Action.",
+      "grants": {
+        "card": "card_deep_calculation"
+      }
     },
     {
       "id": "one_with_the_formula",

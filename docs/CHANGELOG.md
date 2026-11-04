@@ -11,6 +11,7 @@ The version shows on the title screen (data/demo.json "version").
 - **Combat:** party combos at Close Bond (Together), enemies that start hidden, turret and decoy Constructs, damage previews on every attack card.
 - **Class periods are real scenes:** walk the hall, then sit in the room with your classmates and the teacher at the board.
 - **Balance:** Upside-Down nights have their own numbers per difficulty. No single enemy hit can take a whole health bar. Normal gets a Last Stand; on Story the fight goes on while anyone stands. In the arena: some healing between waves and a gentler first boss, so more runs reach the campfire, whose blacksmith is now open.
+- **Techniques:** all 24 work now. The Alchemy line is real: brew spells into potions at night, which also opens the Alchemist class. Constructs can pulse, and a Living Foundry turret fights for you.
 - **Fixes:** the name field on the new run screen works, and clicking a class no longer starts the run. Clear data on the title screen. Long text wraps instead of running off screen. Party members no longer stack on you when you enter a zone. Townsfolk walk at a calmer pace, and characters draw in the right order.
 
 ## 0.2.0 (Act 1 complete)

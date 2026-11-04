@@ -1095,6 +1095,18 @@
     "goals.happenings": "Happening today",
     "goals.happening_now": "NOW: %s",
     "goals.happening_later": "Later: %s",
-    "paper.happenings": "Around town today: %s"
+    "paper.happenings": "Around town today: %s",
+    "card_effects.mp_full": "%s's MP is full.",
+    "combat_state.reactive_cast": "%s snaps a Cantrip at %s!",
+    "combat_state.stored_glyph": "Stored Glyph",
+    "combat_state.potion_backfires": "The potion backfires on %s!",
+    "alchemy.title": "Brew a potion",
+    "alchemy.help": "Pick a spell. Its potion goes in the backpack: anyone can use it as a Quick, at no MP, once.",
+    "alchemy.brew": "Brew a potion (%s)",
+    "alchemy.grand": "Use Grand Reagent: top Magnitude, then pick a spell",
+    "alchemy.made": "You brew a %s and put it in the backpack.",
+    "alchemy.block_brewed": "You already brewed tonight.",
+    "alchemy.block_full": "The backpack is full.",
+    "alchemy.block_unknown": "You don't know Stored Formula."
   }
 }

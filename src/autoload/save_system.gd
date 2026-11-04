@@ -2,7 +2,9 @@
 ## write a temp file, then swap it in, so a crash never corrupts the run.
 extends Node
 
-const SAVE_PATH := "user://run_save.json"
+const UserPaths := preload("res://src/core/user_paths.gd")
+
+var SAVE_PATH := UserPaths.of("run_save.json")
 
 
 ## Clear stored data (Options and the title's Clear data):
@@ -12,10 +14,10 @@ const SAVE_PATH := "user://run_save.json"
 func clear_data(what: String) -> Array:
 	var gone: Array = []
 	if what in ["meta", "all"]:
-		_remove("user://journal.json", gone)
+		_remove(Journal.PATH, gone)
 		Journal.load_journal()
 	if what in ["settings", "all"]:
-		_remove("user://settings.cfg", gone)
+		_remove(UserPaths.of("settings.cfg"), gone)
 		Audio.apply_volumes()
 	if what in ["save", "all"]:
 		if has_save():
@@ -23,7 +25,7 @@ func clear_data(what: String) -> Array:
 		delete_save()
 	if what == "all":
 		_remove(PlayLog.path, gone)
-		for dir in ["user://feedback", "user://custom_smoke", "user://skin_smoke"]:
+		for dir in [Feedback.DIR, "user://custom_smoke", "user://skin_smoke"]:
 			_remove_dir(dir, gone)
 	return gone
 

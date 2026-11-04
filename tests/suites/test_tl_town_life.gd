@@ -646,3 +646,156 @@ func test_hidden_can_not_stall() -> void:
 		st.end_turn() if st.current.team == "party" else preload("res://src/core/combat/enemy_ai.gd").take_turn(st, st.current)
 		guard += 1
 	check(not sk.statuses.has("hidden") or not sk.alive(), "it is out by round %d" % st.round_num)
+
+
+func test_tests_use_a_sandbox() -> void:
+	const UP := preload("res://src/core/user_paths.gd")
+	check(UP.sandboxed() and UP.of("run_save.json").contains("test_sandbox"), "test runs never touch the player's files")
+
+
+func _tech_fight(techs: Array, enemy: String = "pom_pom_wisp", vectors: Array = []) -> Dictionary:
+	var run := run_()
+	var ch: Dictionary = run["player"].duplicate(true)
+	ch["techniques"] = techs
+	if not vectors.is_empty():
+		ch["knownVectors"] = vectors
+	var foe: Dictionary = DT.index_under(db(), "enemies/", "enemies")[enemy].duplicate(true)
+	foe["hp"] = 500
+	var st: Object = preload("res://src/core/combat/combat_state.gd").new(db(), seeded(9), { "layout": { "map": ["P....", ".....", "...E."] }, "party": [{ "char": ch }], "enemies": [foe] })
+	var me = st.unit_by_id("player")
+	st.current = me
+	me.actions_left = 2
+	me.mp = me.max_mp
+	return { "st": st, "me": me, "foe": st.units.filter(func(u) -> bool: return u.team == "enemy")[0], "run": run, "ch": ch }
+
+
+func test_no_technique_is_a_placebo() -> void:
+	for t in db()["techniques"]["techniques"]:
+		check(not bool(t.get("planned", false)), "%s can be learned" % t["id"])
+	# Every mod a Technique names is read somewhere in the rules.
+	var src := ""
+	for p in ["res://src/core/combat/combat_state.gd", "res://src/core/combat/resolver.gd", "res://src/core/combat/card_effects.gd", "res://src/core/character.gd", "res://src/core/effects.gd", "res://src/core/combat/enemy_ai.gd", "res://src/core/combat/unit.gd", "res://src/core/progression/leveling.gd", "res://src/core/dungeon/night.gd", "res://src/core/arena/arena.gd", "res://src/core/card.gd", "res://src/core/combat/forms.gd"]:
+		src += FileAccess.get_file_as_string(p)
+	for t in db()["techniques"]["techniques"]:
+		for key in t.get("mods", {}).get("combat", {}):
+			check(src.contains(str(key)), "%s: combat mod %s is read by the rules" % [t["id"], key])
+	# Efficient Forging really cuts the cost.
+	var CR := preload("res://src/core/card.gd")
+	var con := { "id": "x", "name": "X", "kind": "spell", "vectors": { "force": 1.0 }, "form": "construct", "magnitude": "minor" }
+	var a := _tech_fight([])
+	var b := _tech_fight(["efficient_forging"])
+	check(int(b["st"].card_cost(b["me"], con)) == maxi(0, int(a["st"].card_cost(a["me"], con)) - 1), "Efficient Forging: Constructs cost 1 less")
+	# Reactive Casting fires once a round when an enemy steps next to you.
+	var r := _tech_fight(["reactive_casting"], "pom_pom_wisp", ["heat"])
+	var hp0: int = r["foe"].hp
+	r["foe"].cell = r["me"].cell + Vector2i(1, 0)
+	r["st"]._reactive_cantrips(r["foe"])
+	check(r["foe"].hp < hp0, "Reactive Casting hits an enemy that steps next to you")
+	hp0 = r["foe"].hp
+	r["st"]._reactive_cantrips(r["foe"])
+	check(r["foe"].hp == hp0, "only once a round")
+	# Cards from Techniques.
+	var ch := _tech_fight([])["ch"] as Dictionary
+	ch["level"] = 20
+	ch["pendingTechniques"] = ["x"]
+	check(preload("res://src/core/progression/leveling.gd").choose_technique(db(), ch, "deep_calculation") and ch["deck"].has("card_deep_calculation"), "Deep Calculation adds its card")
+	var dc := _tech_fight([])
+	dc["me"].deck.hand = ["card_deep_calculation"]
+	dc["me"].mp = 0
+	dc["st"].play_card(dc["me"], 0, dc["me"].cell)
+	check(dc["me"].mp == dc["me"].max_mp, "and it fills MP")
+	check(dc["me"].deck.exhausted.has("card_deep_calculation"), "once per fight")
+	var sat := _tech_fight([], "pom_pom_wisp", ["corrosion"])
+	sat["me"].deck.hand = ["card_saturate"]
+	check(sat["st"].play_card(sat["me"], 0, Vector2i(2, 1)) and sat["st"].grid.toxic.size() >= 4, "Saturate soaks the area")
+
+
+func test_construct_techniques() -> void:
+	var spec := func(st: Object, axis: String) -> Dictionary:
+		return { "name": "Test Construct", "vectors": { axis: 1.0 }, "form": st.form_rec("construct"), "power": 10.0, "mult": 1.0, "heal": false, "ranged": true, "kind": "spell" }
+	# Living Foundry: a Force Construct would be a wall; the first is a strong turret.
+	var f := _tech_fight(["living_foundry"])
+	f["st"]._resolve_spec(f["me"], spec.call(f["st"], "force"), f["foe"].cell + Vector2i(-2, 0))
+	var prop = f["st"].unit_at(f["foe"].cell + Vector2i(-2, 0))
+	check(str(f["st"].construct_info[prop]["mode"]) == "turret", "Living Foundry: the first Construct is a turret")
+	var hp0: int = f["foe"].hp
+	f["st"]._construct_turns()
+	var strong: int = hp0 - f["foe"].hp
+	check(strong > 0, "and it fires")
+	f["st"]._resolve_spec(f["me"], spec.call(f["st"], "force"), Vector2i(1, 0))
+	check(str(f["st"].construct_info[f["st"].unit_at(Vector2i(1, 0))]["mode"]) == "wall", "only the first")
+	# Overcharged Construct: a wall pulses at adjacent enemies.
+	var o := _tech_fight(["overcharged_construct"])
+	o["st"]._resolve_spec(o["me"], spec.call(o["st"], "force"), o["foe"].cell + Vector2i(-1, 0))
+	hp0 = o["foe"].hp
+	o["st"]._construct_turns()
+	check(o["foe"].hp < hp0, "Overcharged Construct pulses")
+	# Modular Imbuement: the next Strike leaves a Glyph.
+	var m := _tech_fight(["modular_imbuement"], "pom_pom_wisp", ["heat"])
+	m["st"]._resolve_spec(m["me"], { "name": "Inf", "vectors": { "heat": 1.0 }, "form": m["st"].form_rec("weapon_infusion"), "power": 8.0, "mult": 1.0, "heal": false, "ranged": false, "kind": "spell" }, m["me"].cell)
+	m["foe"].cell = m["me"].cell + Vector2i(1, 0)
+	check(m["st"].strike(m["me"], m["foe"].cell) and m["st"].glyphs.size() == 1, "Modular Imbuement: the Strike leaves a Glyph")
+
+
+func test_alchemy() -> void:
+	const Alch := preload("res://src/core/items/alchemy.gd")
+	const CR := preload("res://src/core/card.gd")
+	var d := db()
+	var run := run_()
+	var ch: Dictionary = run["player"]
+	var spell := ""
+	for c in d["cards/vector_cards"]["cards"]:
+		if str(c.get("kind", "")) == "spell" and str(c.get("form", "")) == "bolt" and not c.has("effects"):
+			spell = str(c["id"])
+			break
+	ch["deck"] = [spell, "card_strike"]
+	check(Alch.block(d, run, ch, 1) == "unknown", "brewing needs Stored Formula")
+	ch["techniques"] = ["stored_formula"]
+	check(Alch.block(d, run, ch, 1) == "" and Alch.brewable(d, run, ch) == [spell], "only spells can be brewed")
+	var id := Alch.brew(d, run, ch, spell, 1, 1)
+	var pot := CR.resolve(d, id, run["cards"])
+	check(id != "" and run["backpack"].has(id) and bool(pot["consumable"]) and bool(pot["quick"]), "the potion goes in the backpack")
+	check(CR.cost(d, pot) == 0, "and costs no MP")
+	check(Alch.brew(d, run, ch, spell, 1, 1) == "" and Alch.block(d, run, ch, 1) == "brewed", "once a night")
+	ch["techniques"] = ["stored_formula", "volatile_brewing", "grand_reagent"]
+	var strong := CR.resolve(d, Alch.brew(d, run, ch, spell, 2, 1), run["cards"])
+	check(bool(strong.get("volatile", false)) and str(strong["magnitude"]) != str(CR.resolve(d, spell)["magnitude"]), "Volatile Brewing: a Magnitude higher")
+	var grand := CR.resolve(d, Alch.brew(d, run, ch, spell, 3, 1, true), run["cards"])
+	check(str(grand["magnitude"]) == "grand" and not Alch.grand_ready(run, ch, 1) and Alch.grand_ready(run, ch, 2), "Grand Reagent: top Magnitude, once a week")
+	# Using one in a fight.
+	var f := _tech_fight([], "pom_pom_wisp", ["heat"])
+	var lib: Dictionary = { "pot:9": pot }
+	f["st"].library.merge(lib, true)
+	f["st"].backpack = ["pot:9"]
+	var hp0: int = f["foe"].hp
+	var mp0: int = f["me"].mp
+	check(f["st"].use_backpack(f["me"], 0) and f["foe"].hp < hp0 and f["me"].mp == mp0, "a potion hits the nearest enemy for no MP")
+	# Backfire, and Mutation Mastery.
+	var v := pot.duplicate()
+	v["volatile"] = true
+	var lost := 0
+	var safe := 0
+	for s in 40:
+		var a := _tech_fight([], "pom_pom_wisp", ["heat"])
+		a["st"].rng.seed = s
+		var h0: int = a["me"].hp
+		a["st"]._use_potion(a["me"], v)
+		lost += 1 if a["me"].hp < h0 else 0
+		var b := _tech_fight(["mutation_mastery"], "pom_pom_wisp", ["heat"])
+		b["st"].rng.seed = s
+		var h1: int = b["me"].hp
+		b["st"]._use_potion(b["me"], v)
+		safe += 1 if b["me"].hp < h1 else 0
+	check(lost > 0 and safe == 0, "volatile potions can backfire (%d of 40); never with Mutation Mastery" % lost)
+	# The Alchemist can be reached now.
+	check(d["techniques"]["techniques"].any(func(t) -> bool: return str(t["id"]) == "stored_formula" and not t.has("planned")), "Stored Formula, the Alchemist's requirement, can be learned")
+
+
+func test_damage_type_fluency() -> void:
+	var f := _tech_fight(["damage_type_fluency"], "hall_rusher", ["force", "binding"])
+	var card := { "id": "t", "vectors": { "force": 1.0 }, "form": "bolt", "magnitude": "minor", "kind": "spell" }
+	var out: Dictionary = f["st"]._fluent(f["me"], card, f["foe"].cell)
+	check(out["vectors"].has("binding"), "a Force spell at a Binding-weak enemy turns to Binding")
+	check(f["st"]._fluent(f["me"], card, f["foe"].cell)["vectors"].has("force"), "once a turn")
+	var g := _tech_fight([], "hall_rusher", ["force", "binding"])
+	check(g["st"]._fluent(g["me"], card, g["foe"].cell)["vectors"].has("force"), "not without the Technique")

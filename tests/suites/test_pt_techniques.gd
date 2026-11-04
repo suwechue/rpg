@@ -13,7 +13,7 @@ func test_techniques() -> void:
 	check(ch["techniques"] == ["still_mind"], "a mage starts with Still Mind")
 	ch["level"] = 6
 	var opts := Lv.technique_options(db(), ch)
-	check(not opts.has("still_mind") and not opts.has("stored_formula"), "owned and planned Techniques aren't offered")
+	check(not opts.has("still_mind") and opts.has("stored_formula"), "owned Techniques aren't offered; the rest are")
 	var lean_first: Dictionary = Lv.techniques(db())[str(opts[0])]
 	check(str(lean_first["category"]) in ["kinetics", "meditation"], "the class's leaning categories come first")
 	check(Lv.choose_technique(db(), ch, "one_with_the_formula") == false, "tier 6 needs level 18")

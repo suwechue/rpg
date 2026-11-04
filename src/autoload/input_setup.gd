@@ -5,6 +5,8 @@
 ## shade every combat tile by incoming damage).
 extends Node
 
+const UserPaths := preload("res://src/core/user_paths.gd")
+
 const KEYS := {
 	"move_up": [KEY_W, KEY_UP],
 	"move_down": [KEY_S, KEY_DOWN],
@@ -62,7 +64,7 @@ func _ready() -> void:
 ## M22: keys the player rebound in Options (user://settings.cfg "keys").
 func _load_rebinds() -> void:
 	var c := ConfigFile.new()
-	if c.load("user://settings.cfg") != OK or not c.has_section("keys"):
+	if c.load(UserPaths.of("settings.cfg")) != OK or not c.has_section("keys"):
 		return
 	for action in c.get_section_keys("keys"):
 		rebind(str(action), int(c.get_value("keys", action, 0)), false)
@@ -80,9 +82,9 @@ func rebind(action: String, keycode: int, save: bool = true) -> void:
 	InputMap.action_add_event(action, k)
 	if save:
 		var c := ConfigFile.new()
-		c.load("user://settings.cfg")
+		c.load(UserPaths.of("settings.cfg"))
 		c.set_value("keys", action, keycode)
-		c.save("user://settings.cfg")
+		c.save(UserPaths.of("settings.cfg"))
 
 
 ## The first key bound to an action, as text ("E").

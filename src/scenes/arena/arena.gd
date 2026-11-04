@@ -210,6 +210,9 @@ func _after_wave() -> void:
 	for l in lines:
 		Narrator.say(str(l))
 	var wave := int(arena["wave"])
+	if int(summary.get("highestHit", 0)) > int(arena.get("highestHit", 0)):
+		arena["bestHitBy"] = str(summary.get("highestHitBy", ""))
+	arena["lastDowned"] = summary.get("party", []).filter(func(p: Dictionary) -> bool: return bool(p.get("downed", false))).map(func(p: Dictionary) -> String: return str(p.get("id", "")))
 	arena["highestHit"] = maxi(int(arena.get("highestHit", 0)), int(summary.get("highestHit", 0)))
 	# PT Part 6: a card pick after every wave.
 	arena["offer"] = Arena.card_offer(db, arena, Party.party(GameState.run), wave)

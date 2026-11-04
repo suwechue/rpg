@@ -7,6 +7,8 @@
 ## or [x, y]) -> Vector2 and cutscene_camera() -> Camera2D.
 extends CanvasLayer
 
+const UserPaths := preload("res://src/core/user_paths.gd")
+
 signal finished(id: String)
 
 const CS := preload("res://src/core/story/cutscenes.gd")
@@ -393,7 +395,7 @@ func _wait(seconds: float) -> void:
 
 func _settings_speed() -> int:
 	var cfg := ConfigFile.new()
-	if cfg.load("user://settings.cfg") == OK:
+	if cfg.load(UserPaths.of("settings.cfg")) == OK:
 		return int(cfg.get_value("text", "speed", 45))
 	return 45
 

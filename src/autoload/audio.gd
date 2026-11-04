@@ -5,6 +5,8 @@
 ## sound file. Missing sounds play nothing and log a warning once.
 extends Node
 
+const UserPaths := preload("res://src/core/user_paths.gd")
+
 const SFX_VOICES := 8
 
 var _music: Array = []        # two players for crossfades
@@ -44,7 +46,7 @@ func _cfg() -> Dictionary:
 ## The player's volume offset for a channel (music, sfx, ambience, voice), in dB (M22).
 func user_db(channel: String) -> float:
 	var c := ConfigFile.new()
-	if c.load("user://settings.cfg") == OK:
+	if c.load(UserPaths.of("settings.cfg")) == OK:
 		return float(c.get_value("audio", channel, 0.0))
 	return 0.0
 
