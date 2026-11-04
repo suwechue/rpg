@@ -371,6 +371,8 @@ func play_inline_story(id: String) -> void:
 				var l := Narrator.line("foreshadow")
 				Narrator.say(l)
 				await show_event({ "title": Strings.t("flow.the_narrator"), "text": l })
+	# Cards a story's choices granted ask whose deck now.
+	await give_pending_cards()
 
 
 ## M18: a hangout you planned by text. Going costs the hangout AP; skipping hurts.
@@ -421,6 +423,8 @@ func _morning_paper() -> Dictionary:
 			open.append(str(l.get("name", "")))
 	lines.append(Strings.t("paper.open") % ", ".join(PackedStringArray(open.slice(0, 6))))
 	lines.append(Strings.t("paper.rumor") % preload("res://src/core/town/crowd.gd").rumor(db, run, Calendar.week(), rng))
+	for h in StoryRules.happenings_today(db, run, GameState.ctx()).slice(0, 2):
+		lines.append(Strings.t("paper.happenings") % str(h["hint"]))
 	return { "title": Strings.t("paper.title"), "text": "\n".join(PackedStringArray(lines)) }
 
 

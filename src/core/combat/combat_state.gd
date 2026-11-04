@@ -43,6 +43,8 @@ var xp_total := 0
 var money_total := 0
 var wild_surges := 0
 var combos_cast: Array = []         # combo ids the party cast this fight (VD Part 2)
+var _last_stands_used := 0
+var story_night := false             # an Upside-Down night fight (difficulty "nights" numbers)
 var together_used: Array = []       # TL Part 5: pairs that cast a party combo this fight
 var construct_info: Dictionary = {} # TL Part 6: Construct prop -> { mode, spec, caster }
 var card_growth: Dictionary = {}    # card id -> times a growing card was played this fight
@@ -93,6 +95,7 @@ func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) ->
 	guarantee_improvise = bool(setup.get("guaranteeImprovise", false))
 	difficulty = str(setup.get("difficulty", db.get("combat_rules", {}).get("difficulty", "normal")))
 	ramp = clampf(float(setup.get("ramp", 1.0)), 0.0, 1.0)
+	story_night = bool(setup.get("storyNight", false))
 	win_flag = str(setup.get("winFlag", ""))
 	ai_overrides = setup.get("ai", {})
 	mutators = setup.get("mutators", [])
@@ -565,6 +568,11 @@ func _end_round() -> void:
 					_hit_unit(caster, t, d["spec"], false)
 			_check_end()
 	revealed = maxi(0, revealed - 1)
+	# Hidden enemies can't wait forever: they come out after a couple of rounds.
+	if round_num >= int(db.get("combat_rules", {}).get("hiddenRounds", 2)):
+		for h in units:
+			if h.alive():
+				unhide(h, "combat_state.leaps_out")
 	_construct_turns()
 	_conveyors()
 	if bool(mutator_rules().get("fireSpreads", false)):
@@ -818,7 +826,13 @@ func mutator_rules() -> Dictionary:
 
 ## The combat difficulty's rules (normal or hard).
 func difficulty_rules() -> Dictionary:
-	return db.get("combat_rules", {}).get("difficulties", {}).get(difficulty, {})
+	var rules: Dictionary = db.get("combat_rules", {}).get("difficulties", {}).get(difficulty, {})
+	# Upside-Down nights use their own numbers (HP carries between fights there).
+	if story_night and rules.has("nights"):
+		var merged := rules.duplicate()
+		merged.merge(rules["nights"], true)
+		return merged
+	return rules
 
 
 ## A difficulty number eased in by the ramp: from data/combat_rules.json
@@ -2474,6 +2488,9 @@ func _note_support_attack(u: UnitScript, t: UnitScript) -> void:
 func _damage(t: UnitScript, amount: int, source: UnitScript, vector: String, cause: String, crit: bool = false, high: bool = false) -> void:
 	if t.dead or amount <= 0:
 		return
+	# Nights: one enemy hit can't take more than a share of a party member's health.
+	if cause == "hit" and t.team == "party" and source != null and source.team == "enemy":
+		amount = mini(amount, _hit_cap(t))
 	# TL Part 4: armor resists its Vector; the Mirror Pin reflects the first hit.
 	if t.team == "party" and vector != "":
 		var res := int(t.source.get("gearStats", {}).get("resist", {}).get(vector, 0))
@@ -2550,9 +2567,20 @@ func _on_zero_hp(t: UnitScript, source: UnitScript) -> void:
 		t.shield = 0
 		_emit({ "t": "down", "unit": t.id })
 		if t.is_player:
-			result = "lose"
-			_emit({ "t": "end", "result": "lose" })
-			return
+			# Last Stand (nights on Normal): once a fight, the blow leaves you standing.
+			var rules := difficulty_rules()
+			if _last_stands_used < int(rules.get("lastStands", 0)):
+				_last_stands_used += 1
+				t.downed = false
+				t.hp = 1
+				t.shield = int(rules.get("lastStandShield", 6))
+				_emit({ "t": "shield", "unit": t.id, "amount": t.shield })
+				_emit({ "t": "log", "text": Str.t(db, "combat_state.last_stand") % t.name })
+				return
+			if bool(rules.get("playerDownEndsFight", true)) or not _party_standing():
+				result = "lose"
+				_emit({ "t": "end", "result": "lose" })
+				return
 		# PT Part 3: a downed ally bleeds out after a few rounds, or at once if nobody can heal.
 		t.bleed = int(Res.combat_cfg(db).get("bleedOutRounds", 2))
 		if not party_can_heal():
@@ -2730,7 +2758,10 @@ func perform_action(u: UnitScript, action: Dictionary, target: Vector2i) -> bool
 
 ## Expected damage of a spec on a target, for the AI.
 func expected_damage(u: UnitScript, t: UnitScript, spec: Dictionary) -> float:
-	return _expected_hit(u, t, spec)
+	var hit := _expected_hit(u, t, spec)
+	if u.team == "enemy" and t.team == "party":
+		return minf(hit, float(_hit_cap(t)))
+	return hit
 
 
 # --- Intents (telegraphs, CU) -------------------------------------------------------
@@ -3283,6 +3314,20 @@ func grant_move(u: UnitScript, tiles: int) -> void:
 ## Whether a movement card would apply now (true) or next turn (false).
 func move_applies_now(u: UnitScript) -> bool:
 	return u.moved_steps == 0 and not u.action_used
+
+
+## The most one enemy hit can deal to this party member (difficulty maxHitPct).
+func _hit_cap(t: UnitScript) -> int:
+	var pct := float(difficulty_rules().get("maxHitPct", 0.0))
+	return maxi(1, ceili(float(t.max_hp) * pct)) if pct > 0.0 else 1 << 30
+
+
+## Someone in the party can still fight (guests don't count).
+func _party_standing() -> bool:
+	for u in units:
+		if u.team == "party" and not u.guest and not u.downed and not u.dead:
+			return true
+	return false
 
 
 ## Out for this fight: a downed ally nobody revived in time (or nobody could).
@@ -3914,7 +3959,8 @@ func _check_end() -> void:
 	for u in units:
 		if u.is_player:
 			has_player = true
-	if has_player and not player_alive:
+	# Easy nights: you going down doesn't end it while anyone still stands.
+	if has_player and not player_alive and (bool(difficulty_rules().get("playerDownEndsFight", true)) or not _party_standing()):
 		result = "lose"
 		_emit({ "t": "end", "result": "lose" })
 	elif not enemies_left:

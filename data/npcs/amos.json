@@ -1,0 +1,63 @@
+{
+  "id": "amos",
+  "name": "Amos",
+  "role": "Retired train conductor",
+  "home": "elm_apartments",
+  "voice": {
+    "id": "voice_default",
+    "pitch": 1.0
+  },
+  "sprite": "npc_amos_walk",
+  "portrait": "portrait_amos",
+  "startBond": 0,
+  "disposition": {
+    "courage": 50,
+    "greed": 20,
+    "curiosity": 60,
+    "loyalty": 50,
+    "kindness": 60,
+    "pride": 30
+  },
+  "traits": [],
+  "recruitable": false,
+  "daytime": true,
+  "schedule": {
+    "weekday": {
+      "period_1": "train_station",
+      "period_2": "train_station",
+      "period_3": "train_station"
+    },
+    "weekend": {
+      "morning": "train_station"
+    }
+  },
+  "greeting": "\"No trains today. No trains for thirty years. I still check the board.\"",
+  "topics": [
+    {
+      "id": "amos_last_train",
+      "label": "Ask about the last train",
+      "tone": {
+        "curiosity": 0.9
+      },
+      "line": "What happened to the last train?",
+      "baseRisk": 0.15,
+      "goodText": "\"Left at 10:15 the night the fountain ran. Full of passengers. I punched every ticket. None of them came back.\"",
+      "badText": "\"It left. That's what trains do.\"",
+      "outcomes": {
+        "onGood": {
+          "clue": "thirty_year_train"
+        }
+      }
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "history"
+    ],
+    "dislikes": [],
+    "likeText": "\"For me? Ha. Thanks.\""
+  },
+  "hangouts": [
+    "You sit with Amos on the empty platform and he names every stop the line used to make."
+  ]
+}

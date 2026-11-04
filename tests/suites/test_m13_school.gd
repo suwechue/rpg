@@ -15,6 +15,18 @@ func test_class_cutscene_steps() -> void:
 	check(steps.any(func(s: Dictionary) -> bool: return s["type"] == "sfx" and s["event"] == "bell"), "the bell rings")
 	check(steps.any(func(s: Dictionary) -> bool: return s["type"] == "seating"), "the class shows a seating chart")
 	check(steps.all(func(s: Dictionary) -> bool: return not str(s.get("text", "")).contains("{")), "every placeholder is filled")
+	# The class as a real scene (Oct 29): a room, the teacher, everyone seated.
+	var seat_step: Dictionary = steps.filter(func(s: Dictionary) -> bool: return s["type"] == "seating")[0]
+	var stage: Dictionary = seat_step.get("stage", {})
+	check(not stage.is_empty() and str(stage["interior"]) == "gym", "PE is staged in the gym")
+	check(stage["seats"].filter(func(x: Array) -> bool: return str(x[2]) == "@you").size() == 1, "you have one seat on the stage")
+	check(steps.any(func(s: Dictionary) -> bool: return s["type"] == "stage" and str(s["interior"]) == "school_hall"), "the walk to class is the school hall")
+	for c in db()["school_classes"]["classes"]:
+		var st := SchoolScenes.stage(db(), c, SchoolScenes.seating(db(), c, seeded(2)))
+		var cells := {}
+		for x in st.get("seats", []):
+			cells[Vector2i(int(x[0]), int(x[1]))] = true
+		check(not st.is_empty() and cells.size() == st["seats"].size() and st["seats"].size() >= c.get("classmates", []).size(), "%s: everyone gets their own seat" % c["id"])
 
 
 func test_seating() -> void:

@@ -109,5 +109,20 @@
   "pulledInText": "The spark yanks you under wherever you're standing. You land somewhere random, with whoever happened to be near.",
   "woodsEdgeText": "You walk into the woods on purpose. The spark meets you halfway and lets you choose who comes.",
   "sealExitUntilCleared": false,
-  "sealExitNote": "When true, the exit stays shut until every fight room is won (CT Part 6). The user turned it off (Oct 28): only the boss room is required."
+  "sealExitNote": "When true, the exit stays shut until every fight room is won (CT Part 6). The user turned it off (Oct 28): only the boss room is required.",
+  "afterFight": {
+    "comment": "Catch your breath after a won fight, by combat difficulty (Oct 29 balance pass): a share of max HP and MP for everyone standing. afterFightHpPct stays as the fallback.",
+    "story": {
+      "hp": 0.5,
+      "mp": 0.3
+    },
+    "normal": {
+      "hp": 0.35,
+      "mp": 0.25
+    },
+    "hard": {
+      "hp": 0.25,
+      "mp": 0.15
+    }
+  }
 }

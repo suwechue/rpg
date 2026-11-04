@@ -14,7 +14,9 @@ const Mystery := preload("res://src/core/story/mystery.gd")
 const Phone := preload("res://src/core/social/phone.gd")
 const CS := preload("res://src/core/story/cutscenes.gd")
 
-const SECTIONS := ["places", "favors", "leads", "bonds", "gear"]
+const StoryRules := preload("res://src/core/story/story.gd")
+
+const SECTIONS := ["happenings", "places", "favors", "leads", "bonds", "gear"]
 
 
 ## { section: [line, ...] } for this moment. ctx: week, day, part, day_count.
@@ -24,12 +26,25 @@ static func build(db: Dictionary, run: Dictionary, ctx: Dictionary) -> Dictionar
 	var part := str(ctx.get("part", ""))
 	var dc := int(ctx.get("day_count", 0))
 	return {
+		"happenings": happenings(db, run, ctx),
 		"places": places(db, run, week, day, part, dc),
 		"favors": favors(db, run, week, part, dc),
 		"leads": leads(db, run),
 		"bonds": bonds(db, run, dc),
 		"gear": gear(db, run, dc),
 	}
+
+
+## Today's optional happenings (exclusive cards), the ones open now first.
+static func happenings(db: Dictionary, run: Dictionary, ctx: Dictionary) -> Array:
+	var now: Array = []
+	var later: Array = []
+	for h in StoryRules.happenings_today(db, run, ctx):
+		if bool(h["open"]):
+			now.append(Str.t(db, "goals.happening_now") % str(h["hint"]))
+		else:
+			later.append(Str.t(db, "goals.happening_later") % str(h["hint"]))
+	return now + later
 
 
 ## Open places, the ones with people you know first ("Gary's Deli: Gary, Dex").
@@ -48,6 +63,9 @@ static func places(db: Dictionary, run: Dictionary, week: int, day: String, part
 	for r in Locs.all(db):
 		var id := str(r.get("id", ""))
 		if Locs.closed_reason(db, run, id, week, part) != "":
+			continue
+		# Single rooms inside a building only count when someone you know is there.
+		if str(r.get("kind", "")) == "room" and not who_at.has(id):
 			continue
 		if who_at.has(id):
 			with_people.append(Str.t(db, "goals.place_people") % [str(r.get("name", id)), ", ".join(PackedStringArray(who_at[id]))])

@@ -97,7 +97,7 @@
   },
   "difficulty": "normal",
   "difficulties": {
-    "comment": "Combat difficulty (user decision, Oct 24). Enemies always telegraph during the player's turn and carry it out on theirs. Enemies telegraph right before their turn (docs/COMBAT_TUNING.md Part 2). Enemies get 2 Actions like the party (PT Part 1): move + attack, or move + move when nothing is in reach. enemyDoubleAttackChance (one number, or one per tier) is the chance that an enemy already in reach attacks twice instead. Hard raises the chance, enemy HP and damage. rangedBuiltinsCostAction (user request, Oct 28): ranged characters (classes with 'ranged': true) pay an Action for the built-in Strike and Guard instead of their Quick.",
+    "comment": "Combat difficulty (user decision, Oct 24). Enemies always telegraph during the player's turn and carry it out on theirs. Enemies telegraph right before their turn (docs/COMBAT_TUNING.md Part 2). Enemies get 2 Actions like the party (PT Part 1): move + attack, or move + move when nothing is in reach. enemyDoubleAttackChance (one number, or one per tier) is the chance that an enemy already in reach attacks twice instead. Hard raises the chance, enemy HP and damage. rangedBuiltinsCostAction (user request, Oct 28): ranged characters (classes with 'ranged': true) pay an Action for the built-in Strike and Guard instead of their Quick. 'nights' (Oct 29 balance pass) overrides a difficulty's numbers in Upside-Down fights only: a night is several fights in a row with HP carrying over, so it can't use the arena's from-full-HP numbers. In nights: lastStands (a blow that would drop you leaves you at 1 HP with lastStandShield, that many times a fight), playerDownEndsFight false (you're downed like an ally; lost only when nobody stands). maxHitPct: one enemy hit deals at most this share of the target's max HP (no one-shots from full health).",
     "normal": {
       "name": "Normal",
       "enemyDoubleAttackChance": {
@@ -108,7 +108,21 @@
         "default": 0.5
       },
       "enemyDamageMul": 2.5,
-      "rangedBuiltinsCostAction": false
+      "rangedBuiltinsCostAction": false,
+      "nights": {
+        "enemyDamageMul": 1.1,
+        "enemyDoubleAttackChance": {
+          "minion": 0.25,
+          "normal": 0.3,
+          "elite": 0.25,
+          "boss": 0.35,
+          "default": 0.3
+        },
+        "lastStands": 1,
+        "lastStandShield": 6,
+        "maxHitPct": 0.35
+      },
+      "maxHitPct": 0.6
     },
     "hard": {
       "name": "Hard",
@@ -120,14 +134,29 @@
         "flankBonus": 0.3,
         "isolatedBonus": 0.2
       },
-      "enemyExtra": 3
+      "enemyExtra": 3,
+      "nights": {
+        "enemyDamageMul": 1.9,
+        "enemyHpMul": 1.1,
+        "enemyExtra": 0,
+        "enemyDoubleAttackChance": 0.6,
+        "maxHitPct": 0.6
+      },
+      "maxHitPct": 0.8
     },
     "story": {
       "name": "Story",
       "enemyDoubleAttackChance": 0.15,
       "enemyHpMul": 0.8,
       "enemyDamageMul": 0.6,
-      "rangedBuiltinsCostAction": false
+      "rangedBuiltinsCostAction": false,
+      "nights": {
+        "enemyDamageMul": 0.5,
+        "enemyDoubleAttackChance": 0.1,
+        "playerDownEndsFight": false,
+        "maxHitPct": 0.3
+      },
+      "maxHitPct": 0.4
     }
   },
   "areaFalloff": {
@@ -171,5 +200,6 @@
     "turretRange": 3,
     "turretShare": 0.5,
     "decoyRadius": 2
-  }
+  },
+  "hiddenRounds": 2
 }

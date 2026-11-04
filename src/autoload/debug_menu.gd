@@ -102,6 +102,9 @@ func _dev_args() -> void:
 			GameState.run["arena"]["phase"] = "checkpoint"
 	if args.has("hand") or args.has("hovercard") or args.has("card"):
 		_combat_dev_args.call_deferred(args)
+	if args.has("period"):
+		# --period=<class id>: play that class's period scene (the walk and the class).
+		_period_arg.call_deferred(str(args["period"]))
 	if args.has("call"):
 		# --call=method: after the scene loads, call it on the current scene (or Flow),
 		# e.g. town's _favor_board or _spotted; --call=paper shows the morning paper.
@@ -125,6 +128,26 @@ func _dev_args() -> void:
 		var img := get_viewport().get_texture().get_image()
 		img.save_png(str(args["shot"]))
 		get_tree().quit()
+
+
+## --period=<class id>[:class]: play that class's period scene (":class" starts at the seating).
+func _period_arg(arg: String) -> void:
+	for i in 20:
+		await get_tree().process_frame
+	var SS := preload("res://src/core/run/school_scenes.gd")
+	var db: Dictionary = DataDB.all()
+	var cid := arg.get_slice(":", 0)
+	for c in db.get("school_classes", {}).get("classes", []):
+		if str(c["id"]) == cid:
+			var prof := str(db["school_classes"].get("professors", {}).get(str(c.get("professor", "")), ""))
+			var steps := SS.steps(db, c, 1, prof, Rng.stream("events"))
+			if arg.ends_with(":class"):
+				var at := 0
+				for i in steps.size():
+					if str(steps[i].get("type", "")) == "seating":
+						at = i
+				steps = steps.slice(at)
+			Cutscenes.play_steps(steps, get_tree().current_scene, "class_" + cid)
 
 
 func _call_arg(method: String) -> void:

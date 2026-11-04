@@ -394,7 +394,8 @@ func _start_fight(room: Dictionary) -> void:
 	elif t == "boss":
 		intro = str(Sig.week_rec(db, _week).get("bossIntro", ""))
 	GameState.run["floor_fight"] = int(room["id"])
-	var setup := GameState.combat_setup(enemies, str(room.get("layout", "open_field")), { "boss": t == "boss", "intro": intro,
+	# Upside-Down fights use the difficulty's "nights" numbers (Oct 29 balance pass).
+	var setup := GameState.combat_setup(enemies, str(room.get("layout", "open_field")), { "boss": t == "boss", "intro": intro, "storyNight": true,
 		"formation": fs["formation"], "roles": fs["roles"], "reinforcements": fs["reinforcements"] })
 	GameState.start_combat(setup, SELF)
 

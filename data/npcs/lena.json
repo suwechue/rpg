@@ -1,0 +1,66 @@
+{
+  "id": "lena",
+  "name": "Lena",
+  "role": "Skater who skips class",
+  "home": "kara_house",
+  "voice": {
+    "id": "voice_default",
+    "pitch": 1.0
+  },
+  "sprite": "npc_lena_walk",
+  "portrait": "portrait_lena",
+  "startBond": 0,
+  "disposition": {
+    "courage": 50,
+    "greed": 20,
+    "curiosity": 60,
+    "loyalty": 50,
+    "kindness": 60,
+    "pride": 30
+  },
+  "traits": [],
+  "recruitable": false,
+  "daytime": true,
+  "schedule": {
+    "weekday": {
+      "period_1": "bus_stop_downtown",
+      "period_2": "park",
+      "period_3": "bus_stop_downtown",
+      "after_school": "arcade"
+    },
+    "weekend": {
+      "afternoon": "park"
+    }
+  },
+  "greeting": "\"You're skipping too? Nice. Don't get caught, Pruitt's on the square today.\"",
+  "topics": [
+    {
+      "id": "lena_tricks",
+      "label": "Ask her to teach you a trick",
+      "tone": {
+        "courage": 0.8
+      },
+      "line": "Teach me something?",
+      "baseRisk": 0.15,
+      "goodText": "\"Bend your knees. Commit. If you hesitate, the board knows.\"",
+      "badText": "\"Maybe later.\"",
+      "outcomes": {
+        "onGood": {
+          "statXp": {
+            "dex": 1
+          }
+        }
+      }
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "sports"
+    ],
+    "dislikes": [],
+    "likeText": "\"For me? Ha. Thanks.\""
+  },
+  "hangouts": [
+    "Lena teaches you to ollie. You fall four times. On the fifth you land it and she cheers louder than you do."
+  ]
+}

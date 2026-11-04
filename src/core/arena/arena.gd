@@ -172,6 +172,9 @@ static func wave_enemies(db: Dictionary, arena: Dictionary, wave: int) -> Dictio
 					rec["affixes"].append(a)
 			rec["summon"] = str(w.get("summonMinion", ""))
 		rec["hp"] = roundi(float(rec.get("hp", 50)) * hp_mul)
+		# The first boss is a gate to the first campfire, not the end of most runs.
+		if wave <= int(w.get("bossEvery", 5)):
+			rec["hp"] = roundi(float(rec["hp"]) * float(w.get("firstBossHpMul", 1.0)))
 		rec["scale"] = power
 		return { "enemies": [rec], "roles": ["boss"], "formation": "default", "boss": true }
 	var room := "elite" if is_elite(db, wave) else "combat"
@@ -278,7 +281,7 @@ static func card_offer(db: Dictionary, arena: Dictionary, party: Array, wave: in
 	for c in DT.records_under(db, "cards/", "cards"):
 		if str(c.get("kind", "")) == "item" or str(c.get("id", "")) in ["card_strike", "card_guard"] or str(c.get("id", "")).begins_with("card_ember") or str(c.get("id", "")).begins_with("card_heat_shield") or str(c.get("id", "")).begins_with("card_frost_line"):
 			continue
-		if wave < int(c.get("minWave", 0)):
+		if wave < int(c.get("minWave", 0)) or bool(c.get("exclusive", false)):
 			continue
 		# Only cards at least one party member can put in their deck (user request, Oct 28).
 		if not party.any(func(ch: Dictionary) -> bool: return Crafting.eligibility(db, ch, c) == ""):
@@ -505,11 +508,14 @@ static func rest(db: Dictionary, party: Array) -> void:
 		ch["mp"] = mini(int(d["maxMp"]), int(ch.get("mp", 0)) + roundi(float(d["maxMp"]) * pct))
 
 
-## Between waves: MP back a little, no healing.
+## Between waves: MP and some HP back for everyone standing.
 static func breather(db: Dictionary, party: Array) -> void:
+	var hp := float(waves(db).get("breatherHp", 0.0))
 	for ch in party:
 		var d := Char.derived(db, ch)
 		ch["mp"] = mini(int(d["maxMp"]), int(ch.get("mp", 0)) + int(waves(db).get("breatherMp", 3)))
+		if int(ch.get("hp", 0)) > 0:
+			ch["hp"] = mini(int(d["maxHp"]), int(ch.get("hp", 0)) + roundi(float(d["maxHp"]) * hp))
 
 
 ## Best scores, keyed by party size and mutator count. Returns true for a new best.

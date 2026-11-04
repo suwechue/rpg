@@ -36,15 +36,25 @@ func build(title: String, width: float = 380.0) -> void:
 	_fit.call_deferred()
 
 
-## Keep the panel inside the screen, leaving room for the HUD bars.
+## Keep the panel inside the screen, leaving room for the HUD bars. A panel
+## wider than the screen is clamped and re-centred, and a warning names it so
+## the smoke runs catch screens built inline (tests grep for "modal off screen").
 func _fit() -> void:
 	if panel == null:
 		return
 	var scroll: ScrollContainer = panel.get_child(0)
 	var want := body.get_combined_minimum_size().y + 8
 	scroll.custom_minimum_size.y = minf(want, Display.base.y - 34.0)
+	var max_w := float(Display.base.x) - 8.0
+	if panel.custom_minimum_size.x > max_w:
+		panel.custom_minimum_size.x = max_w
+		scroll.custom_minimum_size.x = max_w - 8.0
 	panel.size = Vector2(panel.custom_minimum_size.x, 0)
+	var w := panel.get_combined_minimum_size().x
+	panel.position.x = maxf(4.0, (Display.base.x - w) / 2.0)
 	panel.position.y = maxf(6.0, (Display.base.y - panel.get_combined_minimum_size().y) / 2.0)
+	if w > max_w + 1.0 and is_inside_tree():
+		push_warning("modal off screen: '%s' is %d px wide" % [title_label.text if title_label != null else "?", roundi(w)])
 
 
 func clear_body() -> void:
@@ -70,13 +80,18 @@ func add_button(t: String, cb: Callable, disabled: bool = false, tip: String = "
 	# Item icons share one width (skill-frame icons are bigger than item sprites).
 	b.add_theme_constant_override("icon_max_width", Display.tile / 2)
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	# Long labels wrap at the panel's width instead of pushing it off screen.
+	b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	b.custom_minimum_size.x = panel.custom_minimum_size.x - 2 * UiTheme.FONT_SIZE
 	body.add_child(b)
 	_fit.call_deferred()
 	return b
 
 
-func row() -> HBoxContainer:
-	var r := HBoxContainer.new()
+## A row of controls that wraps onto a new line when it runs out of width.
+func row() -> HFlowContainer:
+	var r := HFlowContainer.new()
+	r.custom_minimum_size.x = panel.custom_minimum_size.x - 2 * UiTheme.FONT_SIZE
 	body.add_child(r)
 	return r
 

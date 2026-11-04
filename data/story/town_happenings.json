@@ -1,0 +1,619 @@
+{
+  "comment": "Optional town happenings (user request, Oct 29): each waits at a place during a window of day parts (many during class, so skipping pays off). Each is the only way to get its exclusive card (data/cards/town_exclusive_cards.json). 'hint' shows in the morning paper and the goal tracker. They play once per run.",
+  "stories": [
+    {
+      "id": "hap_pigeon_hour",
+      "inline": true,
+      "happening": true,
+      "hint": "Walt feeds the pigeons in the park (Tue and Thu, periods 1 and 2)",
+      "trigger": {
+        "day": [
+          "tue",
+          "thu"
+        ],
+        "part": "period_1",
+        "minWeek": 1,
+        "maxWeek": 5
+      },
+      "window": [
+        "period_1",
+        "period_2"
+      ],
+      "at": {
+        "loc": "park"
+      },
+      "steps": [
+        {
+          "type": "event",
+          "event": {
+            "title": "Pigeon hour",
+            "text": "Walt is surrounded by about two hundred pigeons. They all turn to look at you at once.",
+            "choices": [
+              {
+                "label": "Help feed them",
+                "effects": {
+                  "bond": {
+                    "walt": 5
+                  },
+                  "card": "card_pigeon_swarm"
+                },
+                "result": "The pigeons accept you. Walt says that's rare. 'They'll come if you need them,' he says, and you somehow believe him. (New card: Pigeon Swarm)"
+              },
+              {
+                "label": "Back away slowly",
+                "effects": {
+                  "statXp": {
+                    "per": 1
+                  }
+                },
+                "result": "Two hundred heads follow you out of the park."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "hap_10_15_freight",
+      "inline": true,
+      "happening": true,
+      "hint": "Something rattles into the empty train station (Wed, period 2, from week 2)",
+      "trigger": {
+        "day": [
+          "wed"
+        ],
+        "part": "period_2",
+        "minWeek": 2,
+        "maxWeek": 5
+      },
+      "window": [
+        "period_2"
+      ],
+      "at": {
+        "loc": "train_station"
+      },
+      "steps": [
+        {
+          "type": "event",
+          "event": {
+            "title": "The 10:15",
+            "text": "At exactly 10:15 the old departure board flips by itself. A whistle sounds from nowhere. Amos goes very still.",
+            "choices": [
+              {
+                "label": "Check the platform",
+                "effects": {
+                  "bond": {
+                    "amos": 6
+                  },
+                  "card": "card_ghost_ticket",
+                  "clue": "thirty_year_train"
+                },
+                "result": "On the platform: one yellowed ticket, punched thirty years ago, warm to the touch. (New card: Ghost Ticket)"
+              },
+              {
+                "label": "Stay with Amos",
+                "effects": {
+                  "bond": {
+                    "amos": 10
+                  }
+                },
+                "result": "'Every Wednesday,' he whispers. 'Every single Wednesday.'"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "hap_rail_grind",
+      "inline": true,
+      "happening": true,
+      "hint": "Lena tries a rail grind at the downtown bus stop (Mon and Fri, period 3)",
+      "trigger": {
+        "day": [
+          "mon",
+          "fri"
+        ],
+        "part": "period_3",
+        "minWeek": 1,
+        "maxWeek": 5
+      },
+      "window": [
+        "period_3"
+      ],
+      "at": {
+        "loc": "bus_stop_downtown"
+      },
+      "steps": [
+        {
+          "type": "event",
+          "event": {
+            "title": "Lena's rail",
+            "text": "Lena has been trying to grind the bus stop railing for a week. 'Spot me?'",
+            "choices": [
+              {
+                "label": "Spot her",
+                "effects": {
+                  "bond": {
+                    "lena": 8
+                  },
+                  "card": "card_kickflip"
+                },
+                "result": "She lands it. Then makes you try. You land something that is technically a trick. (New card: Kickflip)"
+              },
+              {
+                "label": "Film it",
+                "effects": {
+                  "bond": {
+                    "lena": 4
+                  },
+                  "statXp": {
+                    "cha": 1
+                  }
+                },
+                "result": "The video gets eleven views. Nine are Lena."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "hap_busker_duel",
+      "inline": true,
+      "happening": true,
+      "hint": "A rival busker challenges Juniper on the square (Fri after school, Sat midday)",
+      "trigger": {
+        "day": [
+          "fri",
+          "sat"
+        ],
+        "part": "after_school",
+        "minWeek": 1,
+        "maxWeek": 5
+      },
+      "window": [
+        "after_school",
+        "midday"
+      ],
+      "at": {
+        "loc": "town_square"
+      },
+      "steps": [
+        {
+          "type": "event",
+          "event": {
+            "title": "Busker's duel",
+            "text": "A man with an accordion sets up ten feet from Juniper. This is war.",
+            "choices": [
+              {
+                "label": "Hype up Juniper (CHA)",
+                "effects": {
+                  "bond": {
+                    "juniper": 8
+                  },
+                  "card": "card_encore_riff"
+                },
+                "result": "The crowd picks Juniper. She plays one last riff just for you and says you can keep it. (New card: Encore Riff)"
+              },
+              {
+                "label": "Throw a coin in both hats",
+                "effects": {
+                  "money": -2,
+                  "bond": {
+                    "juniper": 3
+                  }
+                },
+                "result": "Diplomatic. Both of them glare at you."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "hap_hanks_keys",
+      "inline": true,
+      "happening": true,
+      "hint": "Hank lost his keys somewhere in the school (Mon to Thu after school, from week 2)",
+      "trigger": {
+        "day": [
+          "mon",
+          "tue",
+          "wed",
+          "thu"
+        ],
+        "part": "after_school",
+        "minWeek": 2,
+        "maxWeek": 5
+      },
+      "window": [
+        "after_school"
+      ],
+      "at": {
+        "loc": "hallways"
+      },
+      "steps": [
+        {
+          "type": "event",
+          "event": {
+            "title": "Hank's keys",
+            "text": "Hank is patting every pocket. 'Forty keys on that ring. If the wrong person finds it...'",
+            "choices": [
+              {
+                "label": "Help search",
+                "effects": {
+                  "bond": {
+                    "hank": 8
+                  },
+                  "card": "card_master_key"
+                },
+                "result": "You find the ring in the boiler room door. He gives you a spare: 'Opens most things. Don't open locker 113.' (New card: Master Key)"
+              },
+              {
+                "label": "Tell him you're busy",
+                "effects": {},
+                "result": "He sighs and keeps patting pockets."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "hap_rare_stall",
+      "inline": true,
+      "happening": true,
+      "hint": "Rosa's rare flower stall at the Saturday morning market",
+      "trigger": {
+        "day": [
+          "sat"
+        ],
+        "part": "morning",
+        "minWeek": 1,
+        "maxWeek": 5
+      },
+      "window": [
+        "morning"
+      ],
+      "at": {
+        "loc": "town_square"
+      },
+      "steps": [
+        {
+          "type": "event",
+          "event": {
+            "title": "The rare stall",
+            "text": "Rosa has one bucket set apart from the rest. The flowers in it are pressed flat, and still somehow growing.",
+            "choices": [
+              {
+                "label": "Buy one ($8)",
+                "effects": {
+                  "money": -8,
+                  "bond": {
+                    "rosa": 5
+                  },
+                  "card": "card_pressed_flower"
+                },
+                "result": "'Keep it close,' Rosa says. 'It remembers how to be alive.' (New card: Pressed Flower)",
+                "cond": {
+                  "minMoney": 8
+                }
+              },
+              {
+                "label": "Just look",
+                "effects": {
+                  "bond": {
+                    "rosa": 2
+                  }
+                },
+                "result": "Rosa lets you smell one. It smells like next week."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "hap_arcade_tournament",
+      "inline": true,
+      "happening": true,
+      "hint": "High-score tournament at the arcade (Thu, period 3)",
+      "trigger": {
+        "day": [
+          "thu"
+        ],
+        "part": "period_3",
+        "minWeek": 1,
+        "maxWeek": 5
+      },
+      "window": [
+        "period_3"
+      ],
+      "at": {
+        "loc": "arcade"
+      },
+      "steps": [
+        {
+          "type": "event",
+          "event": {
+            "title": "Midday tournament",
+            "text": "The arcade is running a 'midday tournament', which is to say it's full of kids who should be in class.",
+            "choices": [
+              {
+                "label": "Enter",
+                "effects": {
+                  "bond": {
+                    "lena": 3,
+                    "dex": 3
+                  },
+                  "statXp": {
+                    "dex": 1
+                  },
+                  "card": "card_high_score"
+                },
+                "result": "You take first place. The prize is a laminated card with your initials. It feels heavier than it should. (New card: High Score)"
+              },
+              {
+                "label": "Watch",
+                "effects": {
+                  "statXp": {
+                    "per": 1
+                  }
+                },
+                "result": "Dex wins, then loses, then wins again. Nobody can explain the scoring."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "hap_pruitt_break",
+      "inline": true,
+      "happening": true,
+      "hint": "Officer Pruitt takes her coffee break at Gary's Deli (Tue, period 2)",
+      "trigger": {
+        "day": [
+          "tue"
+        ],
+        "part": "period_2",
+        "minWeek": 1,
+        "maxWeek": 5
+      },
+      "window": [
+        "period_2"
+      ],
+      "at": {
+        "loc": "garys_deli"
+      },
+      "steps": [
+        {
+          "type": "event",
+          "event": {
+            "title": "Coffee break",
+            "text": "Officer Pruitt is at the counter with a coffee. She sees you. You see her. Gary pretends to see nothing.",
+            "choices": [
+              {
+                "label": "Sit down next to her",
+                "effects": {
+                  "bond": {
+                    "officer_pruitt": 8
+                  },
+                  "card": "card_whistle_blast"
+                },
+                "result": "She lets it slide. 'You remind me of me.' She leaves her spare whistle on the counter when she goes. (New card: Whistle Blast)"
+              },
+              {
+                "label": "Leave before she gets up",
+                "effects": {
+                  "statXp": {
+                    "dex": 1
+                  }
+                },
+                "result": "You're out the door before the bell stops ringing."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "hap_fountain_hum",
+      "inline": true,
+      "happening": true,
+      "hint": "The dry fountain hums after dark (weekend evenings, from week 3)",
+      "trigger": {
+        "day": [
+          "sat",
+          "sun"
+        ],
+        "part": "weekend_evening",
+        "minWeek": 3,
+        "maxWeek": 5
+      },
+      "window": [
+        "weekend_evening"
+      ],
+      "at": {
+        "loc": "town_square"
+      },
+      "steps": [
+        {
+          "type": "event",
+          "event": {
+            "title": "The fountain hums",
+            "text": "The fountain hasn't run in thirty years. Tonight it hums, very softly, in a key that makes your teeth ache.",
+            "choices": [
+              {
+                "label": "Reach into the basin",
+                "effects": {
+                  "card": "card_fountain_coin",
+                  "signature": {
+                    "light": 1
+                  }
+                },
+                "result": "At the bottom: one coin, warm, with a face nobody's minted. (New card: Fountain Coin)"
+              },
+              {
+                "label": "Walk away",
+                "effects": {},
+                "result": "The humming follows you to the corner, then stops."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "hap_wrong_delivery",
+      "inline": true,
+      "happening": true,
+      "hint": "Mo has a package for nobody at the post office (Mon, period 1)",
+      "trigger": {
+        "day": [
+          "mon"
+        ],
+        "part": "period_1",
+        "minWeek": 1,
+        "maxWeek": 5
+      },
+      "window": [
+        "period_1"
+      ],
+      "at": {
+        "loc": "post_office"
+      },
+      "steps": [
+        {
+          "type": "event",
+          "event": {
+            "title": "Wrong delivery",
+            "text": "Mo is holding a box addressed to '?' at '?'. 'Third one this month. You want to help me find where it goes?'",
+            "choices": [
+              {
+                "label": "Ride along",
+                "effects": {
+                  "bond": {
+                    "mo": 8
+                  },
+                  "card": "card_shortcut"
+                },
+                "result": "It belongs to the abandoned lot. Mo shows you six shortcuts on the way. (New card: Shortcut)"
+              },
+              {
+                "label": "Not today",
+                "effects": {},
+                "result": "Mo shrugs and puts it on the 'later' pile. The pile is enormous."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "hap_book_sale",
+      "inline": true,
+      "happening": true,
+      "hint": "Ms. Marlowe's book sale at the library (Wed, period 3)",
+      "trigger": {
+        "day": [
+          "wed"
+        ],
+        "part": "period_3",
+        "minWeek": 1,
+        "maxWeek": 5
+      },
+      "window": [
+        "period_3"
+      ],
+      "at": {
+        "loc": "library"
+      },
+      "steps": [
+        {
+          "type": "event",
+          "event": {
+            "title": "The book sale",
+            "text": "The library's having a book sale. Ms. Marlowe has pulled one book off the cart and is holding it like it bit her.",
+            "choices": [
+              {
+                "label": "Ask about it",
+                "effects": {
+                  "bond": {
+                    "ms_marlowe": 6
+                  },
+                  "card": "card_overdue_notice",
+                  "clue": "founder_fountain"
+                },
+                "result": "'Thirty years overdue,' she says. 'Returned last night. By nobody.' She lets you keep the notice. (New card: Overdue Notice)"
+              },
+              {
+                "label": "Browse the cart",
+                "effects": {
+                  "statXp": {
+                    "int": 1
+                  }
+                },
+                "result": "You buy a paperback about lighthouses for a quarter."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "hap_park_quiz",
+      "inline": true,
+      "happening": true,
+      "hint": "Mr. Ellis grades papers in the park (Fri, period 2, from week 2)",
+      "trigger": {
+        "day": [
+          "fri"
+        ],
+        "part": "period_2",
+        "minWeek": 2,
+        "maxWeek": 5
+      },
+      "window": [
+        "period_2"
+      ],
+      "at": {
+        "loc": "park"
+      },
+      "steps": [
+        {
+          "type": "event",
+          "event": {
+            "title": "Pop quiz in the park",
+            "text": "Mr. Ellis is grading quizzes on a bench. He looks up. 'You're not in my class. Want to take a quiz anyway?'",
+            "choices": [
+              {
+                "label": "Take it (INT)",
+                "effects": {
+                  "bond": {
+                    "mr_ellis": 6
+                  },
+                  "statXp": {
+                    "int": 1
+                  },
+                  "card": "card_pop_quiz"
+                },
+                "result": "You get a B. He gives you his favourite trick question to keep. (New card: Pop Quiz)"
+              },
+              {
+                "label": "Pass",
+                "effects": {
+                  "bond": {
+                    "mr_ellis": 2
+                  }
+                },
+                "result": "'Fair. I wouldn't either.'"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

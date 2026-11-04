@@ -66,6 +66,9 @@ static func options(state: StateScript, u: UnitScript) -> Array:
 				# Moving doesn't dodge a tracking attack unless it gets out of reach.
 				d += float(state.tracking_threat(u, cell))
 			danger[m] = d * float(c.get("dodgeWeight", 1.2))
+			# Don't end a move standing in something that hurts.
+			if state.grid.get_terrain(cell) == GridScript.HAZARD or state.grid.burning.has(cell) or state.grid.toxic.has(cell):
+				danger[m] = float(danger[m]) + float(c.get("hazardAvoid", 6.0))
 	# Teamwork (AR): enemies stay out of each other's telegraphs and spread their
 	# own over different tiles, so the safe ground keeps shrinking.
 	var claimed := {}

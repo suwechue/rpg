@@ -74,12 +74,36 @@ static func due_at(db: Dictionary, run: Dictionary, ctx: Dictionary, zone: Strin
 		var trig: Dictionary = s.get("trigger", {}).duplicate()
 		var want := str(trig.get("part", ""))
 		trig.erase("part")
-		if want != "" and parts.find(str(ctx.get("part", ""))) < parts.find(want):
-			continue
-		if want != "" and parts.find(want) < 0:
+		# A happening's window: only during these parts (not the rest of the day).
+		if s.has("window"):
+			if not Array(s["window"]).has(str(ctx.get("part", ""))):
+				continue
+		elif want != "" and (parts.find(str(ctx.get("part", ""))) < parts.find(want) or parts.find(want) < 0):
 			continue
 		if Fx.conditions_met(db, run, trig, ctx) and Fx.conditions_met(db, run, s.get("cond", {}), ctx):
 			out.append(str(s["id"]))
+	return out
+
+
+## Happenings today (data/story/town_happenings.json) that haven't played:
+## [{ id, hint, open }], open meaning their window is now.
+static func happenings_today(db: Dictionary, run: Dictionary, ctx: Dictionary) -> Array:
+	var out: Array = []
+	for s in all(db):
+		if not bool(s.get("happening", false)) or done(run, str(s["id"])):
+			continue
+		var trig: Dictionary = s.get("trigger", {}).duplicate()
+		trig.erase("part")
+		if not Fx.conditions_met(db, run, trig, ctx) or not Fx.conditions_met(db, run, s.get("cond", {}), ctx):
+			continue
+		var parts := part_order(db, str(ctx.get("day", "")))
+		var win: Array = s.get("window", [])
+		var last := -1
+		for p in win:
+			last = maxi(last, parts.find(str(p)))
+		if last >= 0 and parts.find(str(ctx.get("part", ""))) > last:
+			continue
+		out.append({ "id": str(s["id"]), "hint": str(s.get("hint", "")), "open": win.has(str(ctx.get("part", ""))) })
 	return out
 
 

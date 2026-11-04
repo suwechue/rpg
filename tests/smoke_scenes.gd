@@ -354,6 +354,76 @@ func _drive(done: Callable, needles: Array, seconds: float = 60.0) -> bool:
 
 
 ## M6 "Done when": the Kelly Monday scenario plays and tracks her Risk; both outcomes.
+## Clipping between zones (user request, Oct 29): arriving through every exit,
+## nobody stands on the player, followers stand apart, and the player isn't
+## left inside an exit.
+func smoke_zone_arrivals() -> void:
+	var gs: Node = _root_node("GameState")
+	var cal: Node = _root_node("Calendar")
+	gs.call("new_run", 777, "fighter")
+	gs.get("run")["schedule_week"] = 1
+	cal.call("reset", { "week": 1, "day_index": 0, "part_index": 5, "ap": -1 })
+	# Two followers (their NPC records are all the town needs to draw them).
+	gs.get("run")["party_ids"] = ["theo", "dex"]
+	var town: Node = await _goto("res://src/scenes/town/town.tscn")
+	var ok := true
+	for zid in ["downtown", "residential", "outskirts", "school"]:
+		town.call("_load_map", zid, false, "", Vector2i(10, 10))
+		await process_frame
+		var map: Node = town.get("map")
+		for e in map.get("exits"):
+			town.call("_load_map", str(e["to"]), false, "", e["spawn"])
+			await process_frame
+			var c: Vector2i = town.get("cell")
+			var taken: Dictionary = town.get("npcs").duplicate()
+			taken.merge(town.get("crowd"))
+			var fcells: Dictionary = town.call("_follower_cells")
+			if taken.has(c) or fcells.has(c) or bool(town.call("_in_exit", c)):
+				ok = false
+				printerr("  arrival clash: %s -> %s at %s" % [zid, e["to"], str(c)])
+			var fs: Array = town.get("_followers")
+			if fcells.size() != fs.size():
+				ok = false
+				printerr("  followers stacked: %s -> %s" % [zid, e["to"]])
+	check(ok, "every zone arrival is clear (player, followers, crowd)")
+	await _goto("res://src/scenes/title/title.tscn")
+
+
+## A happening for real: skipping class, walk near the park in its window, take
+## the choice, pick whose deck, and the exclusive card is yours.
+func smoke_happening() -> void:
+	var gs: Node = _root_node("GameState")
+	var cal: Node = _root_node("Calendar")
+	gs.call("new_run", 4242, "fighter")
+	gs.get("run")["schedule_week"] = 1
+	cal.call("reset", { "week": 1, "day_index": 1, "part_index": 1, "ap": 2 })
+	var town: Node = await _goto("res://src/scenes/town/town.tscn")
+	var cls := _top_modal()
+	if cls != null:
+		cls.call("finish", "skipped")
+	await process_frame
+	var spot: Vector2i = Vector2i(-1, -1)
+	town.call("_load_map", "outskirts", false, "", Vector2i(10, 10))
+	await process_frame
+	spot = town.get("map").get("spots").get("park", Vector2i(-1, -1))
+	check(spot.x >= 0, "the park has a spot")
+	town.set("cell", spot + Vector2i(1, 1))
+	town.call("_check_place_stories")
+	var ev := await _wait_modal("event_screen.gd", 60)
+	check(ev != null and _press(ev, "Help feed"), "pigeon hour plays at the park during period 1")
+	await process_frame
+	var cont := await _wait_modal("event_screen.gd", 10)
+	if cont != null:
+		_press(cont)
+	var op := await _wait_modal("owner_pick.gd", 60)
+	check(op != null, "the card asks whose deck")
+	if op != null:
+		_press(op, str(gs.get("player").get("name", "")))
+	await process_frame
+	check(gs.get("player").get("deck", []).has("card_pigeon_swarm"), "the exclusive card lands in the deck")
+	await _goto("res://src/scenes/title/title.tscn")
+
+
 func smoke_kelly_monday() -> void:
 	var gs: Node = _root_node("GameState")
 	var cal: Node = _root_node("Calendar")

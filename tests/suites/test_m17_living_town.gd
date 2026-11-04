@@ -12,7 +12,7 @@ func run_() -> Dictionary:
 func test_generate_crowd() -> void:
 	var run := run_()
 	var people := Crowd.generate(db(), run, "downtown", "midday", 1, seeded(2))
-	check(people.size() == 11, "a weekend square crowd: 7 adults + 4 students (%d)" % people.size())
+	check(people.size() == 15, "a weekend square crowd: 9 adults + 6 students (%d)" % people.size())
 	var names := {}
 	for p in people:
 		check(Assets_has(str(p["sprite"])), "%s has a sprite" % p["name"])

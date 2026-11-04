@@ -17,6 +17,9 @@ var _skip := false
 var _fast := false
 var _advance := false
 var _box: PanelContainer
+var _stage: Node2D                    # a room drawn with sprites (class periods)
+var _stage_map: Node2D
+var _stage_actors: Dictionary = {}
 var _text: Label
 var _name: Label
 var _left: TextureRect
@@ -202,6 +205,8 @@ func _steps(steps: Array, host: Node, markers: Dictionary) -> void:
 					Audio.event(str(st.get("event", "")))
 			"image":
 				var id := str(st.get("id", ""))
+				if id == "":
+					_hide_stage()
 				_image.visible = id != ""
 				_image.texture = Assets.texture(id) if id != "" and (Assets.has(id) or Assets.custom_file(id) != "") else null
 				# Missing art falls back to a dark backdrop over the current scene.
@@ -252,7 +257,14 @@ func _steps(steps: Array, host: Node, markers: Dictionary) -> void:
 				_apply(st.get("effects", {}))
 			"seating":
 				if not _skip:
-					await _seating(st)
+					if not st.get("stage", {}).is_empty():
+						_seat_class(st["stage"])
+						await _until_advance()
+					else:
+						await _seating(st)
+			"stage":
+				if not _skip:
+					await _hall_walk(st)
 			"start_combat":
 				# Ends the cutscene and starts the fight (the scene that called comes back after).
 				var setup := GameState.combat_setup(st.get("enemies", []), str(st.get("layout", "open_field")), { "intro": _line(st) if st.has("text") or st.has("textKey") else "" })
@@ -387,6 +399,7 @@ func _settings_speed() -> int:
 
 
 func _clear() -> void:
+	_hide_stage()
 	_box.visible = false
 	_title.visible = false
 	_image.visible = false
@@ -396,7 +409,103 @@ func _clear() -> void:
 	_fade.color.a = 0.0
 
 
+# --- Stages: rooms drawn with sprites (class periods, user request Oct 29) ---------
+
+## Draw an interior (data/town/interiors.json) as the backdrop, scrolled so the
+## dialogue box doesn't cover the middle of the room. Returns the map node.
+func _show_stage(interior: String) -> Node2D:
+	_hide_stage()
+	_stage = Node2D.new()
+	var bg := ColorRect.new()
+	bg.color = UiTheme.color("bg")
+	bg.size = Display.size_f()
+	_stage.add_child(bg)
+	var map: Node2D = preload("res://src/scenes/town/town_map.gd").new()
+	map.call("build", DataDB.all(), interior, true)
+	map.y_sort_enabled = true
+	var px := Vector2(map.get("size")) * Display.tile
+	map.position = Vector2(maxf(0.0, (Display.size_f().x - px.x) / 2.0), -Display.tile * 0.5).floor()
+	_stage.add_child(map)
+	_stage_map = map
+	add_child(_stage)
+	move_child(_stage, _image.get_index() + 1)
+	return map
+
+
+func _hide_stage() -> void:
+	if _stage != null and is_instance_valid(_stage):
+		_stage.queue_free()
+	_stage = null
+	_stage_map = null
+	_stage_actors.clear()
+
+
+## A character on the stage at a tile, facing a way, with a name tag.
+func _stage_walker(sprite: String, cell: Vector2i, dir: Vector2i, tag_text: String, color: Color) -> Node2D:
+	var w: Node2D = preload("res://src/scenes/common/walker_sprite.gd").new(sprite)
+	w.position = Vector2(cell.x * Display.tile, (cell.y + 1) * Display.tile)
+	# Above the furniture drawing (the town's characters use the same layer).
+	w.z_index = 4
+	w.call("face", dir)
+	if tag_text != "":
+		var tag := UiTheme.world_label(tag_text, color)
+		var fs: Vector2i = w.get("frame_size")
+		tag.position = Vector2((fs.x - tag.get_minimum_size().x) / 2.0, -fs.y - UiTheme.FONT_SIZE - 3)
+		w.add_child(tag)
+	_stage_map.add_child(w)
+	return w
+
+
+func _npc_sprite(id: String) -> String:
+	if id == "@you":
+		return str(GameState.player.get("sprite", Assets.role("player")))
+	return str(DataDB.table("npcs/" + id).get("sprite", Assets.role("player")))
+
+
+## The class: the teacher at the board, everyone in a seat facing it, you marked.
+func _seat_class(stage: Dictionary) -> void:
+	_show_stage(str(stage.get("interior", "classroom")))
+	var t: Array = stage.get("teacher", [8, 3])
+	var tid := str(stage.get("teacherId", ""))
+	if tid != "":
+		_stage_actors[tid] = _stage_walker(_npc_sprite(tid), Vector2i(int(t[0]), int(t[1])), Vector2i.DOWN,
+			str(DataDB.table("npcs/" + tid).get("name", "")), UiTheme.ACCENT)
+	for s in stage.get("seats", []):
+		var who := str(s[2])
+		var you := who == "@you"
+		var nm := Strings.t("school.you") if you else str(DataDB.table("npcs/" + who).get("name", who.capitalize())).split(" ")[0]
+		_stage_actors[who] = _stage_walker(_npc_sprite(who), Vector2i(int(s[0]), int(s[1])), Vector2i.UP, nm, UiTheme.ACCENT if you else UiTheme.DIM)
+
+
+## The walk to class: the hall with a few students at the lockers, and you
+## walking its length while it scrolls along.
+func _hall_walk(st: Dictionary) -> void:
+	var map := _show_stage(str(st.get("interior", "school_hall")))
+	var size: Vector2i = map.get("size")
+	var students: Array = st.get("students", [])
+	for i in students.size():
+		var x := int(float(size.x) * float(i + 1) / float(students.size() + 1))
+		_stage_walker(_npc_sprite(str(students[i])), Vector2i(x, 3), Vector2i.DOWN, "", UiTheme.DIM)
+	if not bool(st.get("walk", true)):
+		return
+	var you := _stage_walker(_npc_sprite("@you"), Vector2i(1, 4), Vector2i.RIGHT, "", UiTheme.ACCENT)
+	var secs := float(DataDB.table("school_scenes").get("stage", {}).get("walkSeconds", 2.4)) / (10.0 if GameState.dev_autoplay else 1.0)
+	var end_x := float((size.x - 2) * Display.tile)
+	var scroll := minf(0.0, Display.size_f().x - float(size.x * Display.tile))
+	you.call("play_walk", secs)
+	var tw := create_tween().set_parallel()
+	tw.tween_property(you, "position:x", end_x, secs)
+	tw.tween_property(map, "position:x", scroll, secs)
+	var t := 0.0
+	while t < secs and not _skip:
+		await get_tree().process_frame
+		t += get_process_delta_time()
+	you.call("stop")
+
+
 func _actor(host: Node, id: String) -> Node2D:
+	if _stage_actors.has(id) and is_instance_valid(_stage_actors[id]):
+		return _stage_actors[id]
 	if host != null and host.has_method("cutscene_actor"):
 		return host.call("cutscene_actor", id)
 	return null

@@ -2,7 +2,7 @@
   "comment": "VD Parts 5 and 6: demo mode and feedback. The demo is on when 'enabled' is true or the build has the 'demo' feature tag (export preset \"Demo\"). It ends the run after week endAfterWeek's boss, shows the thanks screen, then the survey. The full game ignores this file unless demo mode is on; F8 feedback works in every build.",
   "enabled": false,
   "endAfterWeek": 1,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "comingSoon": [
     "Act 1: weeks 2 to 5, four more bosses and the truth about the town",
     "More friends to meet, recruit and fight beside",

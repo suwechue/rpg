@@ -805,7 +805,7 @@
     "combat.piles": "Draw %d · Discard %d",
     "combat_state.enrages": "%s grows furious: +%d%% damage.",
     "combat_state.calls_the_pack": "%s calls the pack! Minions arrive next round.",
-    "combat_state.last_stand": "%s makes a last stand!",
+    "combat_state.last_stand": "Not yet. %s refuses to fall: Last Stand!",
     "card_effects.draws": "%s draws %d.",
     "card_effects.recalls": "%s takes back %s.",
     "card_effects.seeks": "%s finds %s.",
@@ -1091,6 +1091,10 @@
     "cards.shelf_title": "The card shelf",
     "cards.shelf_help": "Ms. Marlowe keeps a shelf of strange cards. New ones each week. You have $%d.",
     "cards.shelf_row": "%s ($%d)",
-    "cards.shelf_empty": "The shelf is bare this week. Come back next week."
+    "cards.shelf_empty": "The shelf is bare this week. Come back next week.",
+    "goals.happenings": "Happening today",
+    "goals.happening_now": "NOW: %s",
+    "goals.happening_later": "Later: %s",
+    "paper.happenings": "Around town today: %s"
   }
 }

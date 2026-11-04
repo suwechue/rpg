@@ -1481,7 +1481,8 @@
         "after_school",
         "morning",
         "midday",
-        "afternoon"
+        "afternoon",
+        "@schoolHours"
       ],
       "lockedLine": "The station's dark. A sign: SERVICE RESUMES SOON. It's been 'soon' for thirty years.",
       "shop": "train_vendor",

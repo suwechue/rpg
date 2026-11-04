@@ -199,5 +199,8 @@
   "summonMinion": "pom_pom_wisp",
   "loopAt": 50,
   "loopMul": 1.25,
-  "loopNote": "After loopAt waves the arena starts over (weeks, themes, bosses, gimmicks) with everything loopMul times stronger per loop (user request, Oct 28)."
+  "loopNote": "After loopAt waves the arena starts over (weeks, themes, bosses, gimmicks) with everything loopMul times stronger per loop (user request, Oct 28).",
+  "breatherHp": 0.2,
+  "breatherNote": "Oct 29 balance pass: between waves everyone standing regains breatherHp of max HP as well as breatherMp, so a run reaches the first campfire more often.",
+  "firstBossHpMul": 0.7
 }

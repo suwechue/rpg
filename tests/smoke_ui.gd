@@ -44,6 +44,7 @@ const SCENES := [
 	"res://src/scenes/title/title.tscn",
 	"res://src/scenes/town/town.tscn",
 	"res://src/scenes/arena/arena.tscn",
+	"res://src/scenes/combat/combat.tscn",
 ]
 
 
@@ -97,6 +98,8 @@ func _run() -> void:
 			(load("res://src/scenes/title/title.gd") as GDScript).call("start_arena", { "class": "mage" }, 4, 4, 3, 999)
 			await _frames(30)
 		else:
+			if path.contains("combat"):
+				gs.set("pending_combat", gs.call("combat_setup", ["pom_pom_wisp"], "open_field", {}))
 			change_scene_to_file(path)
 			await _frames(30)
 		_clear_modals()
@@ -138,6 +141,15 @@ func _in_scroll(n: Node) -> bool:
 	return false
 
 
+func _on_map(n: Node) -> bool:
+	var p := n.get_parent()
+	while p != null:
+		if p is Node2D:
+			return true
+		p = p.get_parent()
+	return false
+
+
 func _audit(root_node: Node, label: String, modal: bool) -> void:
 	var view := Rect2(Vector2.ZERO, Vector2(_node("Display").get("base")))
 	var buttons: Array = []
@@ -162,6 +174,17 @@ func _audit(root_node: Node, label: String, modal: bool) -> void:
 			_issues.append("%s: button '%s' is off screen at %s" % [label, name, str(r)])
 			bad += 1
 	check(bad == 0, "%s: %d buttons are usable and on screen" % [label, buttons.size()])
+	# Text stays on screen too (world labels on the map can scroll off).
+	var lbad := 0
+	for l in root_node.find_children("*", "Label", true, false):
+		var lab := l as Label
+		if lab == null or not lab.is_visible_in_tree() or lab.text.strip_edges() == "" or _in_scroll(lab) or _on_map(lab):
+			continue
+		var lr := lab.get_global_rect()
+		if lr.size.x > 0 and not view.grow(1).encloses(lr):
+			_issues.append("%s: text '%s' is off screen at %s" % [label, lab.text.substr(0, 30), str(lr)])
+			lbad += 1
+	check(lbad == 0, "%s: text is on screen" % label)
 	if modal and not buttons.is_empty():
 		var focus := root_node.get_viewport().gui_get_focus_owner()
 		check(focus != null, "%s: something has keyboard focus" % label)

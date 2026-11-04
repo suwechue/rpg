@@ -1,0 +1,67 @@
+{
+  "id": "juniper",
+  "name": "Juniper",
+  "role": "Street busker",
+  "home": "elm_apartments",
+  "voice": {
+    "id": "voice_default",
+    "pitch": 1.0
+  },
+  "sprite": "npc_juniper_walk",
+  "portrait": "portrait_juniper",
+  "startBond": 0,
+  "disposition": {
+    "courage": 50,
+    "greed": 20,
+    "curiosity": 60,
+    "loyalty": 50,
+    "kindness": 60,
+    "pride": 30
+  },
+  "traits": [],
+  "recruitable": false,
+  "daytime": true,
+  "schedule": {
+    "weekday": {
+      "after_school": "town_square",
+      "period_2": "town_square"
+    },
+    "weekend": {
+      "morning": "town_square",
+      "midday": "town_square",
+      "afternoon": "town_square",
+      "weekend_evening": "town_square"
+    }
+  },
+  "greeting": "\"Request a song. I'll play a different one, but request it.\"",
+  "topics": [
+    {
+      "id": "juniper_song",
+      "label": "Ask about her songs",
+      "tone": {
+        "kindness": 0.7
+      },
+      "line": "Where do your songs come from?",
+      "baseRisk": 0.15,
+      "goodText": "\"Half of them I dreamed. The other half the town hums at night when it thinks nobody's listening.\"",
+      "badText": "\"Here and there.\"",
+      "outcomes": {
+        "onGood": {
+          "statXp": {
+            "cha": 1
+          }
+        }
+      }
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "music"
+    ],
+    "dislikes": [],
+    "likeText": "\"For me? Ha. Thanks.\""
+  },
+  "hangouts": [
+    "You and Juniper busk for an hour. She splits the hat with you, which is generous, since you can't play anything."
+  ]
+}

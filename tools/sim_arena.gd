@@ -59,6 +59,9 @@ static func play(db: Dictionary, seed_value: int, cls: String, size: int, cap: i
 			if int(ch.get("hp", 0)) > 0:
 				party.append({ "char": ch, "ai": true })
 		setup["party"] = party
+		# As the game does it: Normal, eased in by the wave ramp.
+		setup["ramp"] = StateScript.ramp_for(db, 0, int(arena.get("wave", 1)))
+		setup["difficulty"] = "normal"
 		var st := StateScript.new(db, rng, setup)
 		var g := 0
 		while st.result == "" and g < 900:

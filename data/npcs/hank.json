@@ -1,0 +1,61 @@
+{
+  "id": "hank",
+  "name": "Hank",
+  "role": "Night janitor at the school",
+  "home": "elm_apartments",
+  "voice": {
+    "id": "voice_default",
+    "pitch": 1.0
+  },
+  "sprite": "npc_hank_walk",
+  "portrait": "portrait_hank",
+  "startBond": 0,
+  "disposition": {
+    "courage": 50,
+    "greed": 20,
+    "curiosity": 60,
+    "loyalty": 50,
+    "kindness": 60,
+    "pride": 30
+  },
+  "traits": [],
+  "recruitable": false,
+  "daytime": true,
+  "schedule": {
+    "weekday": {
+      "after_school": "hallways"
+    },
+    "weekend": {
+      "afternoon": "hallways"
+    }
+  },
+  "greeting": "\"School's out. Means my shift's in. Don't track mud.\"",
+  "topics": [
+    {
+      "id": "hank_halls",
+      "label": "Ask about the halls at night",
+      "tone": {
+        "curiosity": 0.8
+      },
+      "line": "What's the school like after dark?",
+      "baseRisk": 0.15,
+      "goodText": "\"Lockers breathe. I'm not kidding. I just mop around it.\"",
+      "badText": "\"Quiet. Mostly.\"",
+      "outcomes": {
+        "onGood": {
+          "clue": "fountain_heart_hint"
+        }
+      }
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "food"
+    ],
+    "dislikes": [],
+    "likeText": "\"For me? Ha. Thanks.\""
+  },
+  "hangouts": [
+    "You help Hank mop the second floor. He tells you which lockers to never open."
+  ]
+}

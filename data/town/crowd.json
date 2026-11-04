@@ -116,93 +116,118 @@
     },
     "downtown": {
       "after_school": {
-        "student": 2,
-        "adult": 3
+        "student": 4,
+        "adult": 5
       },
       "evening": {
-        "adult": 3
+        "adult": 5
       },
       "morning": {
-        "adult": 6,
-        "student": 3
+        "adult": 8,
+        "student": 5
       },
       "midday": {
-        "adult": 7,
-        "student": 4
+        "adult": 9,
+        "student": 6
       },
       "afternoon": {
-        "adult": 6,
-        "student": 3
+        "adult": 8,
+        "student": 5
       },
       "period_1": {
-        "adult": 6,
-        "skipper": 2
+        "adult": 8,
+        "skipper": 3
       },
       "period_2": {
-        "adult": 6,
-        "skipper": 2
+        "adult": 8,
+        "skipper": 3
       },
       "period_3": {
-        "adult": 6,
-        "skipper": 2
+        "adult": 8,
+        "skipper": 3
+      },
+      "weekend_evening": {
+        "adult": 3,
+        "student": 2
+      },
+      "lunch": {
+        "adult": 2
       }
     },
     "residential": {
       "before_school": {
-        "adult": 2
+        "adult": 4
       },
       "after_school": {
-        "student": 3,
-        "adult": 2
+        "student": 4,
+        "adult": 4
       },
       "morning": {
-        "adult": 3,
-        "student": 2
+        "adult": 5,
+        "student": 3
       },
       "midday": {
-        "adult": 3,
-        "student": 3
+        "adult": 5,
+        "student": 4
       },
       "afternoon": {
-        "adult": 2,
-        "student": 3
+        "adult": 4,
+        "student": 4
       },
       "period_1": {
-        "adult": 3,
-        "skipper": 1
+        "adult": 5,
+        "skipper": 2
       },
       "period_2": {
-        "adult": 3,
-        "skipper": 1
+        "adult": 5,
+        "skipper": 2
       },
       "period_3": {
-        "adult": 3,
-        "skipper": 1
+        "adult": 5,
+        "skipper": 2
+      },
+      "weekend_evening": {
+        "adult": 2,
+        "student": 1
+      },
+      "lunch": {
+        "adult": 1
       }
     },
     "outskirts": {
       "after_school": {
-        "adult": 2
-      },
-      "midday": {
         "adult": 3,
         "student": 1
       },
-      "afternoon": {
-        "adult": 2,
+      "midday": {
+        "adult": 4,
         "student": 2
       },
+      "afternoon": {
+        "adult": 3,
+        "student": 3
+      },
       "period_1": {
-        "adult": 2,
-        "skipper": 1
+        "adult": 3,
+        "skipper": 2
       },
       "period_2": {
-        "adult": 2,
-        "skipper": 1
+        "adult": 3,
+        "skipper": 2
       },
       "period_3": {
+        "adult": 3,
+        "skipper": 2
+      },
+      "morning": {
+        "student": 1
+      },
+      "weekend_evening": {
         "adult": 2,
-        "skipper": 1
+        "student": 1
+      },
+      "lunch": {
+        "adult": 1
       }
     }
   },
@@ -300,6 +325,16 @@
   },
   "barkSeconds": 2.0,
   "barkCooldown": 4.0,
-  "wanderSeconds": 1.6,
-  "wanderRadius": 2
+  "wanderRadius": 2,
+  "wander": {
+    "comment": "Town walking (user request, Oct 29): everyone keeps their own rhythm: walk 1 to 3 tiles in one direction at a stroll, then stand a few seconds (sometimes just turning to look around).",
+    "tick": 0.25,
+    "stepSeconds": 0.55,
+    "betweenSteps": 0.3,
+    "walkMin": 1,
+    "walkMax": 3,
+    "pauseMin": 2.5,
+    "pauseMax": 6.5,
+    "lookChance": 0.3
+  }
 }

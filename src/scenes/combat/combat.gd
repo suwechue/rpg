@@ -380,6 +380,9 @@ func _build_ui() -> void:
 		b.tooltip_text = spec[2]
 		col.add_child(b)
 		_buttons[key] = b
+	# Sit on the bottom edge however many buttons there are; the pips ride on top.
+	col.position.y = minf(hand_y, view.y - col.get_combined_minimum_size().y - 1)
+	_pips.position.y = col.position.y - 8
 	# Strike and Guard are Quicks: they sit beside the hand (PT Part 3).
 	_quick_box = VBoxContainer.new()
 	_quick_box.theme_type_variation = "CompactBox"

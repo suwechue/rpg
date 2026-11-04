@@ -1,0 +1,289 @@
+{
+  "comment": "Exclusive town cards (user request, Oct 29): each comes only from one optional happening in data/story/town_happenings.json (a place and a time window, often during class). 'exclusive' keeps them out of arena offers, story card picks and the library shelf.",
+  "cards": [
+    {
+      "id": "card_pigeon_swarm",
+      "name": "Pigeon Swarm",
+      "kind": "basic",
+      "rarity": "rare",
+      "exclusive": true,
+      "short": "Blind area",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "any",
+        "range": 4
+      },
+      "effects": [
+        {
+          "op": "status_area",
+          "status": "blind",
+          "turns": 1
+        }
+      ],
+      "text": "Walt's pigeons owe you one. Every enemy within 2 of the target is Blinded for 1 turn."
+    },
+    {
+      "id": "card_ghost_ticket",
+      "name": "Ghost Ticket",
+      "kind": "basic",
+      "rarity": "rare",
+      "exclusive": true,
+      "short": "Swap",
+      "action": "effects",
+      "cost": 0,
+      "quick": true,
+      "targeting": {
+        "type": "unit",
+        "range": 5
+      },
+      "effects": [
+        {
+          "op": "swap"
+        }
+      ],
+      "text": "Quick. A ticket for a train that left thirty years ago. Swap places with any unit within 5."
+    },
+    {
+      "id": "card_kickflip",
+      "name": "Kickflip",
+      "kind": "basic",
+      "rarity": "uncommon",
+      "exclusive": true,
+      "short": "Hit + move",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "strike_x",
+          "stat": "dex",
+          "mult": 0.9
+        },
+        {
+          "op": "free_move",
+          "tiles": 2
+        }
+      ],
+      "text": "Strike (DEX x0.9), then move 2 tiles for free. Lena says you'll land it eventually.",
+      "weaponTag": "blade"
+    },
+    {
+      "id": "card_encore_riff",
+      "name": "Encore Riff",
+      "kind": "basic",
+      "rarity": "rare",
+      "exclusive": true,
+      "short": "Ally acts",
+      "action": "effects",
+      "cost": 2,
+      "targeting": {
+        "type": "ally",
+        "range": 4
+      },
+      "effects": [
+        {
+          "op": "encore"
+        }
+      ],
+      "text": "Juniper's best riff. An ally within 4 takes another turn right after this one."
+    },
+    {
+      "id": "card_master_key",
+      "name": "Master Key",
+      "kind": "basic",
+      "rarity": "rare",
+      "exclusive": true,
+      "short": "Blink + draw",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "empty",
+        "range": 4
+      },
+      "effects": [
+        {
+          "op": "blink"
+        },
+        {
+          "op": "draw",
+          "n": 1
+        }
+      ],
+      "text": "Hank's spare. Teleport to an empty tile within 4 and draw a card."
+    },
+    {
+      "id": "card_pressed_flower",
+      "name": "Pressed Flower",
+      "kind": "basic",
+      "rarity": "uncommon",
+      "exclusive": true,
+      "short": "Heal + cleanse",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "ally",
+        "range": 3
+      },
+      "effects": [
+        {
+          "op": "heal",
+          "amount": 8
+        },
+        {
+          "op": "cleanse",
+          "all": true
+        }
+      ],
+      "text": "From the market's rare stall. An ally within 3 heals 8 and loses every bad status."
+    },
+    {
+      "id": "card_high_score",
+      "name": "High Score",
+      "kind": "basic",
+      "rarity": "rare",
+      "exclusive": true,
+      "short": "Grows",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "strike_x",
+          "stat": "str",
+          "mult": 0.7,
+          "grow": 0.4
+        }
+      ],
+      "text": "Strike (STR x0.7). It hits +0.4 harder every time you play it this fight. Initials: YOU.",
+      "weaponTag": "blunt"
+    },
+    {
+      "id": "card_whistle_blast",
+      "name": "Whistle Blast",
+      "kind": "basic",
+      "rarity": "uncommon",
+      "exclusive": true,
+      "short": "Taunt + root",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "self",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "taunt",
+          "radius": 3,
+          "turns": 1
+        },
+        {
+          "op": "root_area",
+          "turns": 1
+        }
+      ],
+      "text": "Officer Pruitt's spare whistle. Enemies within 3 turn toward you and are Rooted for 1 turn."
+    },
+    {
+      "id": "card_fountain_coin",
+      "name": "Fountain Coin",
+      "kind": "basic",
+      "rarity": "rare",
+      "exclusive": true,
+      "short": "Revive heal",
+      "action": "effects",
+      "cost": 0,
+      "quick": true,
+      "targeting": {
+        "type": "self",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "once_heal_pct",
+          "pct": 0.3
+        }
+      ],
+      "text": "Quick. Once per fight: heal 30% of your max HP. Someone made a wish on it, once."
+    },
+    {
+      "id": "card_shortcut",
+      "name": "Shortcut",
+      "kind": "basic",
+      "rarity": "uncommon",
+      "exclusive": true,
+      "short": "Free move",
+      "action": "effects",
+      "cost": 0,
+      "quick": true,
+      "targeting": {
+        "type": "self",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "free_move",
+          "tiles": 3
+        }
+      ],
+      "text": "Quick. Mo knows every back way. Move 3 tiles for free."
+    },
+    {
+      "id": "card_overdue_notice",
+      "name": "Overdue Notice",
+      "kind": "basic",
+      "rarity": "rare",
+      "exclusive": true,
+      "short": "Recall + draw",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "self",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "recall_best"
+        },
+        {
+          "op": "draw",
+          "n": 1
+        }
+      ],
+      "text": "Ms. Marlowe always gets her books back. Return your most expensive discard to your hand and draw 1."
+    },
+    {
+      "id": "card_pop_quiz",
+      "name": "Pop Quiz",
+      "kind": "basic",
+      "rarity": "rare",
+      "exclusive": true,
+      "short": "Mark + draw",
+      "action": "effects",
+      "cost": 0,
+      "quick": true,
+      "targeting": {
+        "type": "enemy",
+        "range": 5
+      },
+      "effects": [
+        {
+          "op": "status_target",
+          "status": "marked",
+          "turns": 2
+        },
+        {
+          "op": "draw",
+          "n": 1
+        }
+      ],
+      "text": "Quick. Mr. Ellis's favourite trick. The target is Marked for 2 turns; draw 1."
+    }
+  ]
+}

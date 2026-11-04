@@ -87,6 +87,18 @@ static func rest(db: Dictionary, run: Dictionary, room: Dictionary) -> Array:
 	return lines
 
 
+## After a won fight, by combat difficulty (data/dungeon.json afterFight).
+static func after_fight(db: Dictionary, run: Dictionary) -> void:
+	var af: Dictionary = cfg(db).get("afterFight", {}).get(str(run.get("combat_difficulty", "normal")), {})
+	recover(db, run, float(af.get("hp", cfg(db).get("afterFightHpPct", 0.0))))
+	var mp := float(af.get("mp", 0.0))
+	if mp > 0.0:
+		for ch in party_chars(run):
+			var d := Char.derived(db, ch)
+			if int(ch.get("hp", 0)) > 0:
+				ch["mp"] = mini(int(d["maxMp"]), int(ch.get("mp", 0)) + roundi(float(d["maxMp"]) * mp))
+
+
 ## Catch your breath after a won fight: everyone standing regains a share of max HP.
 static func recover(db: Dictionary, run: Dictionary, share: float) -> void:
 	if share <= 0.0:
@@ -178,7 +190,7 @@ static func after_combat(db: Dictionary, run: Dictionary, room: Dictionary, summ
 		Gen.log_encounter(run, week, day, room, result)
 	if result == "win":
 		room["cleared"] = true
-		recover(db, run, float(cfg(db).get("afterFightHpPct", 0.0)))
+		after_fight(db, run)
 		if rng.randf() < float(cfg(db).get("combatLoot", {}).get("shardChance", 0.15)):
 			lines.append_array(add_shard(db, run, shard_axis(db, run, week, rng)))
 	elif result == "flee":

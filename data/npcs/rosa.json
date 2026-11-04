@@ -1,0 +1,64 @@
+{
+  "id": "rosa",
+  "name": "Rosa",
+  "role": "Florist at the morning market",
+  "home": "elm_apartments",
+  "voice": {
+    "id": "voice_default",
+    "pitch": 1.0
+  },
+  "sprite": "npc_rosa_walk",
+  "portrait": "portrait_rosa",
+  "startBond": 0,
+  "disposition": {
+    "courage": 50,
+    "greed": 20,
+    "curiosity": 60,
+    "loyalty": 50,
+    "kindness": 60,
+    "pride": 30
+  },
+  "traits": [],
+  "recruitable": false,
+  "daytime": true,
+  "schedule": {
+    "weekday": {
+      "before_school": "town_square",
+      "period_1": "town_square"
+    },
+    "weekend": {
+      "morning": "town_square"
+    }
+  },
+  "greeting": "\"Fresh flowers! Well. Fresh-ish. Things don't wilt right around here.\"",
+  "topics": [
+    {
+      "id": "rosa_flowers",
+      "label": "Ask why things don't wilt",
+      "tone": {
+        "curiosity": 0.7
+      },
+      "line": "What do you mean, they don't wilt right?",
+      "baseRisk": 0.15,
+      "goodText": "\"They wilt backwards some weeks. I sell those ones cheaper.\"",
+      "badText": "\"Just a florist joke.\"",
+      "outcomes": {
+        "onGood": {
+          "statXp": {
+            "per": 1
+          }
+        }
+      }
+    }
+  ],
+  "gifts": {
+    "likes": [
+      "food"
+    ],
+    "dislikes": [],
+    "likeText": "\"For me? Ha. Thanks.\""
+  },
+  "hangouts": [
+    "You help Rosa arrange buckets of flowers. Some of them turn to face you when you walk past."
+  ]
+}

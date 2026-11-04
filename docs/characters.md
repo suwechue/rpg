@@ -1028,3 +1028,23 @@ People you only meet while you're skipping class. Names are placeholders.
 ## Mr. Ellis (substitute teacher, on a "break") — NEW
 **Summary:** A sympathetic sub who's skipping too, in his way. Might cover for you once.
 **Where to find him:** Gary's Deli (period 1), the park (period 2), the library (period 3).
+
+## Juniper (street busker) — NEW
+**Summary:** Plays the town square for coins. Half her songs she dreamed; the other half the town hums at night.
+**Where to find her:** the square (period 2, after school, weekends).
+
+## Hank (school night janitor) — NEW
+**Summary:** Mops around the lockers that breathe. Forty keys on one ring. Will tell you which locker never to open.
+**Where to find him:** the hallways (after school, weekend afternoons).
+
+## Lena (skater who skips class) — NEW
+**Summary:** Skips more than you do and knows Officer Pruitt's route. Commit or fall; the board knows.
+**Where to find her:** the downtown bus stop (periods 1 and 3), the park (period 2), the arcade after school.
+
+## Amos (retired train conductor) — NEW
+**Summary:** Punched every ticket on the last train out, thirty years ago. Still checks the departure board. A mystery lead.
+**Where to find him:** the train station (school hours, weekend mornings).
+
+## Rosa (florist) — NEW
+**Summary:** Sells flowers on the square. Some weeks they wilt backwards; she sells those cheaper.
+**Where to find her:** the square (before school, period 1, weekend mornings).

@@ -521,3 +521,128 @@ func test_effects_card_preview() -> void:
 	var c := _deck_fight(["card_cleave"], [])
 	var pc: Dictionary = c["st"].preview(c["me"], CR.resolve(db(), "card_cleave"), c["foe"].cell)
 	check(pc["hits"].size() == 1 and pc["cells"].size() >= 1, "Cleave previews its shape")
+
+
+func test_town_happenings() -> void:
+	const StoryRules := preload("res://src/core/story/story.gd")
+	const Goals := preload("res://src/core/town/goals.gd")
+	const Arena := preload("res://src/core/arena/arena.gd")
+	const Locs := preload("res://src/core/town/locations.gd")
+	const CR := preload("res://src/core/card.gd")
+	var d := db()
+	var haps: Array = d["story/town_happenings"]["stories"]
+	check(haps.size() >= 12, "a dozen happenings")
+	var cards_seen := {}
+	var school := 0
+	for h in haps:
+		check(not Locs.rec(d, str(h["at"]["loc"])).is_empty(), "%s is at a real place" % h["id"])
+		for day in h["trigger"]["day"]:
+			var parts := StoryRules.part_order(d, str(day))
+			check(Array(h["window"]).any(func(p: Variant) -> bool: return parts.has(str(p))), "%s: its window exists on %s" % [h["id"], day])
+		for p in h["window"]:
+			check(str(p) != "evening", "%s is not during the dungeon" % h["id"])
+			if str(p).begins_with("period_"):
+				school += 1
+		for c in h["steps"][0]["event"]["choices"]:
+			if c.get("effects", {}).has("card"):
+				var cid := str(c["effects"]["card"])
+				check(bool(CR.resolve(d, cid).get("exclusive", false)), "%s is exclusive" % cid)
+				cards_seen[cid] = true
+	check(school >= 8, "most reward skipping class")
+	for c in d["cards/town_exclusive_cards"]["cards"]:
+		check(cards_seen.has(str(c["id"])), "%s comes from a happening" % c["id"])
+	# Exclusive cards never show up in offers.
+	var run := run_()
+	for w in [5, 15, 25]:
+		for seed_value in 20:
+			for id in Arena.card_offer(d, { "seed": seed_value }, [run["player"]], w):
+				check(not cards_seen.has(str(id)), "offers skip exclusive cards")
+	# The window: only then, and once.
+	var ctx := { "week": 1, "day": "tue", "part": "period_1", "day_count": 1 }
+	check(StoryRules.due_at(d, run, ctx, "downtown", ["park"]).has("hap_pigeon_hour"), "pigeon hour is on during period 1")
+	ctx["part"] = "lunch"
+	check(not StoryRules.due_at(d, run, ctx, "downtown", ["park"]).has("hap_pigeon_hour"), "and gone by lunch")
+	ctx["part"] = "period_1"
+	check(not StoryRules.due_at(d, run, ctx, "downtown", ["library"]).has("hap_pigeon_hour"), "only at the park")
+	check(not StoryRules.due_at(d, run, { "week": 1, "day": "wed", "part": "period_1" }, "downtown", ["park"]).has("hap_pigeon_hour"), "only on its days")
+	var sat := StoryRules.due_at(d, run, { "week": 1, "day": "sat", "part": "midday" }, "downtown", ["town_square"])
+	check(sat.has("hap_busker_duel"), "a window can span weekday and weekend parts")
+	var today := StoryRules.happenings_today(d, run, { "week": 1, "day": "tue", "part": "before_school" })
+	check(today.any(func(h: Dictionary) -> bool: return str(h["id"]) == "hap_pigeon_hour" and not bool(h["open"])), "the morning sees it coming")
+	check(StoryRules.happenings_today(d, run, { "week": 1, "day": "tue", "part": "after_school" }).all(func(h: Dictionary) -> bool: return str(h["id"]) != "hap_pigeon_hour"), "off the list once it is over")
+	check(str(Goals.happenings(d, run, ctx)).contains("NOW"), "the goal tracker says what is on now")
+	run["flags"]["story_done_hap_pigeon_hour"] = true
+	check(not StoryRules.due_at(d, run, ctx, "downtown", ["park"]).has("hap_pigeon_hour"), "it plays once")
+	for n in ["juniper", "hank", "lena", "amos", "rosa"]:
+		check(d.has("npcs/" + n) and d["assets/manifest"]["assets"].has("npc_%s_walk" % n), "%s is in town" % n)
+
+
+func test_night_safety_nets() -> void:
+	var idx := DT.index_under(db(), "enemies/", "enemies")
+	var run := run_()
+	var mk := func(diff: String, night: bool, allies: bool) -> Object:
+		var ch: Dictionary = run["player"].duplicate(true)
+		var party: Array = [{ "char": ch }]
+		if allies:
+			var pal: Dictionary = ch.duplicate(true)
+			pal["id"] = "dex"
+			pal["isPlayer"] = false
+			party.append({ "char": pal })
+		return preload("res://src/core/combat/combat_state.gd").new(db(), seeded(6), { "layout": { "map": ["PP..E"] }, "party": party, "enemies": [idx["pom_pom_wisp"].duplicate(true)], "difficulty": diff, "ramp": 1.0, "storyNight": night })
+	# Normal night: one Last Stand a fight.
+	var n: Object = mk.call("normal", true, false)
+	var me = n.unit_by_id("player")
+	n._damage(me, 9999, null, "", "hit")
+	check(n.result == "" and me.hp == 1 and not me.downed and me.shield > 0, "a Normal night's first deadly blow is a Last Stand")
+	me.shield = 0
+	n._damage(me, 9999, null, "", "hit")
+	check(n.result == "lose", "the second one is not")
+	# The arena and Hard keep the old rule.
+	var a: Object = mk.call("normal", false, false)
+	a._damage(a.unit_by_id("player"), 9999, null, "", "hit")
+	check(a.result == "lose", "no Last Stand outside nights")
+	var h: Object = mk.call("hard", true, false)
+	h._damage(h.unit_by_id("player"), 9999, null, "", "hit")
+	check(h.result == "lose", "no Last Stand on Hard")
+	# Easy night: lost only when nobody stands.
+	var e: Object = mk.call("story", true, true)
+	e._damage(e.unit_by_id("player"), 9999, null, "", "hit")
+	check(e.result == "" and e.unit_by_id("player").downed, "on Easy you go down but the fight goes on")
+	e._damage(e.unit_by_id("dex"), 9999, null, "", "hit")
+	e.check_end()
+	check(e.result == "lose", "and it is lost when nobody stands")
+
+
+func test_night_hit_cap() -> void:
+	var idx := DT.index_under(db(), "enemies/", "enemies")
+	var run := run_()
+	var party: Array = [{ "char": run["player"].duplicate(true) }]
+	var foes: Array = [idx["pom_pom_wisp"].duplicate(true)]
+	var st: Object = preload("res://src/core/combat/combat_state.gd").new(db(), seeded(7), { "layout": { "map": ["PE"] }, "party": party, "enemies": foes, "difficulty": "hard", "ramp": 1.0, "storyNight": true })
+	var me = st.unit_by_id("player")
+	var foe = st.units.filter(func(u) -> bool: return u.team == "enemy")[0]
+	var hp0: int = me.hp
+	st._damage(me, 9999, foe, "", "hit")
+	check(me.hp > 0 and hp0 - me.hp <= ceili(float(me.max_hp) * 0.6), "a night hit on Hard takes at most 60% of max HP")
+	var hp1: int = me.hp
+	st._damage(me, 3, null, "", "hazard")
+	check(me.hp == hp1 - 3, "the cap is only for enemy hits")
+	var arena: Object = preload("res://src/core/combat/combat_state.gd").new(db(), seeded(7), { "layout": { "map": ["PE"] }, "party": party, "enemies": foes, "difficulty": "hard", "ramp": 1.0 })
+	var ame = arena.unit_by_id("player")
+	var afoe = arena.units.filter(func(u) -> bool: return u.team == "enemy")[0]
+	var ahp: int = ame.hp
+	arena._damage(ame, 9999, afoe, "", "hit")
+	check(ame.hp > 0 and ahp - ame.hp <= ceili(float(ame.max_hp) * 0.8), "the arena's cap is looser: 80% on Hard")
+
+
+func test_hidden_can_not_stall() -> void:
+	var idx := DT.index_under(db(), "enemies/", "enemies")
+	var run := run_()
+	var st: Object = preload("res://src/core/combat/combat_state.gd").new(db(), seeded(8), { "layout": { "map": ["P......E"] }, "party": [{ "char": run["player"].duplicate(true) }], "enemies": [idx["skulker"].duplicate(true)] })
+	var sk = st.units.filter(func(u) -> bool: return u.team == "enemy")[0]
+	check(st.hidden(sk), "it starts hidden")
+	var guard := 0
+	while st.round_num < int(db()["combat_rules"]["hiddenRounds"]) + 1 and guard < 60 and st.result == "":
+		st.end_turn() if st.current.team == "party" else preload("res://src/core/combat/enemy_ai.gd").take_turn(st, st.current)
+		guard += 1
+	check(not sk.statuses.has("hidden") or not sk.alive(), "it is out by round %d" % st.round_num)

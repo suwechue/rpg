@@ -50,7 +50,7 @@ func _ready() -> void:
 	if not GameState.has_run():
 		GameState.new_run()
 	player = Walker.new(str(GameState.player.get("sprite", Assets.role("player"))))
-	player.z_index = 5
+	player.z_index = 4
 	_camera = Camera2D.new()
 	_prompt = UiTheme.world_label("", UiTheme.ACCENT)
 	var ui := CanvasLayer.new()
@@ -157,13 +157,15 @@ func _load_map(id: String, is_int: bool, loc: String, at: Vector2i) -> void:
 		player.get_parent().remove_child(player)
 	map = MapScript.new()
 	map.build(DataDB.all(), id, is_int)
+	# Characters sort by their feet (who's in front draws in front).
+	map.y_sort_enabled = true
 	add_child(map)
 	map.add_child(player)
 	map_id = id
 	interior = is_int
 	interior_loc = loc
 	cell = at
-	if not map.walkable(cell):
+	if not map.walkable(cell) or _in_exit(cell):
 		cell = _nearest_free(cell)
 	player.position = _cell_pos(cell)
 	player.face(facing)
@@ -309,9 +311,33 @@ func _nearest_free(c: Vector2i) -> Vector2i:
 		for dy in range(-r, r + 1):
 			for dx in range(-r, r + 1):
 				var n := c + Vector2i(dx, dy)
-				if map.walkable(n) and not npcs.has(n):
+				if map.walkable(n) and not npcs.has(n) and not crowd.has(n) and not _in_exit(n):
 					return n
 	return c
+
+
+## A tile inside one of this zone's exits (standing there would bounce you on).
+func _in_exit(c: Vector2i) -> bool:
+	if interior or map == null:
+		return false
+	for e in map.exits:
+		if (e["rect"] as Rect2i).has_point(c):
+			return true
+	return false
+
+
+## Tiles where party members stand (they follow the player's trail).
+func _follower_cells() -> Dictionary:
+	var out := {}
+	for f in _followers:
+		if is_instance_valid(f) and f.has_meta("cell"):
+			out[f.get_meta("cell")] = true
+	return out
+
+
+## Someone (or something) stands on this tile.
+func _taken(c: Vector2i) -> bool:
+	return npcs.has(c) or crowd.has(c) or c == cell or _follower_cells().has(c)
 
 
 func _home_door_cell() -> Vector2i:
@@ -438,13 +464,13 @@ func _refresh_people() -> void:
 
 
 func _free_near(anchor: Vector2i) -> Vector2i:
-	if map.walkable(anchor) and not npcs.has(anchor) and anchor != cell:
+	if map.walkable(anchor) and not _taken(anchor) and not _in_exit(anchor):
 		return anchor
 	for r in range(1, 5):
 		for dy in range(-r, r + 1):
 			for dx in range(-r, r + 1):
 				var n := anchor + Vector2i(dx, dy)
-				if map.walkable(n) and not npcs.has(n) and n != cell:
+				if map.walkable(n) and not _taken(n) and not _in_exit(n):
 					return n
 	return anchor
 
@@ -458,7 +484,7 @@ func _spread_near(anchor: Vector2i) -> Vector2i:
 				if maxi(absi(dx), absi(dy)) != r:
 					continue
 				var c := anchor + Vector2i(dx, dy)
-				if not map.walkable(c) or npcs.has(c) or crowd.has(c) or c == cell:
+				if not map.walkable(c) or _taken(c) or _in_exit(c):
 					continue
 				var crowded := false
 				for oy in range(-1, 2):
@@ -523,22 +549,51 @@ func _place_crowd(person: Dictionary, at: Vector2i) -> void:
 	w.add_child(tag)
 
 
-## Someone takes a step near where they belong (named people and the crowd).
-func _wander_one() -> void:
-	if map == null or _npc_nodes.is_empty() or _moving:
+## Named people and the crowd wander near where they belong, each on their
+## own rhythm: a short walk in one direction at a stroll, then a pause (data
+## town/crowd.json "wander").
+func _wander_tick() -> void:
+	if map == null or _npc_nodes.is_empty():
 		return
+	var cfg: Dictionary = DataDB.table("town/crowd").get("wander", {})
+	var now := Time.get_ticks_msec() / 1000.0
 	var rng := Rng.stream("npc")
-	var w: Node2D = _npc_nodes[rng.randi_range(0, _npc_nodes.size() - 1)]
-	if not is_instance_valid(w) or not w.has_meta("cell"):
-		return
+	var dirs := [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]
+	for w in _npc_nodes:
+		if not is_instance_valid(w) or not w.has_meta("cell"):
+			continue
+		if not w.has_meta("next_t"):
+			w.set_meta("next_t", now + rng.randf_range(0.5, float(cfg.get("pauseMax", 6.5))))
+			continue
+		if now < float(w.get_meta("next_t")):
+			continue
+		var pause := rng.randf_range(float(cfg.get("pauseMin", 2.5)), float(cfg.get("pauseMax", 6.5)))
+		var left := int(w.get_meta("walk_left", 0))
+		if left <= 0:
+			if rng.randf() < float(cfg.get("lookChance", 0.3)):
+				# Just turn and look around.
+				w.face(dirs[rng.randi_range(0, 3)])
+				w.set_meta("next_t", now + pause)
+				continue
+			w.set_meta("heading", dirs[rng.randi_range(0, 3)])
+			left = rng.randi_range(int(cfg.get("walkMin", 1)), int(cfg.get("walkMax", 3)))
+		if _moving or not _wander_step(w, w.get_meta("heading"), float(cfg.get("stepSeconds", 0.55))):
+			w.set_meta("walk_left", 0)
+			w.set_meta("next_t", now + pause * 0.5)
+			continue
+		left -= 1
+		w.set_meta("walk_left", left)
+		w.set_meta("next_t", now + float(cfg.get("stepSeconds", 0.55)) + (float(cfg.get("betweenSteps", 0.3)) if left > 0 else pause))
+
+
+## One step for a townsperson if the tile is free and near their anchor.
+func _wander_step(w: Node2D, d: Vector2i, seconds: float) -> bool:
 	var at: Vector2i = w.get_meta("cell")
 	var anchor: Vector2i = w.get_meta("anchor")
-	var dirs := [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]
-	var d: Vector2i = dirs[rng.randi_range(0, 3)]
 	var to := at + d
 	var r := int(DataDB.table("town/crowd").get("wanderRadius", 2))
-	if not map.walkable(to) or npcs.has(to) or crowd.has(to) or to == cell or absi(to.x - anchor.x) > r or absi(to.y - anchor.y) > r or map.doors.has(to - Vector2i(0, 1)):
-		return
+	if not map.walkable(to) or _taken(to) or _in_exit(to) or absi(to.x - anchor.x) > r or absi(to.y - anchor.y) > r or map.doors.has(to - Vector2i(0, 1)):
+		return false
 	if npcs.has(at):
 		npcs[to] = npcs[at]
 		npcs.erase(at)
@@ -546,12 +601,23 @@ func _wander_one() -> void:
 		crowd[to] = crowd[at]
 		crowd.erase(at)
 	else:
-		return
+		return false
 	w.set_meta("cell", to)
 	w.face(d)
 	var tw := create_tween()
-	tw.tween_property(w, "position", _cell_pos(to), 0.3)
-	w.play_walk(0.3)
+	tw.tween_property(w, "position", _cell_pos(to), seconds)
+	w.play_walk(seconds)
+	return true
+
+
+## A free tile next to `from`, preferring the one behind the player.
+func _behind(from: Vector2i) -> Vector2i:
+	var back := -facing if facing != Vector2i.ZERO else Vector2i.DOWN
+	for d in [back, Vector2i(back.y, back.x), Vector2i(-back.y, -back.x), -back]:
+		var c: Vector2i = from + d
+		if map.walkable(c) and not _taken(c) and not _in_exit(c):
+			return c
+	return _free_near(from)
 
 
 ## After the player steps: followers move up the trail, people nearby bark,
@@ -562,6 +628,7 @@ func _after_step() -> void:
 	for i in _followers.size():
 		var f: Node2D = _followers[i]
 		var idx := mini(i + 1, _trail.size() - 1)
+		f.set_meta("cell", _trail[idx])
 		var tw := create_tween()
 		tw.tween_property(f, "position", _cell_pos(_trail[idx]), STEP_TIME)
 		f.play_walk(STEP_TIME)
@@ -606,12 +673,18 @@ func _spawn_followers() -> void:
 	if interior:
 		return
 	var first := true
+	_trail = [cell]
 	for id in GameState.party_ids:
 		var rec: Dictionary = DataDB.table("npcs/" + str(id))
 		if rec.is_empty():
 			continue
 		var w := Walker.new(str(rec.get("sprite", "")))
-		w.position = _cell_pos(cell)
+		# Stand on a free tile behind the last one in line (not on the player).
+		var at := _behind(_trail[-1] if not _trail.is_empty() else cell)
+		w.set_meta("cell", at)
+		_trail.append(at)
+		w.position = _cell_pos(at)
+		w.face(facing)
 		w.z_index = 4
 		map.add_child(w)
 		_followers.append(w)
@@ -842,9 +915,9 @@ func _process(_delta: float) -> void:
 		map.refresh_overlay()
 		_patrol_step(_delta)
 	_wander_t += _delta
-	if _wander_t >= float(DataDB.table("town/crowd").get("wanderSeconds", 1.6)) and not Flow.is_busy():
+	if _wander_t >= float(DataDB.table("town/crowd").get("wander", {}).get("tick", 0.25)) and not Flow.is_busy():
 		_wander_t = 0.0
-		_wander_one()
+		_wander_tick()
 	if _moving or Flow.is_busy() or map == null:
 		_update_prompt()
 		return

@@ -61,9 +61,43 @@ static func problems(db: Dictionary, zones: Dictionary) -> Array:
 			var t: Vector2i = zones[to]["tiles"]
 			if sp.x < 0 or sp.y < 0 or sp.x >= t.x or sp.y >= t.y or blocked(zones[to]).has(sp):
 				out.append("zone %s: exit to %s lands on a blocked or outside tile %s" % [zid, to, str(sp)])
+				continue
+			# Clipping checks: never land inside the next zone's exits (an instant
+			# bounce back), and always be able to walk back the way you came.
+			for e2 in zones[to]["exits"]:
+				if (e2["rect"] as Rect2i).has_point(sp):
+					out.append("zone %s: exit to %s lands inside that zone's exit to %s at %s" % [zid, to, e2["to"], str(sp)])
+			if not _reaches_exit(zones[to], sp, zid):
+				out.append("zone %s: from the spawn %s in %s you can't walk back to %s" % [zid, str(sp), to, zid])
 	for key in db:
 		if str(key).begins_with("npcs/"):
 			var home := str(db[key].get("home", ""))
 			if home != "" and not ids.has(home):
 				out.append("%s: home '%s' is not a location" % [key, home])
 	return out
+
+
+## Can someone standing at `from` in zone `z` walk to an exit leading to `back`?
+static func _reaches_exit(z: Dictionary, from: Vector2i, back: String) -> bool:
+	var block := blocked(z)
+	var t: Vector2i = z["tiles"]
+	var goals: Array = []
+	for e in z["exits"]:
+		if str(e["to"]) == back:
+			goals.append(e["rect"])
+	if goals.is_empty():
+		return true
+	var seen := { from: true }
+	var queue: Array = [from]
+	while not queue.is_empty():
+		var c: Vector2i = queue.pop_front()
+		for d in [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]:
+			var n: Vector2i = c + d
+			for g in goals:
+				if (g as Rect2i).has_point(n):
+					return true
+			if seen.has(n) or n.x < 0 or n.y < 0 or n.x >= t.x or n.y >= t.y or block.has(n):
+				continue
+			seen[n] = true
+			queue.append(n)
+	return false

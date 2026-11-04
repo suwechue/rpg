@@ -17,5 +17,29 @@
     "{mate} glances over and nods.",
     "{mate} is doodling on the desk again.",
     "{mate} slides you a note: \"later?\""
-  ]
+  ],
+  "stage": {
+    "comment": "Class periods as real scenes (user request, Oct 29): the walk is the school hall interior with you walking across it; the class is the room's interior with the teacher at the board and everyone in a seat behind a desk. rooms maps a class's room to an interior in data/town/interiors.json; seatKinds are furniture you sit behind; hallStudents is how many students loiter in the hall.",
+    "hall": "school_hall",
+    "default": "classroom",
+    "rooms": {
+      "gym": "gym",
+      "lab": "lab",
+      "shop_classroom": "workshop",
+      "drama_room": "art_room",
+      "earth_science_room": "lab",
+      "biology_room": "lab",
+      "history_room": "classroom",
+      "debate_hall": "classroom"
+    },
+    "seatKinds": [
+      "desk",
+      "labbench",
+      "table",
+      "workbench",
+      "easel"
+    ],
+    "hallStudents": 3,
+    "walkSeconds": 2.4
+  }
 }
