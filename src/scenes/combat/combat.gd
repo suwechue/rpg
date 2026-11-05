@@ -60,6 +60,7 @@ var _stayed_in_red := ""
 const ShapeDiagram := preload("res://src/scenes/ui/shape_diagram.gd")
 const PartyPanel := preload("res://src/scenes/ui/party_panel.gd")
 const Modal := preload("res://src/scenes/ui/modal.gd")
+const LabFlow := preload("res://src/scenes/lab/lab_flow.gd")
 var _tele_since: Dictionary = {}      # enemy id + plan -> when its telegraph first showed (for the pulse)
 var _hover_shapes: HBoxContainer
 var _quick_box: VBoxContainer
@@ -93,7 +94,12 @@ func _ready() -> void:
 		setup = GameState.debug_combat_setup()
 	if GameState.combat_turn_mode != "" and not setup.has("turnMode"):
 		setup["turnMode"] = GameState.combat_turn_mode
-	state = StateScript.new(DataDB.all(), Rng.stream("combat"), setup)
+	var combat_rng: RandomNumberGenerator = Rng.stream("combat")
+	if setup.has("seed"):
+		# Lab fights replay the same seed under any preset, and leave the run's streams alone.
+		combat_rng = RandomNumberGenerator.new()
+		combat_rng.seed = int(setup["seed"])
+	state = StateScript.new(DataDB.all(), combat_rng, setup)
 	var layout: Dictionary = setup.get("layout", {})
 	# Cell sizes are in tiles (data/display.json "combat"); wide or deep layouts get smaller cells.
 	var cc: Dictionary = Display.combat
@@ -331,6 +337,8 @@ func _build_ui() -> void:
 	_override_tag.position = Vector2(view.x - 200, 2)
 	_override_tag.visible = false
 	_ui.add_child(_override_tag)
+	if in_lab():
+		_build_lab_bar(view)
 	_strip = preload("res://src/scenes/ui/effects_strip.gd").new()
 	_strip.state = state
 	_strip.position = Vector2(2, 150)
@@ -419,6 +427,25 @@ func _build_ui() -> void:
 	hv.add_child(_hover_label)
 	_hover_shapes = HBoxContainer.new()
 	hv.add_child(_hover_shapes)
+
+
+## Whether this is a Combat Lab fight.
+func in_lab() -> bool:
+	return state != null and state.lab_log != null
+
+
+## The Lab tag and its buttons (docs/COMBAT_LAB.md Part 1).
+func _build_lab_bar(view: Vector2) -> void:
+	var bar := HBoxContainer.new()
+	bar.theme_type_variation = "CompactBox"
+	bar.position = Vector2(view.x - 128, 2)
+	bar.custom_minimum_size = Vector2(126, 0)
+	_ui.add_child(bar)
+	var tag := UiTheme.label(Strings.t("lab.tag") % state.rules.preset, UiTheme.GOOD)
+	tag.name = "LabTag"
+	bar.add_child(tag)
+	bar.add_child(UiTheme.button(Strings.t("lab.restart"), func() -> void: LabFlow.restart()))
+	bar.add_child(UiTheme.button(Strings.t("lab.other_preset"), func() -> void: LabFlow.restart_other_preset()))
 
 
 func _refresh_hud() -> void:
@@ -936,6 +963,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			_on_button("wheel")
 		elif k == KEY_F:
 			_on_button("flee")
+		elif k == KEY_R and in_lab():
+			LabFlow.restart()
 
 
 ## Highlight the next or previous card with the keyboard or pad; it previews like a hover.
@@ -1854,6 +1883,12 @@ func _finish() -> void:
 	_sync_views()
 	var summary := state.finish()
 	var result := str(summary["result"])
+	if in_lab():
+		Audio.event("victory" if result == "win" else "defeat")
+		if GameState.dev_autoplay:
+			print("[autoplay] lab result: %s, rounds %d" % [result, int(summary["rounds"])])
+		LabFlow.finished(self, state, summary)
+		return
 	var outcome: Dictionary = GameState.finish_combat(summary)
 	_result_panel = PanelContainer.new()
 	_result_panel.position = Vector2((Display.base.x - 240) / 2.0, 70)

@@ -1,0 +1,22 @@
+{
+  "comment": "Hand-made Lab fights (docs/COMBAT_LAB.md Part 4): a fixed map, enemies, party, goal and seed.",
+  "fights": [
+    {
+      "id": "ledge_day",
+      "name": "Ledge Day",
+      "text": "Three minions near a pit. Learn push kills.",
+      "seed": 101,
+      "theme": "school",
+      "map": [
+        "#########",
+        "#P..ppp.#",
+        "#P..ppp.#",
+        "#P...E.E#",
+        "#.....E.#",
+        "#########"
+      ],
+      "enemies": ["dust_gremlin", "paper_wasp", "frost_mite"],
+      "goal": { "type": "kill" }
+    }
+  ]
+}

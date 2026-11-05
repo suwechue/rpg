@@ -267,6 +267,104 @@ Starting decks are 8 to 10 cards.
 
 ---
 
+## Part 3c: Extra mechanics as levers (user request, Nov 5)
+
+Every mechanic below is a lever. All of them are **off in `cl_base`**, unless marked "default on". The user switches them on in the Lab to try them.
+
+**Reuse what exists before building new.** The game already has flanking, relics, reinforcements, hidden units and darkness, card picks, combat speed settings and a combat log. Build each lever on those where it fits.
+
+**Every mechanic needs:**
+- the exact preview (Part 2);
+- a line in the plain-words log;
+- an icon or label wherever it's active;
+- text in the Lab's lever panel saying what it does.
+
+### Turn order and tempo
+
+| Mechanic | Lever | What it does |
+| --- | --- | --- |
+| Team turn vs alternating turns | `turnStructure`: "team" (default), "alternate" | **Team:** the whole party acts, then all enemies. **Alternate:** one ally, one enemy, and so on. Telegraphs update after each enemy acts |
+| Choose your order | `chooseOrder`: false | At the start of the party turn, the player picks who goes next each time; the timeline shows who has acted |
+| Initiative from cards | `cardInitiative`: false | Playing a Quick or Swift card moves that unit earlier next round; Heavy moves it later. The timeline previews the change |
+| Delay | `delay`: false | A unit can pass and act after the next enemy (once per round per unit) |
+
+### Positioning
+
+| Mechanic | Lever | What it does |
+| --- | --- | --- |
+| Facing | `facing`: false; `facingBackMul` 1.5, `facingSideMul` 1.25 | Units face the way they last moved or attacked. Back and side hits deal more. An arrow under each unit shows facing. Replaces flanking while on |
+| Zones of control | `zoneOfControl`: "off", "extra_move", "free_hit" | Leaving a tile next to an enemy costs +1 Movement, or gives that enemy a free hit. Shown as faint tiles around enemies |
+| High ground | `highGround`: false; `highRange` +1, `highDamage` +1, `fallDamage` reuse | Raised tiles give +range and +damage downhill. Uses the 2.5D heights; pushing off a raised tile is a fall |
+| Body blocking | `bodyBlock`: false | A unit standing between a telegraphed attack and its target takes the hit instead. With gear, armored allies take less. The preview shows who'd be hit |
+| Line of sight and fog | `lineOfSight`: false; `fog`: false | **Line of sight:** spells need a clear line; walls, crates and Constructs block. **Fog:** enemies' plans in fog are hidden until something lights them (Light, Reveal, adjacency); hidden plans show as "?" |
+
+### Spells and Vectors
+
+| Mechanic | Lever | What it does |
+| --- | --- | --- |
+| Charge-up spells | `chargeSpells`: false | Cards with the **Charge** keyword fire at the start of your next turn at +1 Magnitude. The target tiles are telegraphed, and enemies try to dodge them. Add 6 Charge cards |
+| Lingering fields | `lingeringFields`: false; `fieldRounds` 3 | **Leftover terrain:** spells leave terrain for N rounds. Heat leaves fire, Cold ice, Binding sticky ground (costs +1 Movement), Light leaves glare (no hidden units), Force cracks floor that turns to a pit after 2 hits. **Fields react:** they follow the reactions table |
+| Vector weather | `weather`: false; `weatherBonus` +1 Magnitude, `weatherMalus` -1 | Each fight has a strong and a weak Vector, by default from the Upside-Down's weekly signature. Shown at fight start and on the effects strip |
+| Overload | `overload`: "off", "hp", "exhaust", "both"; `overloadHp` 3 | Cast one Magnitude above what you can afford by paying HP or Exhausting a card from hand. Risky multi-Vector cards still roll Instability |
+| Cross-ally element combos | `allyReactions`: false | When two different allies hit the same tile or unit with different Vectors in one round, a reaction fires automatically (steam, explosion, shatter, conductive arc, and so on, from `data/lab/reactions.json`). A burst effect and a log line name the combo. It counts for Surge and combo discovery |
+
+### Cards and decks
+
+| Mechanic | Lever | What it does |
+| --- | --- | --- |
+| Upgrade in combat | `fightUpgrade`: false; `fightUpgradeAt` 3 | A card played N times in one fight becomes its "+" version until the fight ends |
+| Status cards | `statusCards`: false | **Junk cards:** some enemy attacks shuffle junk cards into your deck: Fear (unplayable, discards 1 when drawn), Burned (lose 1 HP when drawn), Tangled (costs your Move to play away). **Clearing them:** deck tricks, Exhaust, and a few cleanse cards remove them. **Data:** status cards live in `data/cards/status_cards.json`; add them to 6 enemies' actions |
+| Signature card | `signatureCard`: false | Each character has one unique card, always in their opening hand. The 5 preset characters and the Core Four get one each, in `data/cards/signature_cards.json` |
+| Retain | `retainKeyword`: false | Cards with **Retain** stay in hand when the hand is discarded (only matters when `keepHand` is false) |
+| Duet cards | `duetCards`: false; `duetBond` "Close" | Cards that need two specific characters adjacent. They're unlocked by Bond (story) or a pick (arena). Start with 5 duets in `data/cards/duet_cards.json` |
+| Reshuffle effects | `reshuffleEffect`: "none", "surge", "hp_cost" | When your deck reshuffles: gain 1 Surge, or lose 1 HP. Shown on the deck counter |
+
+### Enemies
+
+| Mechanic | Lever | What it does |
+| --- | --- | --- |
+| Enemy roles | `enemyRoles`: false | **Adds 5 role tags to enemies:** Shield bearer (front blocked; hit from the side or push), Bomber (explodes in a plus shape when pushed or killed; works for you too), Anchor (immovable; stops pushes next to it), Summoner (spawns a minion every 2 rounds; a priority target), Copycat (repeats the last card the party played). **Uses:** at least one Lab fight uses each. Reuse the AR behaviors where they match |
+| Weak points | `weakPoints`: false | Some enemies and boss parts show a marked tile or side. Hitting it Staggers them and cancels their current telegraph |
+| Morale | `morale`: false; `moraleRadius` 2 | When an enemy dies, enemies within the radius may panic: they flee or switch to a weaker plan. The preview shows "may panic". Bosses and mindless enemies are immune |
+| Longer boss intents | `bossLookahead`: 1 (default), 2 | Bosses show their next 2 turns' plans, the second faded |
+
+### Party and characters
+
+| Mechanic | Lever | What it does |
+| --- | --- | --- |
+| Downed allies | `downedRules`: "current" (default), "carry" | **Carry:** a downed ally lies on the board. An adjacent ally can drag them 1 tile with their Move, or revive them with a heal card. They're out of the fight only if an enemy hits them while down, or the fight ends with them down (story rules decide after) |
+| Swap in reserves | `reserves`: false; `reserveUses` 1 | Once per fight, bring a benched member in at a marked edge tile in place of a downed or chosen ally (their turn is spent) |
+| Bond in combat | `bondInCombat`: false; `bondTier` "Close" | Adjacent allies with that Bond share one free Quick per round (either can use it). Shown as a link between them |
+| Class gauges | `classGauges`: false | Each class gets a simple meter with one spender card or effect: Fighter **Momentum** (pushes and collisions), Mage **Heat** (casting, which overheats: at full, the next cast is +2 Magnitude, then the meter locks for a round), Rogue **Shadow** (rounds not targeted; spend for a free reposition and a back hit), Healer **Faith** (preventing or healing damage on allies; spend for a free revive or shield), Bard **Tempo** (playing cards in a chain with allies; spend to give an ally an extra Action). Numbers in `data/lab/gauges.json` |
+
+### Fight structure
+
+| Mechanic | Lever | What it does |
+| --- | --- | --- |
+| Waves in a fight | `fightWaves`: false | **Reinforcements:** they arrive on a set round from marked doors, and the doors are telegraphed a round early. **Blocking:** a unit, crate or Construct on a door stops that group |
+| Bonus objectives | `bonusObjectives`: false; `bonusCount` 2 | **Optional goals:** each fight shows 1 to 3 optional goals from a pool in `data/lab/bonus_goals.json`, e.g. "No one goes down", "Win in 4 rounds", "Kill 2 with the board", "Trigger a combo", "Never get hit by a telegraph". **Rewards:** shown on the result screen; they give extra rewards in story and arena |
+| Retreat | `retreat`: false | An exit tile in each fight. If the whole party reaches it, the fight ends: you keep what you found but lose the fight's reward. Story rules decide what fleeing means after |
+| Environmental timers | `envTimers`: false | Fights can have a board clock: rising water (one row floods per round), a collapsing floor (telegraphed tiles fall), spreading fire. Shown as a counter and tile warnings |
+
+### Rewards and progression
+
+| Mechanic | Lever | What it does |
+| --- | --- | --- |
+| Choose after a fight | `postFightChoice`: false | After a win, pick one: a new card (1 of 3), a gear upgrade, or **remove a card** from a deck. Story and arena |
+| Card mastery | `cardMastery`: false; `masteryUses` 10 | Using a card N times across a run unlocks its "+" version permanently for that run |
+| Run-wide relics in the story | `storyRelics`: false | Relics (from the arena) can drop in the story too. They're small rule changers, e.g. "Your first push each fight goes 1 extra tile". Add 10 board-themed relics |
+
+### How the game feels
+
+| Mechanic | Lever | What it does |
+| --- | --- | --- |
+| Hitstop and slow motion | `hitstop`: true (default on); `hitstopMs` 60; `killSlowmo` true | A short freeze on hits, and slow motion on kills. Screen shake on collisions follows the existing shake setting. A slow pan on big combos |
+| Board kill cams | `killCam`: true (default on) | A quick zoom when a unit falls into a pit or off a ledge, or dies to a collision or explosion. Skippable, and off when combat speed is fast |
+| Speed controls | `speedControls`: true (default on) | The existing combat speed setting, plus a "skip enemy animations" toggle and hold-to-fast-forward in the Lab HUD |
+| Plain-words combat log | `plainLog`: true (default on) | A scrollable log: "Brick pushed the Ghoul into the pit." Every lever that changes something writes a line. Reuse the existing log and its "why" lines |
+
+---
+
 ## Part 4: Hand-made Lab fights
 
 Build **at least 8** fights in `data/lab/fights.json`. Each is a fixed map, enemy set, party, goal and seed:
@@ -291,6 +389,15 @@ Optional: **9. Arena sampler:** 3 waves back to back, so the user can feel a seq
 | `cl_puzzle` | Small numbers, no dice, Surge on, kill refund on, hand of 4 keep |
 | `cl_cards` | `cl_base` plus Follow-up and Free cards weighted up, hand of 5 |
 | `cl_brutal` | `cl_puzzle` with "hit hard but rarely" enemies and the round cap at 6 |
+| `cl_plus` | `cl_puzzle` plus the five top picks from Part 3c: `chooseOrder`, `allyReactions`, `statusCards`, `bonusObjectives`, `lingeringFields` |
+| `cl_everything` | Every Part 3c lever on, for stress-testing how they combine. Not meant to be fun |
+
+**More fights for Part 3c** (each shows off a group of the new levers; turn their levers on in the fight's suggested preset):
+
+10. **Night Market:** fog, line of sight and a Summoner behind stalls (positioning).
+11. **The Bell Tower:** high ground, a Shield bearer and a Bomber (positioning and enemy roles).
+12. **Flood Drill:** rising water timer, waves through doors you can block, and retreat (fight structure).
+13. **Duet:** two characters with Duet cards, Bond in combat and class gauges (party).
 
 ---
 
@@ -410,6 +517,58 @@ These are decided. Do them for the whole game, not just the Lab.
 - `extraEnemies`
 - `enemyAbilitiesTier`
 
+**Part 3c levers** (off unless noted):
+
+- **Turn order:**
+  - `turnStructure` ("team")
+  - `chooseOrder`
+  - `cardInitiative`
+  - `delay`
+- **Positioning:**
+  - `facing`, `facingBackMul` (1.5), `facingSideMul` (1.25)
+  - `zoneOfControl` ("off")
+  - `highGround`, `highRange` (+1), `highDamage` (+1)
+  - `bodyBlock`
+  - `lineOfSight`
+  - `fog`
+- **Spells:**
+  - `chargeSpells`
+  - `lingeringFields`, `fieldRounds` (3)
+  - `weather`, `weatherBonus`, `weatherMalus`
+  - `overload` ("off"), `overloadHp` (3)
+  - `allyReactions`
+- **Cards:**
+  - `fightUpgrade`, `fightUpgradeAt` (3)
+  - `statusCards`
+  - `signatureCard`
+  - `retainKeyword`
+  - `duetCards`, `duetBond` ("Close")
+  - `reshuffleEffect` ("none")
+- **Enemies:**
+  - `enemyRoles`
+  - `weakPoints`
+  - `morale`, `moraleRadius` (2)
+  - `bossLookahead` (1)
+- **Party:**
+  - `downedRules` ("current")
+  - `reserves`, `reserveUses` (1)
+  - `bondInCombat`, `bondTier` ("Close")
+  - `classGauges`
+- **Structure:**
+  - `fightWaves`
+  - `bonusObjectives`, `bonusCount` (2)
+  - `retreat`
+  - `envTimers`
+- **Rewards:**
+  - `postFightChoice`
+  - `cardMastery`, `masteryUses` (10)
+  - `storyRelics`
+- **Feel (default on):**
+  - `hitstop`, `hitstopMs` (60), `killSlowmo`
+  - `killCam`
+  - `speedControls`
+  - `plainLog`
+
 ---
 
 ## Tests and done when
@@ -424,6 +583,8 @@ These are decided. Do them for the whole game, not just the Lab.
 - Surge filling and spending, kill refund, combo chain, the round cap shift.
 - Each fight goal.
 - Small-number rescaling keeps every unit at 1+ HP and every hit at 1+.
+- **Every Part 3c lever:** at least one test with it on, and one checking that it changes nothing when off. That covers turn structures, facing, zones of control, high ground, body blocking, line of sight and fog, charge spells, lingering fields, weather, overload, ally reactions, fight upgrades, status cards, signature, retain and duet cards, reshuffle effects, each enemy role, weak points, morale, boss lookahead, carry-downed, reserves, Bond in combat, each class gauge, waves and door blocking, bonus objectives, retreat, each environmental timer, post-fight choice, card mastery and story relics.
+- `cl_everything` runs every Lab fight under autoplay with zero errors (levers combine safely).
 - The Lab log writes one valid line per fight.
 - `lab_report.gd` summarizes it.
 - **Removal tests:** no guard, cantrip, wheel or improvise references remain in `src/` or data, except the history notes in PROGRESS.md and the reworked perk texts.
@@ -432,6 +593,10 @@ These are decided. Do them for the whole game, not just the Lab.
 **Done when (Parts 1 to 5):**
 - **The Lab:** opens from the title, F1 and the dev flag; runs the 8 fights with any preset; changes levers before and during a fight; does A/B runs; saves logs and ratings.
 - **Rules and cards:** the Part 2 rules work as `cl_base`; the 40+ new cards and board props are in.
+- **Part 3c:**
+  - every extra mechanic works behind its lever, with previews, log lines and lever-panel text;
+  - the Charge, status, signature, duet and relic content is in;
+  - fights 10 to 13 and the `cl_plus` and `cl_everything` presets are in.
 - **Removals:** Guard, the Cantrip and the Wheel are gone from the whole game, with their dependents reworked.
 - **Docs:** MECHANICS.md is updated.
 - **Screenshots in `tools/screenshots/`:**

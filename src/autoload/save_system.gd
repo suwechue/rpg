@@ -56,6 +56,9 @@ func save_run(allow_arena: bool = false) -> bool:
 	# Arena runs are saved only from the pause menu (PT Part 3), at the start of the current wave.
 	if str(GameState.run.get("mode", "")) == "arena" and not allow_arena:
 		return false
+	# Lab fights use a throwaway run: it never reaches the save file.
+	if str(GameState.run.get("mode", "")) == "lab":
+		return false
 	var data: Dictionary = GameState.to_dict()
 	var tmp_path := SAVE_PATH + ".tmp"
 	var f := FileAccess.open(tmp_path, FileAccess.WRITE)

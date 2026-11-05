@@ -1,0 +1,50 @@
+{
+  "comment": "Named sets of lever values (docs/COMBAT_LAB.md Part 4). Levers left out keep the default in data/lab/lab.json (the cl_base values). fromGame reads a lever from the game's own tables, so 'current' can't drift from the real rules.",
+  "presets": [
+    {
+      "id": "current",
+      "name": "Current",
+      "text": "Today's rules, for comparison.",
+      "fromGame": {
+        "actionsPerTurn": "combat_rules.actions.actionsPerTurn",
+        "quicksPerTurn": "combat_rules.actions.quicksPerTurn",
+        "handSize": "stats.combat.drawUpTo",
+        "collisionDamage": "stats.combat.collisionDamage"
+      },
+      "levers": {
+        "moveSeparate": false,
+        "undo": "stack",
+        "hold": true,
+        "turnStructure": "initiative",
+        "keepHand": false,
+        "reshuffleFatigue": true,
+        "mpMax": 0,
+        "mpRegen": -1,
+        "classDecks": "game",
+        "smallNumbers": false,
+        "flatDamageMul": 3.0,
+        "crits": true,
+        "misses": true,
+        "difficultyDamageMul": true,
+        "instability": true,
+        "pitDamageParty": 0,
+        "reactionsTable": "off",
+        "enemiesAvoidEdges": false,
+        "telegraphTiming": "before_acting",
+        "trackingShare": -1.0,
+        "pathBlocking": false,
+        "blindMode": "miss_chance",
+        "surge": false,
+        "killRefund": "off",
+        "comboChain": false,
+        "roundCap": 0
+      }
+    },
+    {
+      "id": "cl_base",
+      "name": "CL Base",
+      "text": "One Action, a separate Move, small numbers, no dice, exact telegraphs.",
+      "levers": {}
+    }
+  ]
+}

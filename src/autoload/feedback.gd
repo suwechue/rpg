@@ -74,6 +74,10 @@ func save_zip(extra: Dictionary, shot: Image = null) -> String:
 	for p in [PlayLog.path, SaveSystem.SAVE_PATH, "user://logs/godot.log"]:
 		if FileAccess.file_exists(str(p)):
 			files[str(p).get_file()] = FileAccess.get_file_as_bytes(str(p))
+	var lab_dir := UserPaths.of("lab/")
+	if DirAccess.dir_exists_absolute(ProjectSettings.globalize_path(lab_dir)):
+		for lab_file in DirAccess.get_files_at(lab_dir):
+			files["lab/" + str(lab_file)] = FileAccess.get_file_as_bytes(lab_dir + str(lab_file))
 	if shot != null and not shot.is_empty():
 		files["screenshot.png"] = shot.save_png_to_buffer()
 	for name in files:

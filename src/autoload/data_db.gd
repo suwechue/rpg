@@ -22,6 +22,8 @@ func _ready() -> void:
 func reload() -> void:
 	var result := DT.load_all(DATA_ROOT)
 	_tables = result["tables"]
+	if _tables.has("lab/presets"):
+		preload("res://src/core/lab/lab_presets.gd").merge_into(_tables["lab/presets"])
 	errors.clear()
 	for e in result["errors"]:
 		errors.append(str(e))

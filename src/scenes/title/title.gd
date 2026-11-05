@@ -53,6 +53,8 @@ func _ready() -> void:
 		var e: Dictionary = extra
 		_menu.add_child(UiTheme.button(str(e["label"]), func() -> void: e["run"].call()))
 	_menu.add_child(UiTheme.button(Strings.t("title.endless_arena"), _arena))
+	if OS.is_debug_build() or bool(DataDB.table("lab/lab").get("showOnTitle", false)):
+		_menu.add_child(UiTheme.button(Strings.t("title.combat_lab"), func() -> void: preload("res://src/scenes/lab/lab.gd").open_lab()))
 	_menu.add_child(UiTheme.button(Strings.t("title.narrator_s_journal"), _show_journal))
 	_menu.add_child(UiTheme.button(Strings.t("title.options"), func() -> void:
 		await Flow.show_modal(preload("res://src/scenes/ui/options_modal.gd").new())))

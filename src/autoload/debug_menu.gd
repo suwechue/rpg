@@ -53,6 +53,7 @@ func _ready() -> void:
 ##   --hand=ids --hovercard=N --card=N --hover=x,y (combat previews, see _combat_dev_args)
 ##   --cutscene=id (play a cutscene over the current scene)
 ##   --tutorial=N (tutorial floor room N with its lesson; use with --scene=res://src/scenes/combat/combat.tscn)
+##   --lab --fight=id --preset=id (a Combat Lab fight; no --fight opens the Lab screen)
 ##   --arena --size=4 --level=3 --arenawave=N --waves=N (Endless Arena; --autoplay plays it)
 ## --debug opens this menu; --shot saves the viewport after N frames and quits.
 func _dev_args() -> void:
@@ -84,7 +85,10 @@ func _dev_args() -> void:
 		GameState.pending_combat = GameState.combat_setup(opts["enemies"], str(opts["layout"]), opts)
 	if args.has("cutscene"):
 		_play_cutscene_arg.call_deferred(str(args["cutscene"]))
-	if args.has("fight"):
+	if args.has("lab"):
+		# --lab [--fight=id --preset=id]: straight into a Lab fight (or the Lab screen with no --fight).
+		_lab_arg.call_deferred(str(args.get("fight", "")), str(args.get("preset", "")))
+	elif args.has("fight"):
 		GameState.pending_combat = GameState.combat_setup(str(args["fight"]).split(","), str(args.get("layout", "boss_stage")), { "boss": true })
 	if args.has("scene"):
 		SceneRouter.goto(str(args["scene"]))
@@ -148,6 +152,21 @@ func _period_arg(arg: String) -> void:
 						at = i
 				steps = steps.slice(at)
 			Cutscenes.play_steps(steps, get_tree().current_scene, "class_" + cid)
+
+
+func _lab_arg(fight: String, preset: String) -> void:
+	const LabSession := preload("res://src/core/lab/lab_session.gd")
+	const LabScreen := preload("res://src/scenes/lab/lab.gd")
+	if preset != "":
+		LabSession.preset_id = preset
+	elif LabSession.preset_id == "":
+		LabSession.preset_id = str(DataDB.table("lab/lab").get("defaultPreset", "cl_base"))
+	if fight == "":
+		LabScreen.open_lab()
+		return
+	LabSession.fight_id = fight
+	LabSession.has_parked = true
+	LabScreen.start_fight()
 
 
 func _call_arg(method: String) -> void:
@@ -283,6 +302,18 @@ func _show_cutscenes(box: VBoxContainer) -> void:
 
 
 func _show_fights(box: VBoxContainer) -> void:
+	box.add_child(UiTheme.button("Lab", func() -> void:
+		toggle()
+		preload("res://src/scenes/lab/lab.gd").open_lab()))
+	var lab_scene := get_tree().current_scene
+	if lab_scene != null and lab_scene.get("state") != null and bool(lab_scene.call("in_lab")):
+		var lab_rules: RefCounted = lab_scene.get("state").get("rules")
+		box.add_child(UiTheme.label("Levers: changes apply from the next turn", UiTheme.ACCENT))
+		var panel := preload("res://src/scenes/lab/lever_panel.gd").new()
+		var shown: Dictionary = lab_rules.levers.duplicate()
+		panel.show_levers(shown, preload("res://src/core/combat/rules.gd").values_for(DataDB.all(), str(lab_rules.preset)))
+		panel.changed.connect(func(key: String, value: Variant) -> void: lab_rules.queue(key, value))
+		box.add_child(panel)
 	var data_rule := str(DataDB.table("combat_rules").get("turnMode", "two_actions"))
 	var eff := GameState.combat_turn_mode if GameState.combat_turn_mode != "" else data_rule
 	box.add_child(UiTheme.label("Turn rule: %s%s" % [eff, " (F1 override)" if GameState.combat_turn_mode != "" else " (data)"], UiTheme.ACCENT))

@@ -23,9 +23,13 @@ const UnitScript := preload("res://src/core/combat/unit.gd")
 const Res := preload("res://src/core/combat/resolver.gd")
 const EnemyMods := preload("res://src/core/combat/enemy_mods.gd")
 const Combos := preload("res://src/core/combos.gd")
+const RulesScript := preload("res://src/core/combat/rules.gd")
+const FightLog := preload("res://src/core/lab/fight_log.gd")
 
 var db: Dictionary = {}
 var rng: RandomNumberGenerator
+var rules: RefCounted = null        # the Rules view: every lever is read through it (docs/COMBAT_LAB.md)
+var lab_log: FightLog = null        # a Lab fight's log (setup "lab")
 var grid: GridScript
 var units: Array = []
 var order: Array = []
@@ -88,6 +92,10 @@ var highest_hit := 0                  # the biggest single party hit (arena scor
 func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) -> void:
 	db = p_db
 	rng = p_rng
+	rules = RulesScript.build(db, str(setup.get("preset", RulesScript.CURRENT)), setup.get("levers", {}))
+	if setup.has("lab"):
+		var names: Array = setup.get("party", []).map(func(e: Dictionary) -> String: return "%s:%d" % [str(e["char"].get("class", "")), int(e["char"].get("level", 1))])
+		lab_log = FightLog.new(str(setup["lab"].get("fight", "")), int(setup.get("seed", 0)), names, str(setup.get("preset", "")), rules.levers.duplicate())
 	library = setup.get("library", {})
 	turn_mode = str(setup.get("turnMode", db.get("combat_rules", {}).get("turnMode", "two_actions")))
 	party_first = bool(setup.get("partyFirst", false))
@@ -675,7 +683,10 @@ func _start_turn(u: UnitScript) -> void:
 	u.start_cell = u.cell
 	if u.team == "party":
 		party_turns += 1
+		_apply_queued_levers()
 		refresh_intents(acts_next(u))
+		if lab_log != null:
+			lab_log.begin_turn(u.id, round_num, turn_options(u))
 	elif u.intent.is_empty():
 		roll_move_and_act(u)
 		if party_turns == 0:
@@ -909,6 +920,30 @@ func move(u: UnitScript, dest: Vector2i) -> bool:
 	_check_end()
 	_after_step(u)
 	return true
+
+
+## Levers changed mid-fight (F1 in the Lab) apply from the next party turn, and the log says so.
+func _apply_queued_levers() -> void:
+	if not rules.has_queued():
+		return
+	var done: Dictionary = rules.apply_queued()
+	if lab_log != null:
+		lab_log.note_lever_change(round_num, done)
+	for k in done:
+		_emit({ "t": "log", "text": Str.t(db, "lab.lever_changed") % [str(k), str(done[k])] })
+
+
+## What this unit could do right now, for the Lab log: playable cards and Strike.
+func turn_options(u: UnitScript) -> Array:
+	var out: Array = []
+	if u.deck != null:
+		for i in u.deck.hand.size():
+			var c := card_of(u, i)
+			if card_block(u, c) == "" and not card_targets(u, c).is_empty():
+				out.append(str(c.get("id", "")))
+	if quick_block(u) == "" and not _adjacent_hostiles(u, 1).is_empty():
+		out.append("strike")
+	return out
 
 
 ## Conveyor tiles carry whoever stands on them one tile along at round end.
@@ -1218,6 +1253,8 @@ func play_card(u: UnitScript, hand_index: int, target: Vector2i) -> bool:
 	u.mp -= cost
 	if u.team == "party":
 		cards_played += 1
+		if lab_log != null:
+			lab_log.played(str(card.get("id", "")))
 	u.played_turn += 1
 	if u.team == "party" and CardRules.is_spell(card):
 		last_party_card = card
@@ -4122,6 +4159,8 @@ func finish() -> Dictionary:
 
 func _emit(e: Dictionary) -> void:
 	events.append(e)
+	if lab_log != null:
+		lab_log.observe(e)
 
 
 ## Drain events for the scene.

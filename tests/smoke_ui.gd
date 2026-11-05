@@ -12,6 +12,7 @@ var _issues: Array = []
 ## Screens to open as modals: script, properties to set first.
 const SCREENS := [
 	["res://src/scenes/ui/options_modal.gd", {}],
+	["res://src/scenes/lab/rating_card.gd", {}],
 	["res://src/scenes/ui/phone_screen.gd", {}],
 	["res://src/scenes/ui/board_screen.gd", {}],
 	["res://src/scenes/ui/equipment_screen.gd", {}],

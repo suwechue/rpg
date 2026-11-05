@@ -625,3 +625,13 @@ Change these in `data/combos.json`, `data/sparks.json`, `data/intro/spark_quiz.j
 # Part D: Changing next
 
 PT (`docs/PATCH_1.md`), P2 Parts 1 to 3 (`docs/PATCH_2.md`, with cutscenes M14 and the intro M15) and VD (combos, the spark, the card builder, the demo and feedback) are in. Demo mode (`data/demo.json`) ends a story run after the week 1 boss. Next:
+
+## Combat Lab (docs/COMBAT_LAB.md)
+
+The Lab is a dev tool for comparing combat rules. Every rule it can switch is a lever in `data/lab/lab.json`, read through the Rules view (`src/core/combat/rules.gd`). A fight that names no preset uses `current`, today's rules; the story and arena do that until the user picks a preset (Part 6).
+
+| Thing | Where |
+| --- | --- |
+| Levers and presets | `data/lab/lab.json`, `data/lab/presets.json`; saved presets in `user://lab/presets.json` |
+| Fights | `data/lab/fights.json` |
+| Fight log and ratings | one JSON line per fight in `user://lab/lab_log.jsonl`; `tools/lab_report.gd` makes a table per preset |
