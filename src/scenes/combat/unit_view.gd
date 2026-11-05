@@ -141,6 +141,15 @@ func _draw() -> void:
 		draw_line(Vector2(-lw * 0.3, -lh + 3), Vector2(-lw * 0.3, 0), Color("5c6068"), 1.0)
 		draw_line(Vector2(lw * 0.4, -lh + 3), Vector2(lw * 0.4, 0), Color("5c6068"), 1.0)
 		draw_rect(Rect2(-lw, -lh, lw * 2.0, lh), Color("4a4d54"), false, 1.0)
+	elif is_prop and "barrel" in unit_id:
+		# Barrels: a drum, red for explosive, dark for oil, blue for water.
+		var bh := sprite_height() * 0.8
+		var bw := Display.tile * 0.28
+		var tone := Color("3a3028") if unit_id.begins_with("oil") else (Color("3a6ea8") if unit_id.begins_with("water") else Color("b0442c"))
+		draw_rect(Rect2(-bw, -bh, bw * 2.0, bh), tone)
+		draw_rect(Rect2(-bw, -bh, bw * 2.0, 3), tone.lightened(0.3))
+		draw_rect(Rect2(-bw, -bh * 0.55, bw * 2.0, 2), tone.darkened(0.4))
+		draw_rect(Rect2(-bw, -bh, bw * 2.0, bh), tone.darkened(0.6), false, 1.0)
 	elif is_prop:
 		var h := sprite_height()
 		var hw := Display.tile * 0.35

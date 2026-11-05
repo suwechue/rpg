@@ -240,6 +240,10 @@ func _draw_cell(cell: Vector2i) -> void:
 			base = base.lerp(Color("6b4a2a"), 0.35)
 		GridScript.DARK:
 			base = base.darkened(0.25)
+		GridScript.LEDGE:
+			base = Color("1b1420")
+		GridScript.SPIKES:
+			base = base.lerp(Color("6e6a62"), 0.35)
 	if grid.exits.has(cell):
 		base = base.lerp(Color("3d6b4a"), 0.5)
 	draw_colored_polygon(poly, base * Color(depth, depth, depth, 1.0))
@@ -252,6 +256,32 @@ func _draw_cell(cell: Vector2i) -> void:
 		# A cracked wall: it has taken damage.
 		draw_line(ctr + Vector2(-5, -3), ctr + Vector2(0, 1), Color("1d140c"), 1.0)
 		draw_line(ctr + Vector2(0, 1), ctr + Vector2(4, -2), Color("1d140c"), 1.0)
+	if t == GridScript.LEDGE:
+		# A drop: a lighter lip along the front edge.
+		draw_line(poly[3], poly[2], Color("8a7fa8"), 2.0)
+	if t == GridScript.SPIKES:
+		for i in 3:
+			var sx := -6.0 + 6.0 * float(i)
+			draw_line(ctr + Vector2(sx - 2, 2), ctr + Vector2(sx, -4), Color("d7d2c4"), 1.0)
+			draw_line(ctr + Vector2(sx, -4), ctr + Vector2(sx + 2, 2), Color("d7d2c4"), 1.0)
+	if grid.oil.has(cell):
+		draw_colored_polygon(poly, Color(0.1, 0.08, 0.05, 0.6))
+	if grid.gas.has(cell):
+		draw_colored_polygon(poly, Color(0.55, 0.75, 0.25, 0.3))
+	if grid.wet.has(cell):
+		draw_colored_polygon(poly, Color(0.2, 0.45, 0.8, 0.35))
+	if grid.bridges.has(cell):
+		draw_colored_polygon(poly, Color("7a5a3a"))
+		draw_line(poly[0], poly[2], Color("3d2b1a"), 1.0)
+	if grid.anchors.has(cell):
+		draw_arc(ctr, 7.0, 0, TAU, 12, UiTheme.vector_color("binding"), 2.0)
+		draw_line(ctr + Vector2(0, -6), ctr + Vector2(0, 6), UiTheme.vector_color("binding"), 1.0)
+	if grid.collapsing.has(cell):
+		# Telegraphed to both sides: cracks and the rounds left.
+		draw_colored_polygon(poly, Color(UiTheme.color("bad"), 0.25))
+		draw_line(ctr + Vector2(-7, -2), ctr + Vector2(1, 1), Color("1d140c"), 1.0)
+		draw_line(ctr + Vector2(1, 1), ctr + Vector2(6, -1), Color("1d140c"), 1.0)
+		draw_string(UiTheme.font, ctr + Vector2(-2, 4), str(grid.collapsing[cell]), HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, UiTheme.color("bad"))
 	if t == GridScript.HAZARD:
 		draw_line(ctr + Vector2(-5, -2), ctr + Vector2(5, 2), Color("e8b04a"), 1.0)
 		draw_line(ctr + Vector2(-5, 2), ctr + Vector2(5, -2), Color("e8b04a"), 1.0)

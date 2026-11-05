@@ -1,0 +1,34 @@
+{
+  "comment": "What each Vector does to each tile or prop (docs/COMBAT_LAB.md Part 3b). tiles -> tile type -> Vector -> ops. Tile types: floor, water, ice, oil, gas, wet, and prop kinds. Ops: burn, steam, terrain (to), wet, arc (damage), ignite, explode (damage). The game and the preview both read this table when the reactionsTable lever is on.",
+  "burnTurns": 2,
+  "steamTurns": 2,
+  "wetTurns": 3,
+  "spikesDamage": 2,
+  "conveyorSteps": 1,
+  "explosionDamage": 3,
+  "gasDamage": 2,
+  "props": {
+    "barrel": { "name": "Barrel", "hp": 1, "explodes": true, "damage": 3 },
+    "oil_barrel": { "name": "Oil Barrel", "hp": 1, "spill": "oil" },
+    "water_barrel": { "name": "Water Barrel", "hp": 1, "spill": "wet" },
+    "totem": { "name": "Totem", "hp": 4, "cover": false }
+  },
+  "tiles": {
+    "floor": { "heat": [{ "op": "burn" }] },
+    "water": {
+      "heat": [{ "op": "steam" }],
+      "cold": [{ "op": "terrain", "to": "ice" }],
+      "lightning": [{ "op": "arc", "damage": 2 }]
+    },
+    "wet": {
+      "heat": [{ "op": "steam" }],
+      "cold": [{ "op": "terrain", "to": "ice" }],
+      "lightning": [{ "op": "arc", "damage": 2 }]
+    },
+    "ice": { "heat": [{ "op": "terrain", "to": "water" }] },
+    "oil": { "heat": [{ "op": "ignite" }], "lightning": [{ "op": "ignite" }] },
+    "gas": { "heat": [{ "op": "explode", "damage": 2 }], "lightning": [{ "op": "explode", "damage": 2 }] },
+    "barrel": { "heat": [{ "op": "explode", "damage": 3 }], "lightning": [{ "op": "explode", "damage": 3 }] },
+    "oil_barrel": { "heat": [{ "op": "explode", "damage": 2 }] }
+  }
+}

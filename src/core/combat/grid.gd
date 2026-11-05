@@ -16,10 +16,13 @@ const ICE := "ice"
 const PIT := "pit"                # arena: enemies pushed in are gone; party members take heavy damage
 const COLLAPSE := "collapse"      # arena: gives way the second time someone steps on it
 const DARK := "dark"              # arena: units here can't be targeted unless Light has lit the tile
+const LEDGE := "ledge"            # Lab: a drop; pushed off it you fall and land below (walking won't take you there)
+const SPIKES := "spikes"          # Lab: damage on entry
 const CONVEYORS := { "conv_r": Vector2i(1, 0), "conv_l": Vector2i(-1, 0), "conv_u": Vector2i(0, -1), "conv_d": Vector2i(0, 1) }
 
 const LEGEND := { ".": FLOOR, "#": WALL, "B": WALL, "r": RUBBLE, "c": FLOOR, "h": HAZARD, "w": WATER, "i": ICE, "p": PIT, "k": COLLAPSE, "d": DARK,
-	"R": "conv_r", "L": "conv_l", "U": "conv_u", "D": "conv_d", "t": FLOOR, "f": FLOOR, "g": FLOOR }
+	"R": "conv_r", "L": "conv_l", "U": "conv_u", "D": "conv_d", "t": FLOOR, "f": FLOOR, "g": FLOOR,
+	"e": LEDGE, "s": SPIKES, "o": FLOOR, "G": FLOOR, "b": FLOOR, "O": FLOOR, "A": FLOOR }
 const DIRS := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
 
 var cols := 9
@@ -38,13 +41,20 @@ var enemy_spawns: Array = []
 var prop_spawns: Array = []      # [{ "cell": Vector2i, "prop": "crate" }]
 var wall_hp: Dictionary = {}     # breakable '#' walls: cell -> HP (the 'B' boundary isn't here)
 var shadow: Dictionary = {}      # PT Part 8: Shadow tiles, cell -> rounds left
+var oil: Dictionary = {}         # Lab: oil puddles (fire runs through them)
+var gas: Dictionary = {}         # Lab: gas (explodes)
+var wet: Dictionary = {}         # Lab: soaked tiles: react like water
+var anchors: Dictionary = {}     # Lab: Anchor Point tiles: nothing is pushed past them
+var bridges: Dictionary = {}     # Lab: walkable tiles over a gap or water
+var collapsing: Dictionary = {}  # Lab: cell -> rounds until it's a pit (telegraphed)
 var theme := ""
 
 
 ## layout: { "cols", "rows", "map": ["P..x...E", ...], "theme" }
 ## Map letters: . floor, # wall, c cover, h hazard, w water, i ice,
 ## P party spawn, E enemy spawn, < exit (floor), x crate prop (floor under it),
-## c low wall prop (cover, floor under it).
+## c low wall prop (cover, floor under it). Lab: e ledge, s spikes, o oil, G gas,
+## b barrel, O oil barrel, A water barrel; layout "props" adds [{ "prop", "cell" }].
 func _init(layout: Dictionary = {}) -> void:
 	var map: Array = layout.get("map", [])
 	rows = maxi(1, map.size()) if not map.is_empty() else int(layout.get("rows", 5))
@@ -66,6 +76,16 @@ func _init(layout: Dictionary = {}) -> void:
 					exits.append(cell)
 				"x":
 					prop_spawns.append({ "cell": cell, "prop": "crate" })
+				"b":
+					prop_spawns.append({ "cell": cell, "prop": "barrel" })
+				"O":
+					prop_spawns.append({ "cell": cell, "prop": "oil_barrel" })
+				"A":
+					prop_spawns.append({ "cell": cell, "prop": "water_barrel" })
+				"o":
+					oil[cell] = 99
+				"G":
+					gas[cell] = 99
 				"c":
 					# Cover is a destructible low wall standing on floor (CT Part 3).
 					prop_spawns.append({ "cell": cell, "prop": "low_wall" })
@@ -79,6 +99,9 @@ func _init(layout: Dictionary = {}) -> void:
 					wall_hp[cell] = int(layout.get("wallHp", 25))
 			row.append(LEGEND.get(ch, FLOOR))
 		terrain.append(row)
+	for p in layout.get("props", []):
+		var at: Array = p.get("cell", [0, 0])
+		prop_spawns.append({ "cell": Vector2i(int(at[0]), int(at[1])), "prop": str(p.get("prop", "crate")) })
 	if exits.is_empty():
 		for r in rows:
 			if walkable_terrain(Vector2i(0, r)):
@@ -103,7 +126,9 @@ func set_terrain(cell: Vector2i, t: String) -> void:
 ## Terrain you can stand on (water only once frozen).
 func walkable_terrain(cell: Vector2i) -> bool:
 	var t := get_terrain(cell)
-	return t != WALL and t != WATER and t != PIT and not fire_walls.has(cell)
+	if bridges.has(cell):
+		return not fire_walls.has(cell)
+	return t != WALL and t != WATER and t != PIT and t != LEDGE and not fire_walls.has(cell)
 
 
 ## Darkness hides a tile unless Light has lit it; Shadow tiles (PT Part 8) hide it too.
@@ -198,7 +223,7 @@ func tick_round() -> void:
 		shadow[c] = int(shadow[c]) - 1
 		if int(shadow[c]) <= 0:
 			shadow.erase(c)
-	for table in [burning, steam, fire_walls, toxic, lit]:
+	for table in [burning, steam, fire_walls, toxic, lit, wet]:
 		for cell in table.keys():
 			table[cell] = int(table[cell]) - 1
 			if int(table[cell]) <= 0:

@@ -224,7 +224,7 @@ func _validate_card_effects() -> void:
 		if c.has("rarity") and not rarities.has(str(c["rarity"])):
 			errors.append("card %s: unknown rarity '%s'" % [id, c["rarity"]])
 		for e in c.get("effects", []) + c.get("upgrade", {}).get("effects", []):
-			if not CardEffects.OPS.has(str(e.get("op", ""))):
+			if not CardEffects.OPS.has(str(e.get("op", ""))) and not preload("res://src/core/combat/lab_ops.gd").OPS.has(str(e.get("op", ""))):
 				errors.append("card %s: unknown effect op '%s'" % [id, e.get("op", "")])
 		if c.has("targeting") and not CardEffects.TARGETING.has(str(c["targeting"].get("type", ""))):
 			errors.append("card %s: unknown targeting '%s'" % [id, c["targeting"].get("type", "")])

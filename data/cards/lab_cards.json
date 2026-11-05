@@ -1,0 +1,1107 @@
+{
+  "comment": "The Combat Lab's cards (docs/COMBAT_LAB.md Part 3). Their text is written from their ops: see src/core/combat/card_text.gd. labOnly: never offered in the story or arena until the user picks (Part 6).",
+  "cards": [
+    {
+      "id": "lab_recall",
+      "name": "Recall",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Discard to hand",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "self"
+      },
+      "effects": [
+        {
+          "op": "discard_recall"
+        }
+      ],
+      "quick": true,
+      "group": "discard",
+      "choose": "discard",
+      "labels": [
+        "discard"
+      ]
+    },
+    {
+      "id": "lab_echo",
+      "name": "Echo",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Last card again",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "any",
+        "range": 4
+      },
+      "effects": [
+        {
+          "op": "discard_echo"
+        }
+      ],
+      "group": "discard",
+      "labels": [
+        "discard"
+      ]
+    },
+    {
+      "id": "lab_kindling",
+      "name": "Kindling",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "+1 per Heat card",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "enemy",
+        "range": 4,
+        "los": true
+      },
+      "effects": [
+        {
+          "op": "discard_damage",
+          "n": 1,
+          "per": 1,
+          "vector": "heat"
+        }
+      ],
+      "group": "discard",
+      "vectors": {
+        "heat": 1.0
+      },
+      "labels": [
+        "discard"
+      ]
+    },
+    {
+      "id": "lab_burnout",
+      "name": "Burnout",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Burn discard: +2",
+      "action": "effects",
+      "cost": 2,
+      "targeting": {
+        "type": "enemy",
+        "range": 4,
+        "los": true
+      },
+      "effects": [
+        {
+          "op": "discard_burn",
+          "n": 1,
+          "per": 2,
+          "max": 3,
+          "vector": "heat"
+        }
+      ],
+      "group": "discard",
+      "vectors": {
+        "heat": 1.0
+      },
+      "labels": [
+        "discard"
+      ]
+    },
+    {
+      "id": "lab_afterimage",
+      "name": "Afterimage Step",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Swap back",
+      "action": "effects",
+      "cost": 0,
+      "targeting": {
+        "type": "self"
+      },
+      "effects": [
+        {
+          "op": "discard_swap"
+        }
+      ],
+      "free": true,
+      "group": "discard",
+      "vectors": {
+        "motion": 1.0
+      },
+      "labels": [
+        "discard",
+        "reposition"
+      ]
+    },
+    {
+      "id": "lab_scrapheap",
+      "name": "Scrapheap",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Reshuffle, draw",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "self"
+      },
+      "effects": [
+        {
+          "op": "discard_shuffle",
+          "n": 1
+        }
+      ],
+      "group": "discard",
+      "labels": [
+        "discard",
+        "deck"
+      ]
+    },
+    {
+      "id": "lab_foresight",
+      "name": "Foresight",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Order top 3",
+      "action": "effects",
+      "cost": 0,
+      "targeting": {
+        "type": "self"
+      },
+      "effects": [
+        {
+          "op": "deck_look",
+          "n": 3
+        }
+      ],
+      "quick": true,
+      "choose": "top",
+      "labels": [
+        "deck"
+      ]
+    },
+    {
+      "id": "lab_gamble",
+      "name": "Gamble",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Draw 2, drop 1",
+      "action": "effects",
+      "cost": 0,
+      "targeting": {
+        "type": "self"
+      },
+      "effects": [
+        {
+          "op": "deck_draw",
+          "n": 2
+        },
+        {
+          "op": "deck_discard"
+        }
+      ],
+      "choose": "hand",
+      "labels": [
+        "deck"
+      ]
+    },
+    {
+      "id": "lab_rehearsed",
+      "name": "Rehearsed",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "First? Draw 1",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "flat_hit",
+          "n": 2
+        },
+        {
+          "op": "deck_if_first_draw",
+          "n": 1
+        }
+      ],
+      "labels": [
+        "deck"
+      ]
+    },
+    {
+      "id": "lab_deep_pocket",
+      "name": "Deep Pocket",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Find a push card",
+      "action": "effects",
+      "cost": 0,
+      "targeting": {
+        "type": "self"
+      },
+      "effects": [
+        {
+          "op": "deck_search",
+          "tag": "push"
+        }
+      ],
+      "exhaust": true,
+      "labels": [
+        "deck"
+      ]
+    },
+    {
+      "id": "lab_stacked_deck",
+      "name": "Stacked Deck",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Top; next turn free",
+      "action": "effects",
+      "cost": 0,
+      "targeting": {
+        "type": "self"
+      },
+      "effects": [
+        {
+          "op": "deck_stack"
+        }
+      ],
+      "choose": "hand",
+      "labels": [
+        "deck"
+      ]
+    },
+    {
+      "id": "lab_pass",
+      "name": "Pass",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Give a card",
+      "action": "effects",
+      "cost": 0,
+      "targeting": {
+        "type": "ally",
+        "range": 3
+      },
+      "effects": [
+        {
+          "op": "ally_pass"
+        }
+      ],
+      "quick": true,
+      "group": "team",
+      "choose": "hand",
+      "labels": [
+        "team"
+      ]
+    },
+    {
+      "id": "lab_borrow",
+      "name": "Borrow",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Play ally's top card",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "ally",
+        "range": 3
+      },
+      "effects": [
+        {
+          "op": "ally_borrow"
+        }
+      ],
+      "group": "team",
+      "labels": [
+        "team"
+      ]
+    },
+    {
+      "id": "lab_setup",
+      "name": "Setup",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Top of ally's deck",
+      "action": "effects",
+      "cost": 0,
+      "targeting": {
+        "type": "ally",
+        "range": 3
+      },
+      "effects": [
+        {
+          "op": "ally_setup"
+        }
+      ],
+      "group": "team",
+      "choose": "hand",
+      "labels": [
+        "team"
+      ]
+    },
+    {
+      "id": "lab_harmony",
+      "name": "Harmony",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Free after same Vector",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "enemy",
+        "range": 4,
+        "los": true
+      },
+      "effects": [
+        {
+          "op": "flat_hit",
+          "n": 2,
+          "vector": "heat"
+        }
+      ],
+      "group": "team",
+      "freeIf": "ally_vector",
+      "vectors": {
+        "heat": 1.0
+      },
+      "labels": [
+        "team"
+      ]
+    },
+    {
+      "id": "lab_relay",
+      "name": "Relay",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Push again",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "enemy",
+        "range": 4
+      },
+      "effects": [
+        {
+          "op": "ally_repush",
+          "steps": 2
+        }
+      ],
+      "group": "team",
+      "labels": [
+        "team",
+        "push"
+      ]
+    },
+    {
+      "id": "lab_encore_two",
+      "name": "Encore for Two",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Ally repeats, half",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "ally",
+        "range": 3
+      },
+      "effects": [
+        {
+          "op": "ally_encore"
+        }
+      ],
+      "group": "team",
+      "labels": [
+        "team"
+      ]
+    },
+    {
+      "id": "lab_shared_burden",
+      "name": "Shared Burden",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Move a status",
+      "action": "effects",
+      "cost": 0,
+      "targeting": {
+        "type": "ally",
+        "range": 3
+      },
+      "effects": [
+        {
+          "op": "ally_move_status"
+        }
+      ],
+      "quick": true,
+      "group": "team",
+      "labels": [
+        "team"
+      ]
+    },
+    {
+      "id": "lab_shove_line",
+      "name": "Shove Line",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Push a line 2",
+      "action": "effects",
+      "cost": 2,
+      "targeting": {
+        "type": "any",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "board_push",
+          "shape": "line",
+          "steps": 2,
+          "reach": 4
+        }
+      ],
+      "vectors": {
+        "force": 1.0
+      },
+      "labels": [
+        "push",
+        "force"
+      ]
+    },
+    {
+      "id": "lab_undertow",
+      "name": "Undertow",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Pull toward a tile",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "any",
+        "range": 4
+      },
+      "effects": [
+        {
+          "op": "board_pull_area",
+          "radius": 2,
+          "steps": 1
+        }
+      ],
+      "vectors": {
+        "motion": 1.0
+      },
+      "labels": [
+        "push",
+        "motion"
+      ]
+    },
+    {
+      "id": "lab_flash_freeze",
+      "name": "Flash Freeze",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Water to ice",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "any",
+        "range": 4
+      },
+      "effects": [
+        {
+          "op": "board_react",
+          "vector": "cold"
+        }
+      ],
+      "area": "square_3x3",
+      "vectors": {
+        "cold": 1.0
+      },
+      "labels": [
+        "terrain"
+      ]
+    },
+    {
+      "id": "lab_steam_vent",
+      "name": "Steam Vent",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Water to steam",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "any",
+        "range": 4
+      },
+      "effects": [
+        {
+          "op": "board_react",
+          "vector": "heat"
+        }
+      ],
+      "area": "square_3x3",
+      "vectors": {
+        "heat": 1.0
+      },
+      "labels": [
+        "terrain"
+      ]
+    },
+    {
+      "id": "lab_collapse",
+      "name": "Collapse",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Pit next round",
+      "action": "effects",
+      "cost": 2,
+      "targeting": {
+        "type": "any",
+        "range": 4
+      },
+      "effects": [
+        {
+          "op": "board_collapse",
+          "rounds": 2
+        }
+      ],
+      "vectors": {
+        "force": 1.0
+      },
+      "labels": [
+        "terrain"
+      ]
+    },
+    {
+      "id": "lab_anchor_point",
+      "name": "Anchor Point",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Nothing pushes past",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "any",
+        "range": 4
+      },
+      "effects": [
+        {
+          "op": "board_anchor",
+          "rounds": 3
+        }
+      ],
+      "vectors": {
+        "binding": 1.0
+      },
+      "labels": [
+        "terrain"
+      ]
+    },
+    {
+      "id": "lab_barrel_toss",
+      "name": "Barrel Toss",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Throw a prop 3",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "any",
+        "range": 3
+      },
+      "effects": [
+        {
+          "op": "board_toss",
+          "reach": 1
+        }
+      ],
+      "labels": [
+        "terrain"
+      ]
+    },
+    {
+      "id": "lab_bridge",
+      "name": "Bridge",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Walk over a gap",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "any",
+        "range": 4,
+        "gaps": true
+      },
+      "effects": [
+        {
+          "op": "board_bridge",
+          "rounds": 2
+        }
+      ],
+      "vectors": {
+        "cold": 1.0
+      },
+      "labels": [
+        "terrain"
+      ]
+    },
+    {
+      "id": "lab_swap",
+      "name": "Swap",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Swap two units",
+      "action": "effects",
+      "cost": 2,
+      "targeting": {
+        "type": "unit",
+        "range": 4
+      },
+      "effects": [
+        {
+          "op": "board_swap"
+        }
+      ],
+      "secondTarget": true,
+      "vectors": {
+        "motion": 1.0
+      },
+      "labels": [
+        "reposition",
+        "motion"
+      ]
+    },
+    {
+      "id": "lab_shatter",
+      "name": "Shatter",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "x3 on Frozen",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "enemy",
+        "range": 3
+      },
+      "effects": [
+        {
+          "op": "flat_hit",
+          "n": 2,
+          "vsStatus": "frozen",
+          "mul": 3
+        }
+      ],
+      "vectors": {
+        "force": 1.0
+      },
+      "labels": [
+        "payoff"
+      ]
+    },
+    {
+      "id": "lab_detonate",
+      "name": "Detonate",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Burning tiles blow",
+      "action": "effects",
+      "cost": 2,
+      "targeting": {
+        "type": "self"
+      },
+      "effects": [
+        {
+          "op": "board_detonate",
+          "n": 2
+        }
+      ],
+      "vectors": {
+        "heat": 1.0
+      },
+      "labels": [
+        "payoff"
+      ]
+    },
+    {
+      "id": "lab_domino",
+      "name": "Domino",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Push; chains",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "board_push",
+          "steps": 2,
+          "domino": true
+        }
+      ],
+      "vectors": {
+        "force": 1.0
+      },
+      "labels": [
+        "push",
+        "force"
+      ]
+    },
+    {
+      "id": "lab_finisher",
+      "name": "Finisher",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Free after a push",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "flat_hit",
+          "n": 3
+        }
+      ],
+      "freeIf": "target_moved",
+      "labels": [
+        "payoff"
+      ]
+    },
+    {
+      "id": "lab_shove",
+      "name": "Shove",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Hit and push 1",
+      "action": "effects",
+      "cost": 0,
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "flat_hit",
+          "n": 1
+        },
+        {
+          "op": "board_push",
+          "steps": 1
+        }
+      ],
+      "labels": [
+        "push",
+        "force"
+      ]
+    },
+    {
+      "id": "lab_spark",
+      "name": "Spark",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "1 at range",
+      "action": "effects",
+      "cost": 0,
+      "targeting": {
+        "type": "enemy",
+        "range": 3,
+        "los": true
+      },
+      "effects": [
+        {
+          "op": "flat_hit",
+          "n": 1,
+          "vector": "heat"
+        }
+      ],
+      "vectors": {
+        "heat": 1.0
+      },
+      "labels": [
+        "attack"
+      ]
+    },
+    {
+      "id": "lab_jab",
+      "name": "Jab",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "1, then keep moving",
+      "action": "effects",
+      "cost": 0,
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "flat_hit",
+          "n": 1
+        }
+      ],
+      "swift": true,
+      "labels": [
+        "attack"
+      ]
+    },
+    {
+      "id": "lab_heavy_slam",
+      "name": "Heavy Slam",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Hit 3, push 3",
+      "action": "effects",
+      "cost": 2,
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "flat_hit",
+          "n": 3
+        },
+        {
+          "op": "board_push",
+          "steps": 3
+        }
+      ],
+      "heavy": true,
+      "labels": [
+        "push",
+        "force"
+      ]
+    },
+    {
+      "id": "lab_ignite",
+      "name": "Ignite",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Set tiles alight",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "any",
+        "range": 4
+      },
+      "effects": [
+        {
+          "op": "board_react",
+          "vector": "heat"
+        }
+      ],
+      "area": "square_3x3",
+      "vectors": {
+        "heat": 1.0
+      },
+      "labels": [
+        "terrain"
+      ]
+    },
+    {
+      "id": "lab_frost_snap",
+      "name": "Frost Snap",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "2 and Frozen",
+      "action": "effects",
+      "cost": 2,
+      "targeting": {
+        "type": "enemy",
+        "range": 4,
+        "los": true
+      },
+      "effects": [
+        {
+          "op": "flat_hit",
+          "n": 2,
+          "vector": "cold"
+        },
+        {
+          "op": "lab_status",
+          "status": "frozen"
+        }
+      ],
+      "vectors": {
+        "cold": 1.0
+      },
+      "labels": [
+        "attack"
+      ]
+    },
+    {
+      "id": "lab_feint",
+      "name": "Feint",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Then a push card",
+      "action": "effects",
+      "cost": 0,
+      "targeting": {
+        "type": "self"
+      },
+      "effects": [
+        {
+          "op": "lab_move",
+          "n": 1
+        }
+      ],
+      "free": true,
+      "followUp": "push",
+      "labels": [
+        "keyword"
+      ]
+    },
+    {
+      "id": "lab_quick_step",
+      "name": "Quick Step",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "+2 Move",
+      "action": "effects",
+      "cost": 0,
+      "targeting": {
+        "type": "self"
+      },
+      "effects": [
+        {
+          "op": "lab_move",
+          "n": 2
+        }
+      ],
+      "quick": true,
+      "labels": [
+        "reposition"
+      ]
+    },
+    {
+      "id": "lab_mend",
+      "name": "Mend",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Heal 3",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "ally",
+        "range": 3
+      },
+      "effects": [
+        {
+          "op": "lab_heal",
+          "n": 3
+        }
+      ],
+      "vectors": {
+        "vitality": 1.0
+      },
+      "labels": [
+        "support"
+      ]
+    },
+    {
+      "id": "lab_ward",
+      "name": "Ward",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Shield 2",
+      "action": "effects",
+      "cost": 0,
+      "targeting": {
+        "type": "ally",
+        "range": 3
+      },
+      "effects": [
+        {
+          "op": "lab_shield",
+          "n": 2
+        }
+      ],
+      "quick": true,
+      "labels": [
+        "support"
+      ]
+    },
+    {
+      "id": "lab_tag_team",
+      "name": "Tag Team",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Push; push again",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "board_push",
+          "steps": 1
+        }
+      ],
+      "followUp": "push",
+      "vectors": {
+        "force": 1.0
+      },
+      "labels": [
+        "push",
+        "force"
+      ]
+    },
+    {
+      "id": "lab_chain_bolt",
+      "name": "Chain Bolt",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "2, then a spell",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "enemy",
+        "range": 4,
+        "los": true
+      },
+      "effects": [
+        {
+          "op": "flat_hit",
+          "n": 2,
+          "vector": "lightning"
+        }
+      ],
+      "followUp": "discard",
+      "vectors": {
+        "lightning": 1.0
+      },
+      "labels": [
+        "attack"
+      ]
+    },
+    {
+      "id": "lab_water_flask",
+      "name": "Water Flask",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Soak the floor",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "any",
+        "range": 4
+      },
+      "effects": [
+        {
+          "op": "board_react",
+          "wet": true
+        }
+      ],
+      "area": "square_3x3",
+      "labels": [
+        "terrain"
+      ]
+    }
+  ]
+}

@@ -12,13 +12,13 @@
   "maxLevel": 10,
   "names": { "mage": "Ash", "fighter": "Brick", "rogue": "Quill", "healer": "Sage", "bard": "Lyric" },
   "classDecks": {
-    "fighter": ["card_strike", "card_strike"],
-    "mage": ["card_strike", "card_strike"],
-    "rogue": ["card_strike", "card_strike"],
-    "healer": ["card_strike", "card_strike"],
-    "bard": ["card_strike", "card_strike"]
+    "fighter": ["card_strike", "card_strike", "lab_shove", "lab_shove_line", "lab_domino", "lab_finisher", "lab_heavy_slam", "lab_tag_team", "lab_relay"],
+    "mage": ["lab_spark", "lab_spark", "lab_ignite", "lab_kindling", "lab_burnout", "lab_steam_vent", "lab_flash_freeze", "lab_shatter", "lab_echo", "lab_water_flask"],
+    "rogue": ["card_strike", "lab_jab", "lab_swap", "lab_afterimage", "lab_foresight", "lab_gamble", "lab_stacked_deck", "lab_deep_pocket", "lab_finisher"],
+    "healer": ["card_strike", "lab_spark", "lab_anchor_point", "lab_bridge", "lab_mend", "lab_mend", "lab_ward", "lab_shared_burden", "lab_undertow"],
+    "bard": ["card_strike", "lab_spark", "lab_pass", "lab_borrow", "lab_setup", "lab_harmony", "lab_encore_two", "lab_feint", "lab_chain_bolt"]
   },
-  "keywordCards": [],
+  "keywordCards": ["lab_feint", "lab_tag_team", "lab_quick_step", "lab_jab"],
   "levers": [
     { "id": "actionsPerTurn", "group": "turn", "type": "int", "default": 1, "min": 1, "max": 3, "name": "Actions per turn" },
     { "id": "moveSeparate", "group": "turn", "type": "bool", "default": true, "name": "Move is separate", "hint": "Off: moving uses an Action." },

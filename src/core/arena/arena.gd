@@ -278,7 +278,7 @@ static func card_offer(db: Dictionary, arena: Dictionary, party: Array, wave: in
 	var pool: Array = []
 	var weights: Array = []
 	var fresh: Array = []
-	for c in DT.records_under(db, "cards/", "cards"):
+	for c in DT.records_under(db, "cards/", "cards").filter(func(rec: Dictionary) -> bool: return not bool(rec.get("labOnly", false))):
 		if str(c.get("kind", "")) == "item" or str(c.get("id", "")) in ["card_strike", "card_guard"] or str(c.get("id", "")).begins_with("card_ember") or str(c.get("id", "")).begins_with("card_heat_shield") or str(c.get("id", "")).begins_with("card_frost_line"):
 			continue
 		if wave < int(c.get("minWave", 0)) or bool(c.get("exclusive", false)):

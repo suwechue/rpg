@@ -656,3 +656,22 @@ Only Lab fights use these until the user picks a preset. `current` keeps today's
 | Combo chain | +1 damage for each other teammate who played a card on that enemy this round |
 | Round cap | Past round 8 the Upside-Down shifts: enemies deal +1 more damage each round |
 | Goals | Kill, survive N rounds, protect a unit, reach the exit, break a target, stop a ritual (a push delays it a round), capture a tile. Killing every enemy always wins |
+
+### Lab cards and the board (Parts 3 and 3b)
+
+The 44 Lab cards are in `data/cards/lab_cards.json` and stay out of the story and arena (`labOnly`). Their ops are in `src/core/combat/lab_ops.gd` and their text is written from the ops (`card_text.gd`). Numbers on them are already small: `flatDamageMul` raises them when small numbers are off. Class decks for the Lab are in `data/lab/lab.json` `classDecks` (8 to 10 cards; every class has a 0 MP card).
+
+| Thing | Rule |
+| --- | --- |
+| Reactions | `data/lab/reactions.json`: what each Vector does to each tile or prop. The game and the preview both read it. Lever `reactionsTable` off: the old Vector tile rules |
+| Pit | Enemies die. Bosses take 35% and climb out. Party takes `pitDamageParty` and comes back at the edge |
+| Ledge | Can't be walked onto. Pushed over it: `fallDamage`, and you land below |
+| Ice | A pushed unit slides until it hits something, then collides. Into a pit: it falls |
+| Barrel | 1 HP. Heat or a hard push blows it up in a plus shape; oil and water barrels spill |
+| Oil, gas | Fire runs through connected oil; gas explodes |
+| Water, wet tiles | Heat makes steam (blocks sight), Cold makes ice, Lightning arcs through everything connected |
+| Spikes, conveyors | Damage on entry; move units 1 tile at round end |
+| Crates | Block, push and break |
+| Collision | `collisionDamage` to both; with Domino (lever or the card) the hit unit is pushed too |
+| Anchor Point, Bridge, Collapse | No push past it for 3 rounds; walkable over a gap for 2 rounds; a telegraphed pit in 2 rounds |
+| Enemy AI | Avoids tiles next to pits and ledges, cracked tiles and spikes (`enemiesAvoidEdges`). `immovable` enemies don't budge |

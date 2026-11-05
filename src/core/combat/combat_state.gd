@@ -26,12 +26,21 @@ const Combos := preload("res://src/core/combos.gd")
 const RulesScript := preload("res://src/core/combat/rules.gd")
 const FightLog := preload("res://src/core/lab/fight_log.gd")
 const Goals := preload("res://src/core/combat/fight_goals.gd")
+const Board := preload("res://src/core/combat/board.gd")
+const LabOps := preload("res://src/core/combat/lab_ops.gd")
 const SCALED_CAUSES := ["burn", "poison", "lingering", "hazard", "toxic", "thorns"]
 
 var db: Dictionary = {}
 var rng: RandomNumberGenerator
 var rules: RefCounted = null        # the Rules view: every lever is read through it (docs/COMBAT_LAB.md)
 var lab_log: FightLog = null        # a Lab fight's log (setup "lab")
+var card_choice: Variant = null     # the card or tile the player picked for the card being played
+var last_played: Dictionary = {}    # unit id -> { id, target, vectors }: the last card they played
+var last_motion_target: Dictionary = {}  # unit id -> the unit their last Motion card moved
+var pushed_this_round: Dictionary = {}   # unit id -> { dir, by, ally } (Relay, Finisher)
+var collided_this_round: Dictionary = {}
+var _domino := false                # a card's Domino is pushing
+var _play_target := Vector2i(-1, -1)
 var surge := 0                      # the party's Surge meter
 var shift_bonus := 0                # past the round cap: enemies hit this much harder
 var chain: Dictionary = {}          # enemy id -> ids of who played a card on it this round
@@ -178,7 +187,15 @@ func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) ->
 		grid.wall_hp[c] = int(Res.combat_cfg(db).get("walls", {}).get("wallHp", 25))
 	for p in grid.prop_spawns:
 		var kind := str(p.get("prop", "crate"))
+		var density: float = rules.num("propsDensity", 1.0)
+		if density < 1.0 and rng.randf() >= density:
+			continue
 		var piece := UnitScript.make_prop(kind, maxi(1, roundi(float(cover_cfg().get("pieces", {}).get(kind, {}).get("hp", 8)) * rules.enemy_hp_scale(false))))
+		var prop_rec := Board.prop_rec(db, kind)
+		if not prop_rec.is_empty():
+			piece.max_hp = int(prop_rec.get("hp", 1))
+			piece.hp = piece.max_hp
+			piece.name = str(prop_rec.get("name", piece.name))
 		piece.cell = p["cell"]
 		_add_unit(piece)
 	var hype := false
@@ -460,9 +477,11 @@ func card_of(u: UnitScript, hand_index: int) -> Dictionary:
 
 ## MP cost of a card for this caster (Triage makes heals cheaper on hurt allies).
 func card_cost(u: UnitScript, card: Dictionary, target: Vector2i = Vector2i(-1, -1)) -> int:
-	if u.links.has("surged"):
+	if u.links.has("surged") or str(u.links.get("free_card", "")) == str(card.get("id", "-")):
 		return 0
 	var c := CardRules.cost(db, card)
+	if str(u.links.get("discount_card", "")) == str(card.get("id", "-")):
+		c = maxi(0, c - 1)
 	if not rules.flag("cardsCostMp", true) and not str(card.get("magnitude", "")) in ["major", "grand"]:
 		return 0
 	if str(card.get("form", "")) in ["construct", "glyph"]:
@@ -608,7 +627,10 @@ func _advance() -> void:
 func _end_round() -> void:
 	round_num += 1
 	chain.clear()
+	pushed_this_round.clear()
+	collided_this_round.clear()
 	Goals.on_round_end(self)
+	Board.on_round_end(self)
 	# Past the round cap the Upside-Down shifts: enemies hit a little harder each round.
 	var cap: int = rules.count("roundCap")
 	if cap > 0 and round_num > cap:
@@ -945,7 +967,7 @@ func move(u: UnitScript, dest: Vector2i) -> bool:
 		if _enter_cell(u, cell):
 			u.undo_ok = false
 			break
-		if grid.get_terrain(cell) == GridScript.ICE:
+		if grid.get_terrain(cell) == GridScript.ICE and rules.flag("iceSlide", true):
 			slide_dir = cell - prev
 			break
 		prev = cell
@@ -1092,11 +1114,25 @@ func _leave_trail(u: UnitScript, cells: Array) -> void:
 
 
 ## Ice: a unit that steps or is pushed onto ice keeps going until something stops it.
-func _slide(u: UnitScript, dir: Vector2i) -> void:
+func _slide(u: UnitScript, dir: Vector2i, pushed: bool = false) -> void:
 	var from := u.cell
 	while u.alive():
 		var next := u.cell + dir
-		if not grid.in_bounds(next) or not grid.walkable_terrain(next) or unit_at(next) != null:
+		if pushed and not rules.is_current() and grid.get_terrain(next) == GridScript.PIT and unit_at(next) == null and not grid.bridges.has(next):
+			u.cell = next
+			_emit({ "t": "slide", "unit": u.id, "from": from, "to": next })
+			_fall(u)
+			return
+		if not grid.in_bounds(next) or not grid.walkable_terrain(next) or unit_at(next) != null or grid.anchors.has(next):
+			# A pushed unit that slides into something collides (the Lab's rule).
+			if pushed and not rules.is_current():
+				var blocker := unit_at(next)
+				var dmg := collision_damage(null)
+				_emit({ "t": "collide", "unit": u.id, "cell": next })
+				collided_this_round[u.id] = true
+				_damage(u, dmg, null, "force", "collision")
+				if blocker != null and blocker.alive():
+					_damage(blocker, dmg, null, "force", "collision")
 			break
 		u.cell = next
 		if _enter_cell(u, next):
@@ -1163,6 +1199,9 @@ func _enter_cell(u: UnitScript, cell: Vector2i) -> bool:
 	var internal := bool(u.mods.get("combat", {}).get("internalCasting", false)) and u == current and u.mp >= 1
 	if grid.get_terrain(cell) == GridScript.HAZARD and not internal:
 		_damage(u, int(cfg.get("hazardDamage", 4)), null, "", "hazard")
+		return not u.alive()
+	if grid.get_terrain(cell) == GridScript.SPIKES:
+		_damage(u, rules.flat(float(Board.cfg(self).get("spikesDamage", 2))), null, "", "spikes")
 		return not u.alive()
 	if grid.burning.has(cell):
 		_damage(u, int(cfg.get("burnDamage", 3)), null, "heat", "burn")
@@ -1278,6 +1317,9 @@ func _adjacent_hostiles(u: UnitScript, reach: int) -> Array:
 func card_block(u: UnitScript, card: Dictionary) -> String:
 	if card.is_empty():
 		return Str.t(db, "combat_state.no_card")
+	var lab_block := LabOps.block(self, u, card)
+	if lab_block != "":
+		return lab_block
 	if kw(card, "heavy") and u.moved_steps > 0:
 		return Str.t(db, "lab.heavy_needs_move")
 	if free_now(u, card):
@@ -1308,7 +1350,70 @@ func card_has_tag(card: Dictionary, tag: String) -> bool:
 func free_now(u: UnitScript, card: Dictionary) -> bool:
 	if u.links.has("surged") or kw(card, "free"):
 		return true
+	if card.has("freeIf") and rules.flag("keywordsOn", true) and LabOps.free_if(self, u, card, _play_target):
+		return true
 	return u.links.has("followUp") and card_has_tag(card, str(u.links["followUp"]))
+
+
+## Reshuffling the discard into the deck (deck cards and an empty draw pile).
+func note_reshuffle(_u: UnitScript) -> void:
+	pass
+
+
+## Play a card from outside the hand: Echo, Borrow, Encore for Two. No cost and no
+## Action; `half` means half Magnitude. A target of (-1, -1) picks the likeliest one.
+func replay_card(u: UnitScript, card_in: Dictionary, target: Vector2i, half: bool) -> void:
+	if card_in.is_empty() or not u.alive():
+		return
+	var card := card_in.duplicate(true)
+	if half:
+		if card.has("magnitude"):
+			var mags: Array = db.get("vectors", {}).get("magnitudeOrder", ["minor"])
+			card["magnitude"] = str(mags[maxi(0, mags.find(str(card["magnitude"])) - 1)])
+		if card.has("mult"):
+			card["mult"] = float(card["mult"]) * 0.5
+		card["halved"] = true
+	var targets := card_targets(u, card)
+	if not targets.has(target):
+		target = _likely_target(u, targets)
+	if target.x < 0:
+		_emit({ "t": "log", "text": Str.t(db, "lab_card.no_target") % str(card.get("name", "")) })
+		return
+	var cells := effect_cells(u, card, target)
+	if CardRules.is_spell(card) and not bool(card.get("effectsOnly", false)):
+		_cast(u, card, target, false, 0, u.mp)
+	elif not CardRules.is_spell(card) and str(card.get("action", "")) != "effects":
+		_basic(u, card, target)
+	else:
+		_emit({ "t": "cast", "unit": u.id, "name": str(card.get("name", "")), "target": target, "improvised": false })
+	if card.has("effects") and result == "":
+		_effects_script().run(self, u, card, target, cells)
+	_note_played(u, card, target)
+
+
+## The likeliest target: an enemy if one is legal, otherwise the first tile.
+func _likely_target(u: UnitScript, targets: Array) -> Vector2i:
+	for c in targets:
+		var t := unit_at(c)
+		if t != null and is_hostile(u, t):
+			return c
+	return targets[0] if not targets.is_empty() else Vector2i(-1, -1)
+
+
+func _note_played(u: UnitScript, card: Dictionary, target: Vector2i) -> void:
+	last_played[u.id] = { "id": str(card.get("id", "")), "target": target, "vectors": card.get("vectors", {}) }
+	if card.get("vectors", {}).has("motion"):
+		var t := unit_at(target)
+		if t != null and t != u:
+			last_motion_target[u.id] = t.id
+
+
+## A push from a card, Domino or not.
+func push_with(u: UnitScript, t: UnitScript, dir: Vector2i, steps: int, domino: bool) -> void:
+	var was := _domino
+	_domino = domino or was
+	_push(u, t, dir, steps)
+	_domino = was
 
 
 ## The Surge meter: filled by playing well, spent to make your next card Free and a Magnitude higher.
@@ -1412,8 +1517,14 @@ func play_card(u: UnitScript, hand_index: int, target: Vector2i) -> bool:
 	if cost > u.mp or card_block(u, card) != "":
 		return false
 	_push_undo(u)
+	_play_target = target
 	_use_slot(u, card)
+	_play_target = Vector2i(-1, -1)
 	u.mp -= cost
+	if str(u.links.get("free_card", "")) == str(card.get("id", "-")):
+		u.links.erase("free_card")
+	if str(u.links.get("discount_card", "")) == str(card.get("id", "-")):
+		u.links.erase("discount_card")
 	var kills_before := kills.size()
 	if u.links.has("surged"):
 		u.links.erase("surged")
@@ -1440,6 +1551,8 @@ func play_card(u: UnitScript, hand_index: int, target: Vector2i) -> bool:
 		_card_infuse = {}
 	if not card.get("riders", []).is_empty() and result == "":
 		_apply_riders(u, card, target, cells)
+	_note_played(u, card, target)
+	card_choice = null
 	_after_card_keywords(u, card)
 	_kill_refund(u, kills_before)
 	_check_end()
@@ -1862,6 +1975,8 @@ func preview(u: UnitScript, card: Dictionary, target: Vector2i, improvised: bool
 				out["hits"].append({ "unit": t.id, "damage": roundi(_expected_hit(u, t, _area_spec(spec, n))), "status": _preview_statuses(spec["vectors"], t),
 					"cover": cover_mul(u.cell, t.cell, bool(spec["ranged"])), "mutator": mutator_note(spec["vectors"]) })
 		_preview_motion(u, spec, out)
+		if Board.on(self):
+			out["notes"] = Board.preview_lines(self, spec["vectors"], cells)
 	else:
 		out["cells"] = [target]
 		out["cost"] = card_cost(u, card, target)
@@ -1953,6 +2068,7 @@ func _effects_preview(u: UnitScript, card: Dictionary, target: Vector2i, out: Di
 	for v in dmg:
 		var unit: UnitScript = v
 		out["hits"].append({ "unit": unit.id, "damage": roundi(float(dmg[v])), "cover": cover_mul(u.cell, unit.cell, false) })
+	LabOps.preview(self, u, card, target, out)
 
 
 # --- Resolution ----------------------------------------------------------------
@@ -2010,13 +2126,20 @@ func push_landing(u: UnitScript, t: UnitScript, dir: Vector2i, steps: int, colli
 	while budget > 0 or sliding:
 		var next := cell + dir
 		var blocker := unit_at(next)
-		if grid.get_terrain(next) == GridScript.PIT and blocker == null:
+		if grid.get_terrain(next) == GridScript.PIT and blocker == null and not grid.bridges.has(next):
 			out["falls"] = true
 			out["hazard"] = true
 			cell = next
 			break
+		if grid.get_terrain(next) == GridScript.LEDGE and blocker == null:
+			out["ledge"] = true
+			out["damage"] = rules.count("fallDamage", 2)
+			cell = next + dir if grid.walkable_terrain(next + dir) and unit_at(next + dir) == null else cell
+			break
+		if grid.anchors.has(next):
+			blocker = _rubble_marker
 		if not grid.in_bounds(next) or not grid.walkable_terrain(next) or (blocker != null and blocker != t):
-			if collide and not sliding:
+			if collide and (not sliding or not rules.is_current()):
 				out["collide"] = true
 				out["damage"] = collision_damage(u)
 			break
@@ -2028,7 +2151,7 @@ func push_landing(u: UnitScript, t: UnitScript, dir: Vector2i, steps: int, colli
 		for g in glyphs:
 			if g["cell"] == cell and str(g["team"]) != t.team:
 				out["hazard"] = true
-		sliding = ter == GridScript.ICE and budget <= 0
+		sliding = ter == GridScript.ICE and budget <= 0 and rules.flag("iceSlide", true)
 		if sliding:
 			out["slide"] = true
 	out["to"] = cell
@@ -2695,7 +2818,10 @@ func _apply_vector_effects(u: UnitScript, spec: Dictionary, cells: Array, hit: A
 	var v: Dictionary = spec["vectors"]
 	var power := float(spec["power"])
 	var root_bonus := int(u.mods.get("combat", {}).get("rootBonus", 0))
-	if v.has("heat"):
+	var table_on := Board.on(self)
+	if table_on:
+		Board.react(self, u, v, cells)
+	if v.has("heat") and not table_on:
 		for c in cells:
 			if grid.get_terrain(c) == GridScript.WATER:
 				grid.steam[c] = int(cfg.get("steamTurns", 2))
@@ -2706,9 +2832,10 @@ func _apply_vector_effects(u: UnitScript, spec: Dictionary, cells: Array, hit: A
 		if not cells.is_empty():
 			_emit({ "t": "tiles", "kind": "burning", "cells": cells })
 	if v.has("cold"):
-		for c in cells:
-			if grid.get_terrain(c) == GridScript.WATER:
-				grid.set_terrain(c, GridScript.ICE)
+		if not table_on:
+			for c in cells:
+				if grid.get_terrain(c) == GridScript.WATER:
+					grid.set_terrain(c, GridScript.ICE)
 		for t in hit:
 			if t.alive() and not t.is_prop():
 				t.statuses["slow"] = int(cfg.get("slowTurns", 1))
@@ -2768,21 +2895,31 @@ func _push(u: UnitScript, t: UnitScript, dir: Vector2i, steps: int, collide: boo
 		_emit({ "t": "log", "text": Str.t(db, "combat_state.braces_and_doesn_t_budge") % t.name })
 		return
 	var from := t.cell
+	if t != u and u != null:
+		pushed_this_round[t.id] = { "dir": dir, "by": u.id, "ally": false }
 	for i in steps:
 		var next := t.cell + dir
 		var blocker := unit_at(next)
-		if grid.get_terrain(next) == GridScript.PIT and blocker == null:
+		if grid.get_terrain(next) == GridScript.PIT and blocker == null and not grid.bridges.has(next):
 			t.cell = next
 			_emit({ "t": "push", "unit": t.id, "from": from, "to": next })
 			_fall(t)
 			return
-		if not grid.in_bounds(next) or not grid.walkable_terrain(next) or blocker != null:
+		if grid.get_terrain(next) == GridScript.LEDGE and blocker == null:
+			Board.ledge_fall(self, t, next, dir)
+			return
+		if not grid.in_bounds(next) or not grid.walkable_terrain(next) or blocker != null or grid.anchors.has(next):
 			if collide:
 				var dmg := collision_damage(u)
 				_emit({ "t": "collide", "unit": t.id, "cell": next })
+				collided_this_round[t.id] = true
 				_damage(t, dmg, u, "force", "collision")
 				if blocker != null and blocker.alive():
+					collided_this_round[blocker.id] = true
 					_damage(blocker, dmg, u, "force", "collision")
+					# Domino: the unit it hit goes flying too.
+					if blocker != null and blocker.alive() and (_domino or rules.flag("domino")):
+						_push(u, blocker, dir, 1)
 			break
 		t.cell = next
 		if _enter_cell(t, next):
@@ -2791,8 +2928,8 @@ func _push(u: UnitScript, t: UnitScript, dir: Vector2i, steps: int, collide: boo
 		_emit({ "t": "push", "unit": t.id, "from": from, "to": t.cell })
 		_shift_intent(t, t.cell - from)
 		Goals.on_pushed(self, t)
-		if t.alive() and grid.get_terrain(t.cell) == GridScript.ICE:
-			_slide(t, dir)
+		if t.alive() and grid.get_terrain(t.cell) == GridScript.ICE and rules.flag("iceSlide", true):
+			_slide(t, dir, true)
 
 
 func _apply_ally_effects(u: UnitScript, spec: Dictionary, t: UnitScript) -> void:
@@ -2911,6 +3048,7 @@ func _on_zero_hp(t: UnitScript, source: UnitScript) -> void:
 		if _prop_kind(t) == "low_wall":
 			grid.set_terrain(t.cell, GridScript.RUBBLE)
 			_emit({ "t": "tiles", "kind": "rubble", "cells": [t.cell] })
+		Board.on_prop_destroyed(self, t, source)
 		return
 	if t.team == "party":
 		t.downed = true

@@ -10,6 +10,7 @@ const GridScript := preload("res://src/core/combat/grid.gd")
 const Forms := preload("res://src/core/combat/forms.gd")
 const CardRules := preload("res://src/core/card.gd")
 const UnitScript := preload("res://src/core/combat/unit.gd")
+const LabOps := preload("res://src/core/combat/lab_ops.gd")
 
 ## Every op name the data may use (DataDB validates cards against this list).
 const OPS := ["burn_tiles", "fire_wall", "empower", "detonate", "self_burn", "steam", "cleanse", "ice_tiles", "cancel_charge", "rime",
@@ -630,4 +631,7 @@ static func _op(st, u: UnitScript, card: Dictionary, fx: Dictionary, target: Vec
 		"once_heal_pct":
 			st._heal(u, u, maxi(1, roundi(float(u.max_hp) * float(fx.get("pct", 0.25)))), false)
 		_:
-			push_warning("card_effects: unknown op %s" % fx.get("op", ""))
+			if LabOps.OPS.has(str(fx.get("op", ""))):
+				LabOps.run(st, u, card, fx, target, cells)
+			else:
+				push_warning("card_effects: unknown op %s" % fx.get("op", ""))

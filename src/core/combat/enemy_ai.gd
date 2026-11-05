@@ -80,6 +80,14 @@ static func options(state: StateScript, u: UnitScript) -> Array:
 		for m in reach:
 			if claimed.has(m):
 				danger[m] = float(c.get("avoidOwnTelegraphs", 3.0))
+			# Enemies keep off edges and bad ground when they can (the Lab's lever).
+			if state.rules.flag("enemiesAvoidEdges") and not bool(u.source.get("immovable", false)):
+				var cell: Vector2i = m
+				var risk := 1.0 if state.grid.collapsing.has(cell) or state.grid.get_terrain(cell) == GridScript.SPIKES else 0.0
+				for d in GridScript.DIRS:
+					if state.grid.get_terrain(cell + d) in [GridScript.PIT, GridScript.LEDGE]:
+						risk = 1.0
+				danger[m] = float(danger.get(m, 0.0)) + risk * float(c.get("edgeAvoid", 2.0))
 	var keep_back: bool = u.team == "enemy" and str(u.source.get("behavior", "")) in ["healer", "summoner", "sniper"]
 	for act in acts:
 		var spec: Dictionary = act["spec"]
@@ -442,6 +450,11 @@ static func _actions(state: StateScript, u: UnitScript) -> Array:
 							"profile": c.get("guard", { "loyalty": 0.5 }), "targets": "card" })
 					continue
 				out.append({ "kind": "card", "card": card, "spec": state._spell_spec(u, card), "profile": c.get("attack", { "courage": 0.6 }) })
+			elif str(card.get("action", "")) == "effects" and _has_op(card, "flat_hit"):
+				# Lab cards with a number on them: hit with it.
+				var flat := float(_effect_amount(card, "flat_hit", "n")) * float(state.rules.num("flatDamageMul", 1.0)) / maxf(0.01, state.rules.damage_scale())
+				out.append({ "kind": "card", "card": card, "spec": { "kind": "strike", "base": flat, "vectors": {}, "form": state.form_rec("touch"), "power": 0.0, "mult": 1.0, "heal": false, "ranged": false },
+					"profile": c.get("attack", { "courage": 0.6 }), "targets": "card" })
 			elif str(card.get("action", "")) == "effects" and (_effect_amount(card, "hit_and_run", "tiles") > 0 or _has_op(card, "shadow_step")):
 				# Hit and Run, Shadow Step: a DEX strike (Shadow Step from range 3).
 				var eff: Dictionary = card["effects"][0]

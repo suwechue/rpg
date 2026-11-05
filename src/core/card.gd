@@ -246,7 +246,7 @@ static func tag_line(db: Dictionary, card: Dictionary) -> String:
 
 static func _describe(db: Dictionary, card: Dictionary) -> String:
 	if not is_spell(card):
-		return str(card.get("text", ""))
+		return str(card.get("text", preload("res://src/core/combat/card_text.gd").describe(db, card)))
 	var form_rec := DT.record(db, "forms", str(card.get("form", "")))
 	var mags: Dictionary = db.get("vectors", {}).get("magnitudes", {})
 	var mag: Dictionary = mags.get(str(card.get("magnitude", "")), {})

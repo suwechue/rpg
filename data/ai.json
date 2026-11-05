@@ -40,5 +40,6 @@
     "courage": -0.3,
     "kindness": 0.2
   },
+  "edgeAvoid": 2.0,
   "hazardAvoid": 6.0
 }

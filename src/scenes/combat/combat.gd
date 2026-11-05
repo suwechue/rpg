@@ -61,11 +61,13 @@ const ShapeDiagram := preload("res://src/scenes/ui/shape_diagram.gd")
 const PartyPanel := preload("res://src/scenes/ui/party_panel.gd")
 const Modal := preload("res://src/scenes/ui/modal.gd")
 const LabFlow := preload("res://src/scenes/lab/lab_flow.gd")
+const LabOps := preload("res://src/core/combat/lab_ops.gd")
 var _tele_since: Dictionary = {}      # enemy id + plan -> when its telegraph first showed (for the pulse)
 var _hover_shapes: HBoxContainer
 var _quick_box: VBoxContainer
 var _hand: HBoxContainer
 var _goal_label: Label
+var _pending_target := Vector2i(-1, -1)  # a two-target card's first tile
 var _buttons: Dictionary = {}
 var _wheel: PanelContainer
 var _result_panel: PanelContainer
@@ -648,6 +650,8 @@ func _refresh_hand() -> void:
 		b.mouse_exited.connect(func() -> void: _hover_card_changed(-1))
 		b.focus_exited.connect(func() -> void: _hover_card_changed(-1))
 		_hand.add_child(b)
+	# Strike sits just past the hand, however many cards there are.
+	_quick_box.position.x = 4 + u.deck.hand.size() * (Assets.texture(str(UiTheme.skin("cards").get("spell", ""))).get_width() + 2) + 2
 	if _focus_card >= 0 and _focus_card < _hand.get_child_count():
 		(_hand.get_child(_focus_card) as Control).grab_focus.call_deferred()
 
@@ -840,6 +844,10 @@ func _refresh_overlays() -> void:
 				var card := state.card_of(u, selected_hand)
 				field.target_cells = state.card_targets(u, card)
 				_preview(card, false)
+			"card2":
+				var both := state.card_of(u, selected_hand)
+				field.target_cells = state.card_targets(u, both).filter(func(c: Vector2i) -> bool: return c != _pending_target)
+				field.footprint_cells = [_pending_target]
 			"strike":
 				field.target_cells = state._adjacent_hostiles(u, 1) + state.adjacent_walls(u)
 				_preview({ "action": "strike", "stat": "str", "mult": 1.0, "name": "Strike" }, false)
@@ -898,6 +906,8 @@ func _preview(card: Dictionary, improvised: bool, guess: bool = false) -> void:
 		var what := Strings.t("combat.lands_in_a_hazard") if bool(m["hazard"]) else (Strings.t("combat.slides_on_ice") if bool(m["slide"]) else "")
 		if bool(m.get("falls", false)):
 			what = Strings.t("combat.falls_in_pit")
+		if bool(m.get("ledge", false)):
+			what = Strings.t("combat.falls_off_ledge") % int(m["damage"])
 		if bool(m["collide"]):
 			what = Strings.t("combat.slams_into_something_2") % int(m["damage"])
 		if what != "" and t != null:
@@ -906,6 +916,8 @@ func _preview(card: Dictionary, improvised: bool, guess: bool = false) -> void:
 		var t := state.unit_by_id(str(i["unit"]))
 		if t != null:
 			lines.append("%s: %s!" % [t.name, i["effect"]])
+	for note in p.get("notes", []):
+		lines.append(str(note))
 	for id in p.get("deaths", []):
 		var t := state.unit_by_id(str(id))
 		if t != null:
@@ -1261,8 +1273,32 @@ func _click_cell(c: Vector2i) -> void:
 					_lesson_event("dodged" if was_red and state.threat_at(u.cell, u.team) == 0 else "moved")
 				_after_action()
 		"card":
+			var picked := state.card_of(u, selected_hand)
+			if not state.card_targets(u, picked).has(c):
+				_cancel()
+				return
+			if bool(picked.get("secondTarget", false)):
+				_pending_target = c
+				mode = "card2"
+				_info.text = Strings.t("combat.second_target")
+				_refresh_overlays()
+				_refresh_hud()
+				return
+			if str(picked.get("choose", "")) != "":
+				var hand_i := selected_hand
+				if not await _ask_card_choice(picked, hand_i):
+					_cancel()
+					return
 			if state.play_card(u, selected_hand, c):
 				_lesson_event("played_card")
+				mode = "idle"
+				selected_hand = -1
+				_after_action()
+			else:
+				_cancel()
+		"card2":
+			state.card_choice = c
+			if state.play_card(u, selected_hand, _pending_target):
 				mode = "idle"
 				selected_hand = -1
 				_after_action()
@@ -1296,6 +1332,41 @@ func _click_cell(c: Vector2i) -> void:
 				_after_action()
 			else:
 				_cancel()
+
+
+## A card that lets you pick (a discard to recall, a hand card to pass, the top of your
+## deck's order). False if the player backs out.
+func _ask_card_choice(card: Dictionary, hand_index: int) -> bool:
+	var u := state.current
+	var ids: Array = LabOps.choice_options(state, u, card, hand_index)
+	var db: Dictionary = DataDB.all()
+	state.card_choice = null
+	if ids.is_empty():
+		return true
+	var ordered: Array = []
+	var ordering: bool = str(card.get("choose", "")) == "top"
+	while true:
+		var m := Modal.new()
+		m.build(str(card.get("name", "")), 300)
+		m.text(Strings.t("combat.choose_order") if ordering else Strings.t("combat.choose_card"))
+		var seen := {}
+		for id in ids:
+			if ordered.has(id) or seen.has(id):
+				continue
+			seen[id] = true
+			var cid := str(id)
+			var rec := CardRules.resolve(db, cid, state.library)
+			m.add_button("%s: %s" % [rec.get("name", cid), CardRules.summary(db, rec)], func() -> void: m.finish(cid), false, CardRules.describe(db, rec))
+		m.add_button(Strings.t("combat.close"), func() -> void: m.finish(null))
+		m.focus_first()
+		var pick: Variant = await Flow.show_modal(m)
+		if pick == null:
+			return false
+		ordered.append(pick)
+		if not ordering or ordered.size() >= ids.size():
+			break
+	state.card_choice = ordered if ordering else ordered[0]
+	return true
 
 
 func _after_action() -> void:
