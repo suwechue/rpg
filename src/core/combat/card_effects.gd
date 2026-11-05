@@ -330,12 +330,14 @@ static func _op(st, u: UnitScript, card: Dictionary, fx: Dictionary, target: Vec
 				if t.alive() and GridScript.manhattan(t.cell, u.cell) == 1:
 					t.statuses["blind"] = int(fx.get("turns", 1))
 					st._emit({ "t": "status", "unit": t.id, "status": "blind" })
+					st.blind_shift(t)
 		"ward":
 			var t: UnitScript = st.unit_at(target)
 			if t != null and t.alive() and t.team == u.team:
 				var amount := int(fx.get("amount", 8))
 				if st.threat_at(t.cell, t.team) > 0 or st.tracking_threat(t, t.cell) > 0:
 					amount *= 2
+				amount = st.rules.scaled(amount)
 				t.shield += amount
 				t.shield_turns = maxi(t.shield_turns, 1)
 				st._emit({ "t": "shield", "unit": t.id, "amount": amount })
@@ -358,9 +360,9 @@ static func _op(st, u: UnitScript, card: Dictionary, fx: Dictionary, target: Vec
 		"halo":
 			for a in st.allies_of(u):
 				if GridScript.manhattan(a.cell, u.cell) <= 1:
-					a.shield += int(fx.get("amount", 5))
+					a.shield += st.rules.scaled(int(fx.get("amount", 5)))
 					a.shield_turns = maxi(a.shield_turns, 2)
-					st._emit({ "t": "shield", "unit": a.id, "amount": int(fx.get("amount", 5)) })
+					st._emit({ "t": "shield", "unit": a.id, "amount": st.rules.scaled(int(fx.get("amount", 5))) })
 		"radiance":
 			var spec := _spec(st, u, card, float(fx.get("power", 6)), { "light": 1.0 })
 			for c in grid.all_cells():
@@ -496,7 +498,7 @@ static func _op(st, u: UnitScript, card: Dictionary, fx: Dictionary, target: Vec
 				var t: UnitScript = st.unit_at(target)
 				st._emit({ "t": "log", "text": Str.t(st.db, "card_effects.burns_discard") % [u.name, burned] })
 				if t != null and t.alive() and st.is_hostile(u, t) and burned > 0:
-					st._damage(t, burned * int(fx.get("per", 3)), u, str(fx.get("vector", "heat")), "hit")
+					st._damage(t, st.rules.scaled(burned * int(fx.get("per", 3))), u, str(fx.get("vector", "heat")), "hit")
 		"shuffle_back":
 			# The discard pile (not this card) goes back into the draw pile; then draw.
 			if u.deck != null:
@@ -557,7 +559,7 @@ static func _op(st, u: UnitScript, card: Dictionary, fx: Dictionary, target: Vec
 					if axes.is_empty() or str(cid) == str(card.get("id", "")):
 						continue
 					st._emit({ "t": "area", "cells": [t.cell], "vectors": { str(axes[0]): 1.0 } })
-					st._damage(t, int(fx.get("per", 2)), u, str(axes[0]), "hit")
+					st._damage(t, st.rules.scaled(int(fx.get("per", 2))), u, str(axes[0]), "hit")
 					shots += 1
 				st._emit({ "t": "log", "text": Str.t(st.db, "card_effects.volley") % [u.name, shots] })
 		"hand_plus":
@@ -626,6 +628,6 @@ static func _op(st, u: UnitScript, card: Dictionary, fx: Dictionary, target: Vec
 				t.resist_shred += int(fx.get("resist", 4))
 				st._emit({ "t": "status", "unit": t.id, "status": "corroded" })
 		"once_heal_pct":
-			st._heal(u, u, maxi(1, roundi(float(u.max_hp) * float(fx.get("pct", 0.25)))))
+			st._heal(u, u, maxi(1, roundi(float(u.max_hp) * float(fx.get("pct", 0.25)))), false)
 		_:
 			push_warning("card_effects: unknown op %s" % fx.get("op", ""))

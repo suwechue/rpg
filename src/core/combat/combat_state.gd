@@ -25,11 +25,20 @@ const EnemyMods := preload("res://src/core/combat/enemy_mods.gd")
 const Combos := preload("res://src/core/combos.gd")
 const RulesScript := preload("res://src/core/combat/rules.gd")
 const FightLog := preload("res://src/core/lab/fight_log.gd")
+const Goals := preload("res://src/core/combat/fight_goals.gd")
+const SCALED_CAUSES := ["burn", "poison", "lingering", "hazard", "toxic", "thorns"]
 
 var db: Dictionary = {}
 var rng: RandomNumberGenerator
 var rules: RefCounted = null        # the Rules view: every lever is read through it (docs/COMBAT_LAB.md)
 var lab_log: FightLog = null        # a Lab fight's log (setup "lab")
+var surge := 0                      # the party's Surge meter
+var shift_bonus := 0                # past the round cap: enemies hit this much harder
+var chain: Dictionary = {}          # enemy id -> ids of who played a card on it this round
+var goal: Dictionary = {}           # this fight's goal (fight_goals.gd)
+var goal_left := 0                  # rounds left on it
+var _telegraphed := false           # a telegraphed attack is landing now
+var _last_cause := ""               # what dealt the latest damage (for board kills)
 var grid: GridScript
 var units: Array = []
 var order: Array = []
@@ -97,7 +106,7 @@ func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) ->
 		var names: Array = setup.get("party", []).map(func(e: Dictionary) -> String: return "%s:%d" % [str(e["char"].get("class", "")), int(e["char"].get("level", 1))])
 		lab_log = FightLog.new(str(setup["lab"].get("fight", "")), int(setup.get("seed", 0)), names, str(setup.get("preset", "")), rules.levers.duplicate())
 	library = setup.get("library", {})
-	turn_mode = str(setup.get("turnMode", db.get("combat_rules", {}).get("turnMode", "two_actions")))
+	turn_mode = str(setup.get("turnMode", db.get("combat_rules", {}).get("turnMode", "two_actions") if rules.is_current() else rules.turn_mode()))
 	party_first = bool(setup.get("partyFirst", false))
 	fair = bool(setup.get("fair", false))
 	hp_floor = bool(setup.get("hpFloor", false))
@@ -119,6 +128,7 @@ func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) ->
 		var u := UnitScript.from_character(db, entry["char"], rng)
 		u.ai_controlled = bool(entry.get("ai", false))
 		u.guest = bool(entry.get("guest", false))
+		_party_levers(u)
 		_place(u, grid.party_spawns, i, true)
 	var enemies: Array = setup.get("enemies", []).duplicate()
 	var roles: Array = setup.get("roles", []).duplicate()
@@ -143,7 +153,7 @@ func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) ->
 		var hp_mul := "bossHpMul" if u.boss else "enemyHpMul"
 		u.max_hp = maxi(1, roundi(float(u.max_hp) * float(db.get("combat_rules", {}).get(hp_mul, 1.0))))
 		u.max_hp = maxi(1, roundi(float(u.max_hp) * diff_value("enemyHpMul") * float(mutator_rules().get("enemyHpMul", 1.0))))
-		u.hp = u.max_hp
+		_scale_enemy(u)
 		u.role = str(roles[i]) if i < roles.size() else ("minion" if str(rec.get("tier", "")) == "minion" else "fighter")
 		_place(u, grid.enemy_spawns, i, false)
 		if float(rec.get("startShieldPct", 0.0)) > 0.0:
@@ -168,7 +178,7 @@ func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) ->
 		grid.wall_hp[c] = int(Res.combat_cfg(db).get("walls", {}).get("wallHp", 25))
 	for p in grid.prop_spawns:
 		var kind := str(p.get("prop", "crate"))
-		var piece := UnitScript.make_prop(kind, int(cover_cfg().get("pieces", {}).get(kind, {}).get("hp", 8)))
+		var piece := UnitScript.make_prop(kind, maxi(1, roundi(float(cover_cfg().get("pieces", {}).get(kind, {}).get("hp", 8)) * rules.enemy_hp_scale(false))))
 		piece.cell = p["cell"]
 		_add_unit(piece)
 	var hype := false
@@ -197,11 +207,32 @@ func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) ->
 			# Pocket Notebook: an extra card on turn 1.
 			var extra_open := int(u.mods.get("combat", {}).get("openingHandBonus", 0))
 			u.deck.hand_limit = hand_size(u) + extra_open
-			u.deck.draw(opening + extra_open, rng)
+			u.deck.no_reshuffle = rules.text("reshuffle", "when_empty") == "never"
+			u.deck.draw((opening if rules.is_current() else hand_size(u)) + extra_open, rng)
+	Goals.start(self, setup.get("goal", {}))
 	_build_order()
 	turn_index = -1
 	_emit({ "t": "round", "n": round_num })
 	_advance()
+
+
+## The party's numbers under the levers: small HP, the Lab's MP pool.
+func _party_levers(u: UnitScript) -> void:
+	if rules.small():
+		var ratio := u.hp_ratio()
+		u.max_hp = maxi(1, roundi(float(u.max_hp) * rules.party_hp_scale()))
+		u.hp = clampi(roundi(ratio * float(u.max_hp)), 1 if ratio > 0.0 else 0, u.max_hp)
+	if rules.count("mpMax") > 0:
+		u.max_mp = rules.count("mpMax")
+		u.mp = u.max_mp
+	if rules.count("mpRegen", -1) >= 0:
+		u.mp_regen = rules.count("mpRegen")
+
+
+## An enemy's HP under the levers. Every enemy that joins a fight goes through this.
+func _scale_enemy(u: UnitScript) -> void:
+	u.max_hp = maxi(1, roundi(float(u.max_hp) * rules.enemy_hp_scale(u.boss)))
+	u.hp = u.max_hp
 
 
 func _add_unit(u: UnitScript) -> void:
@@ -314,6 +345,7 @@ func _reinforce() -> void:
 			if unit_at(cell) != null:
 				cell = _free_near(cell)
 			var s := UnitScript.from_enemy(r, float(r.get("scale", 1.0)))
+			_scale_enemy(s)
 			s.cell = cell
 			s.role = "fighter"
 			_add_unit(s)
@@ -428,7 +460,11 @@ func card_of(u: UnitScript, hand_index: int) -> Dictionary:
 
 ## MP cost of a card for this caster (Triage makes heals cheaper on hurt allies).
 func card_cost(u: UnitScript, card: Dictionary, target: Vector2i = Vector2i(-1, -1)) -> int:
+	if u.links.has("surged"):
+		return 0
 	var c := CardRules.cost(db, card)
+	if not rules.flag("cardsCostMp", true) and not str(card.get("magnitude", "")) in ["major", "grand"]:
+		return 0
 	if str(card.get("form", "")) in ["construct", "glyph"]:
 		c = maxi(0, c + int(u.mods.get("combat", {}).get("constructGlyphCostDelta", 0)))
 	if u.perk == "prism" and CardRules.is_spell(card) and CardRules.ordered_vectors(db, card.get("vectors", {})).size() > 1:
@@ -456,15 +492,34 @@ func _build_order() -> void:
 	for u in units:
 		if u.alive() and not u.is_prop():
 			order.append(u)
-	var first := party_first and round_num == 1
-	order.sort_custom(func(a: UnitScript, b: UnitScript) -> bool:
-		if first and a.team != b.team:
+	order = _ordered(order, party_first and round_num == 1)
+
+
+## Units in turn order under the turnStructure lever: by initiative, or the whole
+## party and then all enemies, or one ally and one enemy in turn.
+func _ordered(list: Array, party_up: bool = false) -> Array:
+	list.sort_custom(func(a: UnitScript, b: UnitScript) -> bool:
+		if party_up and a.team != b.team:
 			return a.team == "party"
 		if a.initiative != b.initiative:
 			return a.initiative > b.initiative
 		if a.team != b.team:
 			return a.team == "party"
 		return a.spawn_index < b.spawn_index)
+	var structure: String = rules.text("turnStructure", "initiative")
+	if structure == "initiative":
+		return list
+	var ours := list.filter(func(a: UnitScript) -> bool: return a.team == "party")
+	var theirs := list.filter(func(a: UnitScript) -> bool: return a.team != "party")
+	if structure == "team":
+		return ours + theirs
+	var out: Array = []
+	for i in maxi(ours.size(), theirs.size()):
+		if i < ours.size():
+			out.append(ours[i])
+		if i < theirs.size():
+			out.append(theirs[i])
+	return out
 
 
 ## The rest of this round and the next round, for the timeline display.
@@ -477,13 +532,7 @@ func timeline_rounds() -> Dictionary:
 	for u in units:
 		if u.alive() and not u.is_prop():
 			next.append(u)
-	next.sort_custom(func(a: UnitScript, b: UnitScript) -> bool:
-		if a.initiative != b.initiative:
-			return a.initiative > b.initiative
-		if a.team != b.team:
-			return a.team == "party"
-		return a.spawn_index < b.spawn_index)
-	return { "now": now, "next": next, "round": round_num }
+	return { "now": now, "next": _ordered(next), "round": round_num }
 
 
 ## Units in timeline order from the current one, then the next round.
@@ -496,12 +545,7 @@ func timeline(count: int = 12) -> Array:
 	for u in units:
 		if u.alive() and not u.is_prop():
 			next.append(u)
-	next.sort_custom(func(a: UnitScript, b: UnitScript) -> bool:
-		if a.initiative != b.initiative:
-			return a.initiative > b.initiative
-		if a.team != b.team:
-			return a.team == "party"
-		return a.spawn_index < b.spawn_index)
+	next = _ordered(next)
 	while out.size() < count and not next.is_empty():
 		out.append_array(next)
 	return out.slice(0, count)
@@ -521,7 +565,9 @@ func end_turn() -> void:
 ## PT Part 2: at End Turn every unplayed card goes to the discard pile, except
 ## the one held card, which stays for next turn.
 func _discard_hand(u: UnitScript) -> void:
-	if u.deck == null or u.team != "party" or turn_mode != "two_actions":
+	if u.deck == null or u.team != "party" or rules.flag("keepHand"):
+		return
+	if rules.is_current() and turn_mode != "two_actions":
 		return
 	var keep := ""
 	for id in u.deck.hand.duplicate():
@@ -561,6 +607,13 @@ func _advance() -> void:
 
 func _end_round() -> void:
 	round_num += 1
+	chain.clear()
+	Goals.on_round_end(self)
+	# Past the round cap the Upside-Down shifts: enemies hit a little harder each round.
+	var cap: int = rules.count("roundCap")
+	if cap > 0 and round_num > cap:
+		shift_bonus = (round_num - cap) * rules.count("shiftDamage", 1)
+		_emit({ "t": "log", "text": Str.t(db, "lab.shift") % shift_bonus })
 	for u in units:
 		if u.team == "party" and u.downed and not u.dead:
 			u.bleed -= 1
@@ -624,6 +677,8 @@ func _start_turn(u: UnitScript) -> void:
 	u.guard_active = false
 	u.action_used = false
 	u.quick_used = u.statuses.has("dazed")    # Daze (PT Part 5): no Quick this turn
+	u.quicks_taken = 0
+	u.links.erase("followUp")
 	u.moved_steps = 0
 	u.played_turn = 0
 	u.undo_ok = true
@@ -663,8 +718,11 @@ func _start_turn(u: UnitScript) -> void:
 		if u.statuses.has("hype_draw"):
 			u.deck.hand_limit += 1
 			u.statuses.erase("hype_draw")
-		var drew := u.deck.draw(maxi(0, u.deck.hand_limit - u.deck.hand.size()), rng)
-		if int(drew["fatigue"]) > 0:
+		var want := maxi(0, u.deck.hand_limit - u.deck.hand.size())
+		if rules.text("drawPerTurn", "refill") != "refill":
+			want = mini(want, int(rules.text("drawPerTurn")))
+		var drew := u.deck.draw(want, rng)
+		if int(drew["fatigue"]) > 0 and rules.flag("reshuffleFatigue", true):
 			_emit({ "t": "log", "text": Str.t(db, "combat_state.reshuffles_and_takes_fatigue") % [u.name, int(drew["fatigue"])] })
 			_damage(u, int(drew["fatigue"]), null, "", "fatigue")
 			if not u.alive():
@@ -684,7 +742,7 @@ func _start_turn(u: UnitScript) -> void:
 	if u.team == "party":
 		party_turns += 1
 		_apply_queued_levers()
-		refresh_intents(acts_next(u))
+		refresh_intents([] if rules.text("telegraphTiming", "before_acting") == "start_of_player_turn" else acts_next(u))
 		if lab_log != null:
 			lab_log.begin_turn(u.id, round_num, turn_options(u))
 	elif u.intent.is_empty():
@@ -970,17 +1028,23 @@ func _spread_fire() -> void:
 ## and climb out onto the nearest free tile.
 func _fall(u: UnitScript) -> void:
 	var cfg := Res.combat_cfg(db)
-	if u.team == "enemy" or u.is_prop():
+	if u.is_prop() or (u.team == "enemy" and not u.boss and rules.flag("pitKillsEnemies", true)):
 		_emit({ "t": "log", "text": Str.t(db, "combat_state.falls_into_the_pit") % u.name })
 		u.hp = 0
 		u.shield = 0
+		_last_cause = "pit"
 		_on_zero_hp(u, null)
 		_check_end()
 		return
 	var pit := u.cell
 	u.cell = _free_near(pit)
 	_emit({ "t": "blink", "unit": u.id, "from": pit, "to": u.cell })
-	_damage(u, maxi(1, roundi(float(u.max_hp) * float(cfg.get("pitDamagePct", 0.35)))), null, "", "hazard")
+	var fixed: int = rules.count("pitDamageParty")
+	if u.team != "party":
+		# Bosses (or everyone, with the lever off) climb out, badly hurt.
+		_damage(u, maxi(1, roundi(float(u.max_hp) * float(cfg.get("pitDamagePct", 0.35)))), null, "", "pit")
+	else:
+		_damage(u, fixed if fixed > 0 else maxi(1, roundi(float(u.max_hp) * float(cfg.get("pitDamagePct", 0.35)))), null, "", "pit")
 
 
 ## Units standing in darkness can't be picked as targets by the other side,
@@ -1046,14 +1110,16 @@ func _slide(u: UnitScript, dir: Vector2i) -> void:
 
 ## Undo this turn's move (before acting): back to the start tile with full Movement.
 func can_undo_move(u: UnitScript) -> bool:
-	if turn_mode == "two_actions":
+	if _undo_stack():
 		return can_undo(u)
+	if rules.text("undo", "stack") == "off":
+		return false
 	return u == current and u.moved_steps > 0 and u.undo_ok and not u.action_used and not u.quick_used and u.cell != u.start_cell \
 		and (unit_at(u.start_cell) == null or unit_at(u.start_cell) == u)
 
 
 func undo_move(u: UnitScript) -> bool:
-	if turn_mode == "two_actions":
+	if _undo_stack():
 		return undo(u)
 	if not can_undo_move(u):
 		return false
@@ -1212,7 +1278,11 @@ func _adjacent_hostiles(u: UnitScript, reach: int) -> Array:
 func card_block(u: UnitScript, card: Dictionary) -> String:
 	if card.is_empty():
 		return Str.t(db, "combat_state.no_card")
-	if bool(card.get("quick", false)) and not u.quick_used:
+	if kw(card, "heavy") and u.moved_steps > 0:
+		return Str.t(db, "lab.heavy_needs_move")
+	if free_now(u, card):
+		pass
+	elif bool(card.get("quick", false)) and not u.quick_used:
 		pass
 	elif act_block(u) != "" and not (bool(card.get("moves", false)) and not u.action_used):
 		return act_block(u)
@@ -1224,15 +1294,108 @@ func card_block(u: UnitScript, card: Dictionary) -> String:
 	return ""
 
 
+## A card keyword, when the lever lets keywords count.
+func kw(card: Dictionary, key: String) -> bool:
+	return rules.flag("keywordsOn", true) and bool(card.get(key, false))
+
+
+## A card's tag: from its "labels", its Vectors or its Form.
+func card_has_tag(card: Dictionary, tag: String) -> bool:
+	return card.get("labels", []).has(tag) or card.get("vectors", {}).has(tag) or str(card.get("form", "")) == tag
+
+
+## This card takes no Action or Quick right now: Free, a Follow-up's next card, or Surge.
+func free_now(u: UnitScript, card: Dictionary) -> bool:
+	if u.links.has("surged") or kw(card, "free"):
+		return true
+	return u.links.has("followUp") and card_has_tag(card, str(u.links["followUp"]))
+
+
+## The Surge meter: filled by playing well, spent to make your next card Free and a Magnitude higher.
+func add_surge(why: String) -> void:
+	if not rules.flag("surge"):
+		return
+	var size: int = rules.count("surgeSize", 5)
+	if surge < size:
+		surge += 1
+		_emit({ "t": "surge", "value": surge, "why": why })
+		_emit({ "t": "log", "text": Str.t(db, "lab.surge_gain") % [Str.t(db, "lab.surge_" + why), surge, size] })
+
+
+func can_surge(u: UnitScript) -> bool:
+	return rules.flag("surge") and surge >= rules.count("surgeSize", 5) and u == current and u.team == "party" and not u.links.has("surged")
+
+
+func spend_surge(u: UnitScript) -> bool:
+	if not can_surge(u):
+		return false
+	surge = 0
+	u.links["surged"] = "1"
+	u.undo_ok = false
+	_emit({ "t": "surge_spent", "unit": u.id })
+	_emit({ "t": "log", "text": Str.t(db, "lab.surge_spent") % u.name })
+	return true
+
+
+## The card a Surge plays: one Magnitude higher (a Strike-like card hits harder).
+func _surge_card(card: Dictionary) -> Dictionary:
+	var out := card.duplicate()
+	if out.has("magnitude"):
+		out["magnitude"] = CardRules.step_up(db, str(out["magnitude"]), 99)
+	elif out.has("mult"):
+		out["mult"] = float(out["mult"]) * 1.5
+	return out
+
+
+## A kill with your Action gives back your Move (or the Action).
+func _kill_refund(u: UnitScript, kills_before: int) -> void:
+	if u.team != "party" or kills.size() <= kills_before or not u.alive():
+		return
+	match rules.text("killRefund", "off"):
+		"move":
+			u.move_left = move_budget(u)
+			_emit({ "t": "log", "text": Str.t(db, "lab.refund_move") % u.name })
+		"action":
+			u.actions_left += 1
+			u.action_used = false
+			_emit({ "t": "log", "text": Str.t(db, "lab.refund_action") % u.name })
+
+
+## Combo chain: damage from each other teammate who played a card on this enemy this round.
+func _chain_bonus(u: UnitScript, t: UnitScript) -> int:
+	if not rules.flag("comboChain") or u.team != "party":
+		return 0
+	var n := 0
+	for id in chain.get(t.id, []):
+		if str(id) != u.id:
+			n += 1
+	return n
+
+
+func _note_chain(u: UnitScript, t: UnitScript) -> void:
+	if not rules.flag("comboChain") or u == null or u.team != "party" or t.team != "enemy":
+		return
+	var list: Array = chain.get(t.id, [])
+	if not list.has(u.id):
+		list.append(u.id)
+	chain[t.id] = list
+
+
 ## Spend the quick slot or the action for a card.
 func _use_slot(u: UnitScript, card: Dictionary) -> void:
+	if free_now(u, card):
+		u.links.erase("followUp")
+		u.undo_ok = false
+		return
 	# TL Part 4 (Lucky Quarter): the first Quick each fight is free.
 	if bool(card.get("quick", false)) and bool(u.mods.get("combat", {}).get("freeFirstQuick", false)) and not u.links.has("free_quick_used"):
 		u.links["free_quick_used"] = "1"
 		u.undo_ok = false
 		return
 	if bool(card.get("quick", false)) and not u.quick_used:
-		u.quick_used = true
+		u.quicks_taken += 1
+		var cap: int = rules.count("quicksPerTurn", 1)
+		u.quick_used = cap > 0 and u.quicks_taken >= cap
 	else:
 		spend_action(u)
 	u.undo_ok = false
@@ -1251,6 +1414,10 @@ func play_card(u: UnitScript, hand_index: int, target: Vector2i) -> bool:
 	_push_undo(u)
 	_use_slot(u, card)
 	u.mp -= cost
+	var kills_before := kills.size()
+	if u.links.has("surged"):
+		u.links.erase("surged")
+		card = _surge_card(card)
 	if u.team == "party":
 		cards_played += 1
 		if lab_log != null:
@@ -1258,7 +1425,7 @@ func play_card(u: UnitScript, hand_index: int, target: Vector2i) -> bool:
 	u.played_turn += 1
 	if u.team == "party" and CardRules.is_spell(card):
 		last_party_card = card
-	u.deck.play(hand_index, bool(card.get("consumable", false)) or bool(card.get("oncePerFight", false)))
+	u.deck.play(hand_index, bool(card.get("consumable", false)) or bool(card.get("oncePerFight", false)) or (rules.flag("exhaustOn", true) and bool(card.get("exhaust", false))))
 	var cells := effect_cells(u, card, target)
 	if CardRules.is_spell(card) and not bool(card.get("effectsOnly", false)):
 		var mp_before := u.mp + cost
@@ -1273,9 +1440,27 @@ func play_card(u: UnitScript, hand_index: int, target: Vector2i) -> bool:
 		_card_infuse = {}
 	if not card.get("riders", []).is_empty() and result == "":
 		_apply_riders(u, card, target, cells)
+	_after_card_keywords(u, card)
+	_kill_refund(u, kills_before)
 	_check_end()
 	_after_step(u)
 	return true
+
+
+## Heavy eats the Move, Swift gives it back, Follow-up opens the next card.
+func _after_card_keywords(u: UnitScript, card: Dictionary) -> void:
+	if not u.alive():
+		return
+	if kw(card, "heavy"):
+		u.move_left = 0
+	if kw(card, "swift"):
+		u.move_left = move_budget(u)
+		_emit({ "t": "log", "text": Str.t(db, "lab.swift") % u.name })
+	if rules.flag("keywordsOn", true) and str(card.get("followUp", "")) != "":
+		u.links["followUp"] = str(card["followUp"])
+		_emit({ "t": "log", "text": Str.t(db, "lab.follow_up") % [u.name, str(card["followUp"])] })
+	if not rules.flag("splitMove", true) and u.moved_steps > 0 and rules.flag("moveSeparate"):
+		u.move_left = 0
 
 
 func status_rules() -> Dictionary:
@@ -1422,7 +1607,7 @@ func _new_vector_effects(u: UnitScript, spec: Dictionary, cells: Array, hit: Arr
 				continue
 			if o.team == u.team:
 				# Doesn't stack: refreshes to the better value.
-				o.shield = maxi(o.shield, roundi(float(spec.get("power", 5))))
+				o.shield = maxi(o.shield, rules.scaled(float(spec.get("power", 5))) if rules.small() else roundi(float(spec.get("power", 5))))
 				o.shield_turns = maxi(o.shield_turns, 2)
 				_emit({ "t": "shield", "unit": o.id, "amount": o.shield })
 			else:
@@ -1558,7 +1743,13 @@ func strike(u: UnitScript, target: Vector2i) -> bool:
 	_push_undo(u)
 	_use_quick_builtin(u)
 	u.undo_ok = false
+	var kills_before := kills.size()
 	_basic(u, { "action": "strike", "stat": "str", "mult": 1.0, "name": "Strike" }, target)
+	_kill_refund(u, kills_before)
+	if lab_log != null and u.team == "party":
+		lab_log.played("strike")
+	if not rules.flag("splitMove", true) and u.moved_steps > 0 and rules.flag("moveSeparate"):
+		u.move_left = 0
 	_check_end()
 	_after_step(u)
 	return true
@@ -1658,14 +1849,14 @@ func preview(u: UnitScript, card: Dictionary, target: Vector2i, improvised: bool
 		var cost := improvise_cost(u, card) if improvised else card_cost(u, card, target)
 		out["cost"] = cost
 		var spec := _spell_spec(u, card)
-		out["chance"] = Res.stability_chance(db, u.stability + int(spec.get("stabilityBonus", 0)), cost, card, improvised and u.perk != "unstable", int(u.mods.get("combat", {}).get("thresholdBonus", 0)))
+		out["chance"] = Res.stability_chance(db, u.stability + int(spec.get("stabilityBonus", 0)), cost, card, improvised and u.perk != "unstable", int(u.mods.get("combat", {}).get("thresholdBonus", 0))) if rules.flag("instability", true) else 1.0
 		var n := 0
 		for c in area_order(cells, target):
 			var t := unit_at(c)
 			if t == null:
 				continue
 			if bool(spec["heal"]) and t.team == u.team:
-				out["hits"].append({ "unit": t.id, "heal": _heal_value(u, spec) })
+				out["hits"].append({ "unit": t.id, "heal": rules.scaled(_heal_value(u, spec)) if rules.small() else _heal_value(u, spec) })
 			elif float(spec["mult"]) > 0.0 and (is_hostile(u, t) or t.is_prop()):
 				n += 1
 				out["hits"].append({ "unit": t.id, "damage": roundi(_expected_hit(u, t, _area_spec(spec, n))), "status": _preview_statuses(spec["vectors"], t),
@@ -1680,8 +1871,29 @@ func preview(u: UnitScript, card: Dictionary, target: Vector2i, improvised: bool
 		elif t != null and str(card.get("action", "")) == "strike":
 			out["hits"].append({ "unit": t.id, "damage": roundi(_expected_strike(u, t, card)), "cover": cover_mul(u.cell, t.cell, false) })
 		elif t != null and str(card.get("action", "")) == "heal":
-			out["hits"].append({ "unit": t.id, "heal": Res.heal_amount(float(card.get("amount", 10)), u) })
+			out["hits"].append({ "unit": t.id, "heal": rules.scaled(Res.heal_amount(float(card.get("amount", 10)), u)) if rules.small() else Res.heal_amount(float(card.get("amount", 10)), u) })
+	_mark_deaths(out)
 	return out
+
+
+## Who a preview's hits, pushes and falls would kill: "the preview is the truth".
+func _mark_deaths(out: Dictionary) -> void:
+	var dealt := {}
+	for h in out["hits"]:
+		if h.has("damage"):
+			dealt[str(h["unit"])] = int(dealt.get(str(h["unit"]), 0)) + int(h["damage"])
+	for m in out.get("pushes", []):
+		dealt[str(m["unit"])] = int(dealt.get(str(m["unit"]), 0)) + int(m.get("damage", 0))
+	var deaths: Array = []
+	for id in dealt:
+		var t := unit_by_id(str(id))
+		if t != null and not t.is_prop() and t.hp + t.shield <= int(dealt[id]):
+			deaths.append(str(id))
+	for m in out.get("pushes", []):
+		var t := unit_by_id(str(m["unit"]))
+		if bool(m.get("falls", false)) and t != null and t.team == "enemy" and not t.boss and rules.flag("pitKillsEnemies", true) and not deaths.has(str(m["unit"])):
+			deaths.append(str(m["unit"]))
+	out["deaths"] = deaths
 
 
 ## The damage an effects card would deal (strike_x with its pattern, scaling,
@@ -1735,7 +1947,7 @@ func _effects_preview(u: UnitScript, card: Dictionary, target: Vector2i, out: Di
 							shots += 1
 					add = float(shots * int(fx.get("per", 2)))
 		if add > 0.0:
-			dmg[t0] = float(dmg.get(t0, 0.0)) + add
+			dmg[t0] = float(dmg.get(t0, 0.0)) + float(rules.scaled(add))
 	card_weapon_tag = ""
 	out["cells"] = cells
 	for v in dmg:
@@ -1798,10 +2010,15 @@ func push_landing(u: UnitScript, t: UnitScript, dir: Vector2i, steps: int, colli
 	while budget > 0 or sliding:
 		var next := cell + dir
 		var blocker := unit_at(next)
+		if grid.get_terrain(next) == GridScript.PIT and blocker == null:
+			out["falls"] = true
+			out["hazard"] = true
+			cell = next
+			break
 		if not grid.in_bounds(next) or not grid.walkable_terrain(next) or (blocker != null and blocker != t):
 			if collide and not sliding:
 				out["collide"] = true
-				out["damage"] = int(Res.combat_cfg(db).get("collisionDamage", 4)) + (4 if u.perk == "momentum" else 0)
+				out["damage"] = collision_damage(u)
 			break
 		cell = next
 		budget -= 1
@@ -1881,6 +2098,24 @@ func position_mul(u: UnitScript, t: UnitScript) -> float:
 	return mul
 
 
+## Rolls a crit when the lever allows it; otherwise the hit is exactly its number.
+func _finalize(dmg: float, attacker: UnitScript, crit_bonus: float = 0.0) -> Dictionary:
+	if rules.flag("crits", true):
+		return Res.finalize(db, dmg, attacker, rng, crit_bonus)
+	return { "amount": maxi(1, roundi(dmg)), "crit": false, "high": false }
+
+
+## A hit's number after the levers: small numbers, the round-cap shift, the combo chain.
+func _final_number(x: float, u: UnitScript, t: UnitScript) -> float:
+	if x <= 0.0:
+		return x
+	if rules.small():
+		x = maxf(1.0, x * rules.damage_scale())
+	if u.team == "enemy":
+		return x + float(shift_bonus)
+	return x + float(_chain_bonus(u, t))
+
+
 func _expected_hit(u: UnitScript, t: UnitScript, spec: Dictionary) -> float:
 	var area := float(spec.get("areaMul", 1.0))
 	if u.statuses.has("encore"):
@@ -1906,8 +2141,8 @@ func _expected_hit(u: UnitScript, t: UnitScript, spec: Dictionary) -> float:
 			area *= float(bonus.get("mul", 2.0))
 			break
 	if str(spec.get("kind", "spell")) == "strike":
-		return Res.strike_damage(db, float(spec["base"]), u, t, _shared(u, t, false)) * area
-	return Res.spell_damage(db, float(spec["power"]), float(spec["mult"]), spec["vectors"], u, t, _shared(u, t, bool(spec["ranged"]))) * area
+		return _final_number(Res.strike_damage(db, float(spec["base"]), u, t, _shared(u, t, false)) * area, u, t)
+	return _final_number(Res.spell_damage(db, float(spec["power"]), float(spec["mult"]), spec["vectors"], u, t, _shared(u, t, bool(spec["ranged"]))) * area, u, t)
 
 
 ## Area cells nearest the aim point first (for the falloff rule).
@@ -1954,7 +2189,7 @@ func _expected_strike(u: UnitScript, t: UnitScript, card: Dictionary) -> float:
 	var dmg := Res.strike_damage(db, base, u, t, _shared(u, t, false))
 	if not u.infusion.is_empty():
 		dmg *= Res.contest_mult(db, u.infusion["vectors"], t)
-	return dmg
+	return _final_number(dmg, u, t)
 
 
 func _shared(u: UnitScript, t: UnitScript, ranged: bool) -> float:
@@ -2049,7 +2284,7 @@ func _cast(u: UnitScript, card_in: Dictionary, target: Vector2i, improvised: boo
 	if u.team == "party":
 		u.source["pairUses"] = uses
 	var rolls := 2 if (bool(u.mods.get("combat", {}).get("stableRolls", false)) or (bool(u.mods.get("combat", {}).get("stillMind", false)) and not u.links.has("still_used"))) else 1
-	var roll := Res.roll_stability(db, u.stability + int(spec.get("stabilityBonus", 0)), cost, card, improvised and u.perk != "unstable", rng, int(u.mods.get("combat", {}).get("thresholdBonus", 0)), rolls)
+	var roll := Res.roll_stability(db, u.stability + int(spec.get("stabilityBonus", 0)), cost, card, improvised and u.perk != "unstable", rng, int(u.mods.get("combat", {}).get("thresholdBonus", 0)), rolls) if rules.flag("instability", true) else { "ok": true, "roll": 0, "target": 0.0 }
 	if int(roll["roll"]) > 0 and rolls > 1:
 		u.links["still_used"] = "1"
 	if improvised and guarantee_improvise:
@@ -2122,6 +2357,7 @@ func _combo(u: UnitScript, card: Dictionary, spec: Dictionary, target: Vector2i)
 	if not combos_cast.has(id):
 		combos_cast.append(id)
 	_emit({ "t": "combo", "unit": u.id, "id": id, "name": str(c.get("name", "")), "text": str(c.get("description", "")) })
+	add_surge("combo")
 	var fx_card := { "name": str(c.get("name", "")), "vectors": spec["vectors"], "effects": c.get("effects", []) }
 	_effects_script().run(self, u, fx_card, target, effect_cells(u, card, target))
 
@@ -2145,6 +2381,8 @@ func _resolve_spec(u: UnitScript, spec: Dictionary, target: Vector2i) -> void:
 				_heal(u, t, _heal_value(u, spec))
 			if t.alive():
 				var amount := roundi(float(spec["power"]) * (1.0 + float(u.mods.get("combat", {}).get("shieldPct", 0.0))))
+				if rules.small():
+					amount = rules.scaled(float(amount))
 				t.shield += amount
 				t.shield_turns = int(form.get("turns", 2))
 				_emit({ "t": "shield", "unit": t.id, "amount": amount })
@@ -2167,6 +2405,7 @@ func _resolve_spec(u: UnitScript, spec: Dictionary, target: Vector2i) -> void:
 			if u.perk == "constructor":
 				hp_value *= 2
 			hp_value = roundi(float(hp_value) * (1.0 + float(u.mods.get("combat", {}).get("constructHpPct", 0.0))))
+			hp_value = maxi(1, roundi(float(hp_value) * rules.enemy_hp_scale(false)))
 			var prop := UnitScript.make_prop("construct", hp_value, int(form.get("turns", 3)) + (2 if u.perk == "constructor" else 0) + int(u.mods.get("combat", {}).get("constructGlyphTurns", 0)))
 			prop.cell = target
 			var mode := construct_mode(spec)
@@ -2232,15 +2471,15 @@ func _hit_unit(u: UnitScript, t: UnitScript, spec: Dictionary, can_miss: bool) -
 		_emit({ "t": "log", "text": Str.t(db, "combat_state.intercepts") % [guard_ally.name, t.name] })
 		t = guard_ally
 	var miss := (float(Res.combat_cfg(db).get("blindMissChance", 0.35)) if u.statuses.has("blind") else 0.0) + (float(Res.combat_cfg(db).get("dazeMissChance", 0.2)) if u.statuses.has("dazed") else 0.0)
-	if can_miss and miss > 0.0 and rng.randf() < miss:
+	if can_miss and miss > 0.0 and rules.flag("misses", true) and rng.randf() < miss:
 		_emit({ "t": "miss", "unit": t.id })
 		return false
-	var dmg := Res.finalize(db, _expected_hit(u, t, spec), u, rng, float(spec.get("critBonus", 0.0)))
+	var dmg := _finalize(_expected_hit(u, t, spec), u, float(spec.get("critBonus", 0.0)))
 	_note = hit_note(u, t, spec["vectors"])
 	_damage(t, int(dmg["amount"]), u, VO.dominant_axis(spec["vectors"], CardRules.arcane_axes(db)), "hit", bool(dmg["crit"]), bool(dmg.get("high", false)))
 	_after_hit(u, t, int(dmg["amount"]))
 	if spec["vectors"].has("vitality") and u.alive():
-		_heal(u, u, maxi(1, roundi(float(dmg["amount"]) * float(Res.combat_cfg(db).get("vitalityDrainPct", 0.5)))))
+		_heal(u, u, maxi(1, roundi(float(dmg["amount"]) * float(Res.combat_cfg(db).get("vitalityDrainPct", 0.5)))), false)
 	_note_support_attack(u, t)
 	return true
 
@@ -2289,7 +2528,7 @@ func _after_hit(u: UnitScript, t: UnitScript, amount: int) -> void:
 		t.mp -= drained
 		_emit({ "t": "log", "text": Str.t(db, "combat_state.drains_mp_from") % [u.name, drained, t.name] })
 	if float(u.source.get("vampiric", 0.0)) > 0.0 and u.alive() and amount > 0:
-		_heal(u, u, maxi(1, roundi(float(amount) * float(u.source["vampiric"]))))
+		_heal(u, u, maxi(1, roundi(float(amount) * float(u.source["vampiric"]))), false)
 
 
 ## Modular Imbuement: the Strike after an infusion leaves its Glyph on the tile.
@@ -2324,10 +2563,10 @@ func _basic(u: UnitScript, card: Dictionary, target: Vector2i) -> void:
 			_emit({ "t": "cast", "unit": u.id, "name": str(card.get("name", "Strike")), "target": target, "improvised": false })
 			if parried(u, t):
 				return
-			if u.statuses.has("blind") and rng.randf() < float(cfg.get("blindMissChance", 0.35)):
+			if u.statuses.has("blind") and rules.flag("misses", true) and rng.randf() < float(cfg.get("blindMissChance", 0.35)):
 				_emit({ "t": "miss", "unit": t.id })
 				return
-			var dmg := Res.finalize(db, _expected_strike(u, t, card), u, rng)
+			var dmg := _finalize(_expected_strike(u, t, card), u)
 			var axis := ""
 			if not u.infusion.is_empty():
 				axis = VO.dominant_axis(u.infusion["vectors"], CardRules.arcane_axes(db))
@@ -2400,7 +2639,7 @@ func parried(u: UnitScript, t: UnitScript) -> bool:
 		return false
 	t.statuses.erase("parry")
 	_emit({ "t": "log", "text": Str.t(db, "combat_state.parries_and_strikes_back") % t.name })
-	var dmg := Res.finalize(db, _expected_strike(t, u, { "stat": "str", "mult": float(str(t.links.get("parry_mult", "1.0"))) }), t, rng)
+	var dmg := _finalize(_expected_strike(t, u, { "stat": "str", "mult": float(str(t.links.get("parry_mult", "1.0"))) }), t)
 	t.links.erase("parry_mult")
 	_damage(u, int(dmg["amount"]), t, "", "hit", bool(dmg["crit"]), bool(dmg.get("high", false)))
 	return true
@@ -2497,6 +2736,7 @@ func _apply_vector_effects(u: UnitScript, spec: Dictionary, cells: Array, hit: A
 				t.statuses["blind"] = int(cfg.get("blindTurns", 1))
 				_emit({ "t": "status", "unit": t.id, "status": "blind" })
 				_interrupt(t, "light")
+				blind_shift(t)
 	if v.has("corrosion"):
 		for t in hit:
 			t.defense_shred += int(cfg.get("corrosionDefense", 2))
@@ -2512,6 +2752,11 @@ func _apply_vector_effects(u: UnitScript, spec: Dictionary, cells: Array, hit: A
 		for t in hit:
 			if t.alive() and not t.is_prop() and GridScript.manhattan(t.cell, u.cell) > 1:
 				_push(u, t, Forms.direction_to(t.cell, u.cell), 1, false)
+
+
+## What a collision deals: the lever, plus Momentum's bonus.
+func collision_damage(u: UnitScript) -> int:
+	return rules.count("collisionDamage", 4) + (rules.scaled(4.0) if u != null and u.perk == "momentum" else 0)
 
 
 ## Push (or pull) a unit. Collisions with walls, edges or units deal bonus damage.
@@ -2533,7 +2778,7 @@ func _push(u: UnitScript, t: UnitScript, dir: Vector2i, steps: int, collide: boo
 			return
 		if not grid.in_bounds(next) or not grid.walkable_terrain(next) or blocker != null:
 			if collide:
-				var dmg := int(Res.combat_cfg(db).get("collisionDamage", 4)) + (4 if u.perk == "momentum" else 0)
+				var dmg := collision_damage(u)
 				_emit({ "t": "collide", "unit": t.id, "cell": next })
 				_damage(t, dmg, u, "force", "collision")
 				if blocker != null and blocker.alive():
@@ -2545,6 +2790,7 @@ func _push(u: UnitScript, t: UnitScript, dir: Vector2i, steps: int, collide: boo
 	if t.cell != from:
 		_emit({ "t": "push", "unit": t.id, "from": from, "to": t.cell })
 		_shift_intent(t, t.cell - from)
+		Goals.on_pushed(self, t)
 		if t.alive() and grid.get_terrain(t.cell) == GridScript.ICE:
 			_slide(t, dir)
 
@@ -2578,6 +2824,8 @@ func _note_support_attack(u: UnitScript, t: UnitScript) -> void:
 func _damage(t: UnitScript, amount: int, source: UnitScript, vector: String, cause: String, crit: bool = false, high: bool = false) -> void:
 	if t.dead or amount <= 0:
 		return
+	if rules.small() and SCALED_CAUSES.has(cause):
+		amount = rules.scaled(float(amount))
 	# Nights: one enemy hit can't take more than a share of a party member's health.
 	if cause == "hit" and t.team == "party" and source != null and source.team == "enemy":
 		amount = mini(amount, _hit_cap(t))
@@ -2631,19 +2879,29 @@ func _damage(t: UnitScript, amount: int, source: UnitScript, vector: String, cau
 		if rest + absorbed > highest_hit:
 			highest_hit = rest + absorbed
 			highest_hit_by = source.id if source != null else ""
+	_last_cause = cause
 	_emit({ "t": "damage", "unit": t.id, "amount": rest, "absorbed": absorbed, "crit": crit, "high": high, "vector": vector, "cause": cause,
-		"source": source.id if source != null else "", "note": _note })
+		"source": source.id if source != null else "", "note": _note, "toParty": t.team == "party", "telegraphed": _telegraphed })
 	_note = ""
+	if cause == "hit" and source != null:
+		_note_chain(source, t)
 	if t.hp <= 0:
 		_on_zero_hp(t, source)
 		return
 	if t.perk == "second_wind" and not t.perk_used and t.hp_ratio() < float(Res.combat_cfg(db).get("secondWindBelowPct", 0.3)):
 		t.perk_used = true
 		perk_fired(t, "Second Wind")
-		_heal(t, t, maxi(1, roundi(float(t.max_hp) * float(Res.combat_cfg(db).get("secondWindHpPct", 0.2)))))
+		_heal(t, t, maxi(1, roundi(float(t.max_hp) * float(Res.combat_cfg(db).get("secondWindHpPct", 0.2)))), false)
 		_emit({ "t": "log", "text": Str.t(db, "combat_state.catches_a_second_wind") % t.name })
 	if t.boss:
 		_check_phase(t)
+
+
+## Killing or moving an enemy off its attack cancels the telegraph: that's worth Surge.
+func _note_cancel(t: UnitScript) -> void:
+	if str(t.intent.get("kind", "")) in ["attack", "special"] and not intent_cells(t).is_empty():
+		_emit({ "t": "telegraph_cancelled", "unit": t.id })
+		add_surge("cancel")
 
 
 func _on_zero_hp(t: UnitScript, source: UnitScript) -> void:
@@ -2679,6 +2937,11 @@ func _on_zero_hp(t: UnitScript, source: UnitScript) -> void:
 			_go_out(t)
 		return
 	t.dead = true
+	if FightLog.BOARD_CAUSES.has(_last_cause) and t.team == "enemy":
+		_emit({ "t": "board_kill", "unit": t.id, "cause": _last_cause })
+		add_surge("board")
+	if t.team == "enemy" and current != null and current.team == "party":
+		_note_cancel(t)
 	kills.append(str(t.source.get("id", t.id)))
 	xp_total += t.xp
 	money_total += t.money
@@ -2712,6 +2975,7 @@ func _on_enemy_death(t: UnitScript) -> void:
 			var c: Vector2i = t.cell + d
 			if grid.in_bounds(c) and grid.walkable_terrain(c) and unit_at(c) == null:
 				var s := UnitScript.from_enemy(EnemyMods.apply(db, rec), 1.0)
+				_scale_enemy(s)
 				s.cell = c
 				_add_unit(s)
 				_emit({ "t": "spawn", "unit": s.id, "cell": c, "prop": false })
@@ -2721,9 +2985,11 @@ func _on_enemy_death(t: UnitScript) -> void:
 			_build_order_keep_current()
 
 
-func _heal(u: UnitScript, t: UnitScript, amount: int) -> void:
+func _heal(u: UnitScript, t: UnitScript, amount: int, scale_it: bool = true) -> void:
 	if t.dead or t.is_prop():
 		return
+	if scale_it and rules.small():
+		amount = rules.scaled(float(amount))
 	if t.statuses.has("poisoned"):
 		amount = maxi(1, roundi(float(amount) * float(status_rules().get("poisoned", {}).get("healMul", 0.5))))
 	var revived := false
@@ -2767,6 +3033,7 @@ func _check_phase(t: UnitScript) -> void:
 			if rec.is_empty():
 				continue
 			var s := UnitScript.from_enemy(rec, 1.0)
+			_scale_enemy(s)
 			_place(s, [], 0, false)
 			_emit({ "t": "spawn", "unit": s.id, "cell": s.cell, "prop": false })
 		_build_order_keep_current()
@@ -2789,7 +3056,10 @@ func _build_order_keep_current() -> void:
 ## place enemy damage is decided: previews, telegraphs, the threat view and the
 ## hit all use it. Heals and shields use "power".
 func action_spec(u: UnitScript, action: Dictionary) -> Dictionary:
-	var dmg_mul := diff_value("enemyDamageMul") if u.team == "enemy" else 1.0
+	var lever_mul := 1.0
+	if u.team == "enemy":
+		lever_mul = rules.num("enemyDamageMul", 1.0) * (rules.num("hitHardMul", 2.0) if rules.flag("hitHardRarely") else 1.0)
+	var dmg_mul := (diff_value("enemyDamageMul") if rules.flag("difficultyDamageMul", true) else 1.0) * lever_mul if u.team == "enemy" else 1.0
 	if u.team == "enemy" and str(action.get("intent", u.source.get("intent", "locked"))) == "tracking":
 		# Tracking attacks can't be dodged by moving, so they hit softer (PT Part 4).
 		dmg_mul *= float(Res.combat_cfg(db).get("trackingDamageMul", 0.6))
@@ -2804,7 +3074,7 @@ func action_spec(u: UnitScript, action: Dictionary) -> Dictionary:
 		return { "name": str(action.get("name", "Attack")), "vectors": action.get("vectors", {}), "form": form,
 			"power": float(action["damage"]) * dmg_mul, "mult": 1.0, "heal": false, "ranged": int(form.get("range", 1)) > 1, "kind": "spell" }
 	return { "name": str(action.get("name", "Attack")), "vectors": action.get("vectors", {}), "form": form,
-		"power": float(action.get("power", 5)), "mult": float(form.get("multiplier", 1.0)), "heal": heal,
+		"power": float(action.get("power", 5)) * lever_mul, "mult": float(form.get("multiplier", 1.0)), "heal": heal,
 		"ranged": int(form.get("range", 1)) > 1, "kind": "spell" }
 
 
@@ -2834,10 +3104,10 @@ func perform_action(u: UnitScript, action: Dictionary, target: Vector2i) -> bool
 		var t := unit_at(target)
 		if t != null and not parried(u, t):
 			_face_toward(u, t.cell)
-			if u.statuses.has("blind") and rng.randf() < float(Res.combat_cfg(db).get("blindMissChance", 0.35)):
+			if u.statuses.has("blind") and rules.flag("misses", true) and rng.randf() < float(Res.combat_cfg(db).get("blindMissChance", 0.35)):
 				_emit({ "t": "miss", "unit": t.id })
 			else:
-				var dmg := Res.finalize(db, Res.strike_damage(db, float(spec["base"]), u, t, _shared(u, t, false)), u, rng)
+				var dmg := _finalize(_final_number(Res.strike_damage(db, float(spec["base"]), u, t, _shared(u, t, false)), u, t), u)
 				_damage(t, int(dmg["amount"]), u, VO.dominant_axis(spec["vectors"], CardRules.arcane_axes(db)), "hit", bool(dmg["crit"]), bool(dmg.get("high", false)))
 				if not spec["vectors"].is_empty() and t.alive():
 					_apply_vector_effects(u, spec, [t.cell], [t])
@@ -2977,6 +3247,8 @@ func refresh_intents(only: Array = []) -> void:
 			u.intent = _ai_script().plan_intent(self, u)
 			if not u.intent.is_empty():
 				_emit({ "t": "intent", "unit": u.id, "kind": str(u.intent.get("kind", "")) })
+				if u.statuses.has("blind"):
+					blind_shift(u)
 	_decoys_draw()
 
 
@@ -2987,7 +3259,7 @@ func actions_cfg() -> Dictionary:
 
 
 func actions_per_turn() -> int:
-	return int(actions_cfg().get("actionsPerTurn", 2))
+	return rules.count("actionsPerTurn", int(actions_cfg().get("actionsPerTurn", 2)))
 
 
 ## Party units under the two-Action turn (enemies carry out their plans instead).
@@ -2996,7 +3268,7 @@ func uses_actions(u: UnitScript) -> bool:
 
 
 func spend_action(u: UnitScript) -> void:
-	if uses_actions(u):
+	if uses_actions(u) or (u.team == "party" and rules.flag("moveSeparate")):
 		u.actions_left = maxi(0, u.actions_left - 1)
 		u.action_used = u.actions_left <= 0
 	else:
@@ -3019,7 +3291,7 @@ func move_budget(u: UnitScript) -> int:
 ## Quick for this unit under the current turn rule (P2 1.1): labels use this so
 ## they never claim QUICK when the rule makes it cost an Action.
 func is_quick_now(u: UnitScript, card: Dictionary) -> bool:
-	if turn_mode != "two_actions" or u == null or u.team != "party":
+	if u == null or u.team != "party" or (rules.is_current() and turn_mode != "two_actions"):
 		return false
 	if bool(card.get("builtin", false)) and ranged_builtins_cost(u):
 		return false
@@ -3032,6 +3304,8 @@ func is_quick_now(u: UnitScript, card: Dictionary) -> bool:
 func ranged_builtins_cost(u: UnitScript) -> bool:
 	if u.team != "party":
 		return false
+	if not rules.is_current():
+		return rules.text("strikeCost", "action") == "action"
 	if not bool(db.get("combat_rules", {}).get("builtinsQuick", true)):
 		return true
 	if not bool(difficulty_rules().get("rangedBuiltinsCostAction", false)):
@@ -3044,15 +3318,16 @@ func ranged_builtins_cost(u: UnitScript) -> bool:
 
 ## Why the Quick can't be used now ("" if it can).
 func quick_block(u: UnitScript) -> String:
-	if turn_mode != "two_actions" or u.team != "party" or ranged_builtins_cost(u):
+	if u.team != "party" or ranged_builtins_cost(u) or (rules.is_current() and turn_mode != "two_actions"):
 		return act_block(u)
 	return Str.t(db, "combat_state.quick_used") if u.quick_used else ""
 
 
 func _use_quick_builtin(u: UnitScript) -> void:
-	if turn_mode == "two_actions" and u.team == "party" and ranged_builtins_cost(u):
+	var party_rule: bool = u.team == "party" and (turn_mode == "two_actions" or not rules.is_current())
+	if party_rule and ranged_builtins_cost(u):
 		spend_action(u)
-	elif turn_mode == "two_actions" and u.team == "party":
+	elif party_rule:
 		u.quick_used = true
 	else:
 		u.action_used = true
@@ -3269,6 +3544,8 @@ func cast_together(u: UnitScript, target: Vector2i) -> bool:
 
 ## Spend an Action to keep one card for next turn (PT Part 2).
 func hold_block(u: UnitScript) -> String:
+	if not rules.flag("hold", true):
+		return Str.t(db, "lab.hold_off")
 	if u.deck == null or u.deck.hand.is_empty():
 		return Str.t(db, "combat_state.no_card")
 	if u.held_id != "":
@@ -3352,7 +3629,7 @@ func blocking(u: UnitScript) -> Array:
 # Undo (PT Part 1): every party step pushes a snapshot of the whole fight. A
 # step that rolled dice, drew a card or revealed something clears the stack.
 
-const _NO_SNAP := ["db", "rng", "forms", "events", "_ai", "_fx", "_undo", "undo_lock", "ai_overrides", "library"]
+const _NO_SNAP := ["rules", "lab_log", "db", "rng", "forms", "events", "_ai", "_fx", "_undo", "undo_lock", "ai_overrides", "library"]
 
 
 func _snap_obj(o: Object, skip: Array = []) -> Dictionary:
@@ -3374,8 +3651,15 @@ func _restore_obj(o: Object, data: Dictionary) -> void:
 		o.set(n, v.duplicate(true) if (v is Dictionary or v is Array) else v)
 
 
+## Whether undo uses the snapshot stack (today's rule) or the Lab's "until a card".
+func _undo_stack() -> bool:
+	if rules.is_current():
+		return turn_mode == "two_actions"
+	return rules.text("undo") == "stack"
+
+
 func _push_undo(u: UnitScript) -> void:
-	if u.team != "party" or u.ai_controlled or turn_mode != "two_actions":
+	if u.team != "party" or u.ai_controlled or not _undo_stack():
 		return
 	var snap := { "state": _snap_obj(self, _NO_SNAP), "grid": _snap_obj(grid), "units": {}, "decks": {}, "rng": rng.state,
 		"intents": _intent_count() }
@@ -3442,7 +3726,7 @@ func undo(u: UnitScript) -> bool:
 ## Cards in hand at the start of a turn: data "drawUpTo" plus draw bonuses.
 func hand_size(u: UnitScript) -> int:
 	var plus := int(str(u.links.get("hand_plus", "0"))) if u.statuses.has("hand_plus") else 0
-	return int(Res.combat_cfg(db).get("drawUpTo", 3)) + int(u.mods.get("combat", {}).get("drawBonus", 0)) + plus
+	return rules.count("handSize", int(Res.combat_cfg(db).get("drawUpTo", 3))) + int(u.mods.get("combat", {}).get("drawBonus", 0)) + plus
 
 
 ## Movement cards (CT Part 4): before moving or acting this turn the tiles
@@ -3469,6 +3753,8 @@ func move_applies_now(u: UnitScript) -> bool:
 
 ## The most one enemy hit can deal to this party member (difficulty maxHitPct).
 func _hit_cap(t: UnitScript) -> int:
+	if not rules.flag("difficultyDamageMul", true):
+		return 1 << 30
 	var pct := float(difficulty_rules().get("maxHitPct", 0.0))
 	return maxi(1, ceili(float(t.max_hp) * pct)) if pct > 0.0 else 1 << 30
 
@@ -3701,7 +3987,58 @@ func intent_cells(u: UnitScript) -> Array:
 	if str(it.get("mode", "locked")) == "tracking":
 		var t := unit_by_id(str(it.get("unit", "")))
 		return [t.cell] if t != null and t.alive() else []
-	return it.get("cells", [])
+	return blocked_cells(u, it)
+
+
+## With the pathBlocking lever: a shot stops at the first enemy, Construct or prop
+## in its way, and a Line stops there too. Patterns and self areas don't care.
+func blocked_cells(u: UnitScript, it: Dictionary) -> Array:
+	var cells: Array = it.get("cells", [])
+	if not rules.flag("pathBlocking") or it.has("pattern") or it.get("action", {}).has("pattern") or cells.is_empty() or self_centered(it.get("action", {})):
+		return cells
+	var from: Vector2i = it.get("move", u.cell)
+	var spec := intent_spec(u, it.get("action", {}))
+	if str(spec.get("kind", "")) == "strike":
+		return cells
+	var fp := str(spec["form"].get("footprint", ""))
+	if fp == "line":
+		var sorted := cells.duplicate()
+		sorted.sort_custom(func(a: Vector2i, b: Vector2i) -> bool: return GridScript.manhattan(a, from) < GridScript.manhattan(b, from))
+		var out: Array = []
+		for c in sorted:
+			out.append(c)
+			var who := unit_at(c)
+			if who != null and who != u and (who.team != "party" or who.is_prop()):
+				break
+		return out
+	if cells.size() != 1:
+		return cells
+	for c in GridScript.cells_between(from, cells[0]):
+		var who := unit_at(c)
+		if who != null and who != u and (who.team != "party" or who.is_prop()):
+			return [c]
+	return cells
+
+
+## Blind (adjacent_tile lever): the attack lands on a tile next to its target, shown in the telegraph.
+func blind_shift(t: UnitScript) -> void:
+	if rules.text("blindMode", "miss_chance") != "adjacent_tile" or t.intent.is_empty() or bool(t.intent.get("blinded", false)):
+		return
+	if not str(t.intent.get("kind", "")) in ["attack", "special"] or t.intent.get("action", {}).has("pattern"):
+		return
+	for d in GridScript.DIRS:
+		var moved: Array = []
+		for c in t.intent.get("cells", []):
+			moved.append(c + d)
+		if moved.is_empty():
+			return
+		var first: Vector2i = moved[0]
+		if grid.in_bounds(first) and grid.walkable_terrain(first) and unit_at(first) == null:
+			t.intent["cells"] = moved
+			t.intent["blinded"] = true
+			t.intent["mode"] = "locked"
+			_emit({ "t": "interrupt", "unit": t.id, "text": Str.t(db, "lab.blind_shift") % t.name })
+			return
 
 
 ## Tiles enemies plan to heal or summon onto (shown in green, not red).
@@ -3856,6 +4193,7 @@ func _shift_intent(u: UnitScript, delta: Vector2i) -> void:
 		if str(u.intent.get("mode", "locked")) == "locked":
 			var tgt: Vector2i = u.intent.get("target", u.cell)
 			if not action_targets(u, u.intent.get("action", {}), u.intent.get("move", u.cell)).has(tgt):
+				_note_cancel(u)
 				u.intent = {}
 				_emit({ "t": "interrupt", "unit": u.id, "text": Str.t(db, "combat_state.off_balance") % u.name })
 		return
@@ -3988,7 +4326,7 @@ func _resolve_locked(u: UnitScript, it: Dictionary) -> void:
 	u.action_used = true
 	var act: Dictionary = it.get("action", {})
 	var spec := intent_spec(u, act)
-	var cells: Array = it.get("cells", [])
+	var cells: Array = blocked_cells(u, it)
 	var target: Vector2i = it.get("target", u.cell)
 	if bool(act.get("burrow", false)):
 		_burrow(u, target)
@@ -4016,9 +4354,13 @@ func _resolve_locked(u: UnitScript, it: Dictionary) -> void:
 	_emit({ "t": "cast", "unit": u.id, "name": spec["name"], "target": target, "improvised": false })
 	_emit({ "t": "area", "cells": cells, "vectors": spec["vectors"] })
 	var hit: Array = []
+	_telegraphed = true
+	var redirect: bool = rules.flag("redirect", true)
 	for c in cells:
 		var t := unit_at(c)
 		if t == null or t == u or not t.alive():
+			continue
+		if not redirect and t.team == u.team and not bool(spec["heal"]):
 			continue
 		if bool(spec["heal"]):
 			if t.team == u.team:
@@ -4027,6 +4369,15 @@ func _resolve_locked(u: UnitScript, it: Dictionary) -> void:
 			continue
 		elif _hit_unit(u, t, _sanctuary_spec(spec, t), true):
 			hit.append(t)
+			if t.team == u.team:
+				_emit({ "t": "redirected", "unit": t.id, "source": u.id })
+				_emit({ "t": "log", "text": Str.t(db, "lab.redirected") % [u.name, t.name] })
+				add_surge("redirect")
+	_telegraphed = false
+	# The target it was aimed at got away.
+	var aimed := unit_by_id(str(it.get("unit", "")))
+	if aimed != null and aimed.team == "party" and aimed.alive() and not bool(spec["heal"]) and not hit.has(aimed):
+		add_surge("dodge")
 	if not bool(spec["heal"]):
 		_apply_vector_effects(u, spec, cells, hit)
 		if act.has("statusAfter"):
@@ -4060,6 +4411,7 @@ func _summon(u: UnitScript, cells: Array) -> void:
 		var cell: Vector2i = c
 		if grid.walkable_terrain(cell) and unit_at(cell) == null:
 			var s := UnitScript.from_enemy(EnemyMods.apply(db, rec), 1.0)
+			_scale_enemy(s)
 			s.cell = cell
 			_add_unit(s)
 			_emit({ "t": "spawn", "unit": s.id, "cell": cell, "prop": false })
@@ -4117,6 +4469,16 @@ func _check_end() -> void:
 	elif not enemies_left:
 		result = "win"
 		_emit({ "t": "end", "result": "win" })
+	else:
+		var by_goal: String = Goals.check(self)
+		if by_goal != "":
+			result = by_goal
+			_emit({ "t": "end", "result": by_goal })
+
+
+## The fight's goal in plain words, for the HUD ("" for kill-everything).
+func goal_line() -> String:
+	return Goals.line(self)
 
 
 ## Call after any action: also used by the AI driver.

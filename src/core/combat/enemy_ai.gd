@@ -189,6 +189,9 @@ static func choose(state: StateScript, u: UnitScript) -> Dictionary:
 ## An enemy's telegraphed next action (CU), chosen like a normal turn and
 ## then frozen: the tiles it will hit, where it will stand, any charge-up.
 static func plan_intent(state: StateScript, u: UnitScript) -> Dictionary:
+	# "Enemies hit hard but rarely": every other turn is quiet, and that's your window.
+	if state.rules.flag("hitHardRarely") and (u.turns_taken + 1) % 2 == 0 and not u.statuses.has("burrowed"):
+		return { "kind": "wait", "move": u.cell, "cells": [] }
 	var special := _behavior_intent(state, u)
 	if not special.is_empty():
 		return special
@@ -229,6 +232,12 @@ static func plan_intent(state: StateScript, u: UnitScript) -> Dictionary:
 	# Attacks lock their tiles (dodge by stepping off them). Tracking attacks,
 	# which follow their target, are rare and marked in data ("intent": "tracking").
 	var mode := str(action.get("intent", u.source.get("intent", "locked")))
+	var share: float = state.rules.num("trackingShare", -1.0)
+	if share >= 0.0 and charge == 0 and not action.has("pattern"):
+		# The lever decides how many attacks follow their target (they hit softer).
+		mode = "tracking" if state.rng.randf() < share else "locked"
+		action = action.duplicate()
+		action["intent"] = mode
 	var it := { "kind": "special" if charge > 0 or action.has("pattern") else "attack", "action": action, "move": m, "target": target,
 		"cells": cells, "mode": mode, "unit": tracked.id if tracked != null else "", "charge": charge }
 	if u.double_attack and m == u.cell and charge == 0 and not action.has("pattern") and not bool(action.get("summon", false)):

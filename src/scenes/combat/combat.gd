@@ -65,6 +65,7 @@ var _tele_since: Dictionary = {}      # enemy id + plan -> when its telegraph fi
 var _hover_shapes: HBoxContainer
 var _quick_box: VBoxContainer
 var _hand: HBoxContainer
+var _goal_label: Label
 var _buttons: Dictionary = {}
 var _wheel: PanelContainer
 var _result_panel: PanelContainer
@@ -339,6 +340,11 @@ func _build_ui() -> void:
 	_ui.add_child(_override_tag)
 	if in_lab():
 		_build_lab_bar(view)
+	_goal_label = UiTheme.label("", UiTheme.GOOD)
+	_goal_label.position = Vector2(118, 38)
+	_goal_label.size = Vector2(view.x - 248, 12)
+	_goal_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_ui.add_child(_goal_label)
 	_strip = preload("res://src/scenes/ui/effects_strip.gd").new()
 	_strip.state = state
 	_strip.position = Vector2(2, 150)
@@ -381,7 +387,8 @@ func _build_ui() -> void:
 			["undo", "Undo", Strings.t("combat.undo_this_turn_s_move")], ["cantrip", Strings.t("combat.cantrip"), Strings.t("combat.cantrip_tip")],
 			["hold", Strings.t("combat.hold"), Strings.t("combat.hold_tip")], ["party", Strings.t("combat.party"), Strings.t("combat.party_tip")],
 			["together", Strings.t("combat.together"), Strings.t("combat.together_tip")],
-			["backpack", Strings.t("combat.backpack"), Strings.t("combat.backpack_tip")]]:
+			["backpack", Strings.t("combat.backpack"), Strings.t("combat.backpack_tip")],
+			["discard", Strings.t("combat.discard"), Strings.t("combat.discard_tip")], ["surge", Strings.t("combat.surge"), Strings.t("combat.surge_tip")]]:
 		var key: String = spec[0]
 		var b := UiTheme.button(spec[1], func() -> void: _on_button(key))
 		b.custom_minimum_size = Vector2(39, 18)
@@ -529,6 +536,8 @@ func _refresh_hud() -> void:
 				lines.append(Strings.t("combat.actions_left") % [u.actions_left, state.actions_per_turn(), Strings.t("combat.quick_ready") if not u.quick_used else Strings.t("combat.quick_spent")])
 			else:
 				lines.append(Strings.t("combat.move") % [u.move_left, Strings.t("combat.action_used") if u.action_used else Strings.t("combat.action_ready")])
+				if not state.rules.is_current():
+					lines.append(Strings.t("combat.quick_ready") if not u.quick_used else Strings.t("combat.quick_spent"))
 		if u.shield > 0:
 			lines.append(Strings.t("combat.shield") % u.shield)
 		_unit_panel.text = "\n".join(PackedStringArray(lines))
@@ -558,6 +567,15 @@ func _refresh_hud() -> void:
 	_buttons["cantrip"].disabled = not player_turn or act_block != "" or state.cantrip_targets(u).is_empty()
 	_buttons["hold"].disabled = not player_turn or state.hold_block(u) != ""
 	_buttons["together"].disabled = not player_turn or state.together_targets(u).is_empty()
+	# The Lab's rules drop the old built-ins (they leave the whole game in CL Part 5).
+	var old_builtins: bool = state.rules.is_current()
+	for key in ["guard", "cantrip", "wheel"]:
+		_buttons[key].visible = old_builtins
+	_buttons["hold"].visible = state.rules.flag("hold", true)
+	_buttons["surge"].visible = state.rules.flag("surge")
+	_buttons["surge"].disabled = not player_turn or not state.can_surge(u)
+	_buttons["surge"].text = Strings.t("combat.surge_meter") % [state.surge, state.rules.count("surgeSize", 5)]
+	_goal_label.text = state.goal_line()
 	_pips.visible = u != null and state.uses_actions(u)
 	if _pips.visible:
 		for i in _pips.get_child_count():
@@ -824,6 +842,7 @@ func _refresh_overlays() -> void:
 				_preview(card, false)
 			"strike":
 				field.target_cells = state._adjacent_hostiles(u, 1) + state.adjacent_walls(u)
+				_preview({ "action": "strike", "stat": "str", "mult": 1.0, "name": "Strike" }, false)
 			"cantrip":
 				field.target_cells = state.cantrip_targets(u)
 			"together":
@@ -877,6 +896,8 @@ func _preview(card: Dictionary, improvised: bool, guess: bool = false) -> void:
 	for m in p.get("pushes", []):
 		var t := state.unit_by_id(str(m["unit"]))
 		var what := Strings.t("combat.lands_in_a_hazard") if bool(m["hazard"]) else (Strings.t("combat.slides_on_ice") if bool(m["slide"]) else "")
+		if bool(m.get("falls", false)):
+			what = Strings.t("combat.falls_in_pit")
 		if bool(m["collide"]):
 			what = Strings.t("combat.slams_into_something_2") % int(m["damage"])
 		if what != "" and t != null:
@@ -885,7 +906,13 @@ func _preview(card: Dictionary, improvised: bool, guess: bool = false) -> void:
 		var t := state.unit_by_id(str(i["unit"]))
 		if t != null:
 			lines.append("%s: %s!" % [t.name, i["effect"]])
-	lines.append(Strings.t("combat.stable") % roundi(float(p["chance"]) * 100.0))
+	for id in p.get("deaths", []):
+		var t := state.unit_by_id(str(id))
+		if t != null:
+			lines.append(Strings.t("combat.would_die") % t.name)
+			field.preview_labels[t.cell] = Strings.t("combat.dies_tag")
+	if float(p["chance"]) < 1.0:
+		lines.append(Strings.t("combat.stable") % roundi(float(p["chance"]) * 100.0))
 	_info.text = "\n".join(PackedStringArray(lines))
 
 
@@ -1122,6 +1149,22 @@ func _on_card(i: int) -> void:
 	_refresh_hud()
 
 
+## The discard pile: visible and clickable (docs/COMBAT_LAB.md Part 2).
+func _open_discard() -> void:
+	var u := state.current
+	if u == null or u.deck == null:
+		return
+	var m := Modal.new()
+	m.build(Strings.t("combat.discard_title") % u.name, 300)
+	if u.deck.discard.is_empty():
+		m.text(Strings.t("combat.discard_empty"), UiTheme.DIM)
+	for id in u.deck.discard:
+		var card := CardRules.resolve(DataDB.all(), str(id), state.library)
+		m.text("%s: %s" % [card.get("name", id), CardRules.describe(DataDB.all(), card)])
+	m.add_button(Strings.t("combat.close"), func() -> void: m.finish(null))
+	await Flow.show_modal(m)
+
+
 ## The party backpack: pick an item; the current character uses it on themselves.
 func _open_backpack() -> void:
 	if not _player_turn():
@@ -1145,12 +1188,18 @@ func _on_button(key: String) -> void:
 	if key == "party":
 		await _open_party_panel()
 		return
+	if key == "discard":
+		await _open_discard()
+		return
 	if not _player_turn():
 		return
 	var u := state.current
 	match key:
 		"backpack":
 			await _open_backpack()
+		"surge":
+			if state.spend_surge(u):
+				_after_action()
 		"end":
 			_cancel()
 			state.end_turn()

@@ -635,3 +635,24 @@ The Lab is a dev tool for comparing combat rules. Every rule it can switch is a 
 | Levers and presets | `data/lab/lab.json`, `data/lab/presets.json`; saved presets in `user://lab/presets.json` |
 | Fights | `data/lab/fights.json` |
 | Fight log and ratings | one JSON line per fight in `user://lab/lab_log.jsonl`; `tools/lab_report.gd` makes a table per preset |
+
+### The `cl_base` rules (Part 2)
+
+Only Lab fights use these until the user picks a preset. `current` keeps today's rules.
+
+| Rule | `cl_base` |
+| --- | --- |
+| Turn | A Move (up to Movement, can be split around the Action) and one Action. A Quick card doesn't use the Action (1 a turn). Hold is off. Undo a Move until you play a card or something random happens |
+| Order | The whole party, then all enemies |
+| Keywords | Free (no Action or Quick), Follow-up (then one card with a named tag, no Action), Swift (gives the Move back), Heavy (uses the Action and the Move, can't follow a move), Exhaust (gone for the fight) |
+| Hand and deck | Hand of 4, drawn back up each turn; leftovers stay. The discard shuffles back with no Fatigue. The discard pile is on a button |
+| MP | A pool of 6, +2 a turn. Lever: cards are free and only Major and Grand spells cost MP |
+| Small numbers | Enemy HP x0.25 (bosses x0.15), party HP x0.33, damage and heals x0.4, never below 1 |
+| No dice | No crits or misses. Blind moves the telegraph to a tile next to its target. Instability rolls stay |
+| Difficulty | No difficulty damage multiplier and no hit cap |
+| Telegraphs | Every enemy shows exact tiles and damage at the start of the party's turn. Push, kill, block the path (enemies, Constructs and props stop shots and Lines), move out, or put an enemy on the tiles: it takes the hit. About 1 attack in 10 tracks its target. Lever: enemies act every other turn and hit twice as hard |
+| Surge | Fills by 1 for a dodge, a cancelled telegraph, a board kill, a redirected hit or a combo. At 5, any character's next card is Free and one Magnitude higher |
+| Kill refund | A kill with your Action gives your Move back (lever: your Action) |
+| Combo chain | +1 damage for each other teammate who played a card on that enemy this round |
+| Round cap | Past round 8 the Upside-Down shifts: enemies deal +1 more damage each round |
+| Goals | Kill, survive N rounds, protect a unit, reach the exit, break a target, stop a ritual (a push delays it a round), capture a tile. Killing every enemy always wins |

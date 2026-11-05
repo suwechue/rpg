@@ -12,6 +12,7 @@ var hand_limit := 7
 var fatigue_next := 1
 var fatigue_step := 1
 var reshuffles := 0
+var no_reshuffle := false      # a Lab lever: the discard never comes back
 
 
 ## cfg keys (data/stats.json "combat"): handLimit, fatigueStart, fatigueStep.
@@ -42,7 +43,7 @@ func draw(n: int, rng: RandomNumberGenerator) -> Dictionary:
 		if hand.size() >= hand_limit:
 			break
 		if draw_pile.is_empty():
-			if discard.is_empty():
+			if discard.is_empty() or no_reshuffle:
 				break
 			draw_pile = discard.duplicate()
 			discard.clear()

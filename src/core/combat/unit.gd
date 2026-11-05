@@ -58,6 +58,7 @@ var auras: Array = []            # [{ "card": {}, "turns": n }]
 var move_left := 0
 var action_used := false         # each turn is Move + 1 Action (CU)
 var quick_used := false          # plus one quick card
+var quicks_taken := 0            # Quicks used this turn (the quicksPerTurn lever)
 var start_cell := Vector2i.ZERO  # where this turn began (undo move)
 var moved_steps := 0
 var played_turn := 0            # cards played this turn (scaling cards)
