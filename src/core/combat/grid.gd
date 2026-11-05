@@ -22,7 +22,7 @@ const CONVEYORS := { "conv_r": Vector2i(1, 0), "conv_l": Vector2i(-1, 0), "conv_
 
 const LEGEND := { ".": FLOOR, "#": WALL, "B": WALL, "r": RUBBLE, "c": FLOOR, "h": HAZARD, "w": WATER, "i": ICE, "p": PIT, "k": COLLAPSE, "d": DARK,
 	"R": "conv_r", "L": "conv_l", "U": "conv_u", "D": "conv_d", "t": FLOOR, "f": FLOOR, "g": FLOOR,
-	"e": LEDGE, "s": SPIKES, "o": FLOOR, "G": FLOOR, "b": FLOOR, "O": FLOOR, "A": FLOOR }
+	"e": LEDGE, "s": SPIKES, "o": FLOOR, "G": FLOOR, "b": FLOOR, "O": FLOOR, "A": FLOOR, "H": FLOOR }
 const DIRS := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
 
 var cols := 9
@@ -47,6 +47,14 @@ var wet: Dictionary = {}         # Lab: soaked tiles: react like water
 var anchors: Dictionary = {}     # Lab: Anchor Point tiles: nothing is pushed past them
 var bridges: Dictionary = {}     # Lab: walkable tiles over a gap or water
 var collapsing: Dictionary = {}  # Lab: cell -> rounds until it's a pit (telegraphed)
+var fog: Dictionary = {}         # fog lever: tiles that hide enemy plans
+var fog_layout: Array = []       # the fight's fog tiles (empty = the far half)
+var high: Dictionary = {}        # highGround lever: raised tiles ("H" on the map)
+var sticky: Dictionary = {}      # lingeringFields: Binding ground, cell -> rounds
+var field_ice: Dictionary = {}   # lingeringFields: ice that melts, cell -> rounds
+var cracks: Dictionary = {}      # lingeringFields: Force hits on a tile
+var doors: Dictionary = {}       # fightWaves: door cell -> the round it opens
+var env_warn: Array = []         # envTimers: the tiles that turn next round
 var theme := ""
 
 
@@ -84,6 +92,8 @@ func _init(layout: Dictionary = {}) -> void:
 					prop_spawns.append({ "cell": cell, "prop": "water_barrel" })
 				"o":
 					oil[cell] = 99
+				"H":
+					high[cell] = true
 				"G":
 					gas[cell] = 99
 				"c":
@@ -99,6 +109,10 @@ func _init(layout: Dictionary = {}) -> void:
 					wall_hp[cell] = int(layout.get("wallHp", 25))
 			row.append(LEGEND.get(ch, FLOOR))
 		terrain.append(row)
+	for h in layout.get("high", []):
+		high[Vector2i(int(h[0]), int(h[1]))] = true
+	for f in layout.get("fog", []):
+		fog_layout.append(Vector2i(int(f[0]), int(f[1])))
 	for p in layout.get("props", []):
 		var at: Array = p.get("cell", [0, 0])
 		prop_spawns.append({ "cell": Vector2i(int(at[0]), int(at[1])), "prop": str(p.get("prop", "crate")) })
@@ -176,7 +190,9 @@ func has_los(a: Vector2i, b: Vector2i, blockers: Dictionary = {}) -> bool:
 
 ## Cells reachable within `budget` steps, avoiding walls, water and occupied
 ## cells. Returns { Vector2i: steps }. The start cell is included at 0.
-func reachable(start: Vector2i, budget: int, occupied: Dictionary) -> Dictionary:
+func reachable(start: Vector2i, budget: int, occupied: Dictionary, leave_cost: Dictionary = {}) -> Dictionary:
+	if not leave_cost.is_empty():
+		return _reachable_costed(start, budget, occupied, leave_cost)
 	var dist := { start: 0 }
 	var frontier: Array = [start]
 	while not frontier.is_empty():
@@ -192,6 +208,24 @@ func reachable(start: Vector2i, budget: int, occupied: Dictionary) -> Dictionary
 				dist[n] = d + 1
 				next.append(n)
 		frontier = next
+	return dist
+
+
+## Reachable cells when leaving some tiles costs extra (zones of control, sticky ground).
+func _reachable_costed(start: Vector2i, budget: int, occupied: Dictionary, leave_cost: Dictionary) -> Dictionary:
+	var dist := { start: 0 }
+	var frontier: Array = [start]
+	while not frontier.is_empty():
+		var cell: Vector2i = frontier.pop_front()
+		var step := 1 + int(leave_cost.get(cell, 0))
+		for dir in DIRS:
+			var n: Vector2i = cell + dir
+			var d: int = int(dist[cell]) + step
+			if d > budget or not in_bounds(n) or not walkable_terrain(n) or occupied.has(n):
+				continue
+			if not dist.has(n) or d < int(dist[n]):
+				dist[n] = d
+				frontier.append(n)
 	return dist
 
 

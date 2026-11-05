@@ -35,6 +35,7 @@
       },
       "actions": [
         {
+          "addsStatusCard": "status_tangled",
           "id": "frost_bite",
           "name": "Frost Bite",
           "kind": "strike",

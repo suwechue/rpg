@@ -37,7 +37,12 @@
         "surge": false,
         "killRefund": "off",
         "comboChain": false,
-        "roundCap": 0
+        "roundCap": 0,
+        "hitstop": false,
+        "killSlowmo": false,
+        "killCam": false,
+        "speedControls": false,
+        "plainLog": false
       }
     },
     {

@@ -81,6 +81,9 @@ static func options(state: StateScript, u: UnitScript) -> Array:
 			if claimed.has(m):
 				danger[m] = float(c.get("avoidOwnTelegraphs", 3.0))
 			# Enemies keep off edges and bad ground when they can (the Lab's lever).
+			# Charged spells are telegraphed: enemies try to step out of them.
+			if not state.charges.is_empty():
+				danger[m] = float(danger.get(m, 0.0)) + float(state.threat_at(m, "enemy"))
 			if state.rules.flag("enemiesAvoidEdges") and not bool(u.source.get("immovable", false)):
 				var cell: Vector2i = m
 				var risk := 1.0 if state.grid.collapsing.has(cell) or state.grid.get_terrain(cell) == GridScript.SPIKES else 0.0

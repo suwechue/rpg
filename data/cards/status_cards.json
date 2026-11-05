@@ -1,0 +1,62 @@
+{
+  "comment": "Junk cards some enemy attacks shuffle into your deck, when the statusCards lever is on.",
+  "cards": [
+    {
+      "id": "status_fear",
+      "name": "Fear",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Can't be played",
+      "action": "effects",
+      "cost": 0,
+      "targeting": {
+        "type": "self"
+      },
+      "effects": [],
+      "unplayable": true,
+      "whenDrawn": "discard",
+      "text": "Unplayable. When drawn, discard 1 card.",
+      "labels": [
+        "status"
+      ]
+    },
+    {
+      "id": "status_burned",
+      "name": "Burned",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Can't be played",
+      "action": "effects",
+      "cost": 0,
+      "targeting": {
+        "type": "self"
+      },
+      "effects": [],
+      "unplayable": true,
+      "whenDrawn": "hurt",
+      "text": "Unplayable. When drawn, lose 1 HP.",
+      "labels": [
+        "status"
+      ]
+    },
+    {
+      "id": "status_tangled",
+      "name": "Tangled",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Costs your Move",
+      "action": "effects",
+      "cost": 0,
+      "targeting": {
+        "type": "self"
+      },
+      "effects": [],
+      "heavy": true,
+      "exhaust": true,
+      "text": "Heavy. Exhaust. Spend your Action and Move to get rid of it.",
+      "labels": [
+        "status"
+      ]
+    }
+  ]
+}

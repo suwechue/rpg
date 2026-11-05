@@ -1,0 +1,55 @@
+{
+  "comment": "Board-themed relics (Part 3c). Each is a small rule changer, read through Extras.has_relic.",
+  "relics": [
+    {
+      "id": "first_push_extra",
+      "name": "Steel Toe",
+      "text": "Your first push each fight goes 1 extra tile."
+    },
+    {
+      "id": "collision_plus",
+      "name": "Hard Hat",
+      "text": "Collisions deal 1 more."
+    },
+    {
+      "id": "surge_start",
+      "name": "Live Wire",
+      "text": "Start each fight with 1 Surge."
+    },
+    {
+      "id": "kill_heal",
+      "name": "Blood Chit",
+      "text": "A kill heals the one who made it for 1."
+    },
+    {
+      "id": "board_mp",
+      "name": "Salvage Coil",
+      "text": "A board kill gives 1 MP."
+    },
+    {
+      "id": "pit_surge",
+      "name": "Bottomless Coin",
+      "text": "Pit kills give 1 more Surge."
+    },
+    {
+      "id": "fall_soft",
+      "name": "Knee Pads",
+      "text": "The party takes 1 less from falls."
+    },
+    {
+      "id": "blast_proof",
+      "name": "Blast Vest",
+      "text": "The party takes 1 less from explosions."
+    },
+    {
+      "id": "swift_after_push",
+      "name": "Slip Shoes",
+      "text": "Your first push each round gives 1 Move."
+    },
+    {
+      "id": "first_card_cheap",
+      "name": "Lucky Stub",
+      "text": "Your party's first card each fight costs 1 less MP."
+    }
+  ]
+}

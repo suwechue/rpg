@@ -16,6 +16,10 @@ var guest := false
 var boss := false
 var cell := Vector2i.ZERO
 var facing := 1              # +1 faces right (party), -1 faces left (enemies)
+var facing_dir := Vector2i(1, 0)  # the facing lever: the way it last moved or attacked
+var init_bonus := 0          # cardInitiative lever: next round's order
+var gauge := 0               # classGauges lever
+var intent_next: Dictionary = {}  # bossLookahead lever: the plan after this one
 var spawn_index := 0
 
 var hp := 1
@@ -170,6 +174,7 @@ static func from_enemy(rec: Dictionary, scale: float = 1.0) -> CombatUnit:
 	u.sprite = str(rec.get("sprite", ""))
 	u.phases = rec.get("phases", [])
 	u.facing = -1
+	u.facing_dir = Vector2i(-1, 0)
 	return u
 
 

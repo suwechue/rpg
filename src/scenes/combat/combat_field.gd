@@ -26,6 +26,10 @@ var telegraphs: Array = []           # PT Part 3: [{ "unit", "from", "cells", "t
 var focus_cells: Array = []          # the hovered enemy's tiles (or the hovered red tile's attackers' tiles)
 var lingering: Dictionary = {}       # cell -> rounds left (burning, toxic, glyphs), drawn as small counters
 var move_marks: Array = []           # enemy plans: [{ "from", "to" }] where they'll walk first
+var zoc_cells: Array = []            # zones of control: faint tiles around enemies
+var faded_cells: Array = []          # a boss's plan after this one
+var weak_cells: Array = []           # tiles to hit weak points from
+var fog_marks: Array = []            # enemies whose plans the fog hides
 var hover_cell := Vector2i(-1, -1)
 var cursor_cell := Vector2i(-1, -1)
 var glyph_cells: Array = []
@@ -54,7 +58,15 @@ func _draw() -> void:
 	if threat_view:
 		_draw_threat_view()
 		return
+	_draw_overlay(zoc_cells, Color(UiTheme.color("bad"), 0.1))
+	_draw_overlay(faded_cells, Color(UiTheme.color("bad"), 0.18))
 	_draw_overlay(reach_cells, Color(0.45, 0.75, 1.0, 0.28))
+	for w in weak_cells:
+		draw_arc(proj.cell_center(w), 5.0, 0, TAU, 12, UiTheme.ACCENT, 1.0)
+	for m in fog_marks:
+		var at := proj.cell_center(m) + Vector2(-2, -Display.tile * 1.4)
+		draw_string_outline(UiTheme.font, at, "?", HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, 3, UiTheme.color("outline"))
+		draw_string(UiTheme.font, at, "?", HORIZONTAL_ALIGNMENT_LEFT, -1, UiTheme.FONT_SIZE, UiTheme.ACCENT)
 	for c in cover_cells:
 		draw_polyline(_closed(proj.cell_polygon(c)), Color(0.5, 0.8, 1.0, 0.9), 1.0)
 	_draw_threats()
@@ -264,6 +276,19 @@ func _draw_cell(cell: Vector2i) -> void:
 			var sx := -6.0 + 6.0 * float(i)
 			draw_line(ctr + Vector2(sx - 2, 2), ctr + Vector2(sx, -4), Color("d7d2c4"), 1.0)
 			draw_line(ctr + Vector2(sx, -4), ctr + Vector2(sx + 2, 2), Color("d7d2c4"), 1.0)
+	if grid.high.has(cell):
+		draw_colored_polygon(poly, Color(1, 1, 1, 0.12))
+		draw_line(poly[3], poly[2], Color(1, 1, 1, 0.6), 2.0)
+	if grid.fog.has(cell) and not grid.lit.has(cell):
+		draw_colored_polygon(poly, Color(0.7, 0.72, 0.8, 0.22))
+	if grid.sticky.has(cell):
+		draw_colored_polygon(poly, Color(UiTheme.vector_color("binding"), 0.3))
+	if grid.cracks.has(cell):
+		draw_line(ctr + Vector2(-6, 1), ctr + Vector2(5, -2), Color("1d140c"), 1.0)
+	if grid.doors.has(cell):
+		draw_polyline(_closed(poly), UiTheme.ACCENT, 2.0)
+	if grid.env_warn.has(cell):
+		draw_colored_polygon(poly, Color(1.0, 0.6, 0.2, 0.3))
 	if grid.oil.has(cell):
 		draw_colored_polygon(poly, Color(0.1, 0.08, 0.05, 0.6))
 	if grid.gas.has(cell):

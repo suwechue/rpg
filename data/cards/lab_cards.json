@@ -694,7 +694,8 @@
       },
       "labels": [
         "payoff"
-      ]
+      ],
+      "retain": true
     },
     {
       "id": "lab_detonate",
@@ -768,7 +769,8 @@
       "freeIf": "target_moved",
       "labels": [
         "payoff"
-      ]
+      ],
+      "retain": true
     },
     {
       "id": "lab_shove",
@@ -1101,6 +1103,129 @@
       "area": "square_3x3",
       "labels": [
         "terrain"
+      ]
+    },
+    {
+      "id": "lab_charge_ember",
+      "name": "Slow Ember",
+      "kind": "spell",
+      "labOnly": true,
+      "vectors": {
+        "heat": 1.0
+      },
+      "form": "burst",
+      "magnitude": "standard",
+      "charge": true,
+      "short": "Charge: Heat burst",
+      "labels": [
+        "charge"
+      ],
+      "cost": 4
+    },
+    {
+      "id": "lab_charge_frost",
+      "name": "Gathering Frost",
+      "kind": "spell",
+      "labOnly": true,
+      "vectors": {
+        "cold": 1.0
+      },
+      "form": "line",
+      "magnitude": "standard",
+      "charge": true,
+      "short": "Charge: Cold line",
+      "labels": [
+        "charge"
+      ],
+      "cost": 3
+    },
+    {
+      "id": "lab_charge_ram",
+      "name": "Battering Ram",
+      "kind": "spell",
+      "labOnly": true,
+      "vectors": {
+        "force": 1.0
+      },
+      "form": "bolt",
+      "magnitude": "standard",
+      "charge": true,
+      "short": "Charge: Force bolt",
+      "labels": [
+        "charge"
+      ],
+      "cost": 1
+    },
+    {
+      "id": "lab_charge_storm",
+      "name": "Stormcall",
+      "kind": "spell",
+      "labOnly": true,
+      "vectors": {
+        "lightning": 1.0
+      },
+      "form": "burst",
+      "magnitude": "standard",
+      "charge": true,
+      "short": "Charge: Lightning",
+      "labels": [
+        "charge"
+      ],
+      "cost": 4
+    },
+    {
+      "id": "lab_charge_lance",
+      "name": "Sunlance",
+      "kind": "spell",
+      "labOnly": true,
+      "vectors": {
+        "light": 1.0
+      },
+      "form": "line",
+      "magnitude": "standard",
+      "charge": true,
+      "short": "Charge: Light line",
+      "labels": [
+        "charge"
+      ],
+      "cost": 3
+    },
+    {
+      "id": "lab_charge_rift",
+      "name": "Slow Rift",
+      "kind": "spell",
+      "labOnly": true,
+      "vectors": {
+        "motion": 1.0
+      },
+      "form": "burst",
+      "magnitude": "minor",
+      "charge": true,
+      "short": "Charge: Motion",
+      "labels": [
+        "charge"
+      ],
+      "cost": 3
+    },
+    {
+      "id": "lab_clear_head",
+      "name": "Clear Head",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Remove junk",
+      "action": "effects",
+      "cost": 0,
+      "targeting": {
+        "type": "self"
+      },
+      "effects": [
+        {
+          "op": "lab_clear_status"
+        }
+      ],
+      "quick": true,
+      "labels": [
+        "deck"
       ]
     }
   ]

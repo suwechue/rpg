@@ -34,6 +34,9 @@ var _walker := false
 var _bob := 0.0
 
 
+var facing_arrow := Vector2i.ZERO    # the facing lever: an arrow under the unit
+
+
 func setup(id: String, p_team: String, sprite_id: String, prop_kind: String = "") -> void:
 	unit_id = id
 	team = p_team
@@ -132,6 +135,10 @@ func _draw() -> void:
 		var a := TAU * float(i) / float(segments)
 		pts.append(Vector2(cos(a) * w, sin(a) * 3.5))
 	draw_colored_polygon(pts, Color(0, 0, 0, 0.35))
+	if facing_arrow != Vector2i.ZERO:
+		var fd := Vector2(facing_arrow) * Vector2(1.0, 0.5)
+		draw_line(Vector2.ZERO, fd * 9.0, UiTheme.ACCENT, 1.0)
+		draw_circle(fd * 9.0, 1.5, UiTheme.ACCENT)
 	if is_prop and unit_id.begins_with("low_wall"):
 		# A low stone wall: wide and short, so it reads as cover, not a crate.
 		var lh := sprite_height() * 0.6

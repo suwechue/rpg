@@ -310,6 +310,6 @@ static func start_fight(seed_override: int = -1) -> void:
 	var db: Dictionary = DataDB.all()
 	var preset := Session.ab_preset() if not Session.ab.is_empty() else Session.preset_id
 	var over: Dictionary = {} if not Session.ab.is_empty() else Session.overrides
-	var built := Setup.build(db, Session.fight_id, preset, over, Session.picks, seed_override)
+	var built := Setup.build(db, Session.fight_id, preset, over, Session.picks, seed_override, { "mastery": Session.mastery, "labRelics": Session.relics })
 	GameState.run = built["run"]
 	GameState.start_combat(built["setup"], SCENE)

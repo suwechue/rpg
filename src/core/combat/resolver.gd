@@ -61,12 +61,12 @@ static func is_behind(attacker: UnitScript, target: UnitScript) -> bool:
 
 
 ## Multipliers that apply to every hit from this attacker on this target.
-static func shared_mult(db: Dictionary, attacker: UnitScript, target: UnitScript, ranged: bool, cover: float, friend_adjacent: bool) -> float:
+static func shared_mult(db: Dictionary, attacker: UnitScript, target: UnitScript, ranged: bool, cover: float, friend_adjacent: bool, flanks: bool = true) -> float:
 	var cfg := combat_cfg(db)
 	var m := 1.0 + attacker.rally_bonus
-	if (attacker.perk == "backstab" or attacker.perk == "sleight") and is_flanking(attacker, target):
+	if flanks and (attacker.perk == "backstab" or attacker.perk == "sleight") and is_flanking(attacker, target):
 		m *= float(cfg.get("flankMul", 1.5))
-	elif is_behind(attacker, target):
+	elif flanks and is_behind(attacker, target):
 		m *= float(cfg.get("backMul", 1.15))
 	m *= cover
 	if friend_adjacent:

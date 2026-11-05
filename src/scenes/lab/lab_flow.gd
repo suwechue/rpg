@@ -4,10 +4,13 @@ extends RefCounted
 
 const Session := preload("res://src/core/lab/lab_session.gd")
 const Rules := preload("res://src/core/combat/rules.gd")
+const Setup := preload("res://src/core/lab/lab_setup.gd")
 const FightLog := preload("res://src/core/lab/fight_log.gd")
 const RatingCard := preload("res://src/scenes/lab/rating_card.gd")
 const LabScreen := preload("res://src/scenes/lab/lab.gd")
 const Modal := preload("res://src/scenes/ui/modal.gd")
+const Extras := preload("res://src/core/combat/extras.gd")
+const CardRules := preload("res://src/core/card.gd")
 
 
 static func restart() -> void:
@@ -46,6 +49,53 @@ static func finished(scene: Node, state: Object, summary: Dictionary) -> void:
 	_result_panel(scene, state, summary)
 
 
+## A board relic drops after a win (the storyRelics lever).
+static func _drop_relic(m: Modal) -> void:
+	var pool: Array = DataDB.table("lab/board_relics").get("relics", []).filter(func(rec: Dictionary) -> bool: return not Session.relics.has(str(rec["id"])))
+	if pool.is_empty():
+		return
+	var rng := RandomNumberGenerator.new()
+	rng.seed = Session.relics.size() + 7
+	var rec: Dictionary = pool[rng.randi_range(0, pool.size() - 1)]
+	Session.relics.append(str(rec["id"]))
+	m.text(Strings.t("lab.relic") % [rec["name"], rec["text"]], UiTheme.ACCENT)
+
+
+## After a win: pick a new card, a gear upgrade, or remove a card. Changes the Lab party's decks.
+static func _post_fight_choice() -> void:
+	var db: Dictionary = DataDB.all()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = Time.get_ticks_msec()
+	var m := Modal.new()
+	m.build(Strings.t("lab.choice"), 340)
+	for id in Extras.post_fight_cards(db, rng):
+		var cid := str(id)
+		var c := CardRules.resolve(db, cid)
+		m.add_button(Strings.t("lab.choice_card") % str(c.get("name", cid)), func() -> void: m.finish(cid), false, CardRules.describe(db, c))
+	m.add_button(Strings.t("lab.choice_gear"), func() -> void: m.finish("gear"))
+	m.add_button(Strings.t("lab.choice_remove"), func() -> void: m.finish("remove"))
+	var r: Variant = await Flow.show_modal(m)
+	if Session.picks.is_empty():
+		Session.picks = Setup.picks_for(db, Setup.fight(db, Session.fight_id)).duplicate(true)
+	var pick: Dictionary = Session.picks[0]
+	var rules: RefCounted = Rules.build(db, Session.preset_id, Session.overrides)
+	var cls: Dictionary = db.get("classes", {}).get("classes", []).filter(func(c: Dictionary) -> bool: return str(c["id"]) == str(pick.get("class", "")))[0]
+	var deck: Array = pick.get("deck", Setup.deck_for(db, pick, rules, { "deck": cls.get("starterDeck", []) }))
+	match str(r):
+		"gear":
+			# The Lab has no gear of its own, so this stands in as a level.
+			pick["level"] = int(pick.get("level", 1)) + 1
+		"remove":
+			if deck.size() > 1:
+				deck.pop_back()
+				pick["deck"] = deck
+		"":
+			pass
+		_:
+			deck.append(str(r))
+			pick["deck"] = deck
+
+
 static func _next_ab(state: Object) -> void:
 	if int(Session.ab["stage"]) == 0:
 		Session.ab["stage"] = 1
@@ -71,6 +121,12 @@ static func _result_panel(scene: Node, state: Object, summary: Dictionary) -> vo
 	var key := "lab.result_" + str(summary["result"])
 	m.build(Strings.t(key), 260)
 	m.text(Strings.t("lab.result_line") % [int(summary["rounds"]), int(state.lab_log.board_kills), int(state.lab_log.combos)])
+	for b in summary.get("bonus", []):
+		m.text(("%s %s" % [Strings.t("lab.bonus_done") if bool(b["done"]) else Strings.t("lab.bonus_missed"), b["text"]]), UiTheme.GOOD if bool(b["done"]) else UiTheme.DIM)
+	if str(summary["result"]) == "win" and state.rules.flag("storyRelics"):
+		_drop_relic(m)
+	if str(summary["result"]) == "win" and state.rules.flag("postFightChoice"):
+		m.add_button(Strings.t("lab.choice"), func() -> void: m.finish("choice"))
 	m.add_button(Strings.t("lab.again"), func() -> void: m.finish("again"))
 	m.add_button(Strings.t("lab.other_preset"), func() -> void: m.finish("other"))
 	m.add_button(Strings.t("lab.back_to_lab"), func() -> void: m.finish("lab"))
@@ -78,6 +134,9 @@ static func _result_panel(scene: Node, state: Object, summary: Dictionary) -> vo
 	if not is_instance_valid(scene):
 		return
 	match str(r):
+		"choice":
+			await _post_fight_choice()
+			restart()
 		"again":
 			restart()
 		"other":

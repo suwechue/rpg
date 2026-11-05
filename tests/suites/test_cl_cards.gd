@@ -82,7 +82,7 @@ func test_forty_new_cards_with_text_and_real_ops() -> void:
 		check(bool(c.get("labOnly", false)), "%s stays out of the story and arena for now" % c["id"])
 		var text := CardRules.describe(db(), c)
 		check(text.length() > 5 and not text.contains("card_op.") and not text.contains("{"), "%s has clear text: %s" % [c["id"], text])
-		for e in c["effects"]:
+		for e in c.get("effects", []):
 			check(LabOps.OPS.has(str(e["op"])), "%s: op %s is real" % [c["id"], e["op"]])
 	for k in db()["lab/lab"]["classDecks"]:
 		var deck: Array = db()["lab/lab"]["classDecks"][k]

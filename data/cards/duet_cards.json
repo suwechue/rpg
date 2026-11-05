@@ -1,0 +1,159 @@
+{
+  "comment": "Cards that need two specific characters adjacent (duetCards lever). duet: two classes or two character ids. Unlocked by Bond in the story, by a pick in the arena; the Lab gives them to matching parties.",
+  "cards": [
+    {
+      "id": "duet_molten_shove",
+      "name": "Molten Shove",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Fire, push 2",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "flat_hit",
+          "n": 3,
+          "vector": "heat"
+        },
+        {
+          "op": "board_push",
+          "steps": 2
+        }
+      ],
+      "duet": [
+        "fighter",
+        "mage"
+      ],
+      "vectors": {
+        "heat": 1.0
+      },
+      "labels": [
+        "push",
+        "duet"
+      ]
+    },
+    {
+      "id": "duet_misdirection",
+      "name": "Misdirection",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Hit, confuse",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "enemy",
+        "range": 3
+      },
+      "effects": [
+        {
+          "op": "flat_hit",
+          "n": 3
+        },
+        {
+          "op": "lab_status",
+          "status": "dazed"
+        }
+      ],
+      "duet": [
+        "rogue",
+        "bard"
+      ],
+      "labels": [
+        "duet"
+      ]
+    },
+    {
+      "id": "duet_bulwark_drive",
+      "name": "Bulwark Drive",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Shield, push 2",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "lab_shield",
+          "n": 3
+        },
+        {
+          "op": "board_push",
+          "steps": 2
+        }
+      ],
+      "duet": [
+        "fighter",
+        "healer"
+      ],
+      "labels": [
+        "push",
+        "duet"
+      ]
+    },
+    {
+      "id": "duet_steam_mend",
+      "name": "Steam Mend",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Heal all near",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "ally",
+        "range": 3
+      },
+      "effects": [
+        {
+          "op": "lab_heal",
+          "n": 4
+        },
+        {
+          "op": "board_react",
+          "wet": true
+        }
+      ],
+      "duet": [
+        "mage",
+        "healer"
+      ],
+      "labels": [
+        "support",
+        "duet"
+      ]
+    },
+    {
+      "id": "duet_encore_swing",
+      "name": "Encore Swing",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Hit 4, Follow-up",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "flat_hit",
+          "n": 4
+        }
+      ],
+      "duet": [
+        "fighter",
+        "bard"
+      ],
+      "followUp": "push",
+      "labels": [
+        "duet"
+      ]
+    }
+  ]
+}

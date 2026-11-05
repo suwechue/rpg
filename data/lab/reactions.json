@@ -7,6 +7,14 @@
   "conveyorSteps": 1,
   "explosionDamage": 3,
   "gasDamage": 2,
+  "allyCombos": {
+    "cold+heat": { "name": "Thermal Burst", "text": "Fire meets frost: steam and a crack of force.", "ops": [{ "op": "steam" }, { "op": "hit", "n": 2 }] },
+    "force+heat": { "name": "Blast Wave", "text": "Force feeds the fire: it blows.", "ops": [{ "op": "explode", "damage": 3 }] },
+    "cold+force": { "name": "Shatter", "text": "Frozen, then struck: it shatters.", "ops": [{ "op": "hit", "n": 3 }] },
+    "cold+lightning": { "name": "Conductive Arc", "text": "Frost carries the charge.", "ops": [{ "op": "arc", "damage": 2 }, { "op": "hit", "n": 1 }] },
+    "heat+lightning": { "name": "Plasma Pop", "text": "Fire and lightning: it blows.", "ops": [{ "op": "explode", "damage": 3 }] },
+    "force+motion": { "name": "Slingshot", "text": "Pushed and pulled at once.", "ops": [{ "op": "hit", "n": 2 }] }
+  },
   "props": {
     "barrel": { "name": "Barrel", "hp": 1, "explodes": true, "damage": 3 },
     "oil_barrel": { "name": "Oil Barrel", "hp": 1, "spill": "oil" },

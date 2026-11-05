@@ -1,0 +1,33 @@
+{
+  "comment": "Optional goals for a fight (Part 3c).",
+  "goals": [
+    {
+      "id": "no_down",
+      "check": "no_down",
+      "text": "No one goes down"
+    },
+    {
+      "id": "fast",
+      "check": "rounds",
+      "n": 4,
+      "text": "Win in 4 rounds"
+    },
+    {
+      "id": "board2",
+      "check": "board",
+      "n": 2,
+      "text": "Kill 2 with the board"
+    },
+    {
+      "id": "combo",
+      "check": "combo",
+      "n": 1,
+      "text": "Trigger a combo"
+    },
+    {
+      "id": "no_telegraph",
+      "check": "no_telegraph",
+      "text": "Never get hit by a telegraph"
+    }
+  ]
+}

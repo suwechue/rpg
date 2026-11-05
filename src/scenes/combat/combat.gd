@@ -62,6 +62,10 @@ const PartyPanel := preload("res://src/scenes/ui/party_panel.gd")
 const Modal := preload("res://src/scenes/ui/modal.gd")
 const LabFlow := preload("res://src/scenes/lab/lab_flow.gd")
 const LabOps := preload("res://src/core/combat/lab_ops.gd")
+const Extras := preload("res://src/core/combat/extras.gd")
+var _button_col: GridContainer
+var _skip_enemy_anim := false
+var _drag_unit: UnitScript = null
 var _tele_since: Dictionary = {}      # enemy id + plan -> when its telegraph first showed (for the pulse)
 var _hover_shapes: HBoxContainer
 var _quick_box: VBoxContainer
@@ -204,6 +208,7 @@ func _sync_views() -> void:
 		var red_here: Array = state.threats().get(hover_cell, []).map(func(h: Dictionary) -> String: return str(h["unit"]))
 		v.focus = red_here.has(u.id) and (hov == null or hov != u)
 		v.face(u.facing)
+		v.facing_arrow = u.facing_dir if state.rules.flag("facing") and not u.is_prop() else Vector2i.ZERO
 		v.statuses = state.status_list(u)
 		v.intent_icon = _intent_icon(u)
 		v.affixes = u.source.get("affixes", [])
@@ -232,6 +237,25 @@ func _sync_views() -> void:
 		threats[c] = { "damage": total, "charge": charge }
 	field.threat_cells = threats
 	field.support_cells = state.support_cells()
+	# The Lab's extras on the field (each list stays empty with its lever off).
+	var zoc: Array = []
+	if state.rules.text("zoneOfControl", "off") != "off":
+		for e in state.units:
+			if e.team == "enemy" and e.alive():
+				for d in GridScript.DIRS:
+					if state.grid.walkable_terrain(e.cell + d):
+						zoc.append(e.cell + d)
+	field.zoc_cells = zoc
+	field.faded_cells = Extras.faded_cells(state)
+	var weak: Array = []
+	var fog_list: Array = []
+	for e in state.units:
+		if e.team == "enemy" and e.alive():
+			weak.append_array(Extras.weak_cells(state, e))
+			if Extras.plan_hidden(state, e):
+				fog_list.append(e.cell)
+	field.weak_cells = weak
+	field.fog_marks = fog_list
 	var marks: Array = []
 	for u in state.units:
 		if u.team == "enemy" and u.alive() and not u.intent.is_empty() and u.intent.get("move", u.cell) != u.cell:
@@ -279,6 +303,8 @@ func _intent_icon(u: UnitScript) -> String:
 	if u.team != "enemy" or u.intent.is_empty() or not u.alive():
 		return ""
 	var icons: Dictionary = DataDB.table("ui").get("intentIcons", {})
+	if Extras.plan_hidden(state, u):
+		return str(icons.get("hidden", ""))
 	var kind := str(u.intent.get("kind", ""))
 	if str(u.intent.get("mode", "")) == "tracking" and kind == "attack":
 		kind = "tracking"
@@ -390,13 +416,16 @@ func _build_ui() -> void:
 			["hold", Strings.t("combat.hold"), Strings.t("combat.hold_tip")], ["party", Strings.t("combat.party"), Strings.t("combat.party_tip")],
 			["together", Strings.t("combat.together"), Strings.t("combat.together_tip")],
 			["backpack", Strings.t("combat.backpack"), Strings.t("combat.backpack_tip")],
-			["discard", Strings.t("combat.discard"), Strings.t("combat.discard_tip")], ["surge", Strings.t("combat.surge"), Strings.t("combat.surge_tip")]]:
+			["discard", Strings.t("combat.discard"), Strings.t("combat.discard_tip")], ["surge", Strings.t("combat.surge"), Strings.t("combat.surge_tip")],
+			["delay", Strings.t("combat.delay"), Strings.t("combat.delay_tip")], ["gauge", Strings.t("combat.gauge"), Strings.t("combat.gauge_tip")], ["reserve", Strings.t("combat.reserve"), Strings.t("combat.reserve_tip")]]:
 		var key: String = spec[0]
 		var b := UiTheme.button(spec[1], func() -> void: _on_button(key))
 		b.custom_minimum_size = Vector2(39, 18)
 		b.tooltip_text = spec[2]
 		col.add_child(b)
 		_buttons[key] = b
+	_button_col = col
+	_apply_button_rules()
 	# Sit on the bottom edge however many buttons there are; the pips ride on top.
 	col.position.y = minf(hand_y, view.y - col.get_combined_minimum_size().y - 1)
 	_pips.position.y = col.position.y - 8
@@ -438,6 +467,18 @@ func _build_ui() -> void:
 	hv.add_child(_hover_shapes)
 
 
+## Which buttons these rules have (the Lab's levers can change them mid-fight).
+func _apply_button_rules() -> void:
+	var old_builtins: bool = state.rules.is_current()
+	for key in ["guard", "cantrip", "wheel"]:
+		_buttons[key].visible = old_builtins
+	_buttons["hold"].visible = state.rules.flag("hold", true)
+	_buttons["surge"].visible = state.rules.flag("surge")
+	_buttons["delay"].visible = state.rules.flag("delay")
+	_buttons["gauge"].visible = state.rules.flag("classGauges")
+	_buttons["reserve"].visible = state.rules.flag("reserves")
+
+
 ## Whether this is a Combat Lab fight.
 func in_lab() -> bool:
 	return state != null and state.lab_log != null
@@ -455,6 +496,13 @@ func _build_lab_bar(view: Vector2) -> void:
 	bar.add_child(tag)
 	bar.add_child(UiTheme.button(Strings.t("lab.restart"), func() -> void: LabFlow.restart()))
 	bar.add_child(UiTheme.button(Strings.t("lab.other_preset"), func() -> void: LabFlow.restart_other_preset()))
+	if state.rules.flag("speedControls"):
+		var skip := UiTheme.button(Strings.t("lab.skip_anim"), func() -> void: pass)
+		skip.tooltip_text = Strings.t("lab.skip_anim_tip")
+		skip.pressed.connect(func() -> void:
+			_skip_enemy_anim = not _skip_enemy_anim
+			skip.theme_type_variation = "SelectedButton" if _skip_enemy_anim else "")
+		bar.add_child(skip)
 
 
 func _refresh_hud() -> void:
@@ -569,15 +617,21 @@ func _refresh_hud() -> void:
 	_buttons["cantrip"].disabled = not player_turn or act_block != "" or state.cantrip_targets(u).is_empty()
 	_buttons["hold"].disabled = not player_turn or state.hold_block(u) != ""
 	_buttons["together"].disabled = not player_turn or state.together_targets(u).is_empty()
-	# The Lab's rules drop the old built-ins (they leave the whole game in CL Part 5).
-	var old_builtins: bool = state.rules.is_current()
-	for key in ["guard", "cantrip", "wheel"]:
-		_buttons[key].visible = old_builtins
-	_buttons["hold"].visible = state.rules.flag("hold", true)
-	_buttons["surge"].visible = state.rules.flag("surge")
+	_apply_button_rules()
+	_button_col.position.y = minf(_button_col.position.y, Display.size_f().y - _button_col.get_combined_minimum_size().y - 1)
+	_buttons["delay"].disabled = not player_turn or not Extras.can_delay(state, u)
+	_buttons["reserve"].disabled = not player_turn or not Extras.can_bring_reserve(state)
+	_buttons["gauge"].disabled = not player_turn or u == null or not Extras.gauge_full(state, u)
+	if u != null and u.team == "party" and state.rules.flag("classGauges"):
+		var grec: Dictionary = Extras.gauge_rec(state, u)
+		_buttons["gauge"].text = "%s %d/%d" % [str(grec.get("name", Strings.t("combat.gauge"))).substr(0, 4), u.gauge, int(grec.get("max", 0))]
+		_buttons["gauge"].tooltip_text = str(grec.get("text", ""))
 	_buttons["surge"].disabled = not player_turn or not state.can_surge(u)
 	_buttons["surge"].text = Strings.t("combat.surge_meter") % [state.surge, state.rules.count("surgeSize", 5)]
 	_goal_label.text = state.goal_line()
+	var active_now := Extras.active_line(state)
+	if active_now != "":
+		_goal_label.text = (_goal_label.text + "  " + active_now).strip_edges()
 	_pips.visible = u != null and state.uses_actions(u)
 	if _pips.visible:
 		for i in _pips.get_child_count():
@@ -624,6 +678,8 @@ func _refresh_hand() -> void:
 	# The hand belongs to someone: their name above it, their color around each
 	# card, and how many cards are left to draw and in the discard pile.
 	_hand_owner.text = Strings.t("combat.hand_of") % u.name + "   " + Strings.t("combat.piles") % [u.deck.draw_pile.size(), u.deck.discard.size()]
+	if state.rules.text("reshuffleEffect", "none") != "none":
+		_hand_owner.text += "  " + Strings.t("combat.reshuffle_" + state.rules.text("reshuffleEffect"))
 	var owner_color := _party_color(u)
 	_hand_owner.add_theme_color_override("font_color", owner_color)
 	for i in u.deck.hand.size():
@@ -844,6 +900,14 @@ func _refresh_overlays() -> void:
 				var card := state.card_of(u, selected_hand)
 				field.target_cells = state.card_targets(u, card)
 				_preview(card, false)
+			"drag":
+				var spots: Array = []
+				if _drag_unit != null:
+					for d in GridScript.DIRS:
+						var at: Vector2i = _drag_unit.cell + d
+						if state.grid.walkable_terrain(at) and state.unit_at(at) == null:
+							spots.append(at)
+				field.target_cells = spots
 			"card2":
 				var both := state.card_of(u, selected_hand)
 				field.target_cells = state.card_targets(u, both).filter(func(c: Vector2i) -> bool: return c != _pending_target)
@@ -1161,6 +1225,22 @@ func _on_card(i: int) -> void:
 	_refresh_hud()
 
 
+## Bring in a benched member: pick who they replace.
+func _open_reserves() -> void:
+	if not Extras.can_bring_reserve(state):
+		return
+	var m := Modal.new()
+	m.build(Strings.t("combat.reserve_title"), 280)
+	for a in state.allies_of(state.current, true):
+		if not a.is_player:
+			var aid: String = a.id
+			m.add_button(a.name + (Strings.t("combat.downed_tag") if a.downed else ""), func() -> void: m.finish(aid))
+	m.add_button(Strings.t("combat.close"), func() -> void: m.finish(null))
+	var pick: Variant = await Flow.show_modal(m)
+	if pick != null and Extras.bring_reserve(state, state.unit_by_id(str(pick))):
+		_after_action()
+
+
 ## The discard pile: visible and clickable (docs/COMBAT_LAB.md Part 2).
 func _open_discard() -> void:
 	var u := state.current
@@ -1204,6 +1284,18 @@ func _on_button(key: String) -> void:
 		await _open_discard()
 		return
 	if not _player_turn():
+		return
+	if key == "delay":
+		if Extras.delay(state, state.current):
+			_cancel()
+			_after_action()
+		return
+	if key == "gauge":
+		if Extras.spend_gauge(state, state.current):
+			_after_action()
+		return
+	if key == "reserve":
+		await _open_reserves()
 		return
 	var u := state.current
 	match key:
@@ -1263,6 +1355,17 @@ func _click_cell(c: Vector2i) -> void:
 	var u := state.current
 	match mode:
 		"idle":
+			var clicked := state.unit_at(c)
+			if Extras.can_pick_turn(state, clicked):
+				Extras.pick_turn(state, clicked)
+				_after_action()
+				return
+			if Extras.can_drag(state, u, clicked):
+				_drag_unit = clicked
+				mode = "drag"
+				_info.text = Strings.t("combat.drag_where")
+				_refresh_overlays()
+				return
 			if state.climb_targets(u).has(c):
 				if state.climb(u, c):
 					_lesson_event("moved")
@@ -1293,6 +1396,14 @@ func _click_cell(c: Vector2i) -> void:
 				_lesson_event("played_card")
 				mode = "idle"
 				selected_hand = -1
+				_after_action()
+			else:
+				_cancel()
+		"drag":
+			var dragged := _drag_unit
+			_drag_unit = null
+			mode = "idle"
+			if Extras.drag(state, u, dragged, c):
 				_after_action()
 			else:
 				_cancel()
@@ -1507,6 +1618,8 @@ func _wait(seconds: float) -> void:
 
 ## Tween durations scaled by combat speed (never zero, so tweens still finish).
 func _dur(seconds: float) -> float:
+	if _skip_enemy_anim and state != null and state.current != null and state.current.team == "enemy":
+		return 0.01
 	return maxf(0.01, seconds * _speed())
 
 
@@ -1667,9 +1780,13 @@ func _play_event(e: Dictionary) -> void:
 			await _wait(float(DataDB.table("ui").get("areaFlashSeconds", 0.6)))
 			field.flash_cells = []
 			field.queue_redraw()
+		"board_kill":
+			await _kill_cam(str(e["unit"]))
 		"damage":
 			var v := _view_for_id(str(e["unit"]))
 			var amt := int(e["amount"])
+			if state.rules.flag("hitstop") and amt > 0 and not GameState.dev_autoplay:
+				await get_tree().create_timer(_dur(float(state.rules.count("hitstopMs", 60)) / 1000.0), true, false, true).timeout
 			var hurt := state.unit_by_id(str(e["unit"]))
 			if not _mocked and _stayed_in_red != "" and hurt != null and hurt.is_player and str(e.get("cause", "")) == "hit":
 				# Tutorial room 2: you stood in the red; the training floor catches you.
@@ -1739,6 +1856,11 @@ func _play_event(e: Dictionary) -> void:
 			if u != null:
 				if str(e["t"]) == "death":
 					_note(Strings.t("combat.is_defeated") % u.name)
+					if state.rules.flag("killSlowmo") and not GameState.dev_autoplay:
+						var was_scale := Engine.time_scale
+						Engine.time_scale = was_scale * 0.4
+						await get_tree().create_timer(0.3, true, false, true).timeout
+						Engine.time_scale = was_scale
 				var v: Node2D = views[u]
 				var tw := create_tween()
 				# M20: a white flash, a drop, then fade.
@@ -1872,6 +1994,24 @@ func _release_float_slot(view_id: int) -> void:
 	var v: Object = instance_from_id(view_id)
 	if v != null and is_instance_valid(v) and _float_slots.has(v):
 		_float_slots[v] = maxi(0, int(_float_slots[v]) - 1)
+
+
+## A quick zoom on a board kill. Skippable, and off at fast speed.
+func _kill_cam(unit_id: String) -> void:
+	if not state.rules.flag("killCam") or GameState.dev_autoplay or _speed() < 1.0 or _skip_enemy_anim:
+		return
+	var v := _view_for_id(unit_id)
+	if v == null:
+		return
+	var zoom := float(DataDB.table("lab/extras").get("killCamZoom", 1.25))
+	var tw := create_tween()
+	var pos_in := Display.size_f() / 2.0 - v.position * zoom
+	tw.tween_property(self, "scale", Vector2(zoom, zoom), _dur(0.12))
+	tw.parallel().tween_property(self, "position", pos_in, _dur(0.12))
+	tw.tween_interval(_dur(0.12))
+	tw.tween_property(self, "scale", Vector2.ONE, _dur(0.15))
+	tw.parallel().tween_property(self, "position", Vector2.ZERO, _dur(0.15))
+	await tw.finished
 
 
 func _shake(amount: float) -> void:

@@ -75,7 +75,46 @@ static func make_run(db: Dictionary, seed_value: int, picks: Array, rules: RefCo
 		Lv.auto_perks(db, ch)
 		Char.full_restore(db, ch)
 		ch["deck"] = deck_for(db, pick, rules, ch)
+	var all_members: Array = members.map(func(m: Array) -> Dictionary: return m[0])
+	if rules.flag("bondInCombat"):
+		for a in all_members:
+			var bonds: Dictionary = {}
+			for b in all_members:
+				if a != b:
+					bonds[str(b["id"])] = float(db.get("lab/extras", {}).get("labBond", 80))
+			a["partyBonds"] = bonds
+	if rules.flag("duetCards"):
+		for card in db.get("cards/duet_cards", {}).get("cards", []):
+			var need: Array = card.get("duet", [])
+			var holders: Array = all_members.filter(func(m: Dictionary) -> bool: return need.has(str(m.get("class", ""))))
+			if holders.size() >= 2:
+				holders[0]["deck"].append(str(card["id"]))
 	return run
+
+
+## A benched member for the reserves lever: a class the party doesn't have.
+static func reserve_for(db: Dictionary, f: Dictionary, picks: Array, seed_value: int, rules: RefCounted) -> Array:
+	var used: Array = picks.map(func(p: Dictionary) -> String: return str(p.get("class", "")))
+	var cls := str(f.get("reserve", ""))
+	if cls == "":
+		for c in db.get("classes", {}).get("classes", []):
+			if int(c.get("tier", 1)) == 1 and not used.has(str(c["id"])):
+				cls = str(c["id"])
+				break
+	if cls == "":
+		return []
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_value + 1
+	var pick := { "class": cls, "level": int(picks[0].get("level", 1)) if not picks.is_empty() else 1 }
+	var ch := Char.create(db, cls, rng, { "id": "lab_reserve_" + cls, "name": str(cfg(db).get("names", {}).get(cls, cls.capitalize())) })
+	ch["sprite"] = str(db.get("assets/roles", {}).get("arena_" + cls, db.get("assets/roles", {}).get("debugAlly", "")))
+	PointBuy.apply_to(db, ch, PointBuy.recommended(db, cls))
+	while int(ch["level"]) < int(pick["level"]):
+		Lv.add_xp(db, ch, Lv.xp_to_next(db, int(ch["level"])), rng)
+	Lv.auto_perks(db, ch)
+	Char.full_restore(db, ch)
+	ch["deck"] = deck_for(db, pick, rules, ch)
+	return [ch]
 
 
 ## The fight's enemy records: ids or { "id", "hp", "immovable", ... } overrides.
@@ -107,7 +146,7 @@ static func enemies_for(db: Dictionary, f: Dictionary, rules: RefCounted) -> Arr
 
 
 ## Everything the combat scene needs, plus "run" (the throwaway run to play it in).
-static func build(db: Dictionary, fight_id: String, preset_id: String, overrides: Dictionary = {}, chosen: Array = [], seed_override: int = -1) -> Dictionary:
+static func build(db: Dictionary, fight_id: String, preset_id: String, overrides: Dictionary = {}, chosen: Array = [], seed_override: int = -1, extra: Dictionary = {}) -> Dictionary:
 	var f := fight(db, fight_id)
 	var rules: RefCounted = Rules.build(db, preset_id, overrides)
 	var seed_value: int = seed_override if seed_override >= 0 else int(f.get("seed", 1))
@@ -117,7 +156,7 @@ static func build(db: Dictionary, fight_id: String, preset_id: String, overrides
 	for pid in run["party_ids"]:
 		party.append({ "char": RM.character(run, str(pid)) })
 	var setup := {
-		"layout": { "map": f.get("map", []), "theme": str(f.get("theme", "school")), "props": f.get("props", []), "tiles": f.get("tiles", {}) },
+		"layout": { "map": f.get("map", []), "theme": str(f.get("theme", "school")), "props": f.get("props", []), "high": f.get("high", []), "fog": f.get("fog", []) },
 		"party": party,
 		"enemies": enemies_for(db, f, rules),
 		"boss": bool(f.get("boss", false)),
@@ -134,7 +173,10 @@ static func build(db: Dictionary, fight_id: String, preset_id: String, overrides
 		"intro": str(f.get("intro", "")),
 		"context": "lab",
 	}
-	for k in ["reinforcements", "formation", "roles", "hazards"]:
+	for k in ["reinforcements", "formation", "roles", "objects", "waves", "timer", "weather"]:
 		if f.has(k):
 			setup[k] = f[k]
+	setup.merge(extra, true)
+	if rules.flag("reserves"):
+		setup["reserves"] = reserve_for(db, f, picks, seed_value, rules)
 	return { "setup": setup, "run": run, "rules": rules }

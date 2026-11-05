@@ -675,3 +675,46 @@ The 44 Lab cards are in `data/cards/lab_cards.json` and stay out of the story an
 | Collision | `collisionDamage` to both; with Domino (lever or the card) the hit unit is pushed too |
 | Anchor Point, Bridge, Collapse | No push past it for 3 rounds; walkable over a gap for 2 rounds; a telegraphed pit in 2 rounds |
 | Enemy AI | Avoids tiles next to pits and ledges, cracked tiles and spikes (`enemiesAvoidEdges`). `immovable` enemies don't budge |
+
+### Extra mechanics (Part 3c)
+
+All in `src/core/combat/extras.gd`, numbers in `data/lab/extras.json` and `data/lab/gauges.json`. Every one is a lever, off in `cl_base`, except the feel levers, which are on (and off in `current`).
+
+| Lever | What it does |
+| --- | --- |
+| `turnStructure` | `team` (party, then enemies), `alternate` (one of each), `initiative` (today's order) |
+| `chooseOrder` | Click an ally who hasn't gone: they go now; whoever was up resumes later |
+| `cardInitiative` | A Quick or Swift card: 3 initiative up next round. Heavy: 3 down |
+| `delay` | Pass and act after the next enemy, once a round |
+| `facing` | Units face the way they last moved or attacked. Back x1.5, side x1.25. Replaces flanking |
+| `zoneOfControl` | Leaving a tile next to an enemy costs +1 Movement, or gives it a free hit |
+| `highGround` | "H" tiles: +1 range, +1 damage downhill; pushed off is a fall |
+| `bodyBlock` | An ally in the path of a telegraphed shot takes it |
+| `lineOfSight` | Spells need a clear line; walls, props and Constructs block |
+| `fog` | Enemy plans in fog show "?" until Light, Reveal or standing next to them |
+| `chargeSpells` | Charge cards fire at the start of your next turn, a Magnitude higher, with their tiles telegraphed. Off: they fire at once at their printed Magnitude |
+| `lingeringFields` | Party spells leave terrain for `fieldRounds`: fire, melting ice, sticky ground (+1 Movement to leave), glare, and floor that becomes a pit after 2 Force hits |
+| `weather` | A strong and a weak Vector: +1 and -1 Magnitude |
+| `overload` | Cast one Magnitude above what you can afford: pay `overloadHp`, or Exhaust a card |
+| `allyReactions` | Two allies, two Vectors, one tile, one round: a named reaction from `data/lab/reactions.json` `allyCombos`. Counts for Surge and combo discovery |
+| `fightUpgrade`, `cardMastery` | Played N times (a fight, or a run): the card's + version |
+| `statusCards` | Six enemies shuffle in junk: Fear (unplayable, discards 1 when drawn), Burned (unplayable, -1 HP when drawn), Tangled (Heavy, Exhaust). Clear Head removes them |
+| `signatureCard` | A unique card in each opening hand (`data/cards/signature_cards.json`) |
+| `retainKeyword` | Retain cards stay when the hand is discarded |
+| `duetCards` | Five cards needing two characters adjacent (`data/cards/duet_cards.json`); needs the Bond in the story |
+| `reshuffleEffect` | A reshuffle gives 1 Surge, or costs 1 HP |
+| `enemyRoles` | Where a fight marks `labRole`: Shield bearer, Bomber (blows when pushed or killed), Anchor (immovable, stops pushes next to it), Summoner, Copycat |
+| `weakPoints` | Where a fight marks `weakPoint`: a hit from that side Staggers and cancels the telegraph |
+| `morale` | A death within `moraleRadius`: a 50% chance others panic and flee. Not bosses or mindless enemies |
+| `bossLookahead` | 2: bosses show their next plan too, faded |
+| `downedRules` | `carry`: a downed ally stays on the board, can be dragged 1 tile with a Move or healed, and is out only if hit while down |
+| `reserves` | Once a fight, a benched member replaces a downed or chosen ally at the edge; their turn is spent |
+| `bondInCombat` | Adjacent allies with the Bond share one free Quick a round |
+| `classGauges` | Momentum, Heat, Shadow, Faith, Tempo, each with one spender (`data/lab/gauges.json`) |
+| `fightWaves` | Reinforcements through marked doors, warned a round early; stand on a door to stop that group |
+| `bonusObjectives` | Optional goals from `data/lab/bonus_goals.json`, on the result screen |
+| `retreat` | The whole party on the exit ends the fight, with no reward |
+| `envTimers` | A board clock on the fight: rising water, a collapsing floor, spreading fire |
+| `postFightChoice` | After a win: a new card, a gear upgrade (in the Lab, a level), or remove a card |
+| `storyRelics` | Ten board relics (`data/lab/board_relics.json`), dropped after Lab wins |
+| `hitstop`, `killSlowmo`, `killCam`, `speedControls`, `plainLog` | The feel levers |

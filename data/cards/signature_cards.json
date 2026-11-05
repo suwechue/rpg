@@ -1,0 +1,255 @@
+{
+  "comment": "One unique card per character, always in the opening hand (signatureCard lever). signatures: character id or class -> card id.",
+  "signatures": {
+    "fighter": "sig_brick",
+    "mage": "sig_ash",
+    "rogue": "sig_quill",
+    "healer": "sig_sage",
+    "bard": "sig_lyric",
+    "theo": "sig_theo",
+    "dex": "sig_dex",
+    "priya": "sig_priya",
+    "mara": "sig_mara"
+  },
+  "cards": [
+    {
+      "id": "sig_brick",
+      "name": "Brick Wall",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Hit, push 2",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "flat_hit",
+          "n": 2
+        },
+        {
+          "op": "board_push",
+          "steps": 2
+        }
+      ],
+      "labels": [
+        "push",
+        "signature"
+      ]
+    },
+    {
+      "id": "sig_ash",
+      "name": "Ash Cloud",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Set a square alight",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "any",
+        "range": 4
+      },
+      "effects": [
+        {
+          "op": "board_react",
+          "vector": "heat"
+        }
+      ],
+      "area": "square_3x3",
+      "vectors": {
+        "heat": 1.0
+      },
+      "labels": [
+        "terrain",
+        "signature"
+      ]
+    },
+    {
+      "id": "sig_quill",
+      "name": "Quill's Trick",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Swap with a foe",
+      "action": "effects",
+      "cost": 0,
+      "targeting": {
+        "type": "enemy",
+        "range": 3
+      },
+      "effects": [
+        {
+          "op": "flat_hit",
+          "n": 1
+        }
+      ],
+      "swift": true,
+      "labels": [
+        "signature"
+      ]
+    },
+    {
+      "id": "sig_sage",
+      "name": "Sage Tea",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Heal 3, shield 1",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "ally",
+        "range": 3
+      },
+      "effects": [
+        {
+          "op": "lab_heal",
+          "n": 3
+        },
+        {
+          "op": "lab_shield",
+          "n": 1
+        }
+      ],
+      "quick": true,
+      "labels": [
+        "support",
+        "signature"
+      ]
+    },
+    {
+      "id": "sig_lyric",
+      "name": "Lyric's Verse",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Ally repeats",
+      "action": "effects",
+      "cost": 0,
+      "targeting": {
+        "type": "ally",
+        "range": 3
+      },
+      "effects": [
+        {
+          "op": "ally_encore"
+        }
+      ],
+      "group": "team",
+      "labels": [
+        "team",
+        "signature"
+      ]
+    },
+    {
+      "id": "sig_theo",
+      "name": "Theo's Proof",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Force 2, push 1",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "enemy",
+        "range": 3,
+        "los": true
+      },
+      "effects": [
+        {
+          "op": "flat_hit",
+          "n": 2,
+          "vector": "force"
+        },
+        {
+          "op": "board_push",
+          "steps": 1
+        }
+      ],
+      "vectors": {
+        "force": 1.0
+      },
+      "labels": [
+        "push",
+        "signature"
+      ]
+    },
+    {
+      "id": "sig_dex",
+      "name": "Dex's Punchline",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Free after a push",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "enemy",
+        "range": 1
+      },
+      "effects": [
+        {
+          "op": "flat_hit",
+          "n": 3
+        }
+      ],
+      "freeIf": "target_moved",
+      "labels": [
+        "signature"
+      ]
+    },
+    {
+      "id": "sig_priya",
+      "name": "Priya's Rebuttal",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Pass and draw",
+      "action": "effects",
+      "cost": 0,
+      "targeting": {
+        "type": "ally",
+        "range": 3
+      },
+      "effects": [
+        {
+          "op": "ally_pass"
+        },
+        {
+          "op": "deck_draw",
+          "n": 1
+        }
+      ],
+      "quick": true,
+      "group": "team",
+      "choose": "hand",
+      "labels": [
+        "team",
+        "signature"
+      ]
+    },
+    {
+      "id": "sig_mara",
+      "name": "Mara's Sketch",
+      "kind": "basic",
+      "labOnly": true,
+      "short": "Soak, heal 2",
+      "action": "effects",
+      "cost": 1,
+      "targeting": {
+        "type": "ally",
+        "range": 3
+      },
+      "effects": [
+        {
+          "op": "lab_heal",
+          "n": 2
+        },
+        {
+          "op": "board_react",
+          "wet": true
+        }
+      ],
+      "labels": [
+        "support",
+        "signature"
+      ]
+    }
+  ]
+}

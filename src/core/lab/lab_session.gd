@@ -11,6 +11,8 @@ static var ab: Dictionary = {}        # { "fight", "a", "b", "stage": 0 or 1 }
 static var parked: Dictionary = {}    # the real run while in the Lab
 static var parked_scene := ""
 static var has_parked := false
+static var mastery: Dictionary = {}   # cardMastery: card id -> uses across this Lab session
+static var relics: Array = []         # storyRelics: relics dropped this Lab session
 
 
 static func reset_ab() -> void:

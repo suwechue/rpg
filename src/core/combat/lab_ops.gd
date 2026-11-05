@@ -15,7 +15,7 @@ const OPS := ["flat_hit", "board_push", "board_pull_area", "board_react", "board
 	"discard_recall", "discard_echo", "discard_damage", "discard_burn", "discard_swap", "discard_shuffle",
 	"deck_look", "deck_draw", "deck_discard", "deck_if_first_draw", "deck_search", "deck_stack",
 	"ally_pass", "ally_borrow", "ally_setup", "ally_repush", "ally_encore", "ally_move_status",
-	"lab_heal", "lab_shield", "lab_move", "lab_status"]
+	"lab_heal", "lab_shield", "lab_move", "lab_status", "lab_clear_status"]
 
 ## Statuses Shared Burden can move.
 const BURDENS := ["burning", "poisoned", "frozen", "wet", "weakened", "dazed", "slow", "root", "blind", "exposed", "marked"]
@@ -298,6 +298,13 @@ static func run(st, u: UnitScript, card: Dictionary, fx: Dictionary, target: Vec
 			who.shield += amount
 			who.shield_turns = maxi(who.shield_turns, 2)
 			st._emit({ "t": "shield", "unit": who.id, "amount": amount })
+		"lab_clear_status":
+			for pile in [deck.hand, deck.discard]:
+				for id in pile.duplicate():
+					if CardRules.resolve(st.db, str(id), st.library).get("labels", []).has("status"):
+						pile.erase(id)
+						deck.exhausted.append(id)
+			st._emit({ "t": "log", "text": Str.t(st.db, "lab_card.cleared") % u.name })
 		"lab_move":
 			u.move_left += int(fx.get("n", 2))
 			st._emit({ "t": "status", "unit": u.id, "status": "dash" })
@@ -365,6 +372,11 @@ static func block(st, u: UnitScript, card: Dictionary) -> String:
 		return Str.t(st.db, "lab_card.off_teammates")
 	if group == "discard" and not st.rules.flag("discardCards", true):
 		return Str.t(st.db, "lab_card.off_discard")
+	if bool(card.get("unplayable", false)):
+		return Str.t(st.db, "lab_card.unplayable")
+	var duet: String = (load("res://src/core/combat/extras.gd") as GDScript).duet_block(st, u, card)
+	if duet != "":
+		return duet
 	var self_id := str(card.get("id", ""))
 	for e in card.get("effects", []):
 		match str(e.get("op", "")):

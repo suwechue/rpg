@@ -34,6 +34,7 @@
       },
       "actions": [
         {
+          "addsStatusCard": "status_burned",
           "id": "splash",
           "name": "Slag Splash",
           "form": "burst",
@@ -159,6 +160,7 @@
       },
       "actions": [
         {
+          "addsStatusCard": "status_burned",
           "id": "ember_dust",
           "name": "Ember Dust",
           "form": "bolt",

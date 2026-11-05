@@ -1,0 +1,39 @@
+{
+  "comment": "Class gauges (docs/COMBAT_LAB.md Part 3c): one meter and one spender per class.",
+  "gauges": {
+    "fighter": {
+      "name": "Momentum",
+      "max": 4,
+      "spend": "shove_all",
+      "steps": 1,
+      "text": "Pushes and collisions fill it. Spend: push every adjacent enemy."
+    },
+    "mage": {
+      "name": "Heat",
+      "max": 4,
+      "spend": "overheat",
+      "text": "Casting fills it. Spend: your next spell is 2 Magnitudes higher, then the meter locks for a round."
+    },
+    "rogue": {
+      "name": "Shadow",
+      "max": 2,
+      "spend": "reposition",
+      "tiles": 3,
+      "text": "Rounds nobody aims at you fill it. Spend: +3 Move and your next hit counts as from behind."
+    },
+    "healer": {
+      "name": "Faith",
+      "max": 4,
+      "spend": "shield_or_revive",
+      "revive": 3,
+      "shield": 3,
+      "text": "Healing and shielding fill it. Spend: revive an adjacent ally, or shield the most hurt one."
+    },
+    "bard": {
+      "name": "Tempo",
+      "max": 3,
+      "spend": "extra_action",
+      "text": "Playing cards in a chain with allies fills it. Spend: an ally gets an extra Action on their next turn."
+    }
+  }
+}

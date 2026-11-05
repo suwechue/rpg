@@ -35,6 +35,7 @@
       },
       "actions": [
         {
+          "addsStatusCard": "status_fear",
           "id": "glitter_spark",
           "name": "Glitter Spark",
           "form": "bolt",
@@ -96,6 +97,7 @@
       },
       "actions": [
         {
+          "addsStatusCard": "status_fear",
           "id": "feedback_blast",
           "name": "Feedback Blast",
           "form": "line",
@@ -161,6 +163,7 @@
       },
       "actions": [
         {
+          "addsStatusCard": "status_tangled",
           "id": "ankle_grab",
           "name": "Ankle Grab",
           "kind": "strike",

@@ -422,7 +422,8 @@
     "buff": "icon_intent_buff",
     "defend": "icon_intent_defend",
     "move": "icon_intent_move",
-    "tracking": "icon_intent_tracking"
+    "tracking": "icon_intent_tracking",
+    "hidden": "icon_intent_special"
   },
   "combatSpeed": {
     "comment": "Seconds of enemy-turn pauses are multiplied by the chosen speed; holding Fast-forward (Shift, pad X) multiplies again.",

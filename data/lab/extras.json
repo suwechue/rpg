@@ -1,0 +1,49 @@
+{
+  "comment": "Numbers for the extra mechanics (docs/COMBAT_LAB.md Part 3c; src/core/combat/extras.gd).",
+  "initiativeStep": 3,
+  "cracksToPit": 2,
+  "panicChance": 0.5,
+  "bomberDamage": 3,
+  "labBond": 80,
+  "defaultWeek": 0,
+  "weatherByWeek": [
+    {
+      "strong": "cold",
+      "weak": "heat"
+    },
+    {
+      "strong": "heat",
+      "weak": "cold"
+    },
+    {
+      "strong": "force",
+      "weak": "motion"
+    },
+    {
+      "strong": "light",
+      "weak": "binding"
+    },
+    {
+      "strong": "motion",
+      "weak": "force"
+    }
+  ],
+  "roles": {
+    "shield": {
+      "frontGuard": 0.75,
+      "immovable": false
+    },
+    "bomber": {},
+    "anchor": {
+      "immovable": true
+    },
+    "summoner": {
+      "behavior": "summoner",
+      "summonEvery": 2,
+      "summons": "dust_gremlin"
+    },
+    "copycat": {
+      "behavior": "mirror"
+    }
+  }
+}
