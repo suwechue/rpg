@@ -176,7 +176,10 @@ func _view_for(u: UnitScript) -> Node2D:
 	var sprite_id := u.sprite
 	if sprite_id == "" and u.team == "party":
 		sprite_id = Assets.role("player")
-	v.setup(u.id, u.team, sprite_id, u.id if u.is_prop() else "")
+	var object: bool = bool(u.source.get("object", false))
+	if object:
+		sprite_id = ""
+	v.setup(u.id, u.team, sprite_id, u.id if u.is_prop() or object else "")
 	add_child(v)
 	views[u] = v
 	return v

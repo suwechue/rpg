@@ -148,7 +148,10 @@ static func enemies_for(db: Dictionary, f: Dictionary, rules: RefCounted) -> Arr
 ## Everything the combat scene needs, plus "run" (the throwaway run to play it in).
 static func build(db: Dictionary, fight_id: String, preset_id: String, overrides: Dictionary = {}, chosen: Array = [], seed_override: int = -1, extra: Dictionary = {}) -> Dictionary:
 	var f := fight(db, fight_id)
-	var rules: RefCounted = Rules.build(db, preset_id, overrides)
+	# A fight's suggested levers, under every preset but today's rules.
+	var levers: Dictionary = {} if preset_id == Rules.CURRENT else f.get("levers", {}).duplicate()
+	levers.merge(overrides, true)
+	var rules: RefCounted = Rules.build(db, preset_id, levers)
 	var seed_value: int = seed_override if seed_override >= 0 else int(f.get("seed", 1))
 	var picks := picks_for(db, f, chosen)
 	var run := make_run(db, seed_value, picks, rules)
@@ -165,7 +168,7 @@ static func build(db: Dictionary, fight_id: String, preset_id: String, overrides
 		"ramp": 1.0,
 		"backpack": [],
 		"preset": preset_id,
-		"levers": overrides,
+		"levers": levers,
 		"goal": f.get("goal", { "type": "kill" }),
 		"fleeAllowed": false,
 		"seed": seed_value,
@@ -173,7 +176,7 @@ static func build(db: Dictionary, fight_id: String, preset_id: String, overrides
 		"intro": str(f.get("intro", "")),
 		"context": "lab",
 	}
-	for k in ["reinforcements", "formation", "roles", "objects", "waves", "timer", "weather"]:
+	for k in ["reinforcements", "formation", "roles", "objects", "waves", "timer", "weather", "phaseEvents"]:
 		if f.has(k):
 			setup[k] = f[k]
 	setup.merge(extra, true)

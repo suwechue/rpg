@@ -511,6 +511,30 @@ func test_goals() -> void:
 	check(str(over.goal["type"]) == "survive", "the goal lever overrides the fight's")
 
 
+func test_objects_are_targets_without_turns() -> void:
+	var st := _fight(["P.....E"], [_enemy("bleacher_creeper")], {}, { "objects": [{ "id": "case", "name": "Case", "hp": 5, "cell": [3, 0] }], "goal": { "type": "protect", "unit": "case", "rounds": 2 } })
+	var o: Object = st.unit_by_id("case")
+	check(o != null and o.team == "party" and not st.order.has(o), "a protected object has no turn")
+	check(st.opponents_of(_foe(st)).has(o), "enemies can aim at it")
+	st._damage(o, 99, _foe(st), "", "hit")
+	st._check_end()
+	check(st.result == "lose", "if it breaks, you lose")
+	var keep := _fight(["P.....E"], [_enemy("bleacher_creeper")], {}, { "objects": [{ "id": "case", "hp": 5, "cell": [3, 0] }], "goal": { "type": "protect", "unit": "case", "rounds": 2 } })
+	keep._end_round()
+	keep._end_round()
+	keep._check_end()
+	check(keep.result == "win", "protect it for N rounds to win")
+
+
+func test_boss_phase_event_collapses_the_floor() -> void:
+	var st := _fight(["P.....E", "......."], [_enemy("hollow_mascot")], {}, { "phaseEvents": { "1": { "collapse": [[3, 0]], "rounds": 1 } }, "boss": true })
+	var boss := _foe(st)
+	st._damage(boss, roundi(float(boss.max_hp) * 0.5), _me(st), "", "hit")
+	check(st.grid.collapsing.has(Vector2i(3, 0)), "phase 2: telegraphed tiles")
+	st._end_round()
+	check(st.grid.get_terrain(Vector2i(3, 0)) == "pit", "then they fall")
+
+
 func test_current_preset_keeps_todays_rules() -> void:
 	var st := _fight(["P.....E"], [_enemy("bleacher_creeper")], {}, {}, "current")
 	check(st.turn_mode == "two_actions" and st.actions_per_turn() == 2, "2 Actions")

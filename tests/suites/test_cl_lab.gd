@@ -54,6 +54,31 @@ func test_rules_view() -> void:
 	check(not Rules.diff(Rules.values_for(db(), "current"), Rules.values_for(db(), "cl_base")).is_empty(), "the presets differ")
 
 
+func test_fights_and_presets_are_complete() -> void:
+	var ids: Array = Setup.fights(db()).map(func(f: Dictionary) -> String: return str(f["id"]))
+	for id in ["ledge_day", "hold_the_line", "thin_ice", "fire_sale", "hand_off", "the_ritual", "crowded_hall", "hollow_mascot", "night_market", "bell_tower", "flood_drill", "duet"]:
+		check(ids.has(id), "fight %s exists" % id)
+	var pids: Array = Rules.presets(db()).map(func(p: Dictionary) -> String: return str(p["id"]))
+	for id in ["current", "cl_base", "cl_puzzle", "cl_cards", "cl_brutal", "cl_plus", "cl_everything"]:
+		check(pids.has(id), "preset %s exists" % id)
+	check(Rules.values_for(db(), "cl_brutal")["hitHardRarely"] == true and int(Rules.values_for(db(), "cl_brutal")["roundCap"]) == 6, "Brutal hits hard, cap 6")
+	check(int(Rules.values_for(db(), "cl_cards")["handSize"]) == 5, "Cards has a hand of 5")
+	for f in Setup.fights(db()):
+		var built := Setup.build(db(), str(f["id"]), "cl_base")
+		var st: Object = StateScript.new(db(), seeded(1), built["setup"])
+		check(st.units.filter(func(u: Object) -> bool: return u.team == "enemy").size() == f["enemies"].size(), "%s: every enemy is on the map" % f["id"])
+		check(st.units.filter(func(u: Object) -> bool: return u.team == "party" and not bool(u.source.get("object", false))).size() == f["party"].size(), "%s: everyone in the party is on the map" % f["id"])
+		var cells := {}
+		for u in st.units:
+			check(st.grid.in_bounds(u.cell) and not cells.has(u.cell), "%s: %s has its own tile" % [f["id"], u.id])
+			cells[u.cell] = true
+		for e in f["enemies"]:
+			var eid := str(e.get("id", "") if typeof(e) == TYPE_DICTIONARY else e)
+			check(DT.index_under(db(), "enemies/", "enemies").has(eid), "%s: %s exists" % [f["id"], eid])
+	check(Setup.build(db(), "duet", "cl_base")["setup"]["levers"]["duetCards"] == true, "a fight's suggested levers apply")
+	check(not Setup.build(db(), "duet", "current")["setup"]["levers"].has("duetCards"), "but not under current")
+
+
 func test_lab_setup_never_touches_a_save_and_runs() -> void:
 	var f: Dictionary = Setup.fights(db())[0]
 	var built := Setup.build(db(), str(f["id"]), "cl_base")

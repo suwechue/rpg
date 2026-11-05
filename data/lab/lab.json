@@ -49,6 +49,7 @@
     { "id": "bossHpScale", "group": "numbers", "type": "float", "default": 0.15, "min": 0.05, "max": 2.0, "step": 0.05, "name": "Boss HP scale" },
     { "id": "partyHpScale", "group": "numbers", "type": "float", "default": 0.33, "min": 0.05, "max": 2.0, "step": 0.01, "name": "Party HP scale" },
     { "id": "damageScale", "group": "numbers", "type": "float", "default": 0.4, "min": 0.05, "max": 2.0, "step": 0.05, "name": "Damage scale" },
+    { "id": "enemyDamageScale", "group": "numbers", "type": "float", "default": 0.25, "min": 0.05, "max": 2.0, "step": 0.05, "name": "Enemy damage scale", "hint": "Enemy data hits harder than cards do, so it scales further: attacks of about 1 to 4." },
     { "id": "flatDamageMul", "group": "numbers", "type": "float", "default": 1.0, "min": 0.5, "max": 5.0, "step": 0.5, "name": "Flat card numbers x", "hint": "Lab cards are written in small numbers. Raise this when small numbers are off." },
     { "id": "crits", "group": "numbers", "type": "bool", "default": false, "name": "Crits" },
     { "id": "misses", "group": "numbers", "type": "bool", "default": false, "name": "Misses" },

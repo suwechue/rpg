@@ -1,6 +1,11 @@
 {
   "comment": "Every player-facing line the scripts show, by key (VD Part 1). Edit the text here; keep the %s and %d placeholders. Story, dialogue, cards and enemies keep their text in their own data files.",
   "strings": {
+    "extra.preview_overload": "Overload: costs %d HP",
+    "extra.preview_overload_card": "Overload: Exhausts a card",
+    "extra.preview_weak": "%s: weak point! Staggers",
+    "extra.preview_panic": "Others nearby may panic",
+    "extra.preview_charge": "Charges: fires next turn, stronger",
     "combat.delay": "Delay",
     "combat.delay_tip": "Pass and act after the next enemy, once a round.",
     "combat.gauge": "Gauge",

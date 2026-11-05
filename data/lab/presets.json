@@ -50,6 +50,109 @@
       "name": "CL Base",
       "text": "One Action, a separate Move, small numbers, no dice, exact telegraphs.",
       "levers": {}
+    },
+    {
+      "id": "cl_puzzle",
+      "name": "CL Puzzle",
+      "text": "No dice at all: small numbers, Surge, kill refund, a kept hand of 4. Everything you see is exactly what happens.",
+      "levers": {
+        "smallNumbers": true,
+        "crits": false,
+        "misses": false,
+        "instability": false,
+        "surge": true,
+        "killRefund": "move",
+        "handSize": 4,
+        "keepHand": true
+      }
+    },
+    {
+      "id": "cl_cards",
+      "name": "CL Cards",
+      "text": "CL Base with a hand of 5 and extra Free and Follow-up cards in each deck.",
+      "levers": {
+        "handSize": 5,
+        "extraKeywordCards": 2
+      }
+    },
+    {
+      "id": "cl_brutal",
+      "name": "CL Brutal",
+      "text": "CL Puzzle, but enemies act every other turn and hit twice as hard, and the round cap is 6.",
+      "levers": {
+        "smallNumbers": true,
+        "crits": false,
+        "misses": false,
+        "instability": false,
+        "surge": true,
+        "killRefund": "move",
+        "handSize": 4,
+        "keepHand": true,
+        "hitHardRarely": true,
+        "roundCap": 6
+      }
+    },
+    {
+      "id": "cl_plus",
+      "name": "CL Plus",
+      "text": "CL Puzzle plus five extras: choose your order, ally reactions, status cards, bonus goals, lingering fields.",
+      "levers": {
+        "smallNumbers": true,
+        "crits": false,
+        "misses": false,
+        "instability": false,
+        "surge": true,
+        "killRefund": "move",
+        "handSize": 4,
+        "keepHand": true,
+        "chooseOrder": true,
+        "allyReactions": true,
+        "statusCards": true,
+        "bonusObjectives": true,
+        "lingeringFields": true
+      }
+    },
+    {
+      "id": "cl_everything",
+      "name": "CL Everything",
+      "text": "Every extra on, to see how they combine. Not meant to be fun.",
+      "levers": {
+        "chooseOrder": true,
+        "cardInitiative": true,
+        "delay": true,
+        "facing": true,
+        "highGround": true,
+        "bodyBlock": true,
+        "lineOfSight": true,
+        "fog": true,
+        "chargeSpells": true,
+        "lingeringFields": true,
+        "weather": true,
+        "allyReactions": true,
+        "fightUpgrade": true,
+        "statusCards": true,
+        "signatureCard": true,
+        "retainKeyword": true,
+        "duetCards": true,
+        "enemyRoles": true,
+        "weakPoints": true,
+        "morale": true,
+        "reserves": true,
+        "bondInCombat": true,
+        "classGauges": true,
+        "fightWaves": true,
+        "bonusObjectives": true,
+        "retreat": true,
+        "envTimers": true,
+        "postFightChoice": true,
+        "cardMastery": true,
+        "storyRelics": true,
+        "zoneOfControl": "free_hit",
+        "overload": "both",
+        "reshuffleEffect": "surge",
+        "bossLookahead": 2,
+        "downedRules": "carry"
+      }
     }
   ]
 }

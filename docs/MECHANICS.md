@@ -647,7 +647,7 @@ Only Lab fights use these until the user picks a preset. `current` keeps today's
 | Keywords | Free (no Action or Quick), Follow-up (then one card with a named tag, no Action), Swift (gives the Move back), Heavy (uses the Action and the Move, can't follow a move), Exhaust (gone for the fight) |
 | Hand and deck | Hand of 4, drawn back up each turn; leftovers stay. The discard shuffles back with no Fatigue. The discard pile is on a button |
 | MP | A pool of 6, +2 a turn. Lever: cards are free and only Major and Grand spells cost MP |
-| Small numbers | Enemy HP x0.25 (bosses x0.15), party HP x0.33, damage and heals x0.4, never below 1 |
+| Small numbers | Enemy HP x0.25 (bosses x0.15), party HP x0.33, party damage and heals x0.4, enemy damage x0.25, never below 1 |
 | No dice | No crits or misses. Blind moves the telegraph to a tile next to its target. Instability rolls stay |
 | Difficulty | No difficulty damage multiplier and no hit cap |
 | Telegraphs | Every enemy shows exact tiles and damage at the start of the party's turn. Push, kill, block the path (enemies, Constructs and props stop shots and Lines), move out, or put an enemy on the tiles: it takes the hit. About 1 attack in 10 tracks its target. Lever: enemies act every other turn and hit twice as hard |
@@ -718,3 +718,9 @@ All in `src/core/combat/extras.gd`, numbers in `data/lab/extras.json` and `data/
 | `postFightChoice` | After a win: a new card, a gear upgrade (in the Lab, a level), or remove a card |
 | `storyRelics` | Ten board relics (`data/lab/board_relics.json`), dropped after Lab wins |
 | `hitstop`, `killSlowmo`, `killCam`, `speedControls`, `plainLog` | The feel levers |
+
+### Lab fights and presets (Part 4)
+
+Twelve fights in `data/lab/fights.json`: Ledge Day, Hold the Line, Thin Ice, Fire Sale, Hand-Off, The Ritual, Crowded Hall, The Hollow Mascot, Night Market, The Bell Tower, Flood Drill, Duet. The optional Arena Sampler (fight 9) isn't built. A fight's `levers` turn on its suggested levers under every preset but `current`.
+
+Presets in `data/lab/presets.json`: `current`, `cl_base`, `cl_puzzle` (also no Instability rolls), `cl_cards` (hand of 5, 2 extra Free and Follow-up cards), `cl_brutal` (`cl_puzzle` with hit-hard-rarely and a round cap of 6), `cl_plus` (`cl_puzzle` with five extras), `cl_everything`.

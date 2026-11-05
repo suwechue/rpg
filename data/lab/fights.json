@@ -1,21 +1,218 @@
 {
-  "comment": "Hand-made Lab fights (docs/COMBAT_LAB.md Part 4): a fixed map, enemies, party, goal and seed.",
+  "comment": "Hand-made Lab fights (docs/COMBAT_LAB.md Part 4): a fixed map, enemies, party, goal and seed. levers: this fight's suggested levers, on under every preset except current. Map letters are in src/core/combat/grid.gd.",
   "fights": [
     {
       "id": "ledge_day",
-      "name": "Ledge Day",
+      "name": "1. Ledge Day",
       "text": "Three minions near a pit. Learn push kills.",
       "seed": 101,
       "theme": "school",
       "map": [
-        "#########",
-        "#P..ppp.#",
-        "#P..ppp.#",
-        "#P...E.E#",
-        "#.....E.#",
-        "#########"
+        "P...ppp..",
+        "P...ppp..",
+        "P...E.E..",
+        "......E..",
+        "........."
       ],
       "enemies": ["dust_gremlin", "paper_wasp", "frost_mite"],
+      "party": [{ "class": "fighter", "level": 3 }, { "class": "mage", "level": 3 }, { "class": "rogue", "level": 3 }],
+      "goal": { "type": "kill" }
+    },
+    {
+      "id": "hold_the_line",
+      "name": "2. Hold the Line",
+      "text": "Survive 4 rounds while two chargers run at the locker you're protecting. Stand in the way, or move them.",
+      "seed": 102,
+      "theme": "school",
+      "map": [
+        "P.......E",
+        "P...x....",
+        "P........",
+        "....x....",
+        "........E"
+      ],
+      "objects": [{ "id": "trophy_case", "name": "Trophy Case", "hp": 10, "cell": [2, 2] }],
+      "enemies": [{ "id": "hall_rusher" }, { "id": "hall_rusher" }],
+      "party": [{ "class": "fighter", "level": 3 }, { "class": "healer", "level": 3 }, { "class": "rogue", "level": 3 }],
+      "goal": { "type": "protect", "unit": "trophy_case", "rounds": 4 }
+    },
+    {
+      "id": "thin_ice",
+      "name": "3. Thin Ice",
+      "text": "A frozen pond with a hole in it. Cold and Force. Pushed units slide until they hit something.",
+      "seed": 103,
+      "theme": "hospital",
+      "map": [
+        "P..iiii..",
+        "P.iiiiiip",
+        "P.iiEiiip",
+        "..iiiiE..",
+        "...iiE..."
+      ],
+      "enemies": ["frost_mite", "slimelet", "bleacher_creeper"],
+      "party": [{ "class": "fighter", "level": 3 }, { "class": "mage", "level": 3 }],
+      "goal": { "type": "kill" }
+    },
+    {
+      "id": "fire_sale",
+      "name": "4. Fire Sale",
+      "text": "Barrels and oil in a shop, against enemies that throw. Blow up the room, not yourself.",
+      "seed": 104,
+      "theme": "school",
+      "map": [
+        "P..b.x..E",
+        "P.oo.b...",
+        "P.oobx.E.",
+        "...x.oo..",
+        "..A...OE."
+      ],
+      "enemies": ["paper_wasp", "spark_imp", "detention_slip"],
+      "party": [{ "class": "mage", "level": 3 }, { "class": "fighter", "level": 3 }, { "class": "rogue", "level": 3 }],
+      "goal": { "type": "kill" }
+    },
+    {
+      "id": "hand_off",
+      "name": "5. Hand-Off",
+      "text": "Two people and two decks built to feed each other: Pass, Borrow and Setup.",
+      "seed": 105,
+      "theme": "school",
+      "map": [
+        "P.......E",
+        "P....x...",
+        ".......E.",
+        "...x.....",
+        "........E"
+      ],
+      "enemies": ["pom_pom_wisp", "bleacher_creeper", "dust_gremlin"],
+      "party": [
+        { "class": "bard", "level": 3, "deck": ["lab_pass", "lab_pass", "lab_borrow", "lab_borrow", "lab_setup", "lab_harmony", "lab_encore_two", "lab_spark", "lab_chain_bolt"] },
+        { "class": "fighter", "level": 3, "deck": ["card_strike", "lab_shove", "lab_shove", "lab_heavy_slam", "lab_finisher", "lab_relay", "lab_domino", "lab_tag_team", "lab_harmony"] }
+      ],
+      "goal": { "type": "kill" }
+    },
+    {
+      "id": "the_ritual",
+      "name": "6. The Ritual",
+      "text": "An enemy channels a 3-round spell behind cover. Break through, or knock it off its feet to buy a round.",
+      "seed": 106,
+      "theme": "school",
+      "map": [
+        "P....c...",
+        "P....c.E.",
+        "P....c..E",
+        ".....c...",
+        ".......E."
+      ],
+      "enemies": ["bleacher_creeper", { "id": "night_nurse" }, "dust_gremlin"],
+      "party": [{ "class": "rogue", "level": 3 }, { "class": "fighter", "level": 3 }, { "class": "mage", "level": 3 }],
+      "goal": { "type": "stop_ritual", "unit": "night_nurse", "rounds": 3 }
+    },
+    {
+      "id": "crowded_hall",
+      "name": "7. Crowded Hall",
+      "text": "Six enemies in a narrow hallway. Domino and Line.",
+      "seed": 107,
+      "theme": "school",
+      "map": [
+        "P...EE..p",
+        "P...EE..p",
+        "P...EE..p"
+      ],
+      "enemies": ["dust_gremlin", "slimelet", "dust_gremlin", "slimelet", "frost_mite", "frost_mite"],
+      "party": [{ "class": "fighter", "level": 3 }, { "class": "rogue", "level": 3 }, { "class": "mage", "level": 3 }],
+      "goal": { "type": "kill" }
+    },
+    {
+      "id": "hollow_mascot",
+      "name": "8. The Hollow Mascot",
+      "text": "The week 1 boss in three phases. In phase 2 the floor starts to collapse.",
+      "seed": 108,
+      "theme": "school",
+      "boss": true,
+      "map": [
+        "P........",
+        "P........",
+        "P.....E..",
+        ".........",
+        "........."
+      ],
+      "enemies": [{ "id": "hollow_mascot", "weakPoint": "back" }],
+      "phaseEvents": { "1": { "collapse": [[3, 0], [4, 0], [3, 4], [4, 4], [5, 0], [5, 4]], "rounds": 1 }, "2": { "collapse": [[2, 1], [2, 3], [6, 1], [6, 3]], "rounds": 1 } },
+      "party": [{ "class": "fighter", "level": 4 }, { "class": "mage", "level": 4 }, { "class": "rogue", "level": 4 }, { "class": "healer", "level": 4 }],
+      "goal": { "type": "kill" }
+    },
+    {
+      "id": "night_market",
+      "name": "10. Night Market",
+      "text": "Fog, line of sight, and a Summoner behind the stalls.",
+      "seed": 110,
+      "theme": "school",
+      "levers": { "fog": true, "lineOfSight": true, "enemyRoles": true },
+      "map": [
+        "P..x...E.",
+        "P..x.x...",
+        "P.....xE.",
+        "..x.x....",
+        "......xE."
+      ],
+      "enemies": [{ "id": "locker_hive", "labRole": "summoner" }, "paper_wasp", "pom_pom_wisp"],
+      "party": [{ "class": "rogue", "level": 3 }, { "class": "healer", "level": 3 }, { "class": "mage", "level": 3 }],
+      "goal": { "type": "kill" }
+    },
+    {
+      "id": "bell_tower",
+      "name": "11. The Bell Tower",
+      "text": "High ground, a Shield bearer and a Bomber. Get up there, or push them off.",
+      "seed": 111,
+      "theme": "school",
+      "levers": { "highGround": true, "enemyRoles": true, "facing": true },
+      "map": [
+        "P...HHH..",
+        "P...HEH..",
+        "P...HHH.E",
+        "......E..",
+        "........."
+      ],
+      "enemies": ["pom_pom_wisp", { "id": "riot_shield", "labRole": "shield" }, { "id": "firecracker_imp", "labRole": "bomber" }],
+      "party": [{ "class": "fighter", "level": 3 }, { "class": "mage", "level": 3 }, { "class": "rogue", "level": 3 }],
+      "goal": { "type": "kill" }
+    },
+    {
+      "id": "flood_drill",
+      "name": "12. Flood Drill",
+      "text": "The water rises a row each round, more come through the doors, and the exit is open. Stand on a door to hold it.",
+      "seed": 112,
+      "theme": "hospital",
+      "levers": { "envTimers": true, "fightWaves": true, "retreat": true },
+      "map": [
+        "<........",
+        "<.....E..",
+        "P.......E",
+        "P........",
+        "P........"
+      ],
+      "enemies": ["bleacher_creeper", "dust_gremlin"],
+      "timer": { "type": "rising_water", "row": 4, "stopRow": 2 },
+      "waves": [{ "round": 2, "enemies": ["dust_gremlin", "paper_wasp"], "door": [8, 0] }, { "round": 3, "enemies": ["frost_mite", "slimelet"], "door": [4, 0] }],
+      "party": [{ "class": "fighter", "level": 3 }, { "class": "bard", "level": 3 }, { "class": "healer", "level": 3 }],
+      "goal": { "type": "kill" }
+    },
+    {
+      "id": "duet",
+      "name": "13. Duet",
+      "text": "Two characters with Duet cards, Bond in combat and class gauges.",
+      "seed": 113,
+      "theme": "school",
+      "levers": { "duetCards": true, "bondInCombat": true, "classGauges": true },
+      "map": [
+        "P.......E",
+        "P....x...",
+        ".......E.",
+        "...x.....",
+        "........E"
+      ],
+      "enemies": ["varsity_shade", "pom_pom_wisp", "dust_gremlin"],
+      "party": [{ "class": "fighter", "level": 4 }, { "class": "mage", "level": 4 }],
       "goal": { "type": "kill" }
     }
   ]

@@ -943,3 +943,35 @@ static func active_line(st) -> String:
 static func plain_push(st, u: Object, t: Object, how: String) -> void:
 	if st.rules.flag("plainLog") and u != null and u != t:
 		_say(st, "extra.push_" + how, [u.name, t.name])
+
+
+## A fight's board event when its boss changes phase: telegraphed tiles collapse.
+static func phase_event(st, index: int) -> void:
+	var ev: Dictionary = st.phase_events.get(str(index), {})
+	if ev.is_empty():
+		return
+	var cells: Array = []
+	for c in ev.get("collapse", []):
+		var cell := Vector2i(int(c[0]), int(c[1]))
+		if st.grid.walkable_terrain(cell):
+			st.grid.collapsing[cell] = int(ev.get("rounds", 1))
+			cells.append(cell)
+	if not cells.is_empty():
+		st._emit({ "t": "tiles", "kind": "collapse", "cells": cells })
+		_say(st, "board.cracked")
+
+
+## What a preview adds for the extras: overload's price, weak points, panic.
+static func preview_notes(st, u: Object, card: Dictionary, out: Dictionary) -> void:
+	var notes: Array = out.get("notes", [])
+	if int(out.get("cost", 0)) > u.mp and can_overload(st, u, card):
+		notes.append(Str.t(st.db, "extra.preview_overload") % st.rules.count("overloadHp", 3) if st.rules.text("overload") != "exhaust" else Str.t(st.db, "extra.preview_overload_card"))
+	for h in out["hits"]:
+		var t: Object = st.unit_by_id(str(h["unit"]))
+		if t != null and weak_from(st, u, t):
+			notes.append(Str.t(st.db, "extra.preview_weak") % t.name)
+	if st.rules.flag("morale") and not out.get("deaths", []).is_empty():
+		notes.append(Str.t(st.db, "extra.preview_panic"))
+	if charging(st, card):
+		notes.append(Str.t(st.db, "extra.preview_charge"))
+	out["notes"] = notes

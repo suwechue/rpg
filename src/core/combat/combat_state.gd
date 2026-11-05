@@ -56,6 +56,7 @@ var reaction_hits: Dictionary = {}  # allyReactions: cell -> who hit it with wha
 var card_plays: Dictionary = {}     # fightUpgrade: card id -> plays this fight
 var bond_quicks: Dictionary = {}    # bondInCombat: pairs that used their Quick this round
 var round_seed := 0
+var phase_events: Dictionary = {}   # a fight's board events per boss phase
 var surge := 0                      # the party's Surge meter
 var shift_bonus := 0                # past the round cap: enemies hit this much harder
 var chain: Dictionary = {}          # enemy id -> ids of who played a card on it this round
@@ -192,6 +193,9 @@ func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) ->
 				var bonus_hp := roundi(float(u.max_hp) * hp_pct)
 				u.max_hp += bonus_hp
 				u.hp += bonus_hp
+	for obj in setup.get("objects", []):
+		_add_object(obj)
+	phase_events = setup.get("phaseEvents", {})
 	backpack = setup.get("backpack", []).duplicate()
 	if not setup.get("reinforcements", {}).is_empty():
 		reinforcements = setup["reinforcements"].duplicate()
@@ -250,6 +254,28 @@ func _init(p_db: Dictionary, p_rng: RandomNumberGenerator, setup: Dictionary) ->
 	turn_index = -1
 	_emit({ "t": "round", "n": round_num })
 	_advance()
+
+
+## Something on the party's side that doesn't act: a goal's "protect" target.
+## Enemies aim at it, it blocks and it can be pushed nowhere. It has no turn.
+func _add_object(rec: Dictionary) -> void:
+	var u := UnitScript.new()
+	u.id = str(rec.get("id", "object"))
+	u.name = str(rec.get("name", u.id))
+	u.team = "party"
+	u.guest = true
+	u.max_hp = int(rec.get("hp", 10))
+	u.hp = u.max_hp
+	u.movement = 0
+	u.source = { "object": true, "id": u.id, "immovable": true, "helpLine": "" }
+	var at: Array = rec.get("cell", [0, 0])
+	u.cell = Vector2i(int(at[0]), int(at[1]))
+	_add_unit(u)
+
+
+## Who gets a turn: not props, and not objects a goal has you protect.
+func takes_turns(u: UnitScript) -> bool:
+	return u.alive() and not u.is_prop() and not bool(u.source.get("object", false))
 
 
 ## The party's numbers under the levers: small HP, the Lab's MP pool.
@@ -530,7 +556,7 @@ func reachable_cells(u: UnitScript) -> Dictionary:
 func _build_order() -> void:
 	order = []
 	for u in units:
-		if u.alive() and not u.is_prop():
+		if takes_turns(u):
 			order.append(u)
 	order = _ordered(order, party_first and round_num == 1)
 	for u in units:
@@ -574,6 +600,7 @@ func timeline_rounds() -> Dictionary:
 	for u in units:
 		if u.alive() and not u.is_prop():
 			next.append(u)
+	next = next.filter(func(x: UnitScript) -> bool: return takes_turns(x))
 	return { "now": now, "next": _ordered(next), "round": round_num }
 
 
@@ -587,7 +614,7 @@ func timeline(count: int = 12) -> Array:
 	for u in units:
 		if u.alive() and not u.is_prop():
 			next.append(u)
-	next = _ordered(next)
+	next = _ordered(next.filter(func(x: UnitScript) -> bool: return takes_turns(x)))
 	while out.size() < count and not next.is_empty():
 		out.append_array(next)
 	return out.slice(0, count)
@@ -2063,6 +2090,7 @@ func preview(u: UnitScript, card: Dictionary, target: Vector2i, improvised: bool
 		elif t != null and str(card.get("action", "")) == "heal":
 			out["hits"].append({ "unit": t.id, "heal": rules.scaled(Res.heal_amount(float(card.get("amount", 10)), u)) if rules.small() else Res.heal_amount(float(card.get("amount", 10)), u) })
 	_mark_deaths(out)
+	Extras.preview_notes(self, u, card, out)
 	return out
 
 
@@ -2312,7 +2340,7 @@ func _final_number(x: float, u: UnitScript, t: UnitScript) -> float:
 	if u.links.has("back_hit") and u.team == "party":
 		x *= rules.num("facingBackMul", 1.5)
 	if rules.small():
-		x = maxf(1.0, x * rules.damage_scale())
+		x = maxf(1.0, x * (rules.enemy_damage_scale() if u.team == "enemy" else rules.damage_scale()))
 	if u.team == "enemy":
 		return x + float(shift_bonus) + Extras.high_bonus(self, u, t)
 	return x + float(_chain_bonus(u, t)) + Extras.high_bonus(self, u, t)
@@ -3268,6 +3296,7 @@ func _check_phase(t: UnitScript) -> void:
 			return
 		t.phase_index += 1
 		_emit({ "t": "phase", "unit": t.id, "index": t.phase_index, "text": str(next.get("say", "")) })
+		Extras.phase_event(self, t.phase_index)
 		if next.has("actions"):
 			t.actions = next["actions"].duplicate(true)
 		if next.has("movement"):

@@ -128,6 +128,10 @@ func damage_scale() -> float:
 	return num("damageScale", 1.0) if small() else 1.0
 
 
+func enemy_damage_scale() -> float:
+	return num("enemyDamageScale", 1.0) if small() else 1.0
+
+
 func enemy_hp_scale(boss: bool) -> float:
 	var scale := (num("bossHpScale", 1.0) if boss else num("hpScale", 1.0)) if small() else 1.0
 	return scale * num("enemyHpMul", 1.0)
