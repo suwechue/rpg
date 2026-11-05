@@ -124,12 +124,6 @@ static func cost(db: Dictionary, card: Dictionary) -> int:
 	return int(card.get("cost", 0))
 
 
-## Improvised cost: ceil(cost x 1.5) + 1.
-static func improvise_cost(db: Dictionary, card: Dictionary) -> int:
-	var imp: Dictionary = db.get("vectors", {}).get("improvise", {})
-	return int(ceil(float(spell_cost(db, card)) * float(imp.get("costMultiplier", 1.5)))) + int(imp.get("flatExtra", 1))
-
-
 static func power(db: Dictionary, card: Dictionary) -> float:
 	var mags: Dictionary = db.get("vectors", {}).get("magnitudes", {})
 	var pm := property_mods(db, card)

@@ -107,16 +107,15 @@ func test_instability_odds() -> void:
 	var minor := CardRules.make_spell(db(), { "heat": 1 }, "burst", "minor")
 	var std := CardRules.make_spell(db(), { "heat": 1 }, "bolt", "standard")
 	var major := CardRules.make_spell(db(), { "heat": 1 }, "bolt", "major")
-	check(not Res.needs_roll(db(), minor, 9, false), "Minor casts never roll")
-	check(not Res.needs_roll(db(), std, 3, false) and Res.needs_roll(db(), std, 4, false), "Standard rolls at 4 MP")
-	check(Res.needs_roll(db(), minor, 1, true), "improvised always rolls")
+	check(not Res.needs_roll(db(), minor, 9), "Minor casts never roll")
+	check(not Res.needs_roll(db(), std, 3) and Res.needs_roll(db(), std, 4), "Standard rolls at 4 MP")
 	check_near(Res.instability_target(db(), major, 9), 10.0 + 1.0, "target 10 + (9 - 6) / 2 rounded down")
 	var anta := CardRules.make_spell(db(), { "heat": 1, "cold": 1 }, "bolt", "major")
 	check_near(Res.instability_target(db(), anta, 6), 12.0, "+2 per antagonistic pair")
 	var syn := CardRules.make_spell(db(), { "heat": 1, "motion": 1 }, "bolt", "major")
 	check_near(Res.instability_target(db(), syn, 6), 10.0, "-1 per synergistic pair, never below 10")
-	check_near(Res.stability_chance(db(), 10, 9, major, false), float(21 - 6) / 20.0, "chance with stability 10")
-	check_near(Res.stability_chance(db(), 10, 2, std, false), 1.0, "no roll means certain")
+	check_near(Res.stability_chance(db(), 10, 9, major), float(21 - 6) / 20.0, "chance with stability 10")
+	check_near(Res.stability_chance(db(), 10, 2, std), 1.0, "no roll means certain")
 
 
 # --- Turn flow and effects --------------------------------------------------------------
@@ -203,30 +202,16 @@ func test_play_card_spends_mp_and_carries_over() -> void:
 	check(summary["party"].size() == 1, "summary lists the party")
 
 
-func test_improvise() -> void:
-	var ch := mage()
-	ch["mp"] = 30
-	var st := fight(["P...E"], [ch], [enemy("pom_pom_wisp")])
-	var me: UnitScript = st.unit_by_id("player")
-	if st.current != me:
-		return
-	check(st.improvise_error(me, ["cold"], "bolt", "standard") != "", "unknown Vector rejected")
-	me.perk_used = true
-	var hand0: int = me.deck.hand.size()
-	var mp0 := me.mp
-	check(st.improvise(me, ["heat"], "bolt", "standard", 0, Vector2i(4, 0)), "improvised heat bolt")
-	check(me.mp == mp0 - 4 and me.deck.hand.size() == hand0 - 1, "costs ceil(2 x 1.5) + 1 and a fuel card")
-
-
 func test_overchannel() -> void:
 	var ch := mage()
 	ch["mp"] = 30
 	var st := fight(["P...E"], [ch], [enemy("pom_pom_wisp")])
 	var me: UnitScript = st.unit_by_id("player")
-	var card := CardRules.make_spell(db(), { "heat": 1 }, "bolt", "standard")
-	check(st.improvise_cost(me, card) == 2, "Overchannel: first improvise at normal cost")
+	var card := CardRules.make_spell(db(), { "heat": 1, "cold": 1 }, "bolt", "standard")
+	var plain := CardRules.make_spell(db(), { "heat": 1 }, "bolt", "standard")
+	check(st.card_cost(me, card) == st.card_cost(me, plain), "Overchannel: a two-Vector card at normal cost, once a fight")
 	me.perk_used = true
-	check(st.improvise_cost(me, card) == 4, "then the usual cost")
+	check(st.card_cost(me, card) > st.card_cost(me, plain), "then the usual cost")
 
 
 func test_flee() -> void:

@@ -412,7 +412,7 @@
           "result": "It is, in fact, probably fine."
         },
         {
-          "label": "Improvise a little",
+          "label": "Try something else",
           "effects": {
             "bondPartner": 5,
             "hp": -2
@@ -1102,7 +1102,7 @@
       "text": "Microscope work with {partner}. One of you has to focus. The other has to not sneeze.",
       "choices": [
         {
-          "label": "You sneeze-guard, they focus",
+          "label": "You cover the bench, they focus",
           "effects": {
             "bondPartner": 4
           },

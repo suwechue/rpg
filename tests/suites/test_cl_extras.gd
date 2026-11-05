@@ -461,7 +461,7 @@ func test_signature_retain_duet_reshuffle() -> void:
 func test_enemy_roles() -> void:
 	var st := _fight(["P.E...#", "P.E...."], { "enemyRoles": true }, [_enemy("bleacher_creeper", { "labRole": "shield" }), _enemy("bleacher_creeper", { "labRole": "anchor" })])
 	var es: Array = st.units.filter(func(u: Object) -> bool: return u.team == "enemy")
-	check(float(es[0].source.get("frontGuard", 0.0)) > 0.0, "Shield bearer: the front is blocked")
+	check(float(es[0].source.get("frontBlock", 0.0)) > 0.0, "Shield bearer: the front is blocked")
 	check(bool(es[1].source.get("immovable", false)), "Anchor: immovable")
 	var me := _me(st)
 	es[0].cell = Vector2i(2, 0)

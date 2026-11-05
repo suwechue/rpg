@@ -54,6 +54,7 @@ func _ready() -> void:
 ##   --cutscene=id (play a cutscene over the current scene)
 ##   --tutorial=N (tutorial floor room N with its lesson; use with --scene=res://src/scenes/combat/combat.tscn)
 ##   --lab --fight=id --preset=id (a Combat Lab fight; no --fight opens the Lab screen)
+##   --place=x,y (put the acting unit on a tile), --labshot=redirect|borrow|rating (Lab screenshots)
 ##   --arena --size=4 --level=3 --arenawave=N --waves=N (Endless Arena; --autoplay plays it)
 ## --debug opens this menu; --shot saves the viewport after N frames and quits.
 func _dev_args() -> void:
@@ -104,7 +105,9 @@ func _dev_args() -> void:
 		if str(args.get("arenaphase", "")) == "checkpoint":
 			preload("res://src/core/arena/arena.gd").checkpoint(DataDB.all(), GameState.run["arena"])
 			GameState.run["arena"]["phase"] = "checkpoint"
-	if args.has("hand") or args.has("hovercard") or args.has("card"):
+	if args.has("labshot"):
+		_lab_shot.call_deferred(str(args["labshot"]))
+	if args.has("hand") or args.has("hovercard") or args.has("card") or args.has("place"):
 		_combat_dev_args.call_deferred(args)
 	if args.has("period"):
 		# --period=<class id>: play that class's period scene (the walk and the class).
@@ -180,6 +183,52 @@ func _call_arg(method: String) -> void:
 		target.call(method)
 
 
+## Lab screenshots: an enemy standing in another's telegraph, a Borrow about to be
+## played, and the rating card.
+func _lab_shot(kind: String) -> void:
+	for i in 40:
+		await get_tree().process_frame
+	var scene := get_tree().current_scene
+	if kind == "rating":
+		Flow.show_modal(preload("res://src/scenes/lab/rating_card.gd").new())
+		return
+	if scene == null or scene.get("state") == null:
+		return
+	var st: Object = scene.get("state")
+	if kind == "redirect":
+		var shooter: Object = null
+		for e in st.units:
+			if e.team == "enemy" and e.alive() and not st.intent_cells(e).is_empty():
+				shooter = e
+				break
+		if shooter == null:
+			return
+		for e in st.units:
+			if e.team == "enemy" and e.alive() and e != shooter:
+				for c in st.intent_cells(shooter):
+					if st.unit_at(c) == null:
+						e.cell = c
+						scene.call("_note", "%s stands in %s's attack: it takes the hit." % [e.name, shooter.name])
+						break
+				break
+		scene.call("_sync_views")
+	elif kind == "borrow":
+		var me: Object = st.current
+		var ally: Object = null
+		for a in st.allies_of(me):
+			if a != me:
+				ally = a
+		if ally == null:
+			return
+		me.deck.hand = ["lab_borrow", "lab_pass", "lab_setup", "lab_harmony"]
+		ally.deck.draw_pile.append("lab_spark")
+		ally.cell = me.cell + Vector2i(1, 0)
+		scene.call("_sync_views")
+		scene.call("_on_card", 0)
+		scene.set("hover_cell", ally.cell)
+		scene.call("_refresh_overlays")
+
+
 ## Combat screenshots: --hand=id,id (the acting unit's hand), --hovercard=N
 ## (preview card N), --card=N (select it), --hover=x,y (the tile under the mouse).
 func _combat_dev_args(args: Dictionary) -> void:
@@ -193,6 +242,10 @@ func _combat_dev_args(args: Dictionary) -> void:
 			break
 		await get_tree().process_frame
 	var u: Object = scene.get("state").get("current")
+	if args.has("place") and u != null:
+		var at := str(args["place"]).split(",")
+		u.set("cell", Vector2i(int(at[0]), int(at[1])))
+		scene.call("_sync_views")
 	if args.has("hand") and u != null and u.get("deck") != null:
 		u.get("deck").set("hand", Array(str(args["hand"]).split(",")))
 		u.set("mp", maxi(int(u.get("mp")), 10))

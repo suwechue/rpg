@@ -15,7 +15,7 @@ Most numbers live in `data/` (JSON). The main files:
 | --- | --- |
 | `data/stats.json` | Stat formulas and combat constants |
 | `data/combat_rules.json` | Turn mode, difficulty, area falloff |
-| `data/vectors.json` | Magnitudes, improvising, failures |
+| `data/vectors.json` | Magnitudes, failures |
 | `data/forms.json` | Spell shapes |
 | `data/cards/*.json` | Cards |
 | `data/classes.json` | Classes and starting decks |
@@ -47,8 +47,8 @@ Most numbers live in `data/` (JSON). The main files:
 
 **Combat in 30 seconds:**
 - Fights are on a grid. Each of your characters takes a turn in **initiative order** (the bar at the top).
-- Every turn you get **2 Actions** (a Move, a card, Strike or Guard) and **1 Quick** (a quick card or a backpack item). Move + card, card + move, card + card and move + move are all fine.
-- Casters always have a **Cantrip** (0 MP, 1 Action) in their first Vector.
+- Every turn you get **2 Actions** (a Move, a card or Strike) and **1 Quick** (a quick card or a backpack item). Move + card, card + move, card + card and move + move are all fine.
+- Everyone has **Strike** for 0 MP. Mage, Healer and Bard start with **Zap** (0 MP, range 4).
 - You draw **back up to 3 cards** every turn; unplayed cards are discarded at End Turn unless you **Hold** one (1 Action).
 - **Undo** anything until a die rolls or something new is revealed.
 - Enemies **telegraph** right before their turn: red tiles and a dotted move arrow show where they'll go and hit. Step out of the red, hide behind cover, block their path, or kill or disable them first.
@@ -66,8 +66,7 @@ Most numbers live in `data/` (JSON). The main files:
 | --- | --- | --- |
 | Turn order | Every unit acts once per **round** in **initiative** order (DEX + PER/2). Party and enemies interleave. In the **arena's first round of a wave, the whole party acts first**. A "Round N" banner starts each round; the timeline shows past turns faded, the current portrait enlarged, and the next round | `data/stats.json` derived.initiative; `data/combat_rules.json` actions.partyFirstInArena |
 | Turn rule | **2 Actions + 1 Quick** (PT Part 1). An Action is a **Move** (up to your Movement: 3 + DEX/5, so 4 for most) or a **non-quick card**. Any order: move + card, card + move, card + card, move + move. Older rules (move-or-act and friends) stay in F1 > Fights | `data/combat_rules.json` turnMode, actions.actionsPerTurn |
-| Quicks | **1 per turn**: a **quick card** or a **backpack item**. The built-in **Strike** (adjacent, STR) and **Guard** (+3 Defense, +15% Magic Resistance until your next turn) cost an **Action** (user request, Oct 28; `builtinsQuick` true brings back the old Quick rule). Usable before or after moving and after your Actions. Strike and Guard are not cards any more | actions.quicksPerTurn; `data/stats.json` combat.guardDefense |
-| Cantrip | Everyone who knows a Vector has a built-in **0 MP, 1 Action** single-target Bolt in their first Vector (range 4, 3 to 4 damage, no riders) | `data/combat_rules.json` cantrip |
+| Quicks | **1 per turn**: a **quick card** or a **backpack item**. The built-in **Strike** (adjacent, STR) costs an **Action** (user request, Oct 28; `builtinsQuick` true brings back the old Quick rule). Usable before or after moving and after your Actions. Strike and Guard are not cards any more | actions.quicksPerTurn; `data/stats.json` combat.guardDefense |
 | Hold | **1 Action:** keep 1 card in hand for next turn (a pin on the card). Everything else is discarded at End Turn | actions.holdCost, holdMax |
 | Undo | Until End Turn, undo any step that didn't roll dice (crit, miss, Stability), draw a card or reveal something. From that point back the Undo button greys out and says why. Snapshots live in `CombatState` | — |
 | Action pips | Two Action pips and one Quick pip above the buttons. Hovering a card says whether it uses an Action or your Quick | — |
@@ -77,12 +76,12 @@ Most numbers live in `data/` (JSON). The main files:
 | Previews | Hovering a card or target shows range, area (in the Vector's color), damage, cover ("in cover: x0.5"), statuses, push landings, collisions, hazards, slides and whether it interrupts a telegraph | — |
 | Whose turn | The active unit is in full color with a pulsing ring and a small bob; everyone else is dimmed and desaturated (HP bars, icons, telegraphs and cover icons stay bright). Units that already acted this round get a check mark. The banner shows the portrait and "Quill's turn: 2 enemies act next". The hand shows whose cards they are, each card with a border in that character's color. Sounds: turn_start_party, turn_start_enemy | `data/ui.json` spotlight, partyColors; `data/audio_events.json` |
 | Clarity (PT Part 3) | **Party panel** (Party button in combat and the arena, pause menu): every member's sheet, hand, draw pile and discard. **Character sheet** stats explain themselves on hover. **Shields** show their number and a segment on the HP bar. **Duplicate enemies** are numbered (Wisp 1, Wisp 2) on their HP bars and telegraph tiles; each enemy's telegraph has its own tint, an outline around the whole shape, a line from the attacker, and a pulse when it appears. Hovering a red tile highlights its attacker; hovering an enemy lists every action (name, shape diagram, range, damage, riders), its passive, affixes, matchups and its plan in words. Units in front of the hovered tile fade to 30%; the threat view ghosts everyone. **Quick cards** have a green edge and a QUICK badge; Strike and Guard sit beside the hand. **Cards** show a mini shape diagram and name their shape ("Plus shape, range 4"). Area flashes linger 0.6 s; burning, toxic and glyph tiles show turn counters. **Pause** (P): Resume, Party, Options, and in the arena Save and Quit (restarts the current wave on Continue) or Abandon | `data/ui.json` areaFlashSeconds |
-| Labels and focus (P2 Part 1) | Strike and Guard say QUICK only when the turn rule makes them Quicks (ACTION otherwise); the F1 turn-rule override shows an amber "F1 override" tag and is cleared on new run, the title and arena start. Mouse clicks don't leave a yellow focus outline (keyboard and controller still show it); the selected card or active mode has its own filled, glowing look | — |
+| Labels and focus (P2 Part 1) | Strike says QUICK only when the turn rule makes it a Quick (ACTION otherwise); the F1 turn-rule override shows an amber "F1 override" tag and is cleared on new run, the title and arena start. Mouse clicks don't leave a yellow focus outline (keyboard and controller still show it); the selected card or active mode has its own filled, glowing look | — |
 | Card owners (P2 Part 1) | A card picked after an arena wave, or granted by an event, treasure or boss, asks whose deck it goes into: party members (lit if eligible; greyed with the reason if not), the bench, or "Collection only". Eligible: basic cards for anyone, class pool cards for that class line, spells for whoever knows every Vector. The arena pick can be undone until the next wave | `src/core/progression/crafting.gd` eligibility |
 | Effects strip (P2 Part 2) | Icons on the left edge (combat, arena, dungeon, town) for everything active: arena mutators (waves to the checkpoint; red border if risky, green if helpful), difficulty, Easy minigames, the starting trait, injuries, Kelly's Risk, and the F1 override (amber). Hover for details; click for the **Effects page** (Party panel tab). Party members show perk badges in the timeline, the turn banner names their perks, perks float their name when they trigger, and mutator bonuses show in the hover breakdown ("+50% (Cold is stronger)", "+50% HP (Thick skin)") | `src/core/effects.gd` |
 | Enemy turns | Played one beat at a time: banner, highlight, move, wind-up, hit, log line. Combat speed setting; hold a key to fast-forward | — |
 | Fleeing | Allowed in non-boss fights (not boss floors). The room stays uncleared | fight setup fleeAllowed |
-| Ranged Strike and Guard (user request) | On **Hard**, ranged characters (Mage, Healer, Bard and their advanced classes) pay an **Action** for the built-in Strike and Guard instead of their Quick; melee characters keep the Quick. Normal keeps the Quick for everyone | `data/combat_rules.json` difficulties.rangedBuiltinsCostAction; classes `ranged` |
+| Ranged Strike (user request) | On **Hard**, ranged characters (Mage, Healer, Bard and their advanced classes) pay an **Action** for the built-in Strike instead of their Quick; melee characters keep the Quick. Normal keeps the Quick for everyone | `data/combat_rules.json` difficulties.rangedBuiltinsCostAction; classes `ranged` |
 | Combat difficulty | Chosen at new run. Enemies get **2 Actions** like you: move + attack, or move + move when nothing is in reach. **Double attack chance** (an enemy already in reach attacks twice): Normal minion 40%, normal 50%, elite 35%, boss 50%; Hard 75%. **Hard** also gives enemies x1.2 HP and x1.25 damage | `data/combat_rules.json` difficulties.enemyDoubleAttackChance |
 
 ## B2. Cards, hand and MP
@@ -174,17 +173,11 @@ Change these in `data/vectors.json` gridEffects and `data/stats.json` combat (bu
 - **On the grid:** Gravity pulls hit units 1 tile toward the impact (and Crushes the Rooted, +50%). Lightning arcs to one more enemy within 2 (half damage) and keeps chaining through Wet and Conductive units. Sound Dazes, cancels charges, and deals x2 to walls. Shadow deals no damage: it darkens tiles for 2 rounds and makes allies there Shadowed. Warding shields allies (refreshes to the better value) or Exposes enemies. Poison stacks. Psychic does nothing to mindless enemies. Cognition Marks and reveals plans for 2 rounds. Void strips shields, buffs, affixes, hazards, constructs and glyphs. Time pushes an enemy's turn to the end of the round (never extra turns). Entropy adds +1 to the Instability target.
 - **Force is free but weak:** Force cards cost 1 less MP (minimum 0) and deal x0.7.
 - **Fusion:** a two-Vector card pays a surcharge by Magnitude (Minor +1, Standard +1, Major +2, Grand +3; three Vectors pay it twice). **Synergistic pairs** (Heat+Motion, Cold+Binding, Light+Sound, Force+Gravity, Corrosion+Vitality, Lightning+Motion, Psychic+Sound, Warding+Vitality, Shadow+Binding, Void+Transmutation, Poison+Corrosion, Cognition+Light) halve it (rounded up) and resonate (+15% effect). **Antagonistic pairs** (Heat+Cold, Binding+Motion, Vitality+Entropy, Light+Corrosion, Lightning+Corrosion, Psychic+Binding, Warding+Entropy, Shadow+Light, Time+Entropy, Void+Warding, Cognition+Binding) add +1 MP. Damage is split between the Vectors, each checking its own matchup.
-- **Instability by Magnitude:** a cast rolls when its final MP cost reaches the threshold (Minor never, Standard 4, Major 6, Grand 9); improvised casts always roll. Target 10 + (cost - threshold) / 2, +1 Entropy, +2 per antagonistic pair, -1 per synergistic pair, never below 10; roll d20 + Stability / 2. **Failures:** Reduced (half effect), Misfire (random valid target), Backlash (you take damage equal to the MP cost; it still resolves), Strain (that Magnitude can't be cast next turn), Wild Surge (resolves as a random Vector), Collapse (nothing; MP lost).
+- **Instability by Magnitude:** a cast rolls when its final MP cost reaches the threshold (Minor never, Standard 4, Major 6, Grand 9). Target 10 + (cost - threshold) / 2, +1 Entropy, +2 per antagonistic pair, -1 per synergistic pair, never below 10; roll d20 + Stability / 2. **Failures:** Reduced (half effect), Misfire (random valid target), Backlash (you take damage equal to the MP cost; it still resolves), Strain (that Magnitude can't be cast next turn), Wild Surge (resolves as a random Vector), Collapse (nothing; MP lost).
 
-## B6. Improvising (the Vector Wheel)
+## B6. Two-Vector casting
 
-- Build any legal spell on the spot from the Vectors and Forms you know.
-- **Cost:** ceil(normal cost x 1.5) + 1 MP, and you **discard 1 card** as fuel.
-- **Instability roll:** improvised casts always roll; prepared cards roll only when spending more than half your current MP. You succeed if d20 + Stability/2 reaches 10 + 10 x (cost ÷ current MP), with +3 for improvised. Stability = WIL + INT/2. The success chance is shown before you cast.
-- **Failures** (weighted random): Fizzle 4 (MP spent, nothing happens), Backlash 3 (half damage to yourself), Misfire 2 (hits a random valid target), Wild Surge 1 (a random Vector from all 9, same target).
-- Mage perk **Overchannel:** your first improvise each fight costs the normal amount.
-
-Change these in `data/vectors.json` improvise and failures; `src/core/combat/resolver.gd` instability_target.
+The Vector Wheel and in-combat improvising are gone (CL Part 5). Combos are found through crafted cards (workbench and card builder), and through Borrow and Harmony in the Lab. Mage perk **Overchannel:** once a fight, a two-Vector card at normal cost. Unstable class: two-Vector spells have a 3 higher Instability threshold; its class card **Wild Cast** throws a random two-Vector spell from your known Vectors.
 
 ## B7. Telegraphs (enemy intents)
 
@@ -196,7 +189,7 @@ Change these in `data/vectors.json` improvise and failures; `src/core/combat/res
 | Intent icons | Attack, special, buff, defend, move, tracking, over the enemy's head |
 | Locked tiles | The default. The attack hits **whoever stands there** when it resolves, including other enemies. Dodge by leaving the red, or hide behind cover |
 | Blocking | If its planned tile is taken or it's rooted, it gets as close as it can and re-aims at the same target if still in reach, otherwise it **loses the attack**. A party member standing on the planned tile gets an opportunity strike |
-| Tracking | Rare (3 enemies, marked in data): the attack follows its target and can't be dodged by moving, so it deals **60%** of a locked attack. Guard, cover, getting out of reach, and an **Afterimage decoy** (it takes the next tracking hit aimed at its caster) are the answers. The party AI knows moving doesn't dodge these |
+| Tracking | Rare (3 enemies, marked in data): the attack follows its target and can't be dodged by moving, so it deals **60%** of a locked attack. Cover, getting out of reach, and an **Afterimage decoy** (it takes the next tracking hit aimed at its caster) are the answers. The party AI knows moving doesn't dodge these |
 | Charge-ups | Big attacks charge for a turn first, with a stronger pulse. Bosses use patterns (cross, ring, rows, checkerboard, line) |
 | Interrupts | Light cancels a charge, Cold delays it, killing the enemy cancels it. **Blind never removes a telegraph**: it adds a 35% miss chance, shown on the telegraph. **Taunt** makes every enemy in range that can reach the taunter re-plan at it, at once. **Pushed before acting:** areas centered on the enemy move with it; attacks aimed at a tile still happen if it's still in range and sight, otherwise they're skipped ("Off balance!") |
 | Overlaps | Tiles hit by several telegraphs show combined damage. Hold the threat key for the **threat view** (every tile shaded by incoming damage). Enemies planning in a row stagger their targets and avoid each other's red tiles |
@@ -214,7 +207,6 @@ Change these in `src/core/combat/enemy_ai.gd`, `data/ai.json` and enemy action d
 | Blind | 35% miss chance | 1 turn |
 | Haste | Extra Movement | 1 turn |
 | Rally | Damage bonus | 1 turn |
-| Guard | +3 Defense, +15% Magic Resistance | Until your next turn |
 | Shield | Absorbs damage | 2 of the target's turns |
 | Decoy | Draws enemy attacks | Varies |
 | Taunt (Beacon) | Enemies retarget to the caster | Varies |
@@ -270,7 +262,7 @@ Change layouts in `data/rooms/combat_layouts.json` and `data/arena/layouts.json`
 
 ## B10. Classes in combat (starting kits)
 
-Strike and Guard are built-in Quicks for everyone, so no deck carries them (PT Part 1). Every deck is 8 to 10 cards (CT Part 5).
+Strike is built in for everyone, so no deck carries it. Every deck is 8 to 10 cards (CT Part 5).
 
 | Class (arena name) | Role | How it plays | Starting deck | Perk |
 | --- | --- | --- | --- | --- |
@@ -448,10 +440,10 @@ Change these in `data/leveling.json`, `data/stats.json` and `data/classes.json`.
 | Runic Toolkit | Yes | Learn Construct; Constructs +50% HP |
 | Efficient Forging, Lasting Rune | Yes | Efficient Forging: Constructs and Glyphs cost 1 less MP. Lasting Rune: they last +2 rounds |
 | Vector Redirection, Perfect Counter | Yes | Reaction, 2 MP (0 with Perfect Counter): a single-target attack on you goes to another enemy within 3 |
-| Reactive Casting | Data | Cantrip at enemies stepping next to you |
+| Reactive Casting | Yes | A small hit at enemies stepping next to you |
 | Conversion Reflex | Yes | Reaction, 1 MP: a known Vector's damage is reduced by INT/2 + level/2 |
 | Mid-Flight Correction | Yes | Your ranged attacks ignore half cover |
-| Living Equation | Yes | Your Quick can be your Cantrip |
+| Living Equation | Yes | Your first 0 MP card each turn is a Quick |
 | Still Mind, Resilient Mind | Yes | Instability rolls twice (first roll each fight / every roll), keep the best |
 | Meditative Reserve | Yes | +3 MP at rest rooms and arena checkpoints |
 | Internal Casting | Yes | Hazards don't hurt you on your own turn while you have 1+ MP |
@@ -566,20 +558,20 @@ Change these in `data/town/*.json` and `docs/TOWN.md`.
 - **Monday evening of week 1 is the combat tutorial floor** (CT Part 7, `data/story/tutorial_floor.json`): 10 small rooms with Kelly as a guest, one lesson each, taught with the 2-Action rules:
   1. First Contact: turn order, 2 Actions, Strike as a Quick.
   2. The Red Tiles: telegraphs and dodging.
-  3. Brace Yourself: Guard and tracking attacks.
+  3. Brace Yourself: Strike, tracking attacks, and cancelling a telegraph.
   4. Cards on the Table: the hand of 3, MP, hover previews, range, area and Hold.
   5. Weak Spots: matchups.
   6. Walls and Cover: line of sight, cover and flanking.
   7. A rest room (campfire, chest), then Hot Floor: hazards, pushes and friendly fire. Taking the shortcut skips Hot Floor.
   8. Quick Thinking: quick cards, Dash and interrupts.
-  9. Off the Script: the Vector Wheel, with the first improvise guaranteed.
+  9. Off the Script: pushing an enemy into a pit, and the discard pile.
   10. The Whole Mess: priorities and the threat view.
 
   How the floor plays:
-  - The hand is greyed out until room 4, the Wheel until room 9 and the threat view until room 10.
+  - The hand is greyed out until room 4 and the threat view until room 10.
   - There are no crits until room 9.
   - A training HP floor means the party can't drop below 1 HP.
-  - Lessons wait for what they teach (moving, dodging, striking, guarding, hovering, playing, holding, improvising) and give a hint after 20 seconds stuck.
+  - Lessons wait for what they teach (moving, dodging, striking, hovering, playing, holding) and give a hint after 20 seconds stuck.
   - The Kelly Risk choices are unchanged: the lantern, the shortcut, the help call (room 8) and the panic moment.
   - Once the floor is cleared in any run, later runs offer "Skip the lessons": the fights stay and the prompts go.
 
@@ -724,3 +716,20 @@ All in `src/core/combat/extras.gd`, numbers in `data/lab/extras.json` and `data/
 Twelve fights in `data/lab/fights.json`: Ledge Day, Hold the Line, Thin Ice, Fire Sale, Hand-Off, The Ritual, Crowded Hall, The Hollow Mascot, Night Market, The Bell Tower, Flood Drill, Duet. The optional Arena Sampler (fight 9) isn't built. A fight's `levers` turn on its suggested levers under every preset but `current`.
 
 Presets in `data/lab/presets.json`: `current`, `cl_base`, `cl_puzzle` (also no Instability rolls), `cl_cards` (hand of 5, 2 extra Free and Follow-up cards), `cl_brutal` (`cl_puzzle` with hit-hard-rarely and a round cap of 6), `cl_plus` (`cl_puzzle` with five extras), `cl_everything`.
+
+### Guard, the Cantrip and the Wheel are gone (Part 5)
+
+Removed from the whole game, under every preset. What replaced what depends on them:
+
+| Was | Now |
+| --- | --- |
+| Guard (button, card, status, AI) | Gone. The AI waits instead |
+| Bulwark perk (double Guard) | The first hit each round on an adjacent ally is reduced by 2 |
+| Guardian class aura | Adjacent allies can't be pushed or pulled |
+| Heavy armor's Guard bonus | Takes 1 less from collisions (`collisionResist`) |
+| The Cantrip | Gone. Strike costs no MP; Mage, Healer and Bard start with Zap |
+| Reactive Casting, Living Equation | A small hit (`combat_rules.json` `reactiveHit`); the first 0 MP card each turn is a Quick |
+| The Vector Wheel and improvising | Gone. Overchannel and Unstable work on two-Vector cards; Wild Cast is the Unstable class card |
+| Tutorial rooms 3 and 9 | Strike, tracking and cancelling a telegraph; pushing into a pit and the discard pile |
+
+These change today's game too, and it hasn't been rebalanced for them: that waits for Part 6.

@@ -44,18 +44,18 @@ static func broken(db: Dictionary, run: Dictionary, id: String) -> bool:
 
 
 ## What one piece adds: defense, magicResist, movement, initiative,
-## strikePower, guardShield, resist { vector: pct }, and for weapons
+## strikePower, collisionResist, resist { vector: pct }, and for weapons
 ## reach, push, mul, tags, infusion. Broken pieces give half.
 static func piece(db: Dictionary, run: Dictionary, ch: Dictionary, id: String) -> Dictionary:
 	var it := item(db, id)
 	var s := state(run, id)
 	var out := { "defense": int(it.get("defense", 0)), "magicResist": int(it.get("magicResist", 0)), "movement": 0, "initiative": 0,
-		"strikePower": 0, "guardShield": 0, "resist": it.get("resist", {}).duplicate() }
+		"strikePower": 0, "collisionResist": 0, "resist": it.get("resist", {}).duplicate() }
 	var lvl := int(s.get("level", 0))
 	var up: Dictionary = cfg(db).get("upgrade", {})
 	if it.has("armorType"):
 		var at: Dictionary = cfg(db).get("armorTypes", {}).get(str(it["armorType"]), {})
-		for k in ["movement", "initiative", "guardShield"]:
+		for k in ["movement", "initiative", "collisionResist"]:
 			out[k] = int(out[k]) + int(at.get(k, 0))
 		out["defense"] = int(out["defense"]) + lvl * int(up.get("armorDefense", 1))
 		if str(cfg(db).get("classArmor", {}).get(str(ch.get("class", "")), "")) == str(it["armorType"]):
@@ -78,13 +78,13 @@ static func piece(db: Dictionary, run: Dictionary, ch: Dictionary, id: String) -
 
 ## Totals over everything a character wears (cached into ch["gearStats"]).
 static func refresh(db: Dictionary, run: Dictionary, ch: Dictionary) -> Dictionary:
-	var tot := { "defense": 0, "magicResist": 0, "movement": 0, "initiative": 0, "strikePower": 0, "guardShield": 0, "resist": {}, "weapon": {} }
+	var tot := { "defense": 0, "magicResist": 0, "movement": 0, "initiative": 0, "strikePower": 0, "collisionResist": 0, "resist": {}, "weapon": {} }
 	for slot in ch.get("equipment", {}):
 		var id: Variant = ch["equipment"][slot]
 		if id == null or str(id) == "":
 			continue
 		var p := piece(db, run, ch, str(id))
-		for k in ["defense", "magicResist", "movement", "initiative", "strikePower", "guardShield"]:
+		for k in ["defense", "magicResist", "movement", "initiative", "strikePower", "collisionResist"]:
 			tot[k] = int(tot[k]) + int(p[k])
 		for v in p["resist"]:
 			tot["resist"][v] = int(tot["resist"].get(v, 0)) + int(p["resist"][v])

@@ -27,9 +27,9 @@ static func floor_rng(run: Dictionary, week: int, day: String) -> RandomNumberGe
 ## Lay out `count` rooms by a random walk from (0, 0). Returns cells in order.
 static func walk(count: int, rng: RandomNumberGenerator) -> Array:
 	var cells: Array = [Vector2i.ZERO]
-	var guard := 0
-	while cells.size() < count and guard < 500:
-		guard += 1
+	var tries := 0
+	while cells.size() < count and tries < 500:
+		tries += 1
 		var from: Vector2i = cells[rng.randi_range(0, cells.size() - 1)]
 		var d: Vector2i = DIRS[rng.randi_range(0, 3)]
 		var n := from + d

@@ -2,8 +2,7 @@
 ## Reads its setup from GameState.pending_combat; when the fight ends it hands
 ## the summary to GameState.finish_combat() and returns to the previous scene.
 ## Controls: click (or arrows + E) to move and target, 1-7 pick a card,
-## Q / Tab (pad LB / RB) highlight cards to preview them, S Strike, G Guard,
-## V Vector Wheel, F Flee, Space end turn, Esc cancel (or undo the move),
+## Q / Tab (pad LB / RB) highlight cards to preview them, S Strike, F Flee, Space end turn, Esc cancel (or undo the move),
 ## hold Shift (pad X) to fast-forward enemy turns.
 ## Each turn is Move + 1 Action (CU, docs/COMBAT_REWORK.md); the player's turn
 ## is a small state machine: idle -> card selected -> target hovered -> confirm.
@@ -30,10 +29,6 @@ var mode := "idle"
 var selected_hand := -1
 var hover_cell := Vector2i(-1, -1)
 var cursor_cell := Vector2i(-1, -1)
-var wheel_vectors: Array = []
-var wheel_form := ""
-var wheel_magnitude := "minor"
-var wheel_fuel := -1
 var _busy := false
 var _done := false
 var _log: Array = []
@@ -54,7 +49,7 @@ var _lesson_box: PanelContainer
 var _lesson_label: Label
 var _lesson_next: Button
 var _lesson_mark: ReferenceRect
-var _ui_open: Dictionary = { "hand": true, "wheel": true, "threat": true }
+var _ui_open: Dictionary = { "hand": true, "threat": true }
 var _mocked := false
 var _stayed_in_red := ""
 const ShapeDiagram := preload("res://src/scenes/ui/shape_diagram.gd")
@@ -73,7 +68,6 @@ var _hand: HBoxContainer
 var _goal_label: Label
 var _pending_target := Vector2i(-1, -1)  # a two-target card's first tile
 var _buttons: Dictionary = {}
-var _wheel: PanelContainer
 var _result_panel: PanelContainer
 var _fx: Node2D
 var _float_slots: Dictionary = {}   # unit view -> floating texts currently shown
@@ -413,9 +407,8 @@ func _build_ui() -> void:
 	col.theme_type_variation = "CompactGrid"
 	_ui.add_child(col)
 	for spec in [["end", "End", Strings.t("combat.end_turn_space")], ["strike", "Strike", Strings.t("combat.basic_strike_adjacent_str_uses")],
-			["guard", "Guard", Strings.t("combat.basic_guard_defense_until_your")],
-			["wheel", "Wheel", Strings.t("combat.vector_wheel_improvise_a_spell_2")], ["flee", "Flee", Strings.t("combat.flee_when_everyone_stands_on")],
-			["undo", "Undo", Strings.t("combat.undo_this_turn_s_move")], ["cantrip", Strings.t("combat.cantrip"), Strings.t("combat.cantrip_tip")],
+			["flee", "Flee", Strings.t("combat.flee_when_everyone_stands_on")],
+			["undo", "Undo", Strings.t("combat.undo_this_turn_s_move")],
 			["hold", Strings.t("combat.hold"), Strings.t("combat.hold_tip")], ["party", Strings.t("combat.party"), Strings.t("combat.party_tip")],
 			["together", Strings.t("combat.together"), Strings.t("combat.together_tip")],
 			["backpack", Strings.t("combat.backpack"), Strings.t("combat.backpack_tip")],
@@ -432,16 +425,15 @@ func _build_ui() -> void:
 	# Sit on the bottom edge however many buttons there are; the pips ride on top.
 	col.position.y = minf(hand_y, view.y - col.get_combined_minimum_size().y - 1)
 	_pips.position.y = col.position.y - 8
-	# Strike and Guard are Quicks: they sit beside the hand (PT Part 3).
+	# Strike sits beside the hand (PT Part 3).
 	_quick_box = VBoxContainer.new()
 	_quick_box.theme_type_variation = "CompactBox"
 	_quick_box.position = Vector2(4 + 3 * (Assets.texture(str(UiTheme.skin("cards").get("spell", ""))).get_width() + 2) + 2, hand_y + 2)
 	_ui.add_child(_quick_box)
-	for key in ["strike", "guard"]:
-		var qb: Button = _buttons[key]
-		col.remove_child(qb)
-		qb.set_meta("base_text", qb.text)
-		_quick_box.add_child(qb)
+	var qb: Button = _buttons["strike"]
+	col.remove_child(qb)
+	qb.set_meta("base_text", qb.text)
+	_quick_box.add_child(qb)
 	# Keep the button grid on screen however wide the labels are.
 	col.position.x = view.x - col.get_combined_minimum_size().x - 2
 	# The combat log: everything that happened, scrollable, newest at the bottom.
@@ -472,9 +464,6 @@ func _build_ui() -> void:
 
 ## Which buttons these rules have (the Lab's levers can change them mid-fight).
 func _apply_button_rules() -> void:
-	var old_builtins: bool = state.rules.is_current()
-	for key in ["guard", "cantrip", "wheel"]:
-		_buttons[key].visible = old_builtins
 	_buttons["hold"].visible = state.rules.flag("hold", true)
 	_buttons["surge"].visible = state.rules.flag("surge")
 	_buttons["delay"].visible = state.rules.flag("delay")
@@ -597,27 +586,22 @@ func _refresh_hud() -> void:
 	_refresh_hand()
 	var player_turn := _player_turn()
 	_buttons["end"].disabled = not player_turn
-	var act_block := state.act_block(u) if u != null else "-"
 	var quick_block := state.quick_block(u) if u != null else "-"
 	_buttons["strike"].disabled = not player_turn or quick_block != "" or (u != null and state._adjacent_hostiles(u, 1).is_empty())
-	_buttons["guard"].disabled = not player_turn or quick_block != ""
-	_buttons["wheel"].disabled = not player_turn or act_block != "" or u.known_vectors.is_empty() or not bool(_ui_open.get("wheel", true))
 	_buttons["flee"].disabled = not player_turn or not state.can_flee()
-	for key in ["strike", "guard"]:
-		var qbtn: Button = _buttons[key]
-		var quick := state.is_quick_now(u, { "builtin": true })
-		qbtn.text = "%s (%s)" % [str(qbtn.get_meta("base_text", qbtn.text)), Strings.t("combat.quick_badge") if quick else Strings.t("combat.action_badge")]
+	var qbtn: Button = _buttons["strike"]
+	var quick := state.is_quick_now(u, { "builtin": true })
+	qbtn.text = "%s (%s)" % [str(qbtn.get_meta("base_text", qbtn.text)), Strings.t("combat.quick_badge") if quick else Strings.t("combat.action_badge")]
 	# The active mode's button is "selected" (a filled look, not the focus outline).
 	for key in _buttons:
 		var mb: Button = _buttons[key]
-		mb.theme_type_variation = "SelectedButton" if (key == mode or (key == "wheel" and mode in ["fuel", "wheel_target"])) else ""
+		mb.theme_type_variation = "SelectedButton" if key == mode else ""
 	if _strip != null and Engine.get_process_frames() % 30 == 0:
 		_strip.refresh()
 	_override_tag.visible = GameState.combat_turn_mode != "" and GameState.combat_turn_mode != str(DataDB.table("combat_rules").get("turnMode", ""))
 	_override_tag.text = Strings.t("combat.override_tag") % GameState.combat_turn_mode
 	_buttons["undo"].disabled = not player_turn or not state.can_undo_move(u)
 	_buttons["undo"].tooltip_text = Strings.t("combat.undo_this_turn_s_move") if u == null or state.can_undo_move(u) else Strings.t("combat.undo_locked") % state.undo_reason(u)
-	_buttons["cantrip"].disabled = not player_turn or act_block != "" or state.cantrip_targets(u).is_empty()
 	_buttons["hold"].disabled = not player_turn or state.hold_block(u) != ""
 	_buttons["together"].disabled = not player_turn or state.together_targets(u).is_empty()
 	_apply_button_rules()
@@ -691,9 +675,9 @@ func _refresh_hand() -> void:
 		var cost := state.card_cost(u, card)
 		b.setup(card, cost)
 		b.owner_color = owner_color
-		b.selected = (mode == "card" and selected_hand == i) or (mode == "wheel_target" and wheel_fuel == i)
+		b.selected = mode == "card" and selected_hand == i
 		var block := state.card_block(u, card)
-		b.disabled = not _player_turn() or (block != "" and mode != "fuel" and mode != "hold") or not bool(_ui_open.get("hand", true))
+		b.disabled = not _player_turn() or (block != "" and mode != "hold") or not bool(_ui_open.get("hand", true))
 		b.held = str(u.deck.hand[i]) == u.held_id
 		b.quick_now = state.is_quick_now(u, card)
 		if state.uses_actions(u):
@@ -898,11 +882,11 @@ func _refresh_overlays() -> void:
 				if _hover_card >= 0 and _hover_card < u.deck.hand.size():
 					var card := state.card_of(u, _hover_card)
 					field.target_cells = state.card_targets(u, card)
-					_preview(card, false, true)
+					_preview(card, true)
 			"card":
 				var card := state.card_of(u, selected_hand)
 				field.target_cells = state.card_targets(u, card)
-				_preview(card, false)
+				_preview(card)
 			"drag":
 				var spots: Array = []
 				if _drag_unit != null:
@@ -917,28 +901,22 @@ func _refresh_overlays() -> void:
 				field.footprint_cells = [_pending_target]
 			"strike":
 				field.target_cells = state._adjacent_hostiles(u, 1) + state.adjacent_walls(u)
-				_preview({ "action": "strike", "stat": "str", "mult": 1.0, "name": "Strike" }, false)
-			"cantrip":
-				field.target_cells = state.cantrip_targets(u)
+				_preview({ "action": "strike", "stat": "str", "mult": 1.0, "name": "Strike" })
 			"together":
 				field.target_cells = state.together_targets(u)
-			"wheel_target":
-				var card := _wheel_card()
-				field.target_cells = state.card_targets(u, card)
-				_preview(card, true)
 	field.queue_redraw()
 
 
 ## Footprint and predicted damage at the hovered tile; for a card that's only
 ## hovered in hand (`guess`), at the nearest target tile with an enemy on it.
-func _preview(card: Dictionary, improvised: bool, guess: bool = false) -> void:
+func _preview(card: Dictionary, guess: bool = false) -> void:
 	var target := hover_cell if hover_cell.x >= 0 else cursor_cell
 	if guess:
 		# Only a tile the mouse is actually on counts; otherwise aim at the likely target.
 		target = hover_cell if field.target_cells.has(hover_cell) else _likely_target(field.target_cells)
 	if not field.target_cells.has(target):
 		return
-	var p := state.preview(state.current, card, target, improvised)
+	var p := state.preview(state.current, card, target)
 	field.footprint_cells = p["cells"]
 	field.footprint_heal = CardRules.heals(card)
 	var axes := CardRules.ordered_vectors(DataDB.all(), card.get("vectors", {}))
@@ -1057,16 +1035,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			_on_card(k - KEY_1)
 		elif k == KEY_S:
 			_on_button("strike")
-		elif k == KEY_G:
-			_on_button("guard")
-		elif k == KEY_C:
-			_on_button("cantrip")
 		elif k == KEY_H:
 			_on_button("hold")
 		elif k == KEY_Y:
 			_on_button("together")
-		elif k == KEY_V:
-			_on_button("wheel")
 		elif k == KEY_F:
 			_on_button("flee")
 		elif k == KEY_R and in_lab():
@@ -1183,10 +1155,6 @@ func _update_hover_info(at: Vector2) -> void:
 func _cancel() -> void:
 	mode = "idle"
 	selected_hand = -1
-	wheel_fuel = -1
-	if _wheel != null:
-		_wheel.queue_free()
-		_wheel = null
 	_refresh_overlays()
 	_refresh_hud()
 
@@ -1202,13 +1170,6 @@ func _on_card(i: int) -> void:
 		if state.hold_card(u, i):
 			_lesson_event("held")
 			_after_action()
-		return
-	if mode == "fuel":
-		wheel_fuel = i
-		mode = "wheel_target"
-		_info.text = Strings.t("combat.aim_the_improvised_spell_burning") % state.card_of(u, i).get("name", "")
-		_refresh_overlays()
-		_refresh_hud()
 		return
 	if mode == "card" and selected_hand == i:
 		_cancel()
@@ -1316,12 +1277,6 @@ func _on_button(key: String) -> void:
 				mode = "strike"
 				_refresh_overlays()
 				_refresh_hud()
-		"guard":
-			if state.guard(u):
-				_lesson_event("guarded")
-				_after_action()
-		"wheel":
-			_open_wheel()
 		"flee":
 			if state.flee():
 				_after_action()
@@ -1343,14 +1298,9 @@ func _on_button(key: String) -> void:
 				_refresh_hud()
 			else:
 				_info.text = Strings.t("combat.together_none")
-		"cantrip":
-			if state.act_block(u) == "" and not state.cantrip_targets(u).is_empty():
-				mode = "cantrip"
-				_refresh_overlays()
 
 
-## Idle: a reachable tile moves you. With a card (or Strike, or an aimed
-## improvised spell) selected: a valid target confirms it, and any other tile
+## Idle: a reachable tile moves you. With a card (or Strike) selected: a valid target confirms it, and any other tile
 ## just deselects, so a misclick never does something unexpected.
 func _click_cell(c: Vector2i) -> void:
 	if not _player_turn():
@@ -1431,21 +1381,6 @@ func _click_cell(c: Vector2i) -> void:
 				_after_action()
 			else:
 				_cancel()
-		"cantrip":
-			if state.cast_cantrip(u, c):
-				_lesson_event("cantrip")
-				mode = "idle"
-				_after_action()
-			else:
-				_cancel()
-		"wheel_target":
-			if state.improvise(u, wheel_vectors, wheel_form, wheel_magnitude, wheel_fuel, c):
-				_lesson_event("improvised")
-				mode = "idle"
-				wheel_fuel = -1
-				_after_action()
-			else:
-				_cancel()
 
 
 ## A card that lets you pick (a discard to recall, a hand card to pass, the top of your
@@ -1486,92 +1421,6 @@ func _ask_card_choice(card: Dictionary, hand_index: int) -> bool:
 func _after_action() -> void:
 	await _play_events()
 	_sync_views()
-
-
-# --- Vector Wheel ------------------------------------------------------------------------------
-
-func _wheel_card() -> Dictionary:
-	if wheel_vectors.is_empty() or wheel_form == "":
-		return {}
-	var v := {}
-	for a in wheel_vectors:
-		v[a] = 1.0
-	return CardRules.make_spell(DataDB.all(), v, wheel_form, wheel_magnitude)
-
-
-func _open_wheel() -> void:
-	if _wheel != null:
-		_wheel.queue_free()
-	var u := state.current
-	if wheel_form == "" or not u.known_forms.has(wheel_form):
-		wheel_form = str(u.known_forms[0]) if not u.known_forms.is_empty() else ""
-	wheel_vectors = wheel_vectors.filter(func(a: Variant) -> bool: return u.known_vectors.has(a))
-	if wheel_vectors.is_empty() and not u.known_vectors.is_empty():
-		wheel_vectors = [u.known_vectors[0]]
-	_wheel = PanelContainer.new()
-	_wheel.position = Vector2((Display.base.x - 260) / 2.0, 60)
-	_wheel.custom_minimum_size = Vector2(260, 0)
-	_ui.add_child(_wheel)
-	var box := VBoxContainer.new()
-	_wheel.add_child(box)
-	box.add_child(UiTheme.label(Strings.t("combat.vector_wheel_improvise_a_spell"), UiTheme.ACCENT))
-	var db: Dictionary = DataDB.all()
-	var row := HBoxContainer.new()
-	box.add_child(row)
-	row.add_child(UiTheme.label(Strings.t("combat.vectors")))
-	for axis in u.known_vectors:
-		var a := str(axis)
-		var b := UiTheme.button(("[%s]" if wheel_vectors.has(a) else "%s") % a.capitalize(), func() -> void:
-			if wheel_vectors.has(a):
-				if wheel_vectors.size() > 1:
-					wheel_vectors.erase(a)
-			elif wheel_vectors.size() < 2:
-				wheel_vectors.append(a)
-			else:
-				wheel_vectors = [wheel_vectors[1], a]
-			_open_wheel())
-		row.add_child(b)
-	var frow := HFlowContainer.new()
-	frow.custom_minimum_size = Vector2(250, 0)
-	box.add_child(frow)
-	frow.add_child(UiTheme.label(Strings.t("combat.form")))
-	for f in u.known_forms:
-		var fid := str(f)
-		frow.add_child(UiTheme.button(("[%s]" if wheel_form == fid else "%s") % str(DataDB.record("forms", fid).get("name", fid)), func() -> void:
-			wheel_form = fid
-			_open_wheel()))
-	var mrow := HBoxContainer.new()
-	box.add_child(mrow)
-	mrow.add_child(UiTheme.label(Strings.t("combat.magnitude")))
-	var cap := CardRules.magnitude_index(db, CardRules.max_magnitude(db, u.knowledge_tier))
-	if CardRules.magnitude_index(db, wheel_magnitude) > cap:
-		wheel_magnitude = "minor"
-	for m in db.get("vectors", {}).get("magnitudeOrder", []):
-		var mid := str(m)
-		if CardRules.magnitude_index(db, mid) > cap:
-			continue
-		mrow.add_child(UiTheme.button(("[%s]" if wheel_magnitude == mid else "%s") % mid.capitalize(), func() -> void:
-			wheel_magnitude = mid
-			_open_wheel()))
-	var card := _wheel_card()
-	var err := state.improvise_error(u, wheel_vectors, wheel_form, wheel_magnitude)
-	if not card.is_empty():
-		var cost := state.improvise_cost(u, card)
-		box.add_child(UiTheme.label(Strings.t("combat.mp_1_card_as_fuel") % [card["name"], cost,
-			roundi(Res.stability_chance(db, u.stability, cost, card, true) * 100.0)]))
-	if err != "":
-		box.add_child(UiTheme.label(err, UiTheme.BAD))
-	var brow := HBoxContainer.new()
-	box.add_child(brow)
-	var aim := UiTheme.button(Strings.t("combat.pick_fuel_card_then_aim"), func() -> void:
-		_wheel.queue_free()
-		_wheel = null
-		mode = "fuel"
-		_info.text = Strings.t("combat.click_a_card_in_your")
-		_refresh_hud())
-	aim.disabled = err != ""
-	brow.add_child(aim)
-	brow.add_child(UiTheme.button(Strings.t("combat.close"), _cancel))
 
 
 # --- Events ---------------------------------------------------------------------------------------
@@ -1827,9 +1676,6 @@ func _play_event(e: Dictionary) -> void:
 			var sname := str(UiTheme.status_info(str(e["status"])).get("name", e["status"]))
 			_float_text(_view_for_id(str(e["unit"])), sname, UiTheme.ACCENT)
 			_note("%s: %s." % [_uname(str(e["unit"])), sname])
-		"guard":
-			_float_text(_view_for_id(str(e["unit"])), "guard", UiTheme.DIM)
-			_note(Strings.t("combat.guards") % _uname(str(e["unit"])))
 		"miss":
 			_float_text(_view_for_id(str(e["unit"])), "miss", UiTheme.DIM)
 			_note(Strings.t("combat.the_attack_on_misses") % _uname(str(e["unit"])))
@@ -2036,7 +1882,7 @@ func randf_range_seeded(amount: float) -> float:
 # --- Tutorial lessons (CT Part 7) ------------------------------------------------
 
 func _start_lesson(setup: Dictionary) -> void:
-	_ui_open = setup.get("ui", { "hand": true, "wheel": true, "threat": true })
+	_ui_open = setup.get("ui", { "hand": true, "threat": true })
 	_stayed_in_red = str(setup.get("stayedInRed", ""))
 	if not bool(_ui_open.get("hand", true)):
 		_hand.modulate = Color(1, 1, 1, 0.35)
@@ -2099,7 +1945,7 @@ func _highlight_control(key: String) -> Control:
 			return _hand
 		"mp":
 			return _unit_panel
-		"strike", "guard", "hold", "wheel", "cantrip":
+		"strike", "hold", "discard":
 			return _buttons.get(key, null)
 	return null
 

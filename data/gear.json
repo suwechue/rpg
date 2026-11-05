@@ -9,7 +9,7 @@
     "medium": {},
     "heavy": {
       "movement": -1,
-      "guardShield": 3
+      "collisionResist": 1
     }
   },
   "weaponTypes": {

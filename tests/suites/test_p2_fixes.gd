@@ -1,4 +1,4 @@
-## P2 Parts 1 and 2: Strike and Guard as Quicks after both Actions, card owners,
+## P2 Parts 1 and 2: Strike as Quicks after both Actions, card owners,
 ## and the effects every screen shows.
 extends "res://tests/suite.gd"
 
@@ -19,7 +19,7 @@ func fight() -> StateScript:
 
 
 func test_quicks_after_actions() -> void:
-	# The PT Part 1 rule (Strike and Guard as Quicks) is a data option now.
+	# The PT Part 1 rule (Strike as Quicks) is a data option now.
 	db()["combat_rules"]["builtinsQuick"] = true
 	var st := fight()
 	var p = st.units[0]
@@ -30,12 +30,11 @@ func test_quicks_after_actions() -> void:
 	var q = st2.units[0]
 	st2.units[1].cell = Vector2i(1, 0)
 	check(st2.strike(q, Vector2i(1, 0)) and q.actions_left == 2, "Strike first: both Actions left")
-	check(not st2.guard(q), "Strike then Guard: one Quick per turn")
+	check(st2.quick_block(q) != "", "one Quick per turn")
 	var st3 := fight()
 	var g = st3.units[0]
 	st3.move(g, Vector2i(1, 0))
 	st3.move(g, Vector2i(1, 1))
-	check(st3.guard(g) and g.actions_left == 0, "Guard after both Actions works")
 	check(st3.is_quick_now(g, { "builtin": true }), "labels say QUICK under two Actions")
 	st3.turn_mode = "move_or_act"
 	check(not st3.is_quick_now(g, { "builtin": true }), "labels say ACTION under another turn rule")
@@ -110,7 +109,7 @@ func test_arena_block_themes() -> void:
 
 
 func test_ranged_builtins_on_hard() -> void:
-	# The PT Part 1 rule (Strike and Guard as Quicks) is a data option now.
+	# The PT Part 1 rule (Strike as Quicks) is a data option now.
 	db()["combat_rules"]["builtinsQuick"] = true
 	var mage := Char.create(db(), "mage", seeded(1), { "isPlayer": true })
 	var e: Dictionary = DT.index_under(db(), "enemies/", "enemies")["pom_pom_wisp"].duplicate(true)

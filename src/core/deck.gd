@@ -71,10 +71,5 @@ func play(hand_index: int, consumable: bool = false) -> String:
 	return id
 
 
-## Discard as fuel for an improvised cast.
-func discard_from_hand(hand_index: int) -> String:
-	return play(hand_index, false)
-
-
 func total_cards() -> int:
 	return draw_pile.size() + hand.size() + discard.size()

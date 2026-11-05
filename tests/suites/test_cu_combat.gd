@@ -60,7 +60,6 @@ func test_move_then_one_action() -> void:
 	check(p.action_used, "the action is used")
 	check(st.card_block(p, st.card_of(p, 0)) == "No action left", "a second action card is blocked: %s" % st.card_block(p, st.card_of(p, 0)))
 	check(not st.strike(p, foe(st).cell), "Strike needs the action too")
-	check(not st.guard(p), "so does Guard")
 	p.move_left = 1
 	check(st.move(p, Vector2i(0, 0)), "movement left over can still be used after acting")
 
@@ -68,8 +67,8 @@ func test_move_then_one_action() -> void:
 func test_quick_cards() -> void:
 	var st := fight(["P.E......"], [enemy("pom_pom_wisp")])
 	var p = player(st)
-	give_hand(p, ["card_guard", "card_dash", "card_heavy_swing"])
-	check(bool(st.card_of(p, 0).get("quick", false)), "Guard is a quick card")
+	give_hand(p, ["card_dash", "card_dash", "card_heavy_swing"])
+	check(bool(st.card_of(p, 0).get("quick", false)), "Dash is a quick card")
 	check(st.play_card(p, 0, p.cell), "a quick card")
 	check(p.quick_used and not p.action_used, "uses the quick slot, not the action")
 	check(st.play_card(p, 0, p.cell), "a second quick card")
@@ -87,7 +86,8 @@ func test_undo_move() -> void:
 	check(st.can_undo_move(p), "undo is offered after a move")
 	check(st.undo_move(p) and p.cell == start and p.move_left == full, "back on the start tile with full Movement")
 	st.move(p, start + Vector2i(1, 0))
-	st.guard(p)
+	give_hand(p, ["card_dash"])
+	st.play_card(p, 0, p.cell)
 	check(not st.can_undo_move(p), "no undo after acting")
 
 

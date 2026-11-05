@@ -425,7 +425,7 @@ Single tiles inside a tileset. Replacing one changes it everywhere it's used. Dr
 | [ ] | `icon_status_rally` | 16x16 | 16x16 white shape with dark outline | center | skin placeholder |  |
 | [ ] | `icon_status_infusion` | 16x16 | 16x16 white shape with dark outline | center | skin placeholder |  |
 | [ ] | `icon_technique_default` | 16x16 | 16x16 white shape with dark outline | center | skin placeholder | Default icon (P2 2.4). Give one its own art as icon_technique_<id>.png in assets/custom/icons/ with the specific id. |
-| [ ] | `icon_status_guard` | 16x16 | 16x16 white shape with dark outline | center | skin placeholder |  |
+| [ ] | `icon_status_cover` | 16x16 | 16x16 white shape with dark outline | center | skin placeholder |  |
 | [ ] | `icon_status_shield` | 16x16 | 16x16 white shape with dark outline | center | skin placeholder |  |
 | [ ] | `icon_kind_spell` | 16x16 | 16x16 white shape with dark outline | center | skin placeholder |  |
 | [ ] | `icon_kind_basic` | 16x16 | 16x16 white shape with dark outline | center | skin placeholder |  |

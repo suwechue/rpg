@@ -54,7 +54,7 @@ Some cards only come from timed events around town, often during class. The morn
 | Town and dungeon | WASD or arrows walk, E or Enter interact, Space ends the day part, G What can I do?, P pause |
 | Menus | Mouse, or arrows + Enter; Esc closes |
 | Combat | Click a tile to move; click a card, then a target |
-| Combat keys | 1-7 cards, S Strike, G Guard, C Cantrip, H Hold, V Vector Wheel, Y Together, F Flee, Space end turn, hold T threat view, hold Shift fast-forward, P pause |
+| Combat keys | 1-7 cards, S Strike, H Hold, Y Together, F Flee, Space end turn, hold T threat view, hold Shift fast-forward, P pause |
 | Anywhere | F8 save a feedback zip, F1 debug menu |
 
 ## Run the tests
@@ -101,6 +101,7 @@ Most changes to content or balance need no code: edit the JSON in `data/`.
 | Doc | For |
 | --- | --- |
 | `docs/MECHANICS.md` | Every rule and number as the game works now. The best description of the game |
+| `docs/COMBAT_LAB.md` | The Combat Lab plan: rules as switches, hand-made fights, and picking what's fun |
 | `docs/PROGRESS.md` | What's done, what was decided, what's left, balance results |
 | `docs/CHANGELOG.md` | What changed in each version |
 | `docs/PLAYTEST.md` | How to playtest and report how it felt; no Godot knowledge needed |

@@ -66,8 +66,6 @@
     "maxMagicResistPct": 60,
     "affinityBonusScale": 0.5,
     "critMultiplier": 1.5,
-    "guardDefense": 3,
-    "guardMagicResistPct": 15,
     "openingHand": 3,
     "drawUpTo": 3,
     "hasteMoveBonus": 2,

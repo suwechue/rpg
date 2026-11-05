@@ -20,7 +20,7 @@ const OPS := ["burn_tiles", "fire_wall", "empower", "detonate", "self_burn", "st
 	"hit_and_run", "shadow_step", "blind_adjacent", "free_move", "ward", "pull_ally", "sanctuary", "intercept", "encore",
 	"strike_x", "dash_line", "pull_root", "status_target", "status_self", "status_area",
 	"draw", "recall", "seek", "hand_plus",
-	"saturate", "mp_full", "burn_discard", "shuffle_back", "recall_best", "cycle_hand", "mp_per_discard", "discard_volley"]
+	"wild_cast", "saturate", "mp_full", "burn_discard", "shuffle_back", "recall_best", "cycle_hand", "mp_per_discard", "discard_volley"]
 const TARGETING := ["self", "enemy", "ally", "unit", "empty", "any", "dir"]
 
 ## Statuses that count as "bad" for Cleanse.
@@ -460,6 +460,30 @@ static func _op(st, u: UnitScript, card: Dictionary, fx: Dictionary, target: Vec
 						st._emit({ "t": "log", "text": Str.t(st.db, "card_effects.seeks") % [u.name, str(c.get("name", ""))] })
 						break
 		# --- Technique cards ---
+		"wild_cast":
+			# A random two-Vector spell from your known Vectors.
+			var pool: Array = u.known_vectors.duplicate()
+			if pool.is_empty():
+				pool = ["force"]
+			var a := str(pool[st.rng.randi_range(0, pool.size() - 1)])
+			pool.erase(a)
+			var b: String = a if pool.is_empty() else str(pool[st.rng.randi_range(0, pool.size() - 1)])
+			var vectors := { a: 1.0, b: 1.0 }
+			var wild := CardRules.make_spell(st.db, vectors, str(fx.get("form", "bolt")), str(fx.get("magnitude", "standard")))
+			st._emit({ "t": "log", "text": Str.t(st.db, "card_effects.wild_cast") % [u.name, str(wild.get("name", ""))] })
+			st.replay_card(u, wild, target, false)
+		"wild_cast":
+			# A random two-Vector spell from your known Vectors.
+			var pool: Array = u.known_vectors.duplicate()
+			if pool.is_empty():
+				pool = ["force"]
+			var a := str(pool[st.rng.randi_range(0, pool.size() - 1)])
+			pool.erase(a)
+			var b: String = a if pool.is_empty() else str(pool[st.rng.randi_range(0, pool.size() - 1)])
+			var vectors := { a: 1.0, b: 1.0 }
+			var wild := CardRules.make_spell(st.db, vectors, str(fx.get("form", "bolt")), str(fx.get("magnitude", "standard")))
+			st._emit({ "t": "log", "text": Str.t(st.db, "card_effects.wild_cast") % [u.name, str(wild.get("name", ""))] })
+			st.replay_card(u, wild, target, false)
 		"saturate":
 			var area: Array = []
 			for dy in range(-1, 2):
@@ -610,9 +634,8 @@ static func _op(st, u: UnitScript, card: Dictionary, fx: Dictionary, target: Vec
 			if t != null and st.is_hostile(u, t):
 				var stolen := t.shield
 				t.shield = 0
-				for s in ["haste", "rally", "guard"]:
+				for s in ["haste", "rally"]:
 					t.statuses.erase(s)
-				t.guard_active = false
 				if stolen > 0:
 					u.shield += stolen
 					u.shield_turns = maxi(u.shield_turns, 2)

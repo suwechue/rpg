@@ -315,7 +315,7 @@
         "loyalty": 70
       },
       "behavior": "shield_bearer",
-      "frontGuard": 0.75,
+      "frontBlock": 0.75,
       "actions": [
         {
           "id": "bash",

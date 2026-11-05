@@ -97,6 +97,9 @@ static func apply(db: Dictionary, run: Dictionary, ch: Dictionary, class_id: Str
 	for f in cls.get("grantForms", []):
 		if not ch["knownForms"].has(f):
 			ch["knownForms"].append(f)
+	for c in cls.get("grantCards", []):
+		if not ch["deck"].has(c):
+			ch["deck"].append(c)
 	for v in cls.get("grantVectors", []):
 		if not ch["knownVectors"].has(v):
 			ch["knownVectors"].append(v)

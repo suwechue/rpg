@@ -337,6 +337,38 @@
         }
       ],
       "text": "Once per fight. Restore full MP."
+    },
+    {
+      "id": "card_zap",
+      "name": "Zap",
+      "kind": "basic",
+      "action": "strike",
+      "stat": "int",
+      "mult": 0.8,
+      "range": 4,
+      "cost": 0,
+      "short": "Hit at range",
+      "text": "Hit an enemy within 4 (INT x0.8). No MP."
+    },
+    {
+      "id": "card_wild_cast",
+      "name": "Wild Cast",
+      "kind": "basic",
+      "action": "effects",
+      "cost": 2,
+      "short": "Random 2-Vector",
+      "targeting": {
+        "type": "enemy",
+        "range": 5
+      },
+      "effects": [
+        {
+          "op": "wild_cast",
+          "form": "bolt",
+          "magnitude": "standard"
+        }
+      ],
+      "text": "Cast a random two-Vector spell from your known Vectors at an enemy within 5."
     }
   ]
 }

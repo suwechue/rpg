@@ -99,7 +99,7 @@
           "maxHp": 8
         }
       },
-      "text": "+3 Defense, +1 Magic Resist, +8 Max HP. Heavy: -1 Movement, bigger Guard.",
+      "text": "+3 Defense, +1 Magic Resist, +8 Max HP. Heavy: -1 Movement, takes less from collisions.",
       "armorType": "heavy",
       "magicResist": 1,
       "rarity": "rare",

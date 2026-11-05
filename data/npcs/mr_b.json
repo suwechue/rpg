@@ -121,7 +121,7 @@
       },
       "line": "The school runs so well because of you.",
       "baseRisk": 0.05,
-      "goodText": "Briefly effective. He's too paranoid to fully let his guard down.",
+      "goodText": "Briefly effective. He's too paranoid to fully relax.",
       "badText": "\"Flattery is a tell.\"",
       "gate": {
         "cha": 8

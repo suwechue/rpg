@@ -6,7 +6,7 @@ The demo (VD Part 5): the intro through the week 1 boss, the Endless Arena from 
 | --- | --- | --- |
 | Town life sim (AP day parts, classes, schedule, dialogue, Charisma gates, misheard lines, Bond, shops) | Have | Interiors still use drawn rectangles for furniture |
 | Dungeon floors, Friday boss, Kelly tutorial floor | Have | Floors use generic rooms with a theme tint |
-| Combat (2 Actions + 1 Quick, telegraphs, cover, statuses, Forge, class pools) | Have | Strike and Guard Quick bug fixed (P2 1.1); Binding tethers, hidden enemies and acting Constructs built (TL Part 6) |
+| Combat (2 Actions + 1 Quick, telegraphs, cover, statuses, Forge, class pools) | Have | Strike Quick bug fixed (P2 1.1); Binding tethers, hidden enemies and acting Constructs built (TL Part 6) |
 | Endless Arena (waves, hazards, checkpoints, mutators, card and perk picks, score) | Have | Owner choice and effects strip done (P2 Parts 1 and 2); the walkable campfire camp is built (AC) |
 | Point buy, Party panel, pause menu, options | Have | Options open from the title screen (VD Part 5) |
 | Art, audio and UI by asset id | Have | VD Part 1: VFX group, art chains, audio situations, ambience, events, audit test, `docs/CUSTOMIZE.md` |

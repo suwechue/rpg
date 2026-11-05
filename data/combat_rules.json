@@ -8,7 +8,7 @@
     "move_and_act"
   ],
   "actions": {
-    "comment": "PT Part 1: every party turn has actionsPerTurn Actions (a Move of up to your Movement, or a non-quick card) plus quicksPerTurn Quicks (Strike, Guard or a quick card). moveActionTiles is the typical Movement (stats.json derived.movement gives 4 at DEX 5 to 9).",
+    "comment": "PT Part 1: every party turn has actionsPerTurn Actions (a Move of up to your Movement, or a non-quick card) plus quicksPerTurn Quicks (Strike or a quick card). moveActionTiles is the typical Movement (stats.json derived.movement gives 4 at DEX 5 to 9).",
     "actionsPerTurn": 2,
     "quicksPerTurn": 1,
     "moveActionTiles": 4,
@@ -16,8 +16,8 @@
     "holdCost": 1,
     "partyFirstInArena": true
   },
-  "cantrip": {
-    "comment": "PT Part 1: a built-in 0 MP Action attack in the character's first Vector. Single target, Bolt or Touch, no riders.",
+  "reactiveHit": {
+    "comment": "Reactive Casting: a small single-target hit in the character's first Vector.",
     "range": 4,
     "damage": {
       "default": 4,
@@ -32,6 +32,7 @@
       "transmutation": 3
     }
   },
+  "unstableThresholdBonus": 3,
   "opportunityStrike": {
     "comment": "PT Part 1: standing on the tile an enemy plans to move to gives a free Strike when it is stopped next to you.",
     "mult": 1.0
@@ -97,7 +98,7 @@
   },
   "difficulty": "normal",
   "difficulties": {
-    "comment": "Combat difficulty (user decision, Oct 24). Enemies always telegraph during the player's turn and carry it out on theirs. Enemies telegraph right before their turn (docs/COMBAT_TUNING.md Part 2). Enemies get 2 Actions like the party (PT Part 1): move + attack, or move + move when nothing is in reach. enemyDoubleAttackChance (one number, or one per tier) is the chance that an enemy already in reach attacks twice instead. Hard raises the chance, enemy HP and damage. rangedBuiltinsCostAction (user request, Oct 28): ranged characters (classes with 'ranged': true) pay an Action for the built-in Strike and Guard instead of their Quick. 'nights' (Oct 29 balance pass) overrides a difficulty's numbers in Upside-Down fights only: a night is several fights in a row with HP carrying over, so it can't use the arena's from-full-HP numbers. In nights: lastStands (a blow that would drop you leaves you at 1 HP with lastStandShield, that many times a fight), playerDownEndsFight false (you're downed like an ally; lost only when nobody stands). maxHitPct: one enemy hit deals at most this share of the target's max HP (no one-shots from full health).",
+    "comment": "Combat difficulty (user decision, Oct 24). Enemies always telegraph during the player's turn and carry it out on theirs. Enemies telegraph right before their turn (docs/COMBAT_TUNING.md Part 2). Enemies get 2 Actions like the party (PT Part 1): move + attack, or move + move when nothing is in reach. enemyDoubleAttackChance (one number, or one per tier) is the chance that an enemy already in reach attacks twice instead. Hard raises the chance, enemy HP and damage. rangedBuiltinsCostAction (user request, Oct 28): ranged characters (classes with 'ranged': true) pay an Action for the built-in Strike instead of their Quick. 'nights' (Oct 29 balance pass) overrides a difficulty's numbers in Upside-Down fights only: a night is several fights in a row with HP carrying over, so it can't use the arena's from-full-HP numbers. In nights: lastStands (a blow that would drop you leaves you at 1 HP with lastStandShield, that many times a fight), playerDownEndsFight false (you're downed like an ally; lost only when nobody stands). maxHitPct: one enemy hit deals at most this share of the target's max HP (no one-shots from full health).",
     "normal": {
       "name": "Normal",
       "enemyDoubleAttackChance": {
@@ -165,7 +166,7 @@
     "mul": 0.75
   },
   "builtinsQuick": false,
-  "builtinsQuickNote": "Strike and Guard: true = they use the Quick (PT Part 1), false = they cost an Action (user request, Oct 28). Quick cards still use the Quick.",
+  "builtinsQuickNote": "Strike: true = it uses the Quick (PT Part 1), false = it costs an Action (user request, Oct 28). Quick cards still use the Quick.",
   "tactics": {
     "comment": "User request (Oct 28): difficulty through positioning, not longer fights. flankBonus: extra damage when the target has a hostile unit on the far side from the attacker (both teams). isolatedBonus: extra damage to a party member with no ally next to them. Each difficulty can override them under difficulties.<id>.tactics.",
     "flankBonus": 0.25,

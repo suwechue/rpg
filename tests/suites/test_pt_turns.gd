@@ -1,5 +1,5 @@
-## PT Parts 1 and 2 (adopted inside CT): 2 Actions + 1 Quick, Strike and Guard
-## as Quicks, the Cantrip, Hold and the end-of-turn discard, undo, party-first
+## PT Parts 1 and 2 (adopted inside CT): 2 Actions + 1 Quick, Strike
+## as Quicks, Hold and the end-of-turn discard, undo, party-first
 ## arena rounds, opportunity strikes, enemy double attacks; plus CT Parts 5 to 7
 ## (role cards, sealed exit, tutorial floor) and the card text audit (CT Part 4).
 extends "res://tests/suite.gd"
@@ -47,7 +47,7 @@ func foe(st: StateScript):
 
 
 func test_two_actions_and_quicks() -> void:
-	# The PT Part 1 rule (Strike and Guard as Quicks) is a data option now.
+	# The PT Part 1 rule (Strike as Quicks) is a data option now.
 	db()["combat_rules"]["builtinsQuick"] = true
 	var st := fight(["P.......E", "........."], [enemy("pom_pom_wisp")])
 	var p = me(st)
@@ -59,27 +59,14 @@ func test_two_actions_and_quicks() -> void:
 	foe(st).cell = Vector2i(5, 0)
 	check(st.quick_block(p) == "" and st.strike(p, Vector2i(5, 0)), "Strike is a Quick, usable after moving twice")
 	check(p.quick_used and st.quick_block(p) != "", "one Quick per turn")
-	check(not st.guard(p), "Guard is the same Quick")
 	var st2 := fight(["PE.......", "........."], [enemy("pom_pom_wisp")])
 	var p2 = me(st2)
 	foe(st2).hp = 999
-	check(st2.guard(p2) and p2.actions_left == 2, "Guard doesn't spend an Action")
+	check(st2.strike(p2, foe(st2).cell) and p2.actions_left == 2, "Strike doesn't spend an Action")
 	p2.deck.hand = ["card_heavy_swing", "card_heavy_swing", "card_heavy_swing"]
 	p2.mp = 10
 	check(st2.play_card(p2, 0, foe(st2).cell) and st2.play_card(p2, 0, foe(st2).cell) and p2.actions_left == 0, "card + card is allowed")
 	db()["combat_rules"]["builtinsQuick"] = false
-
-
-func test_cantrip() -> void:
-	var st := fight(["P...E....", "........."], [enemy("pom_pom_wisp")])
-	var p = me(st)
-	var e = foe(st)
-	e.hp = 999
-	var spec := st.cantrip_spec(p)
-	check(not spec.is_empty() and spec["vectors"].has("heat"), "the Cantrip is in the first Vector known")
-	check(st.cantrip_targets(p).has(e.cell), "single target at range")
-	var mp: int = p.mp
-	check(st.cast_cantrip(p, e.cell) and p.mp == mp and p.actions_left == 1 and e.hp < 999, "0 MP, 1 Action, it hurts")
 
 
 func test_hold_and_end_turn_discard() -> void:
@@ -173,7 +160,6 @@ func test_tutorial_floor() -> void:
 	check(rooms.size() == 10, "10 tutorial rooms")
 	check(Tutorial.route(db(), {}).size() == 10 and not Tutorial.route(db(), { "w1_shortcut": true }).has(7), "the shortcut skips room 7")
 	check(not bool(Tutorial.ui_open(db(), 3)["hand"]) and bool(Tutorial.ui_open(db(), 4)["hand"]), "the hand unlocks in room 4")
-	check(not bool(Tutorial.ui_open(db(), 8)["wheel"]) and bool(Tutorial.ui_open(db(), 9)["wheel"]), "the Vector Wheel unlocks in room 9")
 	check(not bool(Tutorial.ui_open(db(), 9)["threat"]) and bool(Tutorial.ui_open(db(), 10)["threat"]), "the threat view unlocks in room 10")
 	var player := hero()
 	for r in rooms:
@@ -185,7 +171,8 @@ func test_tutorial_floor() -> void:
 			check(Str.t(db(), str(s["say"])) != str(s["say"]), "room %d: line %s is in strings.json" % [int(r["id"]), s["say"]])
 	var r5 := Tutorial.setup_opts(db(), 5, player, {})
 	check(r5["enemies"][0]["weakTo"] == ["heat"] and r5["enemies"][1]["strongAgainst"] == ["heat"], "room 5: weak and strong to your spark")
-	check(bool(Tutorial.setup_opts(db(), 9, player, {})["guaranteeImprovise"]), "room 9: the first improvise always works")
+	check(DT.record(db(), "rooms/combat_layouts", "tut_r9")["map"].any(func(row: String) -> bool: return row.contains("p")), "room 9: a pit to push into")
+	check(Tutorial.setup_opts(db(), 9, player, {})["addCards"].has("card_shove_basic"), "room 9: and a Shove to do it with")
 	check(Tutorial.setup_opts(db(), 10, player, { "w1_shortcut": true })["lesson"].size() > Tutorial.setup_opts(db(), 10, player, {})["lesson"].size(), "after the shortcut, room 10 adds the push hint")
 	check(Tutorial.setup_opts(db(), 1, player, {}, false)["lesson"].is_empty(), "skip the lessons: fights stay, prompts go")
 	var l := Tutorial.Lesson.new([{ "say": "a", "wait": "next" }, { "say": "b", "wait": "moved", "hint": "h" }, { "say": "c", "wait": "struck" }])

@@ -1,5 +1,5 @@
 {
-  "comment": "CT Part 7 (taught with PT Part 1 and 2 rules): the authored combat tutorial floor for Monday evening, week 1, with Kelly as a guest. Each room teaches one thing. Lesson steps: say (a tut_ string key), speaker (narrator or kelly), wait (next, moved, dodged, struck, guarded, hovered_card, played_card, held, improvised), highlight (timeline, pips, strike, guard, telegraph, hand, mp, hold, cover, wheel, threat), hint (shown after hintSeconds stuck), ifFlag. ui hides elements (greyed, not removed) until the room that teaches them. fair: no crits; hpFloor: the party can't drop below 1 HP here.",
+  "comment": "CT Part 7 (taught with PT Part 1 and 2 rules): the authored combat tutorial floor for Monday evening, week 1, with Kelly as a guest. Each room teaches one thing. Lesson steps: say (a tut_ string key), speaker (narrator or kelly), wait (next, moved, dodged, struck, hovered_card, played_card, held), highlight (timeline, pips, strike, telegraph, hand, mp, hold, cover, threat, discard), hint (shown after hintSeconds stuck), ifFlag. ui hides elements (greyed, not removed) until the room that teaches them. fair: no crits; hpFloor: the party can't drop below 1 HP here.",
   "hintSeconds": 20,
   "skipFlag": "tutorial_cleared",
   "rooms": [
@@ -13,7 +13,6 @@
       ],
       "ui": {
         "hand": false,
-        "wheel": false,
         "threat": false
       },
       "fair": true,
@@ -57,7 +56,6 @@
       ],
       "ui": {
         "hand": false,
-        "wheel": false,
         "threat": false
       },
       "fair": true,
@@ -87,14 +85,13 @@
     {
       "id": 3,
       "name": "tut_r3_name",
-      "teaches": "Guard (a Quick), and tracking attacks",
+      "teaches": "Strike, tracking attacks, and cancelling a telegraph",
       "layout": "tut_r3",
       "enemies": [
         "tut_tracker"
       ],
       "ui": {
         "hand": false,
-        "wheel": false,
         "threat": false
       },
       "fair": true,
@@ -115,9 +112,14 @@
         {
           "say": "tut_r3_b",
           "speaker": "narrator",
-          "wait": "guarded",
-          "highlight": "guard",
+          "wait": "struck",
+          "highlight": "strike",
           "hint": "tut_r3_hint"
+        },
+        {
+          "say": "tut_r3_c",
+          "speaker": "narrator",
+          "wait": "next"
         }
       ]
     },
@@ -132,7 +134,6 @@
       ],
       "ui": {
         "hand": true,
-        "wheel": false,
         "threat": false
       },
       "fair": true,
@@ -190,7 +191,6 @@
       ],
       "ui": {
         "hand": true,
-        "wheel": false,
         "threat": false
       },
       "fair": true,
@@ -223,7 +223,6 @@
       ],
       "ui": {
         "hand": true,
-        "wheel": false,
         "threat": false
       },
       "fair": true,
@@ -260,7 +259,6 @@
       "skipIfFlag": "w1_shortcut",
       "ui": {
         "hand": true,
-        "wheel": false,
         "threat": false
       },
       "fair": true,
@@ -297,7 +295,6 @@
       ],
       "ui": {
         "hand": true,
-        "wheel": false,
         "threat": false
       },
       "fair": true,
@@ -335,37 +332,40 @@
     {
       "id": 9,
       "name": "tut_r9_name",
-      "teaches": "Improvising (the Vector Wheel), Instability, fuel",
+      "teaches": "Pushing into a pit, and the discard pile",
       "layout": "tut_r9",
       "enemies": [
         "tut_resistant"
       ],
       "ui": {
         "hand": true,
-        "wheel": true,
         "threat": false
       },
       "fair": false,
       "hpFloor": true,
-      "guaranteeImprovise": true,
       "lesson": [
         {
           "say": "tut_r9_a",
           "speaker": "narrator",
           "wait": "next",
-          "highlight": "wheel"
+          "highlight": "hand"
         },
         {
           "say": "tut_r9_b",
           "speaker": "narrator",
-          "wait": "improvised",
+          "wait": "played_card",
           "hint": "tut_r9_hint"
         },
         {
           "say": "tut_r9_c",
           "speaker": "narrator",
-          "wait": "next"
+          "wait": "next",
+          "highlight": "discard"
         }
+      ],
+      "addCards": [
+        "card_shove_basic",
+        "card_shove_basic"
       ]
     },
     {
@@ -381,7 +381,6 @@
       ],
       "ui": {
         "hand": true,
-        "wheel": true,
         "threat": true
       },
       "fair": false,

@@ -31,12 +31,6 @@
     "major",
     "grand"
   ],
-  "improvise": {
-    "costMultiplier": 1.5,
-    "flatExtra": 1,
-    "discardCards": 1,
-    "instabilityBonus": 0
-  },
   "failures": {
     "reduced": 4,
     "backlash": 3,
@@ -217,7 +211,7 @@
     "unlockWeight": 0.5
   },
   "fusion": {
-    "comment": "PT Part 8: two-Vector cards and improvises pay a surcharge by Magnitude. Synergistic pairs lower it (to half, rounded up) and resonate (+15% effect, -1 Instability target); antagonistic pairs add +1 MP and +2 to the Instability target. Three Vectors pay the surcharge twice.",
+    "comment": "PT Part 8: two-Vector cards pay a surcharge by Magnitude. Synergistic pairs lower it (to half, rounded up) and resonate (+15% effect, -1 Instability target); antagonistic pairs add +1 MP and +2 to the Instability target. Three Vectors pay the surcharge twice.",
     "surcharge": {
       "minor": 1,
       "standard": 1,
@@ -331,7 +325,7 @@
     "damageMul": 0.7
   },
   "instability": {
-    "comment": "PT Part 8: a cast rolls Stability when its final MP cost reaches its Magnitude's threshold (Minor never; improvised always). Target 10 + (cost - threshold) / 2, +1 Entropy, +2 per antagonistic pair, -1 per synergistic pair (minimum 10). Roll d20 + Stability / 2.",
+    "comment": "PT Part 8: a cast rolls Stability when its final MP cost reaches its Magnitude's threshold (Minor never). Target 10 + (cost - threshold) / 2, +1 Entropy, +2 per antagonistic pair, -1 per synergistic pair (minimum 10). Roll d20 + Stability / 2.",
     "thresholds": {
       "minor": 99,
       "standard": 4,

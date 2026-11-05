@@ -2,6 +2,11 @@
 
 The version shows on the title screen (data/demo.json "version").
 
+## Next (Combat Lab)
+
+- **Combat Lab:** a separate mode for trying combat rules. Twelve hand-made fights, seven presets, every rule on a switch, ratings after each fight and A/B runs. The story and arena keep today's rules until a preset is picked.
+- **Removed from the whole game:** Guard, the Cantrip and the Vector Wheel. Perks, Techniques, gear and the tutorial that used them are reworked. The story and arena haven't been rebalanced for this yet.
+
 ## 0.3.0 (Town life, gear and a balance pass)
 
 - **Skipping class means something:** the town is awake during school hours, with people to meet, places open, favors, and a risk of getting caught. Your parents notice.

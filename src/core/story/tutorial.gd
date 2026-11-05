@@ -7,9 +7,9 @@ const DT := preload("res://src/core/data_tables.gd")
 const CardRules := preload("res://src/core/card.gd")
 
 ## Things a lesson step can wait for (events the combat scene reports).
-const WAITS := ["next", "moved", "dodged", "struck", "guarded", "hovered_card", "played_card", "held", "improvised", "cantrip"]
+const WAITS := ["next", "moved", "dodged", "struck", "hovered_card", "played_card", "held"]
 ## UI elements a step can point at.
-const HIGHLIGHTS := ["timeline", "pips", "strike", "guard", "telegraph", "hand", "mp", "hold", "cover", "wheel", "threat", "cantrip"]
+const HIGHLIGHTS := ["timeline", "pips", "strike", "telegraph", "hand", "mp", "hold", "cover", "threat", "discard"]
 
 
 static func cfg(db: Dictionary) -> Dictionary:
@@ -38,9 +38,9 @@ static func route(db: Dictionary, flags: Dictionary) -> Array:
 	return out
 
 
-## Which UI elements are open in a room ("hand", "wheel", "threat").
+## Which UI elements are open in a room ("hand", "threat").
 static func ui_open(db: Dictionary, id: int) -> Dictionary:
-	return room(db, id).get("ui", { "hand": true, "wheel": true, "threat": true })
+	return room(db, id).get("ui", { "hand": true, "threat": true })
 
 
 ## Combat setup options for a room. `player` is the player character (its first
@@ -81,7 +81,7 @@ static func setup_opts(db: Dictionary, id: int, player: Dictionary, flags: Dicti
 				steps.append(st)
 	return { "tutorial": id, "layout": str(r.get("layout", "open_field")), "enemies": enemies, "playerDeck": deck,
 		"addCards": r.get("addCards", []), "ui": ui_open(db, id), "fair": bool(r.get("fair", false)), "hpFloor": bool(r.get("hpFloor", true)),
-		"guaranteeImprovise": bool(r.get("guaranteeImprovise", false)), "lesson": steps, "stayedInRed": str(r.get("stayedInRed", "")),
+		"lesson": steps, "stayedInRed": str(r.get("stayedInRed", "")),
 		"intro": str(r.get("name", "")) }
 
 

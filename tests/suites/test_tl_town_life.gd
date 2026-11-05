@@ -130,7 +130,7 @@ func test_gear() -> void:
 	check(Gear.equip(db(), run, ch, "windbreaker") == "" and int(Char.derived(db(), ch)["movement"]) == mv0 + 1, "light armor: +1 Movement")
 	Fx.add_item(run, "football_pads", 1)
 	Gear.equip(db(), run, ch, "football_pads")
-	check(int(Char.derived(db(), ch)["movement"]) == mv0 - 1 and int(ch["gearStats"]["guardShield"]) > 0, "heavy armor: -1 Movement, a bigger Guard")
+	check(int(Char.derived(db(), ch)["movement"]) == mv0 - 1 and int(ch["gearStats"]["collisionResist"]) > 0, "heavy armor: -1 Movement, a bigger Guard")
 	check(int(run["inventory"].get("windbreaker", 0)) == 1, "the old piece goes back in the bag")
 	Fx.add_item(run, "insulated_coat", 1)
 	Gear.equip(db(), run, ch, "insulated_coat")
@@ -296,7 +296,7 @@ func test_combat_stubs() -> void:
 	check(st.hidden(sk), "the Skulker is hidden")
 	st.current = me
 	me.actions_left = 2
-	check(not st.cantrip_targets(me).has(sk.cell), "and can't be targeted")
+	check(not st._spell_targets(me, st.form_rec("bolt"), false).has(sk.cell), "and can't be targeted")
 	var next_to: Vector2i = sk.cell + Vector2i(-1, 0)
 	var old: Vector2i = me.cell
 	me.cell = next_to
@@ -689,10 +689,10 @@ func test_no_technique_is_a_placebo() -> void:
 	var r := _tech_fight(["reactive_casting"], "pom_pom_wisp", ["heat"])
 	var hp0: int = r["foe"].hp
 	r["foe"].cell = r["me"].cell + Vector2i(1, 0)
-	r["st"]._reactive_cantrips(r["foe"])
+	r["st"]._reactive_hits(r["foe"])
 	check(r["foe"].hp < hp0, "Reactive Casting hits an enemy that steps next to you")
 	hp0 = r["foe"].hp
-	r["st"]._reactive_cantrips(r["foe"])
+	r["st"]._reactive_hits(r["foe"])
 	check(r["foe"].hp == hp0, "only once a round")
 	# Cards from Techniques.
 	var ch := _tech_fight([])["ch"] as Dictionary

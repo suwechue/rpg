@@ -279,7 +279,7 @@ static func card_offer(db: Dictionary, arena: Dictionary, party: Array, wave: in
 	var weights: Array = []
 	var fresh: Array = []
 	for c in DT.records_under(db, "cards/", "cards").filter(func(rec: Dictionary) -> bool: return not bool(rec.get("labOnly", false))):
-		if str(c.get("kind", "")) == "item" or str(c.get("id", "")) in ["card_strike", "card_guard"] or str(c.get("id", "")).begins_with("card_ember") or str(c.get("id", "")).begins_with("card_heat_shield") or str(c.get("id", "")).begins_with("card_frost_line"):
+		if str(c.get("kind", "")) == "item" or str(c.get("id", "")) in ["card_strike"] or str(c.get("id", "")).begins_with("card_ember") or str(c.get("id", "")).begins_with("card_heat_shield") or str(c.get("id", "")).begins_with("card_frost_line"):
 			continue
 		if wave < int(c.get("minWave", 0)) or bool(c.get("exclusive", false)):
 			continue
@@ -309,9 +309,9 @@ static func card_offer(db: Dictionary, arena: Dictionary, party: Array, wave: in
 	var n := int(cr.get("choices", 3))
 	if not fresh.is_empty() and rng.randf() < float(cr.get("newVectorChance", 0.2)):
 		out.append(fresh[rng.randi_range(0, fresh.size() - 1)])
-	var guard := 0
-	while out.size() < n and not pool.is_empty() and guard < 200:
-		guard += 1
+	var tries := 0
+	while out.size() < n and not pool.is_empty() and tries < 200:
+		tries += 1
 		var total := 0.0
 		for w in weights:
 			total += float(w)

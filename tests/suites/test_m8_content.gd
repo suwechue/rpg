@@ -93,7 +93,7 @@ func unit_state(party: Array, enemies: Array) -> StateScript:
 
 
 func test_signature_perks_in_combat() -> void:
-	# The PT Part 1 rule (Strike and Guard as Quicks) is a data option now.
+	# The PT Part 1 rule (Strike as Quicks) is a data option now.
 	db()["combat_rules"]["builtinsQuick"] = true
 	var run := fresh("mage")
 	var p: Dictionary = run["player"]
@@ -112,8 +112,25 @@ func test_signature_perks_in_combat() -> void:
 	au.cell = gu.cell + Vector2i(0, 1)
 	st2.current = gu
 	gu.action_used = false
-	st2.guard(gu)
-	check(au.shield >= 5, "Bulwark: Guard shields adjacent allies")
+	var au_at: Vector2i = au.cell
+	st2._push(st2.units.filter(func(x: Object) -> bool: return x.team == "enemy")[0], au, Vector2i(1, 0), 1)
+	check(au.cell == au_at, "Bulwark aura: adjacent allies can't be pushed")
+	var cover_run: Dictionary = fresh("fighter")["player"]
+	cover_run["id"] = "player"
+	cover_run["perks"] = ["bulwark"]
+	var ally2 := Char.create(db(), "mage", seeded(2), { "id": "ally" })
+	var st2b := unit_state([cover_run, ally2], ["pom_pom_wisp"])
+	var cu = st2b.unit_by_id("player")
+	var ca = st2b.unit_by_id("ally")
+	ca.cell = cu.cell + Vector2i(0, 1)
+	cu.mods["combat"] = { "guardianCover": 2 }
+	var foe2 = st2b.units.filter(func(x: Object) -> bool: return x.team == "enemy")[0]
+	var hp1: int = ca.hp
+	st2b._damage(ca, 10, foe2, "", "hit")
+	check(hp1 - ca.hp < 10, "Guardian perk: the first hit each round on an adjacent ally is reduced")
+	hp1 = ca.hp
+	st2b._damage(ca, 10, foe2, "", "hit")
+	check(hp1 - ca.hp == 10, "only the first")
 	var sb: Dictionary = fresh("fighter")["player"]
 	sb["class"] = "spellblade"
 	var st3 := unit_state([sb], ["pom_pom_wisp"])

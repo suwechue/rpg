@@ -82,7 +82,6 @@ var held_id := ""               # PT Part 2: the card held over to the next turn
 var double_attack := false       # enemies: this turn's plan may attack twice      # the round this unit last started a turn in
 var perk_used := false
 var rally_bonus := 0.0
-var guard_active := false
 var defense_shred := 0
 var resist_shred := 0
 

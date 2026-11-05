@@ -294,10 +294,10 @@ func _wake_at_home() -> void:
 	GameState.player["injured"] = maxi(1, int(GameState.player.get("injured", 0)))
 	GameState.run.erase("town_pos")
 	var day: int = Calendar.logic.day_index
-	var guard := 0
-	while Calendar.logic.day_index == day and guard < 12:
+	var tries := 0
+	while Calendar.logic.day_index == day and tries < 12:
 		GameState.advance_part()
-		guard += 1
+		tries += 1
 	SceneRouter.goto(TOWN)
 
 

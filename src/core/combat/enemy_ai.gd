@@ -176,8 +176,8 @@ static func options(state: StateScript, u: UnitScript) -> Array:
 		if safe != u.cell:
 			out.append({ "kind": "move", "move": safe, "target": safe, "profile": c.get("retreat", { "courage": -1.0 }),
 				"ev": float(danger[u.cell]) })
-	out.append({ "kind": "guard", "move": u.cell, "target": u.cell, "profile": c.get("guard", { "loyalty": 0.5, "courage": -0.3 }),
-		"ev": float(c.get("guardBase", 1.0)) })
+	out.append({ "kind": "wait", "move": u.cell, "target": u.cell, "profile": c.get("wait", { "loyalty": 0.5, "courage": -0.3 }),
+		"ev": float(c.get("waitBase", 1.0)) })
 	return out
 
 
@@ -226,8 +226,8 @@ static func plan_intent(state: StateScript, u: UnitScript) -> Dictionary:
 				# Nothing in reach: both Actions are moves.
 				return { "kind": "move", "move": _far_move(state, u, plan["move"]), "cells": [], "double_move": true }
 			return { "kind": "move", "move": plan["move"], "cells": [] }
-		"guard":
-			return { "kind": "defend", "move": u.cell, "cells": [] }
+		"wait":
+			return { "kind": "wait", "move": u.cell, "cells": [] }
 	var action: Dictionary = plan.get("action", {})
 	var spec := state.action_spec(u, action)
 	var m: Vector2i = plan["move"]
@@ -342,8 +342,6 @@ static func take_turn(state: StateScript, u: UnitScript) -> Dictionary:
 					state.play_card(u, idx, plan["target"])
 			"strike":
 				state.strike(u, plan["target"])
-			"guard":
-				state.guard(u)
 	if state.result == "" and state.current == u:
 		state.end_turn()
 	return plan
@@ -362,11 +360,8 @@ static func _party_turn(state: StateScript, u: UnitScript) -> Dictionary:
 		if plan.is_empty():
 			break
 		last = plan
-		if str(plan["kind"]) == "guard":
-			# Guard is a Quick: take it, then keep using the Actions (P2 fix).
-			if not state.guard(u) or u.actions_left <= 0:
-				break
-			continue
+		if str(plan["kind"]) == "wait":
+			break
 		if plan["move"] != u.cell:
 			state.move(u, plan["move"])
 		if state.result == "" and u.alive():
@@ -377,8 +372,6 @@ static func _party_turn(state: StateScript, u: UnitScript) -> Dictionary:
 						state.play_card(u, idx, plan["target"])
 				"strike":
 					state.strike(u, plan["target"])
-				"cantrip":
-					state.cast_cantrip(u, plan["target"])
 		if [u.actions_left, u.quick_used, u.cell, u.mp] == before:
 			break
 	if state.result == "" and state.current == u and u.alive() and state.quick_block(u) == "":
@@ -450,7 +443,7 @@ static func _actions(state: StateScript, u: UnitScript) -> Array:
 					var heal := _effect_amount(card, "heal", "amount") + _effect_amount(card, "ward", "amount")
 					if heal > 0:
 						out.append({ "kind": "card", "card": card, "spec": { "kind": "spell", "heal": true, "power": float(heal), "vectors": {}, "form": { "footprint": "single_los", "target": "ally", "range": int(card.get("targeting", {}).get("range", 3)) }, "mult": 1.0, "ranged": true },
-							"profile": c.get("guard", { "loyalty": 0.5 }), "targets": "card" })
+							"profile": c.get("wait", { "loyalty": 0.5 }), "targets": "card" })
 					continue
 				out.append({ "kind": "card", "card": card, "spec": state._spell_spec(u, card), "profile": c.get("attack", { "courage": 0.6 }) })
 			elif str(card.get("action", "")) == "effects" and _has_op(card, "flat_hit"):
@@ -472,9 +465,7 @@ static func _actions(state: StateScript, u: UnitScript) -> Array:
 			elif str(card.get("action", "")) == "strike":
 				var base := float(u.stats.get(str(card.get("stat", "str")), 5)) * float(card.get("mult", 1.0))
 				out.append({ "kind": "card", "card": card, "spec": { "kind": "strike", "base": base, "vectors": {}, "form": state.form_rec("touch"), "power": 0.0, "mult": 1.0, "heal": false, "ranged": false },
-					"profile": c.get("attack", { "courage": 0.6 }) })
-	if u.team == "party" and state.turn_mode == "two_actions" and not state.cantrip_spec(u).is_empty() and state.act_block(u) == "":
-		out.append({ "kind": "cantrip", "spec": state.cantrip_spec(u), "profile": c.get("attack", { "courage": 0.6 }) })
+					"profile": c.get("attack", { "courage": 0.6 }), "targets": "card" if int(card.get("range", 1)) > 1 else "" })
 	if (state.quick_block(u) == "") if (u.team == "party" and state.turn_mode == "two_actions") else not u.action_used:
 		var base := float(u.stats.get("str", 5))
 		out.append({ "kind": "strike", "spec": { "kind": "strike", "base": base, "vectors": {}, "form": state.form_rec("touch"), "power": 0.0, "mult": 1.0, "heal": false, "ranged": false },

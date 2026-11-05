@@ -245,7 +245,7 @@ static func fire_charges(st, u: Object) -> void:
 			continue
 		st.charges.erase(ch)
 		_say(st, "extra.fires", [u.name, str(ch["card"].get("name", ""))])
-		st._cast(u, ch["card"], ch["target"], false, 0, u.mp)
+		st._cast(u, ch["card"], ch["target"], 0, u.mp)
 
 
 static func linger(st, u: Object, v: Dictionary, cells: Array) -> void:

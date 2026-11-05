@@ -12,7 +12,7 @@
     { "id": "iron_lungs", "class": "fighter", "level": 6, "name": "Iron Lungs", "text": "+12 Max HP.", "mods": { "derived": { "maxHp": 12 } } },
     { "id": "charge", "class": "fighter", "level": 6, "name": "Charge", "text": "+1 Movement.", "mods": { "derived": { "movement": 1 } } },
     { "id": "cleave", "class": "fighter", "level": 9, "name": "Cleave", "text": "Strikes deal +25% damage.", "mods": { "combat": { "strikeDamagePct": 0.25 } } },
-    { "id": "bulwark", "class": "fighter", "level": 9, "name": "Bulwark", "text": "Guard gives double Defense.", "mods": { "combat": { "guardMul": 2 } } },
+    { "id": "bulwark", "class": "fighter", "level": 9, "name": "Bulwark", "text": "The first hit each round on an adjacent ally is reduced by 2.", "mods": { "combat": { "guardianCover": 2 } } },
 
     { "id": "light_feet", "class": "rogue", "level": 3, "name": "Light Feet", "text": "+1 Movement.", "mods": { "derived": { "movement": 1 } } },
     { "id": "keen_eye", "class": "rogue", "level": 3, "name": "Keen Eye", "text": "+5% crit chance.", "mods": { "derived": { "critChancePct": 5 } } },

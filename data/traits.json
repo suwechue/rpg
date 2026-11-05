@@ -52,7 +52,7 @@
     { "id": "the_one_that_stuck", "name": "The one that finally stuck", "fixed": true, "text": "Smithing is forever.", "mods": {} },
     { "id": "wins_by_accident", "name": "Wins by accident", "fixed": true, "text": "+10% crit chance.", "mods": { "derived": { "critChancePct": 10 } } },
     { "id": "oblivious", "name": "Oblivious", "fixed": true, "text": "+4 Stability.", "mods": { "derived": { "stability": 4 } } },
-    { "id": "improvised_tank", "name": "Improvised tank", "fixed": true, "text": "+10 Max HP.", "mods": { "derived": { "maxHp": 10 } } },
+    { "id": "scrappy_tank", "name": "Scrappy tank", "fixed": true, "text": "+10 Max HP.", "mods": { "derived": { "maxHp": 10 } } },
     { "id": "underestimated", "name": "Underestimated", "fixed": true, "text": "+3 Initiative.", "mods": { "derived": { "initiative": 3 } } },
     { "id": "two_worlds", "name": "Caught between two worlds", "fixed": true, "text": "Flavor.", "mods": {} },
     { "id": "fast_learner", "name": "Fast learner", "fixed": true, "text": "Training gives a little more.", "mods": {} },

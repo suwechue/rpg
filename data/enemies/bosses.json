@@ -556,7 +556,7 @@
         },
         {
           "hpBelow": 0.66,
-          "say": "Every bed sits up. Night Nurses wheel out of the dark.",
+          "say": "Every bed sits up. Night Nurses roll out of the dark.",
           "summon": [
             "night_nurse",
             "iv_wisp"

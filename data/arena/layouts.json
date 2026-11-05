@@ -10,7 +10,7 @@
     { "id": "fire", "name": "Fire and burning ground", "letter": "f", "sprinkle": 6, "icon": "icon_vector_heat" },
     { "id": "ice", "name": "Water and ice", "letter": "i", "sprinkle": 7, "extra": { "letter": "w", "count": 2 }, "icon": "icon_vector_cold" },
     { "id": "pits", "name": "Pits", "letter": "p", "sprinkle": 4, "icon": "icon_intent_special" },
-    { "id": "cover", "name": "Cover", "letter": "c", "sprinkle": 6, "icon": "icon_status_guard" },
+    { "id": "cover", "name": "Cover", "letter": "c", "sprinkle": 6, "icon": "icon_status_cover" },
     { "id": "glyphs", "name": "Glyph traps", "letter": "g", "sprinkle": 5, "icon": "icon_vector_binding" },
     { "id": "collapse", "name": "Collapsing floor", "letter": "k", "sprinkle": 8, "icon": "icon_intent_move" },
     { "id": "conveyors", "name": "Conveyors", "row": "R", "icon": "icon_vector_motion" },

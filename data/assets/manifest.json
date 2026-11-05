@@ -4623,7 +4623,7 @@
     "icon_technique_default": {
       "type": "icons",
       "kind": "image",
-      "source": "res://assets/ui/skin/icons/status_guard.png",
+      "source": "res://assets/ui/skin/icons/status_cover.png",
       "native": [
         16,
         16
@@ -4638,10 +4638,10 @@
       "tint": "#7cc7e8",
       "notes": "Default icon (P2 2.4). Give one its own art as icon_technique_<id>.png in assets/custom/icons/ with the specific id."
     },
-    "icon_status_guard": {
+    "icon_status_cover": {
       "type": "icons",
       "kind": "image",
-      "source": "res://assets/ui/skin/icons/status_guard.png",
+      "source": "res://assets/ui/skin/icons/status_cover.png",
       "native": [
         16,
         16

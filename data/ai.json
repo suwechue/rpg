@@ -13,7 +13,7 @@
     "kindness": 20
   },
   "advanceBase": 2.0,
-  "guardBase": 0.05,
+  "waitBase": 0.05,
   "dodgeWeight": 1.2,
   "rangedSpacing": 0.6,
   "coverSeek": 1.5,
@@ -35,7 +35,7 @@
     "courage": 0.8,
     "pride": 0.3
   },
-  "guard": {
+  "wait": {
     "loyalty": 0.6,
     "courage": -0.3,
     "kindness": 0.2

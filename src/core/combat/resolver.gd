@@ -34,16 +34,11 @@ static func affinity_bonus(db: Dictionary, vectors: Dictionary, caster: UnitScri
 static func magic_resist_pct(db: Dictionary, target: UnitScript) -> float:
 	var cfg := combat_cfg(db)
 	var mr := float(maxi(0, target.magic_resist - target.resist_shred)) * float(cfg.get("magicResistPctPerPoint", 2))
-	if target.guard_active:
-		mr += float(cfg.get("guardMagicResistPct", 15))
 	return minf(mr, float(cfg.get("maxMagicResistPct", 60))) / 100.0
 
 
 static func phys_defense(db: Dictionary, target: UnitScript) -> int:
-	var d := target.phys_defense - target.defense_shred
-	if target.guard_active:
-		d += int(float(combat_cfg(db).get("guardDefense", 3)) * float(target.mods.get("combat", {}).get("guardMul", 1.0)))
-	return maxi(0, d)
+	return maxi(0, target.phys_defense - target.defense_shred)
 
 
 ## Is the attacker behind or on the flank of the target (Backstab)?
@@ -110,16 +105,14 @@ static func heal_amount(base: float, caster: UnitScript) -> int:
 
 # --- Instability ---------------------------------------------------------------
 
-## Does this cast need an Instability roll? Improvised: always. Prepared cards:
-## only when they spend more than half the caster's current MP.
 ## PT Part 8: Instability by Magnitude. The threshold MP cost for a card's Magnitude.
 static func threshold(db: Dictionary, card: Dictionary, bonus: int = 0) -> int:
 	return int(db.get("vectors", {}).get("instability", {}).get("thresholds", {}).get(str(card.get("magnitude", "minor")), 99)) + bonus
 
 
-## A cast rolls when its final cost reaches the threshold; improvised casts always roll.
-static func needs_roll(db: Dictionary, card: Dictionary, cost: int, improvised: bool, bonus: int = 0) -> bool:
-	return improvised or cost >= threshold(db, card, bonus)
+## A cast rolls when its final cost reaches the threshold.
+static func needs_roll(db: Dictionary, card: Dictionary, cost: int, bonus: int = 0) -> bool:
+	return cost >= threshold(db, card, bonus)
 
 
 ## Target: 10 + (cost - threshold) / 2, +1 Entropy, +2 per antagonistic pair,
@@ -136,16 +129,16 @@ static func instability_target(db: Dictionary, card: Dictionary, cost: int, bonu
 
 
 ## Chance that d20 + Stability / 2 meets the target.
-static func stability_chance(db: Dictionary, stability: int, cost: int, card: Dictionary, improvised: bool, bonus: int = 0) -> float:
-	if not needs_roll(db, card, cost, improvised, bonus):
+static func stability_chance(db: Dictionary, stability: int, cost: int, card: Dictionary, bonus: int = 0) -> float:
+	if not needs_roll(db, card, cost, bonus):
 		return 1.0
 	var need := ceili(instability_target(db, card, cost, bonus) - float(stability) / 2.0)
 	return clampf(float(21 - need) / 20.0, 0.0, 1.0)
 
 
 ## Roll d20 + Stability / 2. Returns { "ok": bool, "roll": n, "target": t }.
-static func roll_stability(db: Dictionary, stability: int, cost: int, card: Dictionary, improvised: bool, rng: RandomNumberGenerator, bonus: int = 0, rolls: int = 1) -> Dictionary:
-	if not needs_roll(db, card, cost, improvised, bonus):
+static func roll_stability(db: Dictionary, stability: int, cost: int, card: Dictionary, rng: RandomNumberGenerator, bonus: int = 0, rolls: int = 1) -> Dictionary:
+	if not needs_roll(db, card, cost, bonus):
 		return { "ok": true, "roll": 0, "target": 0.0 }
 	var d20 := 0
 	for i in maxi(1, rolls):

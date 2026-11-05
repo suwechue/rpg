@@ -286,9 +286,9 @@ static func reconfigure(db: Dictionary, ch: Dictionary, old_id: String, new_id: 
 
 ## Auto-pick the first offered Technique for every pending level (NPCs, autoplay, tests).
 static func auto_techniques(db: Dictionary, ch: Dictionary) -> void:
-	var guard := 0
-	while not ch.get("pendingTechniques", []).is_empty() and guard < 10:
-		guard += 1
+	var tries := 0
+	while not ch.get("pendingTechniques", []).is_empty() and tries < 10:
+		tries += 1
 		var opts := technique_options(db, ch)
 		if opts.is_empty():
 			ch["pendingTechniques"] = []

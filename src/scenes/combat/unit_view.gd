@@ -203,7 +203,7 @@ func _draw() -> void:
 		draw_texture_rect(tex, Rect2(x, 3, icon_w, icon_w), false, Color(str(info.get("color", "#ffffff"))))
 		x += icon_w
 	if covered and not downed:
-		var sh := Assets.texture(str(DataDB.table("ui").get("coverIcon", "icon_status_guard")))
+		var sh := Assets.texture(str(DataDB.table("ui").get("coverIcon", "icon_status_cover")))
 		draw_texture_rect(sh, Rect2(-Display.tile * 0.55, top - Display.tile * 0.15, Display.tile / 2.0, Display.tile / 2.0), false, UiTheme.color("cover", Color("7cc7e8")))
 	if acted and not downed and not is_prop:
 		# A small check mark: this unit already acted this round.

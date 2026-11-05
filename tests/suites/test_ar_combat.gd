@@ -53,7 +53,7 @@ func test_move_or_act() -> void:
 	var st := fight(["P..E.....", "........."], [enemy("pom_pom_wisp")], "move_or_act")
 	var p = player(st)
 	foe(st).hp = 999
-	p.deck.hand = ["card_heavy_swing", "card_guard", "card_light_jab"]
+	p.deck.hand = ["card_heavy_swing", "card_dash", "card_light_jab"]
 	check(st.move(p, Vector2i(2, 0)), "moving is allowed")
 	check(st.act_block(p) != "", "after moving, no action: %s" % st.act_block(p))
 	check(not st.strike(p, foe(st).cell), "Strike is blocked after moving")
@@ -63,7 +63,7 @@ func test_move_or_act() -> void:
 	var st2 := fight(["P.E......", "........."], [enemy("pom_pom_wisp")], "move_or_act")
 	var p2 = player(st2)
 	foe(st2).hp = 999
-	p2.deck.hand = ["card_light_jab", "card_guard"]
+	p2.deck.hand = ["card_light_jab", "card_dash"]
 	check(st2.play_card(p2, 0, foe(st2).cell) == false, "not adjacent yet")
 	p2.cell = Vector2i(1, 0)
 	p2.start_cell = p2.cell

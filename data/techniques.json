@@ -163,10 +163,10 @@
       "category": "kinetics",
       "tier": 2,
       "minLevel": 3,
-      "text": "Once per round, cast your Cantrip at an enemy that steps next to you.",
+      "text": "Once per round, a small hit in your first Vector at an enemy that steps next to you.",
       "mods": {
         "combat": {
-          "reactiveCantrip": true
+          "reactiveHit": true
         }
       }
     },
@@ -215,10 +215,10 @@
       "category": "kinetics",
       "tier": 6,
       "minLevel": 18,
-      "text": "Your Quick Strike can be your Cantrip instead (a Quick).",
+      "text": "Your first 0 MP card each turn is a Quick.",
       "mods": {
         "combat": {
-          "quickCantrip": true
+          "quickZero": true
         }
       }
     },

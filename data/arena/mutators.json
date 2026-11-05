@@ -7,7 +7,7 @@
     { "id": "deep_breath", "name": "Deep breath", "text": "+1 MP regen per turn.", "icon": "icon_status_infusion", "effects": { "mpRegen": 1 } },
     { "id": "wildfire", "name": "Wildfire", "text": "Fire spreads each round.", "icon": "icon_vector_heat", "effects": { "fireSpreads": true } },
     { "id": "high_stakes", "name": "High stakes", "text": "Double rewards, but no resting at the next checkpoint.", "icon": "icon_kind_item", "effects": { "rewardMul": 2.0, "noRest": true } },
-    { "id": "thick_skin", "name": "Thick skin", "text": "Enemies have +50% HP; score bonus doubled.", "icon": "icon_status_guard", "effects": { "enemyHpMul": 1.5, "scoreMul": 2.0 } },
+    { "id": "thick_skin", "name": "Thick skin", "text": "Enemies have +50% HP; score bonus doubled.", "icon": "icon_status_cover", "effects": { "enemyHpMul": 1.5, "scoreMul": 2.0 } },
     { "id": "force_field", "name": "Force field", "text": "+50% Force damage, and collisions hurt everyone.", "icon": "icon_vector_force", "effects": { "vectorDamage": { "force": 1.5 } } }
   ]
 }

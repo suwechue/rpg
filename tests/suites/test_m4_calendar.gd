@@ -200,8 +200,8 @@ func test_deck_rules() -> void:
 	var small := deck.slice(0, int(db()["leveling"]["deckMin"]) - 1)
 	check(Crafting.deck_error(db(), run, p, small) != "", "too small")
 	var four := deck.duplicate()
-	four.append("card_guard")
-	four.append("card_guard")
+	four.append("card_dash")
+	four.append("card_dash")
 	check(Crafting.deck_error(db(), run, p, four) != "", "more copies than owned / allowed")
 	var bad := deck.duplicate()
 	bad[0] = "sp:binding:bolt:minor"

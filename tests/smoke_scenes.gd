@@ -522,12 +522,6 @@ func _smoke_combat() -> void:
 		break
 	check(played, "a card can be selected, previewed and played")
 	if scene.call("_player_turn"):
-		scene.call("_on_button", "guard")
-		await create_timer(0.5).timeout
-		check(not bool(u.get("quick_used")) and int(u.get("actions_left")) < 2, "Guard costs an Action (user request, Oct 28)")
-		scene.call("_on_button", "wheel")
-		check(scene.get("_wheel") != null, "the Vector Wheel opens")
-		scene.call("_cancel")
 		scene.call("_on_button", "end")
 		await create_timer(0.3).timeout
 		check(st.get("current") != u or str(st.get("result")) != "", "end turn passes the turn")

@@ -82,3 +82,15 @@ Sparks (name, trait, first card, reveal text) are in `data/sparks.json`; spark t
 **A cutscene:** see [CUTSCENE_GUIDE.md](CUTSCENE_GUIDE.md).
 
 **A building:** add a location in `data/town/locations.json` (see docs/TOWN.md): its door tile, hours, door line and what you can do inside.
+
+## Combat Lab
+
+The Lab's rules, fights and cards are data too. See docs/COMBAT_LAB.md.
+
+| Change this | In |
+| --- | --- |
+| A lever's default, range or text | `data/lab/lab.json` |
+| A preset | `data/lab/presets.json` |
+| A fight's map, enemies, party or goal | `data/lab/fights.json` (map letters are at the top of `src/core/combat/grid.gd`) |
+| What a Vector does to a tile, or an ally reaction | `data/lab/reactions.json` |
+| Lab cards and class decks | `data/cards/lab_cards.json`, `data/lab/lab.json` `classDecks` |

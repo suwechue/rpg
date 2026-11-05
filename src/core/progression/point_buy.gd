@@ -77,9 +77,9 @@ static func recommended(db: Dictionary, class_id: String) -> Dictionary:
 static func random(db: Dictionary, rng: RandomNumberGenerator) -> Dictionary:
 	var out := blank(db)
 	var order := stat_order(db)
-	var guard := 0
-	while left(db, out) > 0 and guard < 500:
-		guard += 1
+	var tries := 0
+	while left(db, out) > 0 and tries < 500:
+		tries += 1
 		var s := str(order[rng.randi_range(0, order.size() - 1)])
 		out = step(db, out, s, 1)
 	return out

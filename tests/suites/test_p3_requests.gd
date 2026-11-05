@@ -1,4 +1,4 @@
-## User requests (Oct 28): Strike and Guard cost an Action, place-based story
+## User requests (Oct 28): Strike cost an Action, place-based story
 ## events, the open dungeon exit, equipable arena cards, tooltips that wrap,
 ## relics, consumables, the backpack, the merchant, boss gimmicks and the loop.
 extends "res://tests/suite.gd"
@@ -25,10 +25,7 @@ func fight(ch: Dictionary, map: Array = ["P..E"], extra: Dictionary = {}) -> Sta
 func test_builtins_cost_an_action() -> void:
 	var st := fight(hero())
 	var me = st.unit_by_id("player")
-	check(not st.is_quick_now(me, { "builtin": true }), "Strike and Guard are not Quicks any more")
-	var a0: int = me.actions_left
-	if st.guard(me):
-		check(me.actions_left == a0 - 1, "Guard spends an Action")
+	check(not st.is_quick_now(me, { "builtin": true }), "Strike is not a Quick any more")
 
 
 func test_dungeon_exit_open() -> void:

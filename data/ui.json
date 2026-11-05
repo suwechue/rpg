@@ -216,12 +216,6 @@
       "icon": "icon_status_infusion",
       "color": "#e8663c"
     },
-    "guard": {
-      "name": "Guarding",
-      "text": "+Defense and Magic Resistance until their next turn.",
-      "icon": "icon_status_guard",
-      "color": "#c9c9c9"
-    },
     "shield": {
       "name": "Shielded",
       "text": "A Shield absorbs damage first.",
@@ -261,7 +255,7 @@
     "brace": {
       "name": "Braced",
       "text": "Can't be pushed or pulled until its next turn.",
-      "icon": "icon_status_guard",
+      "icon": "icon_status_cover",
       "color": "#c9a66b"
     },
     "parry": {
@@ -297,13 +291,13 @@
     "sanctuary": {
       "name": "Sanctuary",
       "text": "Telegraphed hits deal half.",
-      "icon": "icon_status_guard",
+      "icon": "icon_status_cover",
       "color": "#f5e27a"
     },
     "intercept": {
       "name": "Intercepting",
       "text": "Takes the next attack aimed at an adjacent ally.",
-      "icon": "icon_status_guard",
+      "icon": "icon_status_cover",
       "color": "#e8a87c"
     },
     "encore": {
@@ -383,7 +377,7 @@
     "armored": {
       "name": "Armored",
       "text": "Extra Defense and Resistance. Blunt weapons hit it 50% harder.",
-      "icon": "icon_status_guard",
+      "icon": "icon_status_cover",
       "color": "#c9c9c9"
     },
     "burning": {
@@ -420,7 +414,7 @@
     "attack": "icon_intent_attack",
     "special": "icon_intent_special",
     "buff": "icon_intent_buff",
-    "defend": "icon_intent_defend",
+    "wait": "icon_intent_defend",
     "move": "icon_intent_move",
     "tracking": "icon_intent_tracking",
     "hidden": "icon_intent_special"
@@ -461,7 +455,7 @@
     "#bb6bd9",
     "#f2994a"
   ],
-  "coverIcon": "icon_status_guard",
+  "coverIcon": "icon_status_cover",
   "areaFlashSeconds": 0.6,
   "tooltipChars": 56,
   "hitPauseSeconds": 0.07,

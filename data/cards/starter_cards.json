@@ -11,8 +11,6 @@
       "text": "Quick. Adjacent hit with DEX." },
     { "id": "card_light_jab",   "name": "Light Jab",   "kind": "basic", "action": "strike", "stat": "dex", "mult": 0.8, "range": 1, "short": "Poke DEX", "cost": 0,
       "text": "A polite adjacent poke with DEX." },
-    { "id": "card_guard",       "name": "Guard",       "kind": "basic", "action": "guard", "short": "+Defense", "quick": true, "cost": 0,
-      "text": "Quick. +3 Defense and +15% Magic Resistance until your next turn." },
     { "id": "card_dash",        "name": "Dash",        "kind": "basic", "action": "dash", "amount": 2, "short": "+2 Move", "quick": true, "cost": 0,
       "text": "Quick. +2 Movement this turn, or next turn if you've already moved or acted." },
     { "id": "card_rally",       "name": "Rally",       "kind": "basic", "action": "rally", "range": 3, "amount": 0.2, "short": "Rally +20%", "cost": 1,

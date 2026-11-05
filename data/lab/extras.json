@@ -30,7 +30,7 @@
   ],
   "roles": {
     "shield": {
-      "frontGuard": 0.75,
+      "frontBlock": 0.75,
       "immovable": false
     },
     "bomber": {},

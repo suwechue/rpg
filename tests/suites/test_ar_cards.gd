@@ -100,7 +100,7 @@ func test_class_decks() -> void:
 		if int(c.get("tier", 1)) > 1:
 			continue
 		var deck := Char.create(db(), str(c["id"]), seeded(4))["deck"] as Array
-		check(not deck.has("card_strike") and not deck.has("card_guard"), "%s: Strike and Guard are built-in Quicks, not cards (PT Part 1)" % c["id"])
+		check(not deck.has("card_strike"), "%s: Strike is built-in Quicks, not cards (PT Part 1)" % c["id"])
 		check(deck.size() >= int(db()["leveling"]["deckMin"]), "%s starts with at least the minimum deck (%d)" % [c["id"], deck.size()])
 	for cls in expect:
 		var ch := Char.create(db(), cls, seeded(4))
