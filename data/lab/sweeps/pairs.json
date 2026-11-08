@@ -1,0 +1,13 @@
+{
+  "comment": "LT Part 4 stage 3: the top 12 levers from the latest screening run, every pair, each at its best value, on the base screening liked better.",
+  "id": "pairs",
+  "kind": "pairs",
+  "from": "screening",
+  "base": "auto",
+  "top": 12,
+  "fights": ["ledge_day", "fire_sale", "hand_off", "crowded_hall", "hollow_mascot"],
+  "seeds": 4,
+  "profiles": ["expert", "novice", "greedy", "random"],
+  "parties": ["balanced"],
+  "budgetMinutes": 60
+}

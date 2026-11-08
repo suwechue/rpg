@@ -45,13 +45,42 @@ static func record(tables_dict: Dictionary, table_key: String, id: String) -> Di
 	return {}
 
 
-## Build an id -> record index over records_under().
+## Build an id -> record index over records_under(). Cached per tables
+## Dictionary (by identity) until a table under the prefix gains or loses
+## records; the index is read-only, the records are the tables' own.
+static var _index_cache: Array = []   # [[tables_dict, prefix, list_key, record count, index]]
+const INDEX_CACHE_SIZE := 12
+
+
 static func index_under(tables_dict: Dictionary, prefix: String, list_key: String) -> Dictionary:
+	var n := _count_under(tables_dict, prefix, list_key)
+	for entry in _index_cache:
+		if is_same(entry[0], tables_dict) and entry[1] == prefix and entry[2] == list_key and int(entry[3]) == n:
+			return entry[4]
 	var out := {}
 	for r in records_under(tables_dict, prefix, list_key):
 		if typeof(r) == TYPE_DICTIONARY:
 			out[str(r.get("id", ""))] = r
+	out.make_read_only()
+	for i in _index_cache.size():
+		var entry: Array = _index_cache[i]
+		if is_same(entry[0], tables_dict) and entry[1] == prefix and entry[2] == list_key:
+			_index_cache.remove_at(i)
+			break
+	_index_cache.push_front([tables_dict, prefix, list_key, n, out])
+	if _index_cache.size() > INDEX_CACHE_SIZE:
+		_index_cache.pop_back()
 	return out
+
+
+static func _count_under(tables_dict: Dictionary, prefix: String, list_key: String) -> int:
+	var n := 0
+	for key in tables_dict:
+		if str(key).begins_with(prefix):
+			var t: Variant = tables_dict[key]
+			if typeof(t) == TYPE_DICTIONARY and typeof(t.get(list_key)) == TYPE_ARRAY:
+				n += (t[list_key] as Array).size() + 1
+	return n
 
 
 static func _load_dir(path: String, prefix: String, tables: Dictionary, errors: Array) -> void:

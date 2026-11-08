@@ -102,6 +102,7 @@ var fair := false                   # tutorial: no crits until the lesson that t
 var hp_floor := false               # tutorial: the party can't drop below 1 HP
 var _undo: Array = []               # PT Part 1: snapshots of this turn, newest last
 var undo_lock := ""                 # why the turn can't be undone further (a roll, a draw, a reveal)
+var no_undo := false                # Lab sweeps: AI players keep no undo snapshots (docs/LAB_TUNER.md)
 var turn_mode := "two_actions"     # data/combat_rules.json "turnMode" (PT Part 1); setup "turnMode" overrides
 var difficulty := "normal"         # data/combat_rules.json "difficulty"; setup "difficulty" overrides
 var win_flag := ""                # setup "winFlag": a run flag set when the party wins (M21 leak points)
@@ -3879,7 +3880,7 @@ func _undo_stack() -> bool:
 
 
 func _push_undo(u: UnitScript) -> void:
-	if u.team != "party" or u.ai_controlled or not _undo_stack():
+	if u.team != "party" or u.ai_controlled or no_undo or not _undo_stack():
 		return
 	var snap := { "state": _snap_obj(self, _NO_SNAP), "grid": _snap_obj(grid), "units": {}, "decks": {}, "rng": rng.state,
 		"intents": _intent_count() }

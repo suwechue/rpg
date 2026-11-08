@@ -1,0 +1,11 @@
+{
+  "comment": "LT Part 4 stage 1: every hand-made preset on every fight, 30 seeds, all four AI players. Run: godot --headless --path . -s res://tools/lab_sweep.gd -- --plan=res://data/lab/sweeps/baseline.json",
+  "id": "baseline",
+  "kind": "grid",
+  "presets": ["current", "cl_base", "cl_puzzle", "cl_cards", "cl_brutal", "cl_plus", "cl_everything"],
+  "fights": "all",
+  "seeds": 30,
+  "profiles": ["expert", "novice", "greedy", "random"],
+  "parties": ["balanced"],
+  "budgetMinutes": 180
+}

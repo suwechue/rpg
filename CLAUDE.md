@@ -8,6 +8,10 @@ Read `docs/DESIGN.md` before starting any task. The Vector system reference is `
 
 Parts 1 to 5 are done; Part 6 waits for the user to pick a preset. Every rule the Lab switches is a lever in `data/lab/lab.json`, read through `CombatState.rules` (`src/core/combat/rules.gd`). A fight with no preset uses `current`, today's rules. New Lab code: `src/core/combat/board.gd`, `lab_ops.gd`, `extras.gd`, `fight_goals.gd`, `card_text.gd`; `src/core/lab/`; `src/scenes/lab/`. Guard, the Cantrip and the Vector Wheel are gone from the whole game. Run `tests/smoke_lab.gd` (every fight under every preset) before committing combat changes.
 
+## Lab Tuner (LT, docs/LAB_TUNER.md)
+
+LT comes before CL Part 6. AI players: `src/core/lab/players/` (`player.gd` search, `evaluator.gd` state score, `legal.gd` steps, `sim.gd` masked snapshots), tuned in `data/lab/players.json`. Sweeps: `tools/lab_sweep.gd -- --plan=res://data/lab/sweeps/<plan>.json` (`--jobs=N`, resumes; `--fresh` starts over), core in `src/core/lab/sweep.gd` and `src/core/lab/tuner/`. Metric targets and weights: `data/lab/tuner.json`; lever `learnCost`/`offValue`/`fights` in `data/lab/lab.json`. Report: `tools/lab_tune_report.gd` appends to `docs/LAB_TUNING.md`. Text play for agents: `tools/lab_play.gd`. After any rules or card change, re-run `--plan=res://data/lab/sweeps/shortlist.json --fresh`. Lever choices and targets go in data, never code; never tune to one number.
+
 ## Current state
 
 The alpha (M0 to M8) is done:

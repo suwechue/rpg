@@ -1,0 +1,43 @@
+{
+  "comment": "Lab Tuner AI players (docs/LAB_TUNER.md Part 2). One shared turn search (src/core/lab/players/player.gd); a profile picks its search size, noise, what it ignores and how it weighs a state. weights: the state score (src/core/lab/players/evaluator.gd), from the party's side; a profile's weights replace these. beam: lines kept per step; moveBeam: extra slots kept for lines that start with a move; depth: steps per turn; moveCells: tiles worth trying for the first move, moveCellsLate: for later ones; noise: random share added to each line's value; ignoreChance: chance per turn to ignore ignoreKinds, ignoreOps and the cards of ignoreLevers; boardBlindChance: chance per turn to ignore cards that push or pull. record: keep the per-turn option values (Part 3).",
+  "weights": {
+    "partyHp": 1.0,
+    "downed": 8.0,
+    "objectHp": 1.5,
+    "enemyHp": 1.2,
+    "enemyAlive": 4.0,
+    "win": 60.0,
+    "loss": 60.0,
+    "threat": 0.9,
+    "lethal": 5.0,
+    "surge": 0.3,
+    "shield": 0.5,
+    "enemyStatus": 0.3,
+    "allyStatus": 0.2,
+    "handCard": 0.15,
+    "mp": 0.05,
+    "gauge": 0.2
+  },
+  "profiles": {
+    "expert": {
+      "beam": 3, "moveBeam": 3, "depth": 4, "moveCells": 8, "moveCellsLate": 4, "noise": 0.0, "record": true, "orderSearch": true
+    },
+    "novice": {
+      "beam": 1, "moveBeam": 2, "depth": 3, "moveCells": 5, "noise": 0.35,
+      "ignoreChance": 0.5,
+      "ignoreKinds": ["pick", "delay", "gauge", "reserve", "together", "drag", "surge"],
+      "ignoreOps": ["ally_pass", "ally_borrow", "ally_setup", "ally_repush", "ally_encore", "ally_move_status", "deck_stack", "deck_look", "discard_echo", "discard_recall"],
+      "ignoreLevers": ["chargeSpells", "duetCards", "signatureCard", "overload"],
+      "boardBlindChance": 0.7,
+      "boardOps": ["board_push", "board_pull_area", "board_swap", "board_toss", "board_collapse"],
+      "weights": { "threat": 0.4, "lethal": 2.0, "handCard": 0.0, "allyStatus": 0.0 }
+    },
+    "greedy": {
+      "beam": 2, "moveBeam": 2, "depth": 3, "moveCells": 6, "noise": 0.0,
+      "weights": { "partyHp": 0.0, "downed": 0.0, "objectHp": 0.0, "threat": 0.0, "lethal": 0.0, "surge": 0.0, "shield": 0.0, "enemyStatus": 0.0, "allyStatus": 0.0, "handCard": 0.0, "mp": 0.0, "gauge": 0.0, "loss": 0.0 }
+    },
+    "random": {
+      "random": true, "maxSteps": 6, "endChance": 0.2
+    }
+  }
+}

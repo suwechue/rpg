@@ -733,3 +733,14 @@ Removed from the whole game, under every preset. What replaced what depends on t
 | Tutorial rooms 3 and 9 | Strike, tracking and cancelling a telegraph; pushing into a pit and the discard pile |
 
 These change today's game too, and it hasn't been rebalanced for them: that waits for Part 6.
+
+## Lab Tuner (docs/LAB_TUNER.md)
+
+A tool for picking a preset, not a game rule: nothing here changes how a fight plays.
+
+- **AI players** (`src/core/lab/players/`, weights and profiles in `data/lab/players.json`): `expert`, `novice`, `greedy` and `random`. The first three search their whole turn as lines of steps (move, card, Strike, Surge...) with a beam, scored by one state score: party HP, kills, telegraphed damage still aimed at the party, Surge, setups. `expert` keeps 3 lines plus 3 that start with a move, 4 steps deep. `novice` keeps 1, adds noise, and half its turns ignores the extras and teammate cards; most turns it ignores push cards. `greedy` scores damage and kills only. `random` plays random legal steps.
+- **No peeking:** a search runs on a copy of the fight with every draw pile sorted and the dice reseeded from the board, so the players never see the deck order or the next roll.
+- **Sweeps** (`tools/lab_sweep.gd`, plans in `data/lab/sweeps/`): one headless fight per fight x preset or lever set x seed x player x party, in parallel processes, resumable. A fight past `stallRounds` (30) ends as a stall, which disqualifies its lever set.
+- **Fun proxies** (`src/core/lab/tuner/metrics.gd`, targets in `data/lab/tuner.json`): real choices per turn, obvious turns, option load, win rates per player, the most-played card, the most common winning opening, close wins, rounds, telegraphed damage avoided, board kills, teamwork, card variety, and a complexity cost from each lever's `learnCost`. The fun score is the weighted closeness to every target minus complexity. Hard limits (any stall, expert under 70%, random over 20%) disqualify.
+- **Text play** (`tools/lab_play.gd`, `src/core/lab/play_text.gd`): a fight as text for agent playtesters. Each call replays its inputs and prints the board, plans, hand and every option with its exact preview.
+- **Speed:** a cheap card index (`DataTables.index_under` is cached per data set) made every card lookup in the game faster, not just the sweeps.

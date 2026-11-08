@@ -115,6 +115,13 @@ func _fill_fights() -> void:
 	play.name = "PlayButton"
 	_left.add_child(play)
 	_left.add_child(UiTheme.button(Strings.t("lab.play_ab"), _ask_ab))
+	var series: Array = _db.get("lab/lab", {}).get("abShortlist", {}).get("steps", [])
+	if not series.is_empty() and series.all(func(st: Dictionary) -> bool: return str(st["a"]) == "winner" or not Rules.preset_rec(_db, str(st["a"])).is_empty()):
+		var sb := UiTheme.button(Strings.t("lab.play_shortlist"), func() -> void:
+			if Session.start_series(series):
+				start_fight())
+		sb.tooltip_text = str(_db.get("lab/lab", {}).get("abShortlist", {}).get("text", ""))
+		_left.add_child(sb)
 	play.grab_focus.call_deferred()
 
 

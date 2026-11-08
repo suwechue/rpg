@@ -1,0 +1,11 @@
+{
+  "comment": "LT re-run after any rules or card change: the tuned shortlist against current and cl_base on every fight. Run: godot --headless --path . -s res://tools/lab_sweep.gd -- --plan=res://data/lab/sweeps/shortlist.json --fresh",
+  "id": "shortlist",
+  "kind": "grid",
+  "presets": ["tuned_1", "tuned_2", "tuned_3", "tuned_4", "tuned_5", "current", "cl_base"],
+  "fights": "all",
+  "seeds": 20,
+  "profiles": ["expert", "novice", "greedy", "random"],
+  "parties": ["balanced"],
+  "budgetMinutes": 90
+}

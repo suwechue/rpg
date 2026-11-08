@@ -66,3 +66,35 @@ static func _num(v: float) -> String:
 
 static func _pct(v: float) -> String:
 	return "-" if v < 0.0 else "%d%%" % roundi(v * 100.0)
+
+
+## Human ratings next to the agents' and the machine's (docs/LAB_TUNER.md Part 6).
+## The human columns come first: they outrank the others.
+static func combined(summary: Dictionary, cards: Array, machine: Dictionary) -> String:
+	var agents := {}
+	for c in cards:
+		var k := str(c.get("preset", ""))
+		if not agents.has(k):
+			agents[k] = { "n": 0, "fun": 0.0 }
+		agents[k]["n"] += 1
+		agents[k]["fun"] += float(c.get("fun", 0))
+	var keys := {}
+	for k in summary:
+		keys[k] = true
+	for k in agents:
+		keys[k] = true
+	for k in machine:
+		keys[k] = true
+	var order: Array = keys.keys()
+	order.sort()
+	var rows: Array = ["%-14s %7s %9s %6s %9s %9s %9s" % ["preset", "you:fun", "you:fights", "A/B", "agent:fun", "agent:n", "machine"]]
+	for k in order:
+		var h: Dictionary = summary.get(k, {})
+		var a: Dictionary = agents.get(k, {})
+		var m: Dictionary = machine.get(k, {})
+		rows.append("%-14s %7s %9d %6d %9s %9d %9s" % [str(k), _num(float(h.get("fun", -1.0))), int(h.get("fights", 0)), int(h.get("abWins", 0)),
+			_num(float(a["fun"]) / float(a["n"])) if not a.is_empty() else "-", int(a.get("n", 0)),
+			("%.2f%s" % [float(m["score"]), "!" if bool(m.get("dq", false)) else ""]) if not m.is_empty() else "-"])
+	rows.append("you = your Lab ratings (they outrank the rest); agent = Claude playtesters; machine = the sweep's fun score (! = a hard limit failed).")
+	return "\n".join(PackedStringArray(rows))
+

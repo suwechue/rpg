@@ -111,7 +111,11 @@ static func _next_ab(state: Object) -> void:
 		m.add_button(Strings.t("lab.ab_b") % b, func() -> void: m.finish(b))
 		m.add_button(Strings.t("lab.ab_same"), func() -> void: m.finish(""))
 		pick = await Flow.show_modal(m)
-	FightLog.append({ "kind": "ab", "at": Time.get_datetime_string_from_system(), "fight": str(Session.ab["fight"]), "a": a, "b": b, "pick": str(pick), "seed": int(state.lab_log.seed_value) })
+	FightLog.append({ "kind": "ab", "at": Time.get_datetime_string_from_system(), "fight": str(Session.ab["fight"]), "a": a, "b": b, "pick": str(pick), "seed": int(state.lab_log.seed_value),
+		"series": Session.ab.has("queue") })
+	if not Session.next_in_series(str(pick)).is_empty():
+		LabScreen.start_fight()
+		return
 	Session.reset_ab()
 	SceneRouter.goto(LabScreen.SCENE)
 

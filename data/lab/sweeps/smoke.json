@@ -1,0 +1,11 @@
+{
+  "comment": "A tiny sweep that checks the tool works: two presets, two fights, two seeds.",
+  "id": "smoke",
+  "kind": "grid",
+  "presets": ["cl_base", "current"],
+  "fights": ["ledge_day", "thin_ice"],
+  "seeds": 2,
+  "profiles": ["expert", "novice", "greedy", "random"],
+  "parties": ["balanced"],
+  "budgetMinutes": 20
+}

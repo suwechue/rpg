@@ -207,6 +207,7 @@
     "lab.party": "Party",
     "lab.play": "Play this fight",
     "lab.play_ab": "Play this fight twice (A/B)",
+    "lab.play_shortlist": "Tuned shortlist (A/B)",
     "lab.levers_changed": "%d levers changed",
     "lab.save_name": "New preset name",
     "lab.save_preset": "Save as a preset",

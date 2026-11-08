@@ -1,0 +1,37 @@
+{
+  "comment": "Lab Tuner fun metrics (docs/LAB_TUNER.md Part 3). Edit freely: targets are starting guesses. metrics: target [low, high] (null = no limit on that side), weight in the fun score, scale = how far outside the target counts as 0. realChoiceBand: an option within this share of the best counts as a real choice; obviousGap: a turn is obvious when the best leads the second by more than this share; valueUnit: the smallest value the shares are taken of (1 = about 1 HP). closeWinHp: a win is close when the party's total HP fell under this share. dominantIgnore: plays left out of the dominant card count (the built-in Strike isn't a card). complexity: the fun score loses complexityWeight x (sum of learnCost of levers turned on) / complexityNorm. hardLimits disqualify a lever set whatever its score (minFightExpertWin: in the final robustness check, the expert must win this share of every fight). effectEpsilon: a lever helps or hurts when it moves the fun score by more than this. parties: party compositions for robustness (balanced = the fight's own party). teamworkOps: card ops that count as teammate-deck plays. stallRounds/maxSteps: the sweep watchdog.",
+  "realChoiceBand": 0.10,
+  "obviousGap": 0.30,
+  "valueUnit": 1.0,
+  "closeWinHp": 0.30,
+  "dominantIgnore": ["strike"],
+  "stallRounds": 30,
+  "maxSteps": 2000,
+  "metrics": {
+    "realChoices": { "target": [2.0, 4.0], "weight": 1.0, "scale": 2.0, "name": "Real choices per turn" },
+    "obviousShare": { "target": [null, 0.35], "weight": 1.0, "scale": 0.35, "name": "Obvious turn share" },
+    "optionLoad": { "target": [null, 40.0], "weight": 0.5, "scale": 40.0, "name": "Option load" },
+    "expertWin": { "target": [0.85, 0.95], "weight": 1.0, "scale": 0.25, "name": "Expert win rate" },
+    "noviceWin": { "target": [0.5, 0.7], "weight": 1.0, "scale": 0.3, "name": "Novice win rate" },
+    "greedyWin": { "target": [null, 0.5], "weight": 0.75, "scale": 0.4, "name": "Greedy win rate" },
+    "randomWin": { "target": [null, 0.1], "weight": 0.5, "scale": 0.3, "name": "Random win rate" },
+    "dominantCard": { "target": [null, 0.25], "weight": 0.5, "scale": 0.3, "name": "Most-played card share" },
+    "dominantLine": { "target": [null, 0.6], "weight": 0.5, "scale": 0.4, "name": "Most common winning opening" },
+    "closeWins": { "target": [0.25, 0.45], "weight": 1.0, "scale": 0.3, "name": "Close wins" },
+    "rounds": { "target": [3.0, 5.0], "weight": 0.75, "scale": 3.0, "name": "Rounds (normal fights)" },
+    "bossRounds": { "target": [6.0, 8.0], "weight": 0.5, "scale": 4.0, "name": "Rounds (boss)" },
+    "agency": { "target": [0.5, 0.8], "weight": 1.0, "scale": 0.4, "name": "Telegraphed damage avoided" },
+    "boardUse": { "target": [0.25, 0.5], "weight": 0.75, "scale": 0.3, "name": "Board kills share" },
+    "teamwork": { "target": [2.0, null], "weight": 0.75, "scale": 2.0, "name": "Teamwork plays per fight" },
+    "variety": { "target": [0.6, null], "weight": 0.5, "scale": 0.4, "name": "Card variety (entropy, 0 to 1)" }
+  },
+  "complexityWeight": 0.15,
+  "complexityNorm": 10.0,
+  "hardLimits": { "maxStallShare": 0.0, "minExpertWin": 0.7, "maxRandomWin": 0.2, "minFightExpertWin": 0.5 },
+  "effectEpsilon": 0.02,
+  "parties": {
+    "melee": ["fighter", "rogue"],
+    "caster": ["mage", "healer", "bard"]
+  },
+  "teamworkOps": ["ally_pass", "ally_borrow", "ally_setup", "ally_repush", "ally_encore", "ally_move_status"]
+}

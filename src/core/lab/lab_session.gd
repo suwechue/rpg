@@ -24,6 +24,34 @@ static func start_ab(fight: String, a: String, b: String) -> void:
 	ab = { "fight": fight, "a": a, "b": b, "stage": 0 }
 
 
+## A series of A/B pairs (the Lab Tuner shortlist, docs/LAB_TUNER.md Part 6):
+## steps [{ fight, a, b }]; "winner" as a or b means the preset picked last.
+static func start_series(steps: Array) -> bool:
+	if steps.is_empty():
+		return false
+	var first: Dictionary = steps[0]
+	start_ab(str(first["fight"]), str(first["a"]), str(first["b"]))
+	ab["queue"] = steps.slice(1)
+	fight_id = str(first["fight"])
+	return true
+
+
+## After a pick: the next pair of the series ({} when it's over). A tie keeps a.
+static func next_in_series(pick: String) -> Dictionary:
+	var queue: Array = ab.get("queue", [])
+	if queue.is_empty():
+		return {}
+	var won := pick if pick != "" else str(ab.get("a", ""))
+	var step: Dictionary = queue[0]
+	var a := won if str(step["a"]) == "winner" else str(step["a"])
+	var b := won if str(step["b"]) == "winner" else str(step["b"])
+	var rest := queue.slice(1)
+	start_ab(str(step["fight"]), a, b)
+	ab["queue"] = rest
+	fight_id = str(step["fight"])
+	return ab
+
+
 static func ab_preset() -> String:
 	if ab.is_empty():
 		return ""

@@ -1,0 +1,35 @@
+{
+  "comment": "LT Part 4 stages 4 and 5: an evolutionary search over the top 15 screening levers plus alwaysLevers, seeded with the best pairs. Each candidate plays searchCells; the best finalCount then play finalCells (every fight, 20 seeds, three parties), and the 5 best that differ by at least minDistance levers become tuned_1..5 in data/lab/presets.json. finalMinutes is kept back for that check.",
+  "id": "search",
+  "kind": "search",
+  "from": "screening",
+  "pairsFrom": "pairs",
+  "base": "auto",
+  "top": 15,
+  "alwaysLevers": [
+    { "lever": "enemyDamageMul", "values": [1.0, 1.5, 2.0, 2.5] },
+    { "lever": "enemyHpMul", "values": [1.0, 1.25, 1.5, 2.0] }
+  ],
+  "seedPairs": 4,
+  "seed": 7,
+  "population": 12,
+  "keep": 24,
+  "generations": 40,
+  "searchCells": {
+    "fights": ["ledge_day", "thin_ice", "fire_sale", "hand_off", "crowded_hall", "hollow_mascot"],
+    "seeds": 3,
+    "profiles": ["expert", "novice", "greedy", "random"],
+    "parties": ["balanced"]
+  },
+  "finalCount": 7,
+  "finalCells": {
+    "fights": "all",
+    "seeds": 20,
+    "profiles": ["expert", "novice", "greedy", "random"],
+    "parties": ["balanced", "melee", "caster"]
+  },
+  "finalMinutes": 50,
+  "shortlist": 5,
+  "minDistance": 3,
+  "budgetMinutes": 170
+}
