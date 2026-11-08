@@ -1,0 +1,129 @@
+{
+  "comment": "Per-fight difficulty steps for presets with the fightScaled lever, written by tools/lab_sweep.gd (plan kind scaled). scales: preset id -> fight id -> levers. Only sets that passed the full check are saved here.",
+  "scales": {
+    "tuned_1": {
+      "ledge_day": {
+        "enemyDamageMul": 4.0,
+        "enemyHpMul": 3.0,
+        "extraEnemies": 2.0
+      },
+      "hold_the_line": {
+        "enemyDamageMul": 3.0,
+        "enemyHpMul": 2.0,
+        "extraEnemies": 1.0
+      },
+      "thin_ice": {
+        "enemyDamageMul": 4.0,
+        "enemyHpMul": 3.0,
+        "extraEnemies": 2.0
+      },
+      "fire_sale": {
+        "enemyDamageMul": 4.0,
+        "enemyHpMul": 4.0,
+        "extraEnemies": 3.0
+      },
+      "hand_off": {
+        "enemyDamageMul": 3.0,
+        "enemyHpMul": 2.5,
+        "extraEnemies": 2.0
+      },
+      "the_ritual": {
+        "enemyDamageMul": 0.75,
+        "enemyHpMul": 0.75,
+        "extraEnemies": 0.0
+      },
+      "crowded_hall": {
+        "enemyDamageMul": 4.0,
+        "enemyHpMul": 3.0,
+        "extraEnemies": 2.0
+      },
+      "hollow_mascot": {
+        "enemyDamageMul": 1.5,
+        "enemyHpMul": 1.0,
+        "extraEnemies": 0.0
+      },
+      "night_market": {
+        "enemyDamageMul": 2.0,
+        "enemyHpMul": 1.5,
+        "extraEnemies": 0.0
+      },
+      "bell_tower": {
+        "enemyDamageMul": 3.0,
+        "enemyHpMul": 2.5,
+        "extraEnemies": 2.0
+      },
+      "flood_drill": {
+        "enemyDamageMul": 2.0,
+        "enemyHpMul": 2.0,
+        "extraEnemies": 1.0
+      },
+      "duet": {
+        "enemyDamageMul": 2.0,
+        "enemyHpMul": 1.5,
+        "extraEnemies": 0.0
+      }
+    },
+    "tuned_2": {
+      "ledge_day": {
+        "enemyDamageMul": 4.0,
+        "enemyHpMul": 4.0,
+        "extraEnemies": 3.0
+      },
+      "hold_the_line": {
+        "enemyDamageMul": 3.0,
+        "enemyHpMul": 2.0,
+        "extraEnemies": 1.0
+      },
+      "thin_ice": {
+        "enemyDamageMul": 3.0,
+        "enemyHpMul": 2.5,
+        "extraEnemies": 2.0
+      },
+      "fire_sale": {
+        "enemyDamageMul": 4.0,
+        "enemyHpMul": 4.0,
+        "extraEnemies": 3.0
+      },
+      "hand_off": {
+        "enemyDamageMul": 3.0,
+        "enemyHpMul": 2.5,
+        "extraEnemies": 2.0
+      },
+      "the_ritual": {
+        "enemyDamageMul": 1.5,
+        "enemyHpMul": 1.0,
+        "extraEnemies": 0.0
+      },
+      "crowded_hall": {
+        "enemyDamageMul": 4.0,
+        "enemyHpMul": 4.0,
+        "extraEnemies": 3.0
+      },
+      "hollow_mascot": {
+        "enemyDamageMul": 1.5,
+        "enemyHpMul": 1.0,
+        "extraEnemies": 0.0
+      },
+      "night_market": {
+        "enemyDamageMul": 2.0,
+        "enemyHpMul": 1.5,
+        "extraEnemies": 0.0
+      },
+      "bell_tower": {
+        "enemyDamageMul": 3.0,
+        "enemyHpMul": 2.5,
+        "extraEnemies": 2.0
+      },
+      "flood_drill": {
+        "enemyDamageMul": 2.0,
+        "enemyHpMul": 2.0,
+        "extraEnemies": 1.0
+      },
+      "duet": {
+        "enemyDamageMul": 4.0,
+        "enemyHpMul": 3.0,
+        "extraEnemies": 2.0
+      }
+    }
+  }
+}

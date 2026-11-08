@@ -1,5 +1,5 @@
 {
-  "comment": "LT Part 4 stages 4 and 5: an evolutionary search over the top 15 screening levers plus alwaysLevers, seeded with the best pairs. Each candidate plays searchCells; the best finalCount then play finalCells (every fight, 20 seeds, three parties), and the 5 best that differ by at least minDistance levers become tuned_1..5 in data/lab/presets.json. finalMinutes is kept back for that check.",
+  "comment": "LT Part 4 stages 4 and 5: an evolutionary search over the top 15 screening levers plus alwaysLevers (the difficulty levers: the baseline and a probe showed random wins 70 to 90% even at 4x enemy damage, because the party's total HP dwarfs what enemies deal), seeded with the best pairs. Each candidate plays searchCells; the best finalCount then play finalCells (every fight, 20 seeds, three parties), and the 5 best that differ by at least minDistance levers become tuned_1..5 in data/lab/presets.json. finalMinutes is kept back for that check.",
   "id": "search",
   "kind": "search",
   "from": "screening",
@@ -7,8 +7,11 @@
   "base": "auto",
   "top": 15,
   "alwaysLevers": [
-    { "lever": "enemyDamageMul", "values": [1.0, 1.5, 2.0, 2.5] },
-    { "lever": "enemyHpMul", "values": [1.0, 1.25, 1.5, 2.0] }
+    { "lever": "enemyDamageMul", "values": [1.0, 1.5, 2.0, 3.0, 4.0] },
+    { "lever": "enemyHpMul", "values": [1.0, 1.5, 2.0, 3.0] },
+    { "lever": "partyHpScale", "values": [0.12, 0.16, 0.2, 0.25, 0.33] },
+    { "lever": "hpScale", "values": [0.25, 0.5, 0.75, 1.0] },
+    { "lever": "extraEnemies", "values": [0, 1, 2] }
   ],
   "seedPairs": 4,
   "seed": 7,

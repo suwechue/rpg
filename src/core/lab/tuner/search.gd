@@ -45,7 +45,7 @@ static func effects(variants: Array, metrics_by_group: Dictionary, scores: Dicti
 		if str(v["lever"]) == "":
 			continue
 		var g := str(v["group"])
-		var bg := "screen:%s" % v["base"]
+		var bg := str(v.get("baseGroup", "screen:%s" % v["base"]))
 		if not metrics_by_group.has(g) or not metrics_by_group.has(bg):
 			continue
 		var m: Dictionary = metrics_by_group[g]
@@ -206,3 +206,115 @@ static func shortlist(scored: Array, n: int, min_distance: int, base: Dictionary
 		if out.size() >= n:
 			break
 	return out
+
+
+## The rule sets a difficulty ladder tries: the best finalists without their
+## difficulty levers, kept only when they differ, plus any extra sets from the plan.
+static func ladder_rules(finals: Array, plan: Dictionary, base: Dictionary = {}) -> Array:
+	var strip: Array = plan.get("difficultyLevers", [])
+	var sorted := finals.duplicate()
+	sorted.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a.get("score", 0.0)) > float(b.get("score", 0.0)))
+	var out: Array = []
+	for f in sorted:
+		if out.size() >= int(plan.get("fromFinals", 2)):
+			break
+		var rule: Dictionary = f["levers"].duplicate()
+		for k in strip:
+			rule.erase(k)
+		var far := true
+		for o in out:
+			far = far and distance(rule, o, base) >= int(plan.get("minRuleDistance", 2))
+		if far:
+			out.append(rule)
+	for x in plan.get("extraRuleSets", []):
+		out.append((x as Dictionary).duplicate())
+	return out
+
+
+## Every rule set at every difficulty level.
+static func ladder_sets(rules: Array, levels: Array) -> Array:
+	var out: Array = []
+	for r in rules:
+		for l in levels:
+			var lv: Dictionary = (r as Dictionary).duplicate()
+			lv.merge(l, true)
+			out.append(lv)
+	return out
+
+
+# --- Scaled difficulty ---------------------------------------------------------
+
+## Fight -> { expert, random, stalls, n } from a scan's result lines.
+static func scale_stats(lines: Array) -> Dictionary:
+	var raw := {}
+	for rec in lines:
+		var f := str(rec.get("fight", ""))
+		if not raw.has(f):
+			raw[f] = { "expert": [0, 0], "random": [0, 0], "stalls": 0, "n": 0 }
+		var row: Dictionary = raw[f]
+		row["n"] = int(row["n"]) + 1
+		var res := str(rec.get("result", ""))
+		if res == "stall":
+			row["stalls"] = int(row["stalls"]) + 1
+		var who := str(rec.get("profile", ""))
+		if row.has(who):
+			row[who][1] += 1
+			row[who][0] += 1 if res == "win" else 0
+	var out := {}
+	for f in raw:
+		var row: Dictionary = raw[f]
+		out[f] = { "stalls": row["stalls"], "n": row["n"],
+			"expert": float(row["expert"][0]) / float(maxi(1, row["expert"][1])),
+			"random": float(row["random"][0]) / float(maxi(1, row["random"][1])) }
+	return out
+
+
+## One difficulty step per fight. by_rung: scale_stats for each rung, easiest first.
+## Of the steps with no stalls where the expert still wins minExpert, take the one
+## where random play wins least (anything under maxRandom counts the same), then the
+## hardest. A fight with no such step gets the step the expert does best on, fit = false.
+## pick.force (fight -> step) overrides the choice by hand.
+static func scale_pick(by_rung: Array, rungs: Array, pick: Dictionary) -> Dictionary:
+	var min_expert := float(pick.get("minExpert", 0.8))
+	var max_random := float(pick.get("maxRandom", 0.15))
+	var fights := {}
+	for stats in by_rung:
+		for f in stats:
+			fights[f] = true
+	var out := {}
+	for f in fights:
+		var best := -1
+		var fit := false
+		for i in by_rung.size():
+			var st: Dictionary = by_rung[i].get(f, {})
+			if st.is_empty():
+				continue
+			var ok := int(st["stalls"]) == 0 and float(st["expert"]) >= min_expert
+			if best < 0:
+				best = i
+				fit = ok
+				continue
+			var cur: Dictionary = by_rung[best][f]
+			if ok and not fit:
+				best = i
+				fit = true
+			elif ok == fit and _scale_better(st, cur, ok, max_random):
+				best = i
+		var forced: Dictionary = pick.get("force", {})
+		if forced.has(f):
+			best = int(forced[f])
+			fit = int(by_rung[best][f]["stalls"]) == 0 and float(by_rung[best][f]["expert"]) >= min_expert
+		var chosen: Dictionary = by_rung[best][f]
+		out[f] = { "rung": best, "levers": rungs[best], "fit": fit, "expert": chosen["expert"], "random": chosen["random"], "stalls": chosen["stalls"] }
+	return out
+
+
+static func _scale_better(a: Dictionary, b: Dictionary, fit: bool, max_random: float) -> bool:
+	if not fit:
+		return float(a["expert"]) - float(a["stalls"]) >= float(b["expert"]) - float(b["stalls"])
+	var ra := maxf(0.0, float(a["random"]) - max_random)
+	var rb := maxf(0.0, float(b["random"]) - max_random)
+	if ra != rb:
+		return ra < rb
+	return float(a["expert"]) <= float(b["expert"])
+

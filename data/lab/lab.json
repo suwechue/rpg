@@ -84,6 +84,7 @@
     { "id": "enemyCount", "group": "pacing", "type": "int", "default": 0, "min": 0, "max": 12, "name": "Enemy count", "hint": "0 = what the fight says." },
     { "id": "goal", "group": "pacing", "type": "enum", "default": "", "options": ["", "kill", "survive"], "name": "Goal override", "hint": "Blank = what the fight says." },
 
+    { "id": "fightScaled", "group": "difficulty", "type": "bool", "default": false, "name": "Scaled fight difficulty", "hint": "Each fight uses its own enemy HP, damage and count from data/lab/fight_scales.json." },
     { "id": "enemyHpMul", "group": "difficulty", "type": "float", "default": 1.0, "min": 0.25, "max": 4.0, "step": 0.25, "name": "Enemy HP x" },
     { "id": "enemyDamageMul", "group": "difficulty", "type": "float", "default": 1.0, "min": 0.25, "max": 4.0, "step": 0.25, "name": "Enemy damage x" },
     { "id": "extraEnemies", "group": "difficulty", "type": "int", "default": 0, "min": 0, "max": 6, "name": "Extra enemies" },

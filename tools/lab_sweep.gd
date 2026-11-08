@@ -4,7 +4,8 @@
 ## Run: godot --headless --path . -s res://tools/lab_sweep.gd -- --plan=res://data/lab/sweeps/baseline.json
 ## Options: --jobs=N (parallel processes; default the plan's, else the CPU count),
 ## --fresh (start a new run instead of resuming the unfinished one),
-## --budget=minutes (overrides the plan's time budget).
+## --budget=minutes (overrides the plan's time budget), --generations=N (a search's
+## generation cap, e.g. to resume a stopped search straight into its final check).
 ## A stopped run resumes where it left off: run the same command again.
 ## Plan kinds: grid (named presets), screen (one lever at a time), pairs (the top
 ## levers from a screening run, two at a time), search (an evolutionary search,
@@ -63,6 +64,10 @@ func _main() -> void:
 			summary = _pairs(plan, dir, run)
 		"search":
 			summary = _search(plan, dir, run)
+		"ladder":
+			summary = _ladder(plan, dir, run)
+		"scaled":
+			summary = _scaled(plan, dir, run)
 	summary["plan"] = plan["id"]
 	summary["kind"] = plan.get("kind", "grid")
 	summary["run"] = run
@@ -225,7 +230,23 @@ func _screen(plan: Dictionary, dir: String, run: String) -> Dictionary:
 	for g in groups:
 		metrics_by[g] = groups[g]["metrics"]
 		scores[g] = groups[g]["score"]
-	return { "groups": groups, "effects": Search.effects(variants, metrics_by, scores, Metrics.cfg(db)), "complete": _complete(cells, lines), "fights": lines.size() }
+	# Each lever against its base on the same fights: the base's row for a variant
+	# is its lines on that variant's fights only.
+	var by_group := Plan.by_group(lines)
+	var t := Metrics.cfg(db)
+	for v in variants:
+		if str(v["lever"]) == "":
+			continue
+		var fights := Plan.variant_fights(db, plan, v)
+		var bg := "screen:%s" % v["base"]
+		var mine: Array = by_group.get(bg, []).filter(func(r: Dictionary) -> bool: return fights.has(str(r.get("fight", ""))))
+		var key := "%s@%s" % [bg, ",".join(PackedStringArray(fights))]
+		if not metrics_by.has(key):
+			var m := Metrics.summarize(mine, t)
+			metrics_by[key] = m
+			scores[key] = Metrics.fun_score(m, t, Metrics.complexity(db, levers_of.get(bg, {})))
+		v["baseGroup"] = key
+	return { "groups": groups, "effects": Search.effects(variants, metrics_by, scores, t), "complete": _complete(cells, lines), "fights": lines.size() }
 
 
 ## The latest finished summary of another plan.
@@ -314,7 +335,7 @@ func _search(plan: Dictionary, dir: String, run: String) -> Dictionary:
 	var state := Search.start(space, base, seeds)
 	var scored_all: Array = []
 	var search_cfg: Dictionary = plan.get("searchCells", {})
-	var gens := int(plan.get("generations", 30))
+	var gens := int(args.get("generations", plan.get("generations", 30)))
 	var per_gen := int(plan.get("population", 12))
 	var gen_times: Array = []
 	var complete := true
@@ -361,20 +382,140 @@ func _search(plan: Dictionary, dir: String, run: String) -> Dictionary:
 			per_party[party] = { "metrics": m, "score": Metrics.fun_score(m, Metrics.cfg(db), Metrics.complexity(db, lv)) }
 		final_rows.append(_robust(fset, per_party, all_lines))
 	var short := Search.shortlist(final_rows, int(plan.get("shortlist", 5)), int(plan.get("minDistance", 3)), base_values)
-	if short.size() < int(plan.get("shortlist", 5)):
-		# Not enough finals far enough apart: fill from the whole search.
-		var more: Array = final_rows.duplicate()
-		more.append_array(state["pop"])
-		short = Search.shortlist(more, int(plan.get("shortlist", 5)), int(plan.get("minDistance", 3)), base_values)
-	if complete and not short.is_empty() and not bool(plan.get("dryRun", false)):
-		var path := ProjectSettings.globalize_path("res://data/lab/presets.json")
-		var text := Tuned.write(FileAccess.get_file_as_string(path), Tuned.presets_for(db, base, short))
-		var f := FileAccess.open(path, FileAccess.WRITE)
-		f.store_string(text)
-		f.close()
-		print("  wrote %d tuned presets to data/lab/presets.json" % short.size())
+	# Only sets that passed the full check can be shortlisted.
+	short = Search.shortlist(final_rows.filter(func(r: Dictionary) -> bool: return not bool(r["dq"])), int(plan.get("shortlist", 5)), int(plan.get("minDistance", 3)), base_values)
+	if complete and not bool(plan.get("dryRun", false)):
+		_write_tuned(base, short)
 	return { "base": base, "space": space, "generations": state["gen"], "population": state["pop"], "tried": scored_all.size(), "finals": final_rows,
 		"shortlist": short, "complete": complete, "genSeconds": gen_times }
+
+
+## Replace the generated presets with this shortlist (none if nothing passed).
+func _write_tuned(base: String, short: Array) -> void:
+	var path := ProjectSettings.globalize_path("res://data/lab/presets.json")
+	var text := Tuned.write(FileAccess.get_file_as_string(path), Tuned.presets_for(db, base, short))
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	f.store_string(text)
+	f.close()
+	print("  wrote %d tuned presets to data/lab/presets.json" % short.size())
+
+
+## After a search whose finalists failed the full check: the same rules at milder
+## difficulty levels, on every fight and party. Only sets that pass are shortlisted.
+func _ladder(plan: Dictionary, dir: String, run: String) -> Dictionary:
+	var source := latest_summary(str(plan.get("from", "search")))
+	if source.is_empty():
+		printerr("lab_sweep: run the search plan first")
+		return { "complete": false }
+	var base := str(source.get("base", "cl_puzzle"))
+	var base_values := Rules.values_for(db, base)
+	var rules := Search.ladder_rules(source.get("finals", []), plan, base_values)
+	var sets := Search.ladder_sets(rules, plan.get("levels", []))
+	print("  %d rule sets x %d difficulty levels" % [rules.size(), plan.get("levels", []).size()])
+	var cfg: Dictionary = plan.get("cells", {})
+	var rows: Array = []
+	var complete := true
+	for lv in sets:
+		var per_party := {}
+		var all_lines: Array = []
+		for party in cfg.get("parties", ["balanced"]):
+			var pc := cfg.duplicate()
+			pc["parties"] = [party]
+			var cells := Plan.set_cells(db, [{ "group": "ladder:%s|%s" % [Search.set_key(lv), party], "base": base, "levers": lv }], pc)
+			var lines := run_cells(dir, run, cells, str(party))
+			complete = complete and lines.size() >= cells.size()
+			all_lines.append_array(lines)
+			var full := base_values.duplicate()
+			full.merge(lv, true)
+			var m := Metrics.summarize(lines, Metrics.cfg(db))
+			per_party[party] = { "metrics": m, "score": Metrics.fun_score(m, Metrics.cfg(db), Metrics.complexity(db, full)) }
+		var row := _robust({ "levers": lv }, per_party, all_lines)
+		rows.append(row)
+		print("  %.3f%s %s" % [float(row["score"]), " (fails: %s)" % str(row["reasons"]).left(120) if bool(row["dq"]) else " PASSES", Search.set_key(lv)])
+	var short := Search.shortlist(rows.filter(func(r: Dictionary) -> bool: return not bool(r["dq"])), int(plan.get("shortlist", 5)), int(plan.get("minDistance", 3)), base_values)
+	if complete:
+		_write_tuned(base, short)
+	return { "base": base, "rules": rules, "finals": rows, "shortlist": short, "space": [], "tried": rows.size(), "generations": 0, "complete": complete }
+
+
+## Scaled difficulty: scan every fight at every difficulty step, pick one step per
+## fight, then check those picks on new seeds with every profile and party. The picks
+## are saved (and presets written) only for sets that pass the full check.
+func _scaled(plan: Dictionary, dir: String, run: String) -> Dictionary:
+	var source := latest_summary(str(plan.get("from", "search")))
+	if source.is_empty():
+		printerr("lab_sweep: run the search plan first")
+		return { "complete": false }
+	var base := str(source.get("base", "cl_puzzle"))
+	var base_values := Rules.values_for(db, base)
+	var rules := Search.ladder_rules(source.get("finals", []), plan, base_values)
+	var rungs: Array = plan.get("rungs", [])
+	var check: Dictionary = plan.get("check", {})
+	var rows: Array = []
+	var complete := true
+	for rule in rules:
+		var key := Search.set_key(rule)
+		var by_rung: Array = []
+		for i in rungs.size():
+			var lv: Dictionary = (rule as Dictionary).duplicate()
+			lv.merge(rungs[i], true)
+			var cells := Plan.set_cells(db, [{ "group": "scan:%s|%d" % [key, i], "base": base, "levers": lv }], plan.get("scan", {}))
+			var lines := run_cells(dir, run, cells, "step %d" % i)
+			complete = complete and lines.size() >= cells.size()
+			by_rung.append(Search.scale_stats(lines))
+		var picks := Search.scale_pick(by_rung, rungs, plan.get("pick", {}))
+		var names: Array = picks.keys()
+		names.sort()
+		for f in names:
+			print("  %s: step %d, expert %d%%, random %d%%%s" % [f, int(picks[f]["rung"]), roundi(float(picks[f]["expert"]) * 100.0), roundi(float(picks[f]["random"]) * 100.0), "" if bool(picks[f]["fit"]) else " (no step fits)"])
+		var per_party := {}
+		var all_lines: Array = []
+		var full := base_values.duplicate()
+		full.merge(rule, true)
+		for party in check.get("parties", ["balanced"]):
+			var pc := check.duplicate()
+			pc["parties"] = [party]
+			var cells: Array = []
+			for f in names:
+				var lv: Dictionary = (rule as Dictionary).duplicate()
+				lv.merge(picks[f]["levers"], true)
+				cells.append_array(Plan.cells_for(db, "check:%s|%s" % [key, party], base, lv, pc, [f]))
+			var lines := run_cells(dir, run, cells, str(party))
+			complete = complete and lines.size() >= cells.size()
+			all_lines.append_array(lines)
+			var m := Metrics.summarize(lines, Metrics.cfg(db))
+			per_party[party] = { "metrics": m, "score": Metrics.fun_score(m, Metrics.cfg(db), Metrics.complexity(db, full)) }
+		var named: Dictionary = (rule as Dictionary).duplicate()
+		named["fightScaled"] = true
+		var row := _robust({ "levers": named }, per_party, all_lines)
+		row["picks"] = picks
+		rows.append(row)
+		print("  %.3f%s %s" % [float(row["score"]), " (fails: %s)" % str(row["reasons"]) if bool(row["dq"]) else " PASSES", Search.set_key(named)])
+	var short := Search.shortlist(rows.filter(func(r: Dictionary) -> bool: return not bool(r["dq"])), int(plan.get("shortlist", 5)), int(plan.get("minDistance", 3)), base_values)
+	if short.is_empty() and bool(plan.get("keepBestIfNonePass", false)):
+		# Marked as not passing in the preset's data and text (Tuned.presets_for).
+		short = Search.shortlist(rows, int(plan.get("shortlist", 5)), int(plan.get("minDistance", 3)), base_values)
+	if complete:
+		_write_scales(short)
+		_write_tuned(base, short)
+	return { "base": base, "rules": rules, "finals": rows, "shortlist": short, "space": [], "tried": rows.size(), "generations": 0, "complete": complete }
+
+
+## The per-fight steps of the shortlisted sets, keyed by the preset ids they become.
+func _write_scales(short: Array) -> void:
+	var scales := {}
+	for i in short.size():
+		var table := {}
+		for f in short[i]["picks"]:
+			table[f] = short[i]["picks"][f]["levers"]
+		scales[Tuned.PREFIX + str(i + 1)] = table
+	var path := ProjectSettings.globalize_path("res://data/lab/fight_scales.json")
+	var old: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	var out: Dictionary = old if typeof(old) == TYPE_DICTIONARY else {}
+	out["scales"] = scales
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	f.store_string(JSON.stringify(out, "  ", false) + "\n")
+	f.close()
 
 
 func _score_sets(sets: Array, lines: Array, base_values: Dictionary) -> Array:

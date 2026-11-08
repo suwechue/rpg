@@ -736,6 +736,8 @@ These change today's game too, and it hasn't been rebalanced for them: that wait
 
 ## Lab Tuner (docs/LAB_TUNER.md)
 
+**Scaled fight difficulty (lever `fightScaled`).** A preset with this lever on gives each Lab fight its own enemy damage, enemy HP and enemy count, from `data/lab/fight_scales.json` (preset id -> fight id -> levers). A change made by hand in the Lab still wins. The sweep plan `data/lab/sweeps/scaled.json` scans 9 difficulty steps per fight and picks one; `pick.force` sets a step by hand. A generated preset that failed a hard limit carries `"passed": false` and `failed`, and its text says so.
+
 A tool for picking a preset, not a game rule: nothing here changes how a fight plays.
 
 - **AI players** (`src/core/lab/players/`, weights and profiles in `data/lab/players.json`): `expert`, `novice`, `greedy` and `random`. The first three search their whole turn as lines of steps (move, card, Strike, Surge...) with a beam, scored by one state score: party HP, kills, telegraphed damage still aimed at the party, Surge, setups. `expert` keeps 3 lines plus 3 that start with a move, 4 steps deep. `novice` keeps 1, adds noise, and half its turns ignores the extras and teammate cards; most turns it ignores push cards. `greedy` scores damage and kills only. `random` plays random legal steps.

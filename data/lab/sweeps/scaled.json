@@ -1,0 +1,112 @@
+{
+  "comment": "LT: one global difficulty cannot suit all 12 fights, so each fight gets its own step. Scan every fight at every rung (easiest first), pick per fight with the pick thresholds, then check the picks on new seeds with all profiles and parties. Only sets that pass every hard limit in tuner.json become tuned presets.",
+  "id": "scaled",
+  "kind": "scaled",
+  "from": "search",
+  "difficultyLevers": [
+    "enemyDamageMul",
+    "enemyHpMul",
+    "partyHpScale",
+    "hpScale",
+    "extraEnemies"
+  ],
+  "fromFinals": 1,
+  "minRuleDistance": 2,
+  "extraRuleSets": [
+    {}
+  ],
+  "rungs": [
+    {
+      "enemyDamageMul": 0.75,
+      "enemyHpMul": 0.75,
+      "extraEnemies": 0
+    },
+    {
+      "enemyDamageMul": 1.0,
+      "enemyHpMul": 1.0,
+      "extraEnemies": 0
+    },
+    {
+      "enemyDamageMul": 1.5,
+      "enemyHpMul": 1.0,
+      "extraEnemies": 0
+    },
+    {
+      "enemyDamageMul": 2.0,
+      "enemyHpMul": 1.5,
+      "extraEnemies": 0
+    },
+    {
+      "enemyDamageMul": 2.0,
+      "enemyHpMul": 2.0,
+      "extraEnemies": 1
+    },
+    {
+      "enemyDamageMul": 3.0,
+      "enemyHpMul": 2.0,
+      "extraEnemies": 1
+    },
+    {
+      "enemyDamageMul": 3.0,
+      "enemyHpMul": 2.5,
+      "extraEnemies": 2
+    },
+    {
+      "enemyDamageMul": 4.0,
+      "enemyHpMul": 3.0,
+      "extraEnemies": 2
+    },
+    {
+      "enemyDamageMul": 4.0,
+      "enemyHpMul": 4.0,
+      "extraEnemies": 3
+    }
+  ],
+  "pick": {
+    "minExpert": 0.7,
+    "maxRandom": 0.1,
+    "force": { "flood_drill": 4, "hold_the_line": 5, "hollow_mascot": 2, "hand_off": 6 }
+  },
+  "scan": {
+    "fights": "all",
+    "seeds": 4,
+    "profiles": [
+      "expert",
+      "random"
+    ],
+    "parties": [
+      "balanced",
+      "melee",
+      "caster"
+    ]
+  },
+  "check": {
+    "seeds": [
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110
+    ],
+    "profiles": [
+      "expert",
+      "novice",
+      "greedy",
+      "random"
+    ],
+    "parties": [
+      "balanced",
+      "melee",
+      "caster"
+    ]
+  },
+  "keepBestIfNonePass": true,
+  "shortlist": 5,
+  "minDistance": 2,
+  "budgetMinutes": 150
+}

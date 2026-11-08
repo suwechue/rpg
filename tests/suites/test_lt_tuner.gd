@@ -462,3 +462,52 @@ func test_lab_report_shows_human_agent_machine() -> void:
 	var text := LR.combined(human, [{ "preset": "tuned_1", "fun": 3 }, { "preset": "cl_base", "fun": 2 }], { "tuned_1": { "score": 0.61, "dq": false }, "cl_base": { "score": 0.4, "dq": true } })
 	check(text.contains("you:fun") and text.contains("agent:fun") and text.contains("machine"), "the table has your, the agents' and the machine's columns")
 	check(text.contains("5.0") and text.contains("3.0") and text.contains("0.61") and text.contains("0.40!"), "each column shows its number")
+
+
+func test_difficulty_ladder() -> void:
+	var finals := [{ "levers": { "keywordsOn": false, "surge": false, "enemyDamageMul": 4 }, "score": 0.5 },
+		{ "levers": { "keywordsOn": false, "surge": false, "enemyHpMul": 3 }, "score": 0.6 },
+		{ "levers": { "facing": true, "fog": true, "enemyHpMul": 2 }, "score": 0.4 }]
+	var plan := { "difficultyLevers": ["enemyDamageMul", "enemyHpMul"], "fromFinals": 2, "minRuleDistance": 2, "extraRuleSets": [{}] }
+	var rules := Search.ladder_rules(finals, plan)
+	check(rules.size() == 3 and not rules[0].has("enemyHpMul"), "the finalists' rules lose their difficulty levers")
+	check(bool(rules[1].get("facing", false)) and rules[2].is_empty(), "near-copies are dropped and the plan's extra sets join")
+	var sets := Search.ladder_sets(rules, [{ "enemyHpMul": 1.5 }, { "enemyHpMul": 2 }])
+	check(sets.size() == 6 and int(sets[1]["enemyHpMul"]) == 2 and not bool(sets[0]["surge"]), "every rule set meets every level")
+
+
+func test_scaled_difficulty_pick() -> void:
+	var line := func(f: String, who: String, res: String) -> Dictionary: return { "fight": f, "profile": who, "result": res }
+	var st := Search.scale_stats([line.call("a", "expert", "win"), line.call("a", "expert", "loss"), line.call("a", "random", "stall")])
+	check(is_equal_approx(float(st["a"]["expert"]), 0.5) and int(st["a"]["stalls"]) == 1 and int(st["a"]["n"]) == 3, "a scan's lines become win shares and stalls per fight")
+	var row := func(e: float, r: float, s: int = 0) -> Dictionary: return { "expert": e, "random": r, "stalls": s, "n": 12 }
+	var rungs := [{ "enemyHpMul": 1 }, { "enemyHpMul": 2 }, { "enemyHpMul": 3 }]
+	var by := [{ "easy": row.call(1.0, 0.9), "hard": row.call(0.6, 0.0), "stally": row.call(1.0, 0.5, 2) },
+		{ "easy": row.call(1.0, 0.1), "hard": row.call(0.3, 0.0), "stally": row.call(0.9, 0.1) },
+		{ "easy": row.call(0.85, 0.0), "hard": row.call(0.1, 0.0), "stally": row.call(0.7, 0.0) }]
+	var p := Search.scale_pick(by, rungs, { "minExpert": 0.8, "maxRandom": 0.15 })
+	check(int(p["easy"]["rung"]) == 2 and bool(p["easy"]["fit"]), "the hardest step the expert still wins is picked")
+	check(int(p["stally"]["rung"]) == 1, "a step with stalls is passed over")
+	check(int(p["hard"]["rung"]) == 0 and not bool(p["hard"]["fit"]), "with no fitting step the expert's best one is used and flagged")
+	var forced := Search.scale_pick(by, rungs, { "minExpert": 0.8, "maxRandom": 0.15, "force": { "easy": 0 } })
+	check(int(forced["easy"]["rung"]) == 0 and int(forced["stally"]["rung"]) == 1, "the plan can set a fight's step by hand")
+
+
+func test_scaled_difficulty_applies_per_fight() -> void:
+	var d := db().duplicate()
+	d["lab/fight_scales"] = { "scales": { "cl_base": { "ledge_day": { "enemyHpMul": 3.0 } } } }
+	var on := Setup.build(d, "ledge_day", "cl_base", { "fightScaled": true })
+	check(is_equal_approx(on["rules"].num("enemyHpMul"), 3.0), "a scaled preset uses its step for the fight")
+	var other := Setup.build(d, "fire_sale", "cl_base", { "fightScaled": true })
+	check(is_equal_approx(other["rules"].num("enemyHpMul", 1.0), 1.0), "a fight with no step is unchanged")
+	var hand := Setup.build(d, "ledge_day", "cl_base", { "fightScaled": true, "enemyHpMul": 2.0 })
+	check(is_equal_approx(hand["rules"].num("enemyHpMul"), 2.0), "a change made by hand still wins")
+	var off := Setup.build(d, "ledge_day", "cl_base")
+	check(is_equal_approx(off["rules"].num("enemyHpMul", 1.0), 1.0), "off by default")
+
+
+func test_failed_presets_are_marked() -> void:
+	var rec: Array = Tuned.presets_for(db(), "cl_base", [{ "levers": { "surge": false }, "score": 0.5, "dq": true, "reasons": ["stalls"] }, { "levers": { "fog": true }, "score": 0.4, "dq": false }])
+	check(not bool(rec[0].get("passed", true)) and str(rec[0]["text"]).begins_with("Did not pass") and rec[0]["failed"].has("stalls"), "a preset that failed the limits says so")
+	check(not rec[1].has("failed"), "a passing preset is not marked")
+

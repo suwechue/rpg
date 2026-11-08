@@ -152,6 +152,11 @@ static func build(db: Dictionary, fight_id: String, preset_id: String, overrides
 	var levers: Dictionary = {} if preset_id == Rules.CURRENT else f.get("levers", {}).duplicate()
 	levers.merge(overrides, true)
 	var rules: RefCounted = Rules.build(db, preset_id, levers)
+	if rules.flag("fightScaled"):
+		# This preset's difficulty step for this fight; a change made by hand still wins.
+		levers.merge(db.get("lab/fight_scales", {}).get("scales", {}).get(preset_id, {}).get(fight_id, {}), true)
+		levers.merge(overrides, true)
+		rules = Rules.build(db, preset_id, levers)
 	var seed_value: int = seed_override if seed_override >= 0 else int(f.get("seed", 1))
 	var picks := picks_for(db, f, chosen)
 	var run := make_run(db, seed_value, picks, rules)

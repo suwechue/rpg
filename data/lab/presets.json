@@ -153,6 +153,64 @@
         "bossLookahead": 2,
         "downedRules": "carry"
       }
+    },
+    {
+      "base": "cl_puzzle",
+      "failed": [
+        "melee: stalls",
+        "melee: random wins over 20%"
+      ],
+      "generated": true,
+      "id": "tuned_1",
+      "levers": {
+        "crits": false,
+        "enemiesAvoidEdges": false,
+        "exhaustOn": false,
+        "fightScaled": true,
+        "handSize": 4.0,
+        "instability": false,
+        "keepHand": true,
+        "keywordsOn": false,
+        "killRefund": "off",
+        "lineOfSight": true,
+        "misses": false,
+        "pathBlocking": false,
+        "redirect": false,
+        "smallNumbers": true,
+        "strikeCost": "quick",
+        "surge": false,
+        "trackingShare": -1.0,
+        "turnStructure": "alternate"
+      },
+      "name": "Tuned 1",
+      "passed": false,
+      "score": 0.598,
+      "text": "Did not pass every limit. CL Puzzle plus: Enemies avoid edges off, Exhaust off, Scaled fight difficulty on, Keywords off, Kill refund off, Line of sight on, Things in the path take the shot off, Enemies hit each other off, Strike costs quick, Surge meter off, Tracking attack share -1, Turn structure alternate."
+    },
+    {
+      "base": "cl_puzzle",
+      "failed": [
+        "balanced: random wins over 20%",
+        "melee: stalls",
+        "melee: random wins over 20%"
+      ],
+      "generated": true,
+      "id": "tuned_2",
+      "levers": {
+        "crits": false,
+        "fightScaled": true,
+        "handSize": 4.0,
+        "instability": false,
+        "keepHand": true,
+        "killRefund": "move",
+        "misses": false,
+        "smallNumbers": true,
+        "surge": true
+      },
+      "name": "Tuned 2",
+      "passed": false,
+      "score": 0.468,
+      "text": "Did not pass every limit. CL Puzzle plus: Scaled fight difficulty on."
     }
   ]
 }

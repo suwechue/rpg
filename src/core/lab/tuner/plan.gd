@@ -102,15 +102,30 @@ static func screen_variants(db: Dictionary, plan: Dictionary) -> Array:
 	return out
 
 
+## The fights a screening variant plays: its lever's own, or the plan's.
+static func variant_fights(db: Dictionary, plan: Dictionary, v: Dictionary) -> Array:
+	if str(v["lever"]) != "":
+		var spec := lever_spec(db, str(v["lever"]))
+		if spec.has("fights"):
+			return spec["fights"]
+	return fights_of(db, plan.get("fights", "all"))
+
+
+## Screening cells. Each base also plays every fight a lever names, so a lever
+## is always compared with its base on the same fights.
 static func screen_cells(db: Dictionary, plan: Dictionary) -> Array:
 	var out: Array = []
+	var base_fights := {}
 	for v in screen_variants(db, plan):
-		var fights: Variant = null
+		var fights := variant_fights(db, plan, v)
 		if str(v["lever"]) != "":
-			var spec := lever_spec(db, str(v["lever"]))
-			if spec.has("fights"):
-				fights = spec["fights"]
-		out.append_array(cells_for(db, str(v["group"]), str(v["base"]), v["levers"], plan, fights))
+			out.append_array(cells_for(db, str(v["group"]), str(v["base"]), v["levers"], plan, fights))
+		if not base_fights.has(v["base"]):
+			base_fights[v["base"]] = {}
+		for f in fights:
+			base_fights[v["base"]][str(f)] = true
+	for b in base_fights:
+		out.append_array(cells_for(db, "screen:%s" % b, str(b), {}, plan, (base_fights[b] as Dictionary).keys()))
 	return out
 
 

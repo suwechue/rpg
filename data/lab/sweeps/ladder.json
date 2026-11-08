@@ -1,0 +1,65 @@
+{
+  "comment": "LT: the search's finalists failed the full check (x4 damage and x3 HP left easy fights near 100% and hard ones near 0%). This keeps their rules, adds plain cl_puzzle, and tries milder difficulty on every fight and party. Only sets that pass every hard limit become tuned presets. Run it after search.json.",
+  "id": "ladder",
+  "kind": "ladder",
+  "from": "search",
+  "difficultyLevers": [
+    "enemyDamageMul",
+    "enemyHpMul",
+    "partyHpScale",
+    "hpScale",
+    "extraEnemies"
+  ],
+  "fromFinals": 2,
+  "minRuleDistance": 2,
+  "extraRuleSets": [
+    {}
+  ],
+  "levels": [
+    {
+      "enemyDamageMul": 2.0,
+      "enemyHpMul": 1.5,
+      "extraEnemies": 0
+    },
+    {
+      "enemyDamageMul": 3.0,
+      "enemyHpMul": 2.0,
+      "extraEnemies": 1
+    },
+    {
+      "enemyDamageMul": 2.0,
+      "enemyHpMul": 2.0,
+      "extraEnemies": 1,
+      "partyHpScale": 0.25
+    },
+    {
+      "enemyDamageMul": 3.0,
+      "enemyHpMul": 1.5,
+      "extraEnemies": 1,
+      "partyHpScale": 0.25
+    },
+    {
+      "enemyDamageMul": 2.0,
+      "enemyHpMul": 1.5,
+      "extraEnemies": 2
+    }
+  ],
+  "cells": {
+    "fights": "all",
+    "seeds": 6,
+    "profiles": [
+      "expert",
+      "novice",
+      "greedy",
+      "random"
+    ],
+    "parties": [
+      "balanced",
+      "melee",
+      "caster"
+    ]
+  },
+  "shortlist": 5,
+  "minDistance": 3,
+  "budgetMinutes": 150
+}

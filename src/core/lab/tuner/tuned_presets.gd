@@ -42,6 +42,10 @@ static func presets_for(db: Dictionary, base: String, short: Array) -> Array:
 			"text": "%s plus: %s." % [str(base_rec.get("name", base)), describe(db, s["levers"])], "score": s.get("score", 0.0), "levers": lv }
 		if base_rec.has("fromGame"):
 			rec["fromGame"] = base_rec["fromGame"]
+		if bool(s.get("dq", false)):
+			rec["passed"] = false
+			rec["failed"] = s.get("reasons", [])
+			rec["text"] = "Did not pass every limit. " + str(rec["text"])
 		out.append(rec)
 	return out
 

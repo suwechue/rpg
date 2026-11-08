@@ -17,7 +17,6 @@ const DT := preload("res://src/core/data_tables.gd")
 const Play := preload("res://src/core/lab/play_text.gd")
 const Setup := preload("res://src/core/lab/lab_setup.gd")
 const Rules := preload("res://src/core/combat/rules.gd")
-const UserPaths := preload("res://src/core/user_paths.gd")
 
 
 func _initialize() -> void:
@@ -45,7 +44,8 @@ static func rate(fight: String, preset: String, persona: String, card_json: Stri
 	var card: Variant = JSON.parse_string(card_json)
 	if persona == "" or typeof(card) != TYPE_DICTIONARY:
 		return "Sorry: pass --persona=<id> and --card with a JSON object: fun 1-5, options 1-5, clever true/false, boring, misunderstood, broken, journal."
-	var dir := UserPaths.of("lab/agents/") + "%s/%s/" % [persona, preset]
+	# Always the real Lab folder: lab_play runs take --seed, which would send them to the test sandbox.
+	var dir := "user://lab/agents/%s/%s/" % [persona, preset]
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(dir))
 	card["savedAt"] = Time.get_datetime_string_from_system()
 	var f := FileAccess.open(dir + fight + ".json", FileAccess.WRITE)

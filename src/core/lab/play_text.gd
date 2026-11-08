@@ -133,7 +133,7 @@ static func _matches(st: Object, s: Dictionary, t: String) -> bool:
 		if choice == "":
 			return true
 		var ch: Variant = s.get("choice")
-		return ch != null and (str(ch).to_lower() == choice or str(CardRules.resolve(st.db, str(ch), st.library).get("name", "")).to_lower() == choice)
+		return ch != null and (str(ch).to_lower() == choice or str(CardRules.resolve(st.db, str(ch), st.library).get("name", "")).to_lower().replace(" ", "") == choice.replace(" ", ""))
 	return false
 
 
@@ -396,11 +396,15 @@ static func render(db: Dictionary, r: Dictionary, preset: String, brief: bool = 
 		if brief and str(o["step"]["kind"]) == "move":
 			var pv := str(o["preview"])
 			var danger := pv.get_slice("stand in ", 1).get_slice(" telegraphed", 0) if pv.contains("stand in ") else ""
-			moves.append("%d:m%d.%d%s" % [i + 1, o["step"]["cell"].x, o["step"]["cell"].y, "" if danger == "" else "(!%s)" % danger])
+			var hurt := ""
+			for part in pv.split("; "):
+				if part.begins_with("you ") and part.contains(" HP"):
+					hurt = "[" + part.trim_prefix("you ") + "]"
+			moves.append("%d:m%d.%d%s%s" % [i + 1, o["step"]["cell"].x, o["step"]["cell"].y, "" if danger == "" else "(!%s)" % danger, hurt])
 			continue
 		out.append("  %d. %s%s" % [i + 1, o["label"], "" if str(o["preview"]) == "" else " -> " + str(o["preview"])])
 	if not moves.is_empty():
-		out.append("  Moves (number:step; (!n) = you'd stand in n telegraphed damage): " + " ".join(PackedStringArray(moves)))
+		out.append("  Moves (number:step; (!n) = you'd stand in n telegraphed damage; [a -> b HP] = the walk itself hurts): " + " ".join(PackedStringArray(moves)))
 	if st.rules.text("undo", "stack") != "off":
 		out.append("  u. Undo the last step (%s)" % ("allowed" if st.can_undo(st.current) or st.can_undo_move(st.current) else _undo_reason(st, st.current)))
 	return "\n".join(PackedStringArray(out))
@@ -498,8 +502,8 @@ static func unit_lines(st: Object) -> Array:
 		if x.downed:
 			bits.append("DOWNED")
 		if x == st.current:
-			bits.append("<- acting now (Move left %d, Action %s, Quick %s)" % [x.move_left, "used" if x.action_used or (st.uses_actions(x) and x.actions_left <= 0) else "ready",
-				"used" if x.quick_used else "ready"])
+			var acts := ("Actions left %d" % x.actions_left) if st.uses_actions(x) else ("Action " + ("used" if x.action_used else "ready"))
+			bits.append("<- acting now (Move left %d, %s, Quick %s)" % [x.move_left, acts, "used" if x.quick_used else "ready"])
 		elif st.acted_this_round(x):
 			bits.append("(already acted this round)")
 		if x.team == "enemy":
@@ -507,6 +511,9 @@ static func unit_lines(st: Object) -> Array:
 				bits.append("plan: hidden in fog (?)")
 			else:
 				var w: String = st.intent_words(x)
+				var kind := str(x.intent.get("kind", ""))
+				if kind in ["attack", "special"]:
+					w += " (follows its target if they move)" if str(x.intent.get("mode", "locked")) == "tracking" else " (locked: step off those tiles to dodge)"
 				bits.append("plan: " + (w if w != "" else "nothing"))
 		out.append("  " + ", ".join(PackedStringArray(bits)))
 	var order: Array = []
@@ -529,14 +536,19 @@ static func hand_lines(st: Object) -> Array:
 	var out: Array = []
 	if u == null or u.deck == null:
 		return out
-	out.append("%s's hand:" % u.name)
+	out.append("%s's hand (c<number> in a named step means this list's number, playable or not):" % u.name)
 	for i in u.deck.hand.size():
 		var card: Dictionary = st.card_of(u, i)
 		var block: String = st.card_block(u, card)
 		var tags: Array = []
 		if st.is_quick_now(u, card):
 			tags.append("Quick")
-		out.append("  - %s (cost %d MP%s): %s%s" % [str(card.get("name", "?")), st.card_cost(u, card), (", " + ", ".join(PackedStringArray(tags))) if not tags.is_empty() else "",
+		var reach := int(card.get("targeting", {}).get("range", card.get("range", 0)))
+		if reach > 0:
+			tags.append("range %d" % reach)
+		elif str(card.get("action", "")) == "strike":
+			tags.append("adjacent")
+		out.append("  c%d. %s (cost %d MP%s): %s%s" % [i + 1, str(card.get("name", "?")), st.card_cost(u, card), (", " + ", ".join(PackedStringArray(tags))) if not tags.is_empty() else "",
 			CardRules.describe(st.db, card), "" if block == "" else " [can't play now: %s]" % block])
 	out.append("  Draw pile %d cards, discard %d, exhausted %d." % [u.deck.draw_pile.size(), u.deck.discard.size(), u.deck.exhausted.size()])
 	return out
