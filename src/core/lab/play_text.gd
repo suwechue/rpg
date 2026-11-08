@@ -365,9 +365,12 @@ static func render(db: Dictionary, r: Dictionary, preset: String, brief: bool = 
 		out.append(str(f["text"]))
 	var goal: String = st.goal_line()
 	out.append("Goal: " + (goal if goal != "" else "defeat every enemy."))
+	var lead: String = st.lead_who_loses_fight()
+	if lead != "":
+		out.append("If %s goes down, the fight is lost." % lead)
 	for n in r.get("notes", []):
 		out.append("NOTE: " + str(n))
-	var log := _log_lines(r.get("events", []))
+	var log := _log_lines(r.get("events", []), st)
 	if not log.is_empty():
 		out.append("")
 		out.append("What just happened:")
@@ -410,17 +413,34 @@ static func render(db: Dictionary, r: Dictionary, preset: String, brief: bool = 
 	return "\n".join(PackedStringArray(out))
 
 
-static func _log_lines(events: Array) -> Array:
+static func _log_lines(events: Array, st: Object = null) -> Array:
 	var out: Array = []
 	for e in events:
+		var who := _unit_name(st, e.get("unit"))
 		match str(e.get("t", "")):
+			"damage":
+				var cause := str(e.get("cause", ""))
+				out.append("%s takes %d damage%s" % [who, int(e.get("amount", 0)), "" if cause == "" else " (%s)" % cause])
+			"down":
+				out.append("%s goes down" % who)
+			"death":
+				out.append("%s is gone" % who)
+			"push":
+				out.append("%s is pushed to %s" % [who, str(e.get("to", ""))])
 			"log", "say":
 				var t := str(e.get("text", ""))
 				if t != "" and (out.is_empty() or out[-1] != t):
 					out.append(t)
 			"round":
 				out.append("-- round %d --" % int(e.get("n", 0)))
-	return out.slice(maxi(0, out.size() - 30))
+	return out.slice(maxi(0, out.size() - 60))
+
+
+static func _unit_name(st: Object, id: Variant) -> String:
+	if st == null or id == null:
+		return "Someone"
+	var u: Object = st.unit_by_id(str(id))
+	return u.name if u != null else "Someone"
 
 
 static func board(st: Object) -> Array:
@@ -549,7 +569,7 @@ static func hand_lines(st: Object) -> Array:
 		elif str(card.get("action", "")) == "strike":
 			tags.append("adjacent")
 		out.append("  c%d. %s (cost %d MP%s): %s%s" % [i + 1, str(card.get("name", "?")), st.card_cost(u, card), (", " + ", ".join(PackedStringArray(tags))) if not tags.is_empty() else "",
-			CardRules.describe(st.db, card), "" if block == "" else " [can't play now: %s]" % block])
+			CardRules.describe(st.db, st.card_as_shown(card)), "" if block == "" else " [can't play now: %s]" % block])
 	out.append("  Draw pile %d cards, discard %d, exhausted %d." % [u.deck.draw_pile.size(), u.deck.discard.size(), u.deck.exhausted.size()])
 	return out
 

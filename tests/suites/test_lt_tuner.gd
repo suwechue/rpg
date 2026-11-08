@@ -511,3 +511,13 @@ func test_failed_presets_are_marked() -> void:
 	check(not bool(rec[0].get("passed", true)) and str(rec[0]["text"]).begins_with("Did not pass") and rec[0]["failed"].has("stalls"), "a preset that failed the limits says so")
 	check(not rec[1].has("failed"), "a passing preset is not marked")
 
+
+func test_text_explains_what_happened() -> void:
+	var lines: Array = Play._log_lines([{ "t": "damage", "unit": "x", "amount": 9, "cause": "pit" }, { "t": "down", "unit": "x" }, { "t": "log", "text": "Hello" }])
+	check(lines[0] == "Someone takes 9 damage (pit)" and lines[1] == "Someone goes down" and lines[2] == "Hello", "damage and knockdowns reach the log")
+	var r := Setup.build(db(), "ledge_day", "cl_base", { "keywordsOn": false })
+	var st: Object = (load("res://src/core/combat/combat_state.gd") as GDScript).new()
+	st.rules = r["rules"]
+	var shown: Dictionary = st.card_as_shown({ "name": "A", "swift": true, "quick": true })
+	check(not shown.has("swift") and shown.has("quick"), "switched-off keywords leave the text")
+

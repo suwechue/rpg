@@ -1432,6 +1432,27 @@ func kw(card: Dictionary, key: String) -> bool:
 	return rules.flag("keywordsOn", true) and bool(card.get(key, false))
 
 
+## A card with the keywords that do nothing under these rules taken off, for its text.
+func card_as_shown(card: Dictionary) -> Dictionary:
+	var out := card.duplicate()
+	if not rules.flag("keywordsOn", true):
+		for k in ["free", "swift", "heavy", "exhaust", "retain", "charge", "followUp", "freeIf"]:
+			out.erase(k)
+	if not rules.flag("exhaustOn", true):
+		out.erase("exhaust")
+	return out
+
+
+## The name of the hero whose fall ends the fight, or "" if a fall doesn't.
+func lead_who_loses_fight() -> String:
+	if not bool(difficulty_rules().get("playerDownEndsFight", true)) or Extras.carry(self):
+		return ""
+	for u in units:
+		if u.is_player:
+			return u.name
+	return ""
+
+
 ## A card's tag: from its "labels", its Vectors or its Form.
 func card_has_tag(card: Dictionary, tag: String) -> bool:
 	return card.get("labels", []).has(tag) or card.get("vectors", {}).has(tag) or str(card.get("form", "")) == tag

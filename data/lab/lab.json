@@ -1,4 +1,5 @@
 {
+  "abShortlist": { "text": "Tuned shortlist: play each pair and rate them. Neither tuned preset passed every limit; your ratings decide.", "steps": [{ "fight": "thin_ice", "a": "tuned_1", "b": "tuned_2" }, { "fight": "hollow_mascot", "a": "winner", "b": "current" }] },
   "comment": "Combat Lab settings (docs/COMBAT_LAB.md). showOnTitle: show the Lab on the title screen in any build (dev builds always do). levers: every rule the Lab can switch; 'default' is the cl_base value, data/lab/presets.json overrides them. Read only through src/core/combat/rules.gd. Lab Tuner (docs/LAB_TUNER.md): learnCost = how much rules text a player must learn when it's on (the complexity cost), offValue = the value that counts as off (false for switches, else the default), fights = the fights the lever matters in (screening runs only those).",
   "showOnTitle": false,
   "defaultPreset": "cl_base",
@@ -38,7 +39,7 @@
     { "id": "mpRegen", "group": "cards", "type": "int", "default": 2, "min": -1, "max": 10, "name": "MP per turn", "hint": "-1 = the character's own." },
     { "id": "cardsCostMp", "group": "cards", "type": "bool", "default": true, "name": "All cards cost MP", "hint": "Off: only Major and Grand spells do." },
     { "id": "exhaustOn", "group": "cards", "type": "bool", "default": true, "learnCost": 1, "name": "Exhaust" },
-    { "id": "keywordsOn", "group": "cards", "type": "bool", "default": true, "learnCost": 2, "name": "Keywords", "hint": "Free, Follow-up, Swift, Heavy." },
+    { "id": "keywordsOn", "group": "cards", "type": "bool", "default": true, "learnCost": 2, "name": "Keywords", "hint": "Free: costs no MP. Swift: still spends your Action, but your Move comes back after it. Heavy: only playable before you move, and it uses up your Move. Follow-up: opens the named card next." },
     { "id": "teammateCards", "group": "cards", "type": "bool", "default": true, "learnCost": 2, "fights": ["hand_off"], "name": "Teammate cards" },
     { "id": "discardCards", "group": "cards", "type": "bool", "default": true, "learnCost": 1, "name": "Discard cards" },
     { "id": "classDecks", "group": "cards", "type": "enum", "default": "lab", "options": ["lab", "game"], "name": "Class decks" },
@@ -49,7 +50,7 @@
     { "id": "bossHpScale", "group": "numbers", "type": "float", "default": 0.15, "min": 0.05, "max": 2.0, "step": 0.05, "fights": ["hollow_mascot"], "name": "Boss HP scale" },
     { "id": "partyHpScale", "group": "numbers", "type": "float", "default": 0.33, "min": 0.05, "max": 2.0, "step": 0.01, "name": "Party HP scale" },
     { "id": "damageScale", "group": "numbers", "type": "float", "default": 0.4, "min": 0.05, "max": 2.0, "step": 0.05, "name": "Damage scale" },
-    { "id": "enemyDamageScale", "group": "numbers", "type": "float", "default": 0.25, "min": 0.05, "max": 2.0, "step": 0.05, "name": "Enemy damage scale", "hint": "Enemy data hits harder than cards do, so it scales further: attacks of about 1 to 4." },
+    { "id": "enemyDamageScale", "group": "numbers", "type": "float", "default": 0.25, "min": 0.05, "max": 2.0, "step": 0.05, "name": "Enemy damage scale", "hint": "Enemy data hits harder than cards do, so it scales further: attacks of about 1 to 4 before Enemy damage x and any scaled fight difficulty." },
     { "id": "flatDamageMul", "group": "numbers", "type": "float", "default": 1.0, "min": 0.5, "max": 5.0, "step": 0.5, "name": "Flat card numbers x", "hint": "Lab cards are written in small numbers. Raise this when small numbers are off." },
     { "id": "crits", "group": "numbers", "type": "bool", "default": false, "learnCost": 1, "name": "Crits" },
     { "id": "misses", "group": "numbers", "type": "bool", "default": false, "learnCost": 1, "name": "Misses" },

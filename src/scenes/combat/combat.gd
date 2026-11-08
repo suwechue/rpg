@@ -841,7 +841,7 @@ func _likely_target(cells: Array) -> Vector2i:
 func _show_card_info(i: int) -> void:
 	var card := state.card_of(state.current, i)
 	if not card.is_empty():
-		_info.text = Strings.t("combat.mp") % [card.get("name", ""), state.card_cost(state.current, card), CardRules.describe(DataDB.all(), card)]
+		_info.text = Strings.t("combat.mp") % [card.get("name", ""), state.card_cost(state.current, card), CardRules.describe(DataDB.all(), state.card_as_shown(card))]
 
 
 func _player_turn() -> bool:
