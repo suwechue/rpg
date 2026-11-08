@@ -519,6 +519,8 @@ static func unit_lines(st: Object) -> Array:
 			bits.append("facing %s" % _dir(x.facing_dir))
 		if st.rules.flag("classGauges") and x.team == "party":
 			bits.append("gauge %d" % x.gauge)
+		if x.links.has("fired_up"):
+			bits.append("Fired Up +%s" % str(x.links["fired_up"]))
 		if x.downed:
 			bits.append("DOWNED")
 		if x == st.current:
@@ -611,6 +613,17 @@ static func _value_words(v: Variant) -> String:
 
 ## The rules as a player learns them: the tutorial's lessons, then this preset's
 ## lever panel (the core levers always, the extras only when on).
+## Text for a blind panel: the preset's id, name and description never show.
+static func blind(db: Dictionary, text: String, preset: String, alias: String) -> String:
+	var rec := Rules.preset_rec(db, preset)
+	var out := text
+	if str(rec.get("text", "")) != "":
+		out = out.replace(str(rec["text"]), "")
+	if str(rec.get("name", "")) != "":
+		out = out.replace(str(rec["name"]), alias)
+	return out.replace(preset, alias)
+
+
 static func rules_text(db: Dictionary, preset: String) -> String:
 	var out: Array = ["RULES FOR PRESET %s" % preset]
 	var rec := Rules.preset_rec(db, preset)

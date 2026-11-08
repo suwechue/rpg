@@ -28,14 +28,25 @@ func _initialize() -> void:
 	var db: Dictionary = DT.tables("res://data")
 	var fight := str(args.get("fight", "ledge_day"))
 	var preset := str(args.get("preset", "cl_base"))
+	# FF panels play blind: a neutral name stands in for the preset.
+	var alias := ""
+	if args.has("panel"):
+		var aliases: Dictionary = db.get("lab/panels/" + str(args["panel"]), {}).get("aliases", {})
+		if not aliases.has(preset):
+			print("Sorry: that ruleset isn't in this panel.")
+			quit(1)
+			return
+		alias = preset
+		preset = str(aliases[alias])
 	var seed_value := int(args.get("seed", "1"))
 	var inputs: Array = []
 	for t in str(args.get("actions", "")).replace(" ", "").replace(";", ",").split(",", false):
 		inputs.append(t)
 	if str(args.get("cmd", "")) == "rate":
-		print(rate(fight, preset, str(args.get("persona", "")), str(args.get("card", ""))))
+		print(rate(fight, preset, ("panel_%s/" % str(args["panel"]) if args.has("panel") else "") + str(args.get("persona", "")), str(args.get("card", ""))))
 	else:
-		print(run(db, fight, preset, seed_value, inputs, str(args.get("cmd", "")), args.has("brief")))
+		var text := run(db, fight, preset, seed_value, inputs, str(args.get("cmd", "")), args.has("brief"))
+		print(Play.blind(db, text, preset, alias) if alias != "" else text)
 	quit(0)
 
 

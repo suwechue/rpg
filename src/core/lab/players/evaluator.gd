@@ -41,6 +41,7 @@ static func _board(st: Object, w: Dictionary) -> float:
 				s += float(w.get("allyStatus", 0.0)) * float(x.statuses.size())
 				s += float(w.get("mp", 0.0)) * float(x.mp)
 				s += float(w.get("gauge", 0.0)) * float(x.gauge)
+				s += float(w.get("firedUp", 0.0)) * float(int(x.links.get("fired_up", "0")))
 				if x.deck != null:
 					s += float(w.get("handCard", 0.0)) * float(x.deck.hand.size())
 			if x.alive() and incoming_at.has(x):
@@ -48,6 +49,8 @@ static func _board(st: Object, w: Dictionary) -> float:
 				s -= float(w.get("threat", 0.9)) * float(mini(hit, x.hp + x.shield))
 				if hit >= x.hp + x.shield:
 					s -= float(w.get("lethal", 5.0))
+				elif hit > 0 and st.rules.flag("firedUp"):
+					s += float(w.get("firedUp", 0.0)) * float(st.fired_up_bonus(hit))
 		elif x.team == "enemy":
 			if x.alive():
 				s -= float(w.get("enemyHp", 1.2)) * float(x.hp + x.shield)

@@ -319,6 +319,7 @@ static func take_turn(state: StateScript, u: UnitScript) -> Dictionary:
 	if u.team == "enemy" and not u.intent.is_empty():
 		var it: Dictionary = u.intent
 		if state.execute_intent(u):
+			_extra_actions(state, u)
 			if state.result == "" and state.current == u:
 				state.end_turn()
 			return it
@@ -342,9 +343,29 @@ static func take_turn(state: StateScript, u: UnitScript) -> Dictionary:
 					state.play_card(u, idx, plan["target"])
 			"strike":
 				state.strike(u, plan["target"])
+	_extra_actions(state, u)
 	if state.result == "" and state.current == u:
 		state.end_turn()
 	return plan
+
+
+## Lab lever enemyActions: an enemy's extra actions this turn, chosen on the spot
+## (they are not telegraphed).
+static func _extra_actions(state: StateScript, u: UnitScript) -> void:
+	if u.team != "enemy" or state.rules == null:
+		return
+	for i in state.rules.count("enemyActions", 1) - 1:
+		if state.result != "" or not u.alive() or state.current != u:
+			return
+		u.move_left = state.move_budget(u)
+		u.action_used = false
+		var plan := choose(state, u)
+		if plan.is_empty() or str(plan.get("kind", "")) != "action":
+			return
+		if plan["move"] != u.cell:
+			state.move(u, plan["move"])
+		if state.result == "" and u.alive():
+			state.perform_action(u, plan["action"], plan["target"])
 
 
 ## A party turn under two Actions: pick and carry out plans until the Actions

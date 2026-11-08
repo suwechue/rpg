@@ -75,6 +75,10 @@
     { "id": "hitHardMul", "group": "telegraphs", "type": "float", "default": 2.0, "min": 1.0, "max": 4.0, "step": 0.5, "name": "Hard hit x" },
     { "id": "blindMode", "group": "telegraphs", "type": "enum", "default": "adjacent_tile", "options": ["adjacent_tile", "miss_chance"], "name": "Blind" },
 
+    { "id": "firedUp", "group": "rewards", "type": "bool", "default": false, "learnCost": 1, "name": "Fired Up", "hint": "Taking an enemy hit makes your next attack before the end of your next turn hit harder." },
+    { "id": "firedUpShare", "group": "rewards", "type": "float", "default": 0.25, "min": 0.05, "max": 1.0, "step": 0.05, "name": "Fired Up share", "hint": "The bonus is this share of the damage you took, at least 1." },
+    { "id": "firedUpCap", "group": "rewards", "type": "int", "default": 3, "min": 1, "max": 12, "name": "Fired Up cap" },
+    { "id": "surgeFromDodge", "group": "rewards", "type": "bool", "default": true, "name": "Dodging fills Surge" },
     { "id": "surge", "group": "rewards", "type": "bool", "default": true, "learnCost": 2, "name": "Surge meter" },
     { "id": "surgeSize", "group": "rewards", "type": "int", "default": 5, "min": 1, "max": 12, "name": "Surge size" },
     { "id": "killRefund", "group": "rewards", "type": "enum", "default": "move", "options": ["move", "action", "off"], "learnCost": 1, "offValue": "off", "name": "Kill refund" },
@@ -86,6 +90,7 @@
     { "id": "goal", "group": "pacing", "type": "enum", "default": "", "options": ["", "kill", "survive"], "name": "Goal override", "hint": "Blank = what the fight says." },
 
     { "id": "fightScaled", "group": "difficulty", "type": "bool", "default": false, "name": "Scaled fight difficulty", "hint": "Each fight uses its own enemy HP, damage and count from data/lab/fight_scales.json." },
+    { "id": "enemyActions", "group": "difficulty", "type": "int", "default": 1, "min": 1, "max": 3, "name": "Enemy actions per turn", "hint": "Past the first, an enemy's actions are chosen on the spot and not telegraphed." },
     { "id": "enemyHpMul", "group": "difficulty", "type": "float", "default": 1.0, "min": 0.25, "max": 4.0, "step": 0.25, "name": "Enemy HP x" },
     { "id": "enemyDamageMul", "group": "difficulty", "type": "float", "default": 1.0, "min": 0.25, "max": 4.0, "step": 0.25, "name": "Enemy damage x" },
     { "id": "extraEnemies", "group": "difficulty", "type": "int", "default": 0, "min": 0, "max": 6, "name": "Extra enemies" },

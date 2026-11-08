@@ -16,7 +16,8 @@
     "allyStatus": 0.2,
     "handCard": 0.15,
     "mp": 0.05,
-    "gauge": 0.2
+    "gauge": 0.2,
+    "firedUp": 1.0
   },
   "profiles": {
     "expert": {

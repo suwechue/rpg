@@ -534,3 +534,27 @@ No preset passed every limit, so this ranks the best available. Your ratings out
    - **Weakest:** expert 99% and random 37%, so fights barely challenge anyone.
 
 **Before any of these ships, three things need attention, whichever you pick:** the hit-then-step-off exploit, Flood Drill and Hold the Line, and the 30-round stalls on Hollow Mascot and Hand-Off.
+
+## Hit-then-step-off and the turn grid (2026-11-08)
+
+Fired Up alone did not fix it: telegraphed damage avoided went from 86% to 83% on `tuned_1` and stayed 96% on `tuned_2`, within noise, because enemy hits (7 to 15) outweigh a bonus of 3 to 5.
+
+**Turn grid** (`data/lab/sweeps/turn_grid.json`; 20 setups, 12 fights, 6 seeds, 4 AIs, `tuned_1` plus two `tuned_2` checks, all with Fired Up on):
+
+| Change | Expert | Random | Rounds | Note |
+| --- | --- | --- | --- | --- |
+| Fired Up only (reference) | 93% | 18% | 4.2 | |
+| Quicks 0 or 2 | 93% | 18% | 4.2 | No change at all: the AI never plays two Quick cards in a turn, so this lever is untested in practice |
+| Strike costs an Action | 89% | 7% | 5.8 | Removes the double Strike |
+| Move or act (1 action, no separate move) | 85% | 24% | 6.4 | 4 stalls |
+| 2 Actions, move separate off | 96% | 13% | 3.7 | Fights get too easy |
+| 3 Actions, move separate off | 96% | 19% | 3.0 | |
+| 2 Actions, Strike an Action | 90% | 4% | 4.9 | Lowest random wins |
+| 2 enemy actions | 43% | 1% | 3.1 | Close wins 23%, but nearly all damage is untelegraphed (35.6 vs 2.3) |
+| Half of attacks tracking | 93% | 15% | 4.2 | Shifts about 4 damage per fight from avoidable to not |
+| All attacks tracking | 90% | 21% | 4.3 | |
+
+**Combined candidate (`ff_candidate`, Fired Up, Strike an Action, half tracking), 10 seeds:** expert 82%, novice 85%, greedy 67%, random 10%, rounds 5.4, score 0.642, against `tuned_1` at 90%, 91%, 78%, 15%, 4.3, 0.628. It still has one stall in 480, so it does not pass the zero-stall limit, and it carries `tuned_1`'s per-fight steps without re-tuning them. The "avoided" metric only counts telegraphed attacks, so it cannot show tracking working.
+
+Screening's flat results for `actionsPerTurn` were a test fault: with `moveSeparate` on, that lever is ignored.
+

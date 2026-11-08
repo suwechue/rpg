@@ -1,0 +1,197 @@
+{
+  "comment": "Turn-structure grid: player Actions, move rules, Quicks and Strike cost, enemy actions per turn and tracking attacks, on tuned_1 (two checks on tuned_2), all with Fired Up on. moveSeparate must be off for actionsPerTurn to matter.",
+  "id": "turn_grid",
+  "kind": "sets",
+  "sets": [
+    {
+      "id": "fired",
+      "base": "tuned_1",
+      "levers": {
+        "firedUp": true
+      }
+    },
+    {
+      "id": "quick0",
+      "base": "tuned_1",
+      "levers": {
+        "firedUp": true,
+        "quicksPerTurn": 0
+      }
+    },
+    {
+      "id": "quick2",
+      "base": "tuned_1",
+      "levers": {
+        "firedUp": true,
+        "quicksPerTurn": 2
+      }
+    },
+    {
+      "id": "strikeAction",
+      "base": "tuned_1",
+      "levers": {
+        "firedUp": true,
+        "strikeCost": "action"
+      }
+    },
+    {
+      "id": "strikeAction_quick2",
+      "base": "tuned_1",
+      "levers": {
+        "firedUp": true,
+        "strikeCost": "action",
+        "quicksPerTurn": 2
+      }
+    },
+    {
+      "id": "moveOrAct",
+      "base": "tuned_1",
+      "levers": {
+        "firedUp": true,
+        "moveSeparate": false,
+        "actionsPerTurn": 1
+      }
+    },
+    {
+      "id": "twoActions",
+      "base": "tuned_1",
+      "levers": {
+        "firedUp": true,
+        "moveSeparate": false,
+        "actionsPerTurn": 2
+      }
+    },
+    {
+      "id": "threeActions",
+      "base": "tuned_1",
+      "levers": {
+        "firedUp": true,
+        "moveSeparate": false,
+        "actionsPerTurn": 3
+      }
+    },
+    {
+      "id": "twoActions_quick0",
+      "base": "tuned_1",
+      "levers": {
+        "firedUp": true,
+        "moveSeparate": false,
+        "actionsPerTurn": 2,
+        "quicksPerTurn": 0
+      }
+    },
+    {
+      "id": "twoActions_quick2",
+      "base": "tuned_1",
+      "levers": {
+        "firedUp": true,
+        "moveSeparate": false,
+        "actionsPerTurn": 2,
+        "quicksPerTurn": 2
+      }
+    },
+    {
+      "id": "twoActions_strikeAction",
+      "base": "tuned_1",
+      "levers": {
+        "firedUp": true,
+        "moveSeparate": false,
+        "actionsPerTurn": 2,
+        "strikeCost": "action"
+      }
+    },
+    {
+      "id": "enemy2",
+      "base": "tuned_1",
+      "levers": {
+        "firedUp": true,
+        "enemyActions": 2
+      }
+    },
+    {
+      "id": "enemy2_twoActions",
+      "base": "tuned_1",
+      "levers": {
+        "firedUp": true,
+        "enemyActions": 2,
+        "moveSeparate": false,
+        "actionsPerTurn": 2
+      }
+    },
+    {
+      "id": "enemy2_big",
+      "base": "tuned_1",
+      "levers": {
+        "firedUp": true,
+        "enemyActions": 2,
+        "firedUpShare": 0.5,
+        "firedUpCap": 5
+      }
+    },
+    {
+      "id": "track50",
+      "base": "tuned_1",
+      "levers": {
+        "firedUp": true,
+        "trackingShare": 0.5
+      }
+    },
+    {
+      "id": "track100",
+      "base": "tuned_1",
+      "levers": {
+        "firedUp": true,
+        "trackingShare": 1.0
+      }
+    },
+    {
+      "id": "track50_big",
+      "base": "tuned_1",
+      "levers": {
+        "firedUp": true,
+        "trackingShare": 0.5,
+        "firedUpShare": 0.5,
+        "firedUpCap": 5
+      }
+    },
+    {
+      "id": "track50_nosplit",
+      "base": "tuned_1",
+      "levers": {
+        "firedUp": true,
+        "trackingShare": 0.5,
+        "splitMove": false
+      }
+    },
+    {
+      "id": "t2_track50",
+      "base": "tuned_2",
+      "levers": {
+        "firedUp": true,
+        "trackingShare": 0.5
+      }
+    },
+    {
+      "id": "t2_enemy2",
+      "base": "tuned_2",
+      "levers": {
+        "firedUp": true,
+        "enemyActions": 2
+      }
+    }
+  ],
+  "cells": {
+    "fights": "all",
+    "seeds": 6,
+    "profiles": [
+      "expert",
+      "novice",
+      "greedy",
+      "random"
+    ],
+    "parties": [
+      "balanced"
+    ]
+  },
+  "budgetMinutes": 60
+}

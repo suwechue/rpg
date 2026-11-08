@@ -68,6 +68,8 @@ func _main() -> void:
 			summary = _ladder(plan, dir, run)
 		"scaled":
 			summary = _scaled(plan, dir, run)
+		"sets":
+			summary = _sets(plan, dir, run)
 	summary["plan"] = plan["id"]
 	summary["kind"] = plan.get("kind", "grid")
 	summary["run"] = run
@@ -512,10 +514,35 @@ func _write_scales(short: Array) -> void:
 	var path := ProjectSettings.globalize_path("res://data/lab/fight_scales.json")
 	var old: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
 	var out: Dictionary = old if typeof(old) == TYPE_DICTIONARY else {}
+	# Hand-made presets keep their steps; only the generated ones are replaced.
+	var kept: Dictionary = out.get("scales", {})
+	for id in kept:
+		if not str(id).begins_with(Tuned.PREFIX):
+			scales[id] = kept[id]
 	out["scales"] = scales
 	var f := FileAccess.open(path, FileAccess.WRITE)
 	f.store_string(JSON.stringify(out, "  ", false) + "\n")
 	f.close()
+
+
+## Named lever sets, each on its own preset, side by side: the quick way to compare a rule.
+func _sets(plan: Dictionary, dir: String, run: String) -> Dictionary:
+	var rows: Array = []
+	var complete := true
+	for rec in plan.get("sets", []):
+		var id := str(rec["id"])
+		var cells := Plan.set_cells(db, [{ "group": "set:" + id, "base": str(rec["base"]), "levers": rec.get("levers", {}) }], plan.get("cells", {}))
+		var lines := run_cells(dir, run, cells, id)
+		complete = complete and lines.size() >= cells.size()
+		var m := Metrics.summarize(lines, Metrics.cfg(db))
+		var full := Rules.values_for(db, str(rec["base"]))
+		full.merge(rec.get("levers", {}), true)
+		var sc := Metrics.fun_score(m, Metrics.cfg(db), Metrics.complexity(db, full))
+		rows.append({ "id": id, "metrics": m, "score": sc["score"], "dq": sc["dq"], "reasons": sc["reasons"] })
+		print("  %s: score %.3f, expert %d%%, novice %d%%, greedy %d%%, random %d%%, avoided %d%%, close %d%%, rounds %.1f, stalls %d" % [id, float(sc["score"]),
+			roundi(float(m["expertWin"]) * 100.0), roundi(float(m["noviceWin"]) * 100.0), roundi(float(m["greedyWin"]) * 100.0), roundi(float(m["randomWin"]) * 100.0),
+			roundi(float(m["agency"]) * 100.0), roundi(float(m["closeWins"]) * 100.0), float(m["rounds"]), int(m["stalls"])])
+	return { "rows": rows, "complete": complete }
 
 
 func _score_sets(sets: Array, lines: Array, base_values: Dictionary) -> Array:

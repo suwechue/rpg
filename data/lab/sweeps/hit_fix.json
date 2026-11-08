@@ -1,0 +1,101 @@
+{
+  "comment": "Hit-then-step-off fix: Fired Up (taking a hit makes your next attack stronger), alone and with no split move and no Surge from dodging, on both tuned presets.",
+  "id": "hit_fix",
+  "kind": "sets",
+  "sets": [
+    {
+      "id": "t1_base",
+      "base": "tuned_1",
+      "levers": {}
+    },
+    {
+      "id": "t1_fired",
+      "base": "tuned_1",
+      "levers": {
+        "firedUp": true
+      }
+    },
+    {
+      "id": "t1_fired_big",
+      "base": "tuned_1",
+      "levers": {
+        "firedUp": true,
+        "firedUpShare": 0.5,
+        "firedUpCap": 5
+      }
+    },
+    {
+      "id": "t1_fired_nosplit",
+      "base": "tuned_1",
+      "levers": {
+        "firedUp": true,
+        "splitMove": false
+      }
+    },
+    {
+      "id": "t1_big_nosplit_nododge",
+      "base": "tuned_1",
+      "levers": {
+        "firedUp": true,
+        "firedUpShare": 0.5,
+        "firedUpCap": 5,
+        "splitMove": false,
+        "surgeFromDodge": false
+      }
+    },
+    {
+      "id": "t2_base",
+      "base": "tuned_2",
+      "levers": {}
+    },
+    {
+      "id": "t2_fired",
+      "base": "tuned_2",
+      "levers": {
+        "firedUp": true
+      }
+    },
+    {
+      "id": "t2_fired_big",
+      "base": "tuned_2",
+      "levers": {
+        "firedUp": true,
+        "firedUpShare": 0.5,
+        "firedUpCap": 5
+      }
+    },
+    {
+      "id": "t2_fired_nosplit",
+      "base": "tuned_2",
+      "levers": {
+        "firedUp": true,
+        "splitMove": false
+      }
+    },
+    {
+      "id": "t2_big_nosplit_nododge",
+      "base": "tuned_2",
+      "levers": {
+        "firedUp": true,
+        "firedUpShare": 0.5,
+        "firedUpCap": 5,
+        "splitMove": false,
+        "surgeFromDodge": false
+      }
+    }
+  ],
+  "cells": {
+    "fights": "all",
+    "seeds": 8,
+    "profiles": [
+      "expert",
+      "novice",
+      "greedy",
+      "random"
+    ],
+    "parties": [
+      "balanced"
+    ]
+  },
+  "budgetMinutes": 60
+}

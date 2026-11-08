@@ -625,6 +625,7 @@ func end_turn() -> void:
 	_check_end()
 	if result != "" or current == null:
 		return
+	current.links.erase("fired_up")
 	_discard_hand(current)
 	_end_cleanup(current)
 	_undo.clear()
@@ -3043,11 +3044,36 @@ func _note_support_attack(u: UnitScript, t: UnitScript) -> void:
 
 # --- Damage, healing, death ------------------------------------------------------
 
+## The bonus a hit of this size earns: a share of the damage, at least 1, up to the cap.
+func fired_up_bonus(taken: int) -> int:
+	return clampi(ceili(float(taken) * rules.num("firedUpShare", 0.25)), 1, rules.count("firedUpCap", 3))
+
+
+## Taking a hit fires a hero up: their next attack, before the end of their next turn, hits harder.
+func _gain_fired_up(t: UnitScript, taken: int) -> void:
+	if not rules.flag("firedUp") or t.hp <= 0:
+		return
+	var bonus := maxi(fired_up_bonus(taken), int(t.links.get("fired_up", "0")))
+	t.links["fired_up"] = str(bonus)
+	_emit({ "t": "log", "text": Str.t(db, "lab.fired_up_gain") % [t.name, bonus] })
+
+
+func _spend_fired_up(u: UnitScript) -> int:
+	if not u.links.has("fired_up"):
+		return 0
+	var bonus := int(u.links["fired_up"])
+	u.links.erase("fired_up")
+	_emit({ "t": "log", "text": Str.t(db, "lab.fired_up_spent") % [u.name, bonus] })
+	return bonus
+
+
 func _damage(t: UnitScript, amount: int, source: UnitScript, vector: String, cause: String, crit: bool = false, high: bool = false) -> void:
 	if t.dead or amount <= 0:
 		return
 	if rules.small() and SCALED_CAUSES.has(cause):
 		amount = rules.scaled(float(amount))
+	if cause == "hit" and t.team == "enemy" and source != null and source.team == "party":
+		amount += _spend_fired_up(source)
 	if cause == "hit" and t.team == "party" and source != null and source.team == "enemy":
 		amount = _guardian_cover(t, amount)
 	if cause == "collision" and t.team == "party":
@@ -3108,6 +3134,8 @@ func _damage(t: UnitScript, amount: int, source: UnitScript, vector: String, cau
 	t.shield -= absorbed
 	var rest := amount - absorbed
 	t.hp = maxi(0, t.hp - rest)
+	if rest > 0 and cause == "hit" and t.team == "party" and source != null and source.team == "enemy":
+		_gain_fired_up(t, rest)
 	if source != null and source.team == "party" and cause == "hit":
 		if rest + absorbed > highest_hit:
 			highest_hit = rest + absorbed
@@ -4634,7 +4662,7 @@ func _resolve_locked(u: UnitScript, it: Dictionary) -> void:
 	# The target it was aimed at got away.
 	var aimed := unit_by_id(str(it.get("unit", "")))
 	if aimed != null and aimed.team == "party" and aimed.alive() and not bool(spec["heal"]) and not hit.has(aimed):
-		add_surge("dodge")
+		if rules.flag("surgeFromDodge", true): add_surge("dodge")
 	if not bool(spec["heal"]):
 		_apply_vector_effects(u, spec, cells, hit)
 		if act.has("statusAfter"):

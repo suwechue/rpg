@@ -1,0 +1,35 @@
+{
+  "comment": "FF quick panel (docs/FUN_AND_FEEL.md Part 3.5). Presets play blind under neutral names; the map is here, so agents never read this file. budget: fights, and tokens as a soft cap.",
+  "id": "quick",
+  "personas": [
+    "newcomer",
+    "tactician",
+    "deckbuilder",
+    "casual",
+    "breaker",
+    "frustrated"
+  ],
+  "fights": [
+    "fire_sale",
+    "hand_off",
+    "hollow_mascot"
+  ],
+  "aliases": {
+    "Alder": "ff_candidate",
+    "Birch": "current",
+    "Cedar": "ref_boring",
+    "Dogwood": "ref_unfair"
+  },
+  "calibration": {
+    "solid": "ff_candidate",
+    "low": [
+      "ref_boring",
+      "ref_unfair"
+    ]
+  },
+  "maxAgentsAtOnce": 5,
+  "budget": {
+    "fights": 72,
+    "tokens": 3000000
+  }
+}

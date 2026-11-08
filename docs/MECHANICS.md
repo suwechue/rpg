@@ -736,6 +736,8 @@ These change today's game too, and it hasn't been rebalanced for them: that wait
 
 ## Lab Tuner (docs/LAB_TUNER.md)
 
+**Fired Up (lever `firedUp`, off by default).** When an enemy hit damages a hero, their next attack before the end of their next turn deals a bonus: `firedUpShare` of the damage taken, at least 1, at most `firedUpCap`. It works only on attacks, and a bigger hit replaces a smaller waiting bonus. `surgeFromDodge` turns off Surge from dodging. **`enemyActions`** gives enemies extra actions per turn; past the first they are chosen on the spot and not telegraphed. `actionsPerTurn` only matters with `moveSeparate` off. `quicksPerTurn` limits Quick cards, not the Quick Strike, and 0 means no cap.
+
 **Scaled fight difficulty (lever `fightScaled`).** A preset with this lever on gives each Lab fight its own enemy damage, enemy HP and enemy count, from `data/lab/fight_scales.json` (preset id -> fight id -> levers). A change made by hand in the Lab still wins. The sweep plan `data/lab/sweeps/scaled.json` scans 9 difficulty steps per fight and picks one; `pick.force` sets a step by hand. A generated preset that failed a hard limit carries `"passed": false` and `failed`, and its text says so.
 
 A tool for picking a preset, not a game rule: nothing here changes how a fight plays.

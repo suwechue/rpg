@@ -179,6 +179,8 @@
     "lab.heavy_needs_move": "Heavy: needs your whole Move, and you've moved.",
     "lab.hold_off": "Hold is off under these rules.",
     "lab.swift": "%s gets their Move back.",
+    "lab.fired_up_gain": "%s is Fired Up: their next attack hits for +%d.",
+    "lab.fired_up_spent": "%s hits back harder (+%d).",
     "lab.follow_up": "%s can follow up with a %s card.",
     "lab.surge_gain": "Surge! %s (%d/%d)",
     "lab.surge_board": "A board kill",

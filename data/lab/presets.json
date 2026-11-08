@@ -155,6 +155,63 @@
       }
     },
     {
+      "id": "ff_candidate",
+      "name": "FF candidate",
+      "base": "cl_puzzle",
+      "passed": false,
+      "text": "Tuned 1 with Fired Up on, Strike costing an Action, and half of enemy attacks tracking. Not checked against every hard limit.",
+      "levers": {
+        "crits": false,
+        "enemiesAvoidEdges": false,
+        "exhaustOn": false,
+        "fightScaled": true,
+        "handSize": 4.0,
+        "instability": false,
+        "keepHand": true,
+        "keywordsOn": false,
+        "killRefund": "off",
+        "lineOfSight": true,
+        "misses": false,
+        "pathBlocking": false,
+        "redirect": false,
+        "smallNumbers": true,
+        "strikeCost": "action",
+        "surge": false,
+        "trackingShare": 0.5,
+        "turnStructure": "alternate",
+        "firedUp": true
+      }
+    },
+    {
+      "id": "ref_boring",
+      "name": "Reference: boring",
+      "base": "cl_base",
+      "calibration": true,
+      "text": "Calibration only: obvious moves, long fights, no board.",
+      "levers": {
+        "pitKillsEnemies": false,
+        "domino": false,
+        "iceSlide": false,
+        "enemyAbilitiesTier": 1,
+        "enemyHpMul": 2.5,
+        "propsDensity": 0.0
+      }
+    },
+    {
+      "id": "ref_unfair",
+      "name": "Reference: unfair",
+      "base": "cl_base",
+      "calibration": true,
+      "text": "Calibration only: unavoidable damage and random misses.",
+      "levers": {
+        "misses": true,
+        "crits": true,
+        "trackingShare": 1.0,
+        "enemyDamageMul": 3.0,
+        "telegraphTiming": "before_acting"
+      }
+    },
+    {
       "base": "cl_puzzle",
       "failed": [
         "melee: stalls",

@@ -515,9 +515,54 @@ func test_failed_presets_are_marked() -> void:
 func test_text_explains_what_happened() -> void:
 	var lines: Array = Play._log_lines([{ "t": "damage", "unit": "x", "amount": 9, "cause": "pit" }, { "t": "down", "unit": "x" }, { "t": "log", "text": "Hello" }])
 	check(lines[0] == "Someone takes 9 damage (pit)" and lines[1] == "Someone goes down" and lines[2] == "Hello", "damage and knockdowns reach the log")
-	var r := Setup.build(db(), "ledge_day", "cl_base", { "keywordsOn": false })
-	var st: Object = (load("res://src/core/combat/combat_state.gd") as GDScript).new()
-	st.rules = r["rules"]
+	var st := _fired_state({ "keywordsOn": false })
 	var shown: Dictionary = st.card_as_shown({ "name": "A", "swift": true, "quick": true })
 	check(not shown.has("swift") and shown.has("quick"), "switched-off keywords leave the text")
+
+
+func _fired_state(levers: Dictionary) -> Object:
+	var built := Setup.build(db(), "ledge_day", "cl_base", levers)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 1
+	return (load("res://src/core/combat/combat_state.gd") as GDScript).new(db(), rng, built["setup"])
+
+
+func test_fired_up() -> void:
+	var st := _fired_state({ "firedUp": true, "firedUpShare": 0.5, "firedUpCap": 4 })
+	var hero: Object = st.units.filter(func(u: Object) -> bool: return u.team == "party")[0]
+	var foe: Object = st.units.filter(func(u: Object) -> bool: return u.team == "enemy")[0]
+	check(st.fired_up_bonus(1) == 1 and st.fired_up_bonus(4) == 2 and st.fired_up_bonus(99) == 4, "the bonus is a share of the hit, at least 1, up to the cap")
+	foe.max_hp = 50
+	foe.hp = 50
+	hero.max_hp = 50
+	hero.hp = 50
+	st._damage(hero, 4, foe, "", "direct")
+	check(not hero.links.has("fired_up"), "only an enemy hit fires a hero up")
+	st._gain_fired_up(hero, 4)
+	check(hero.links.has("fired_up"), "a hit taken fires the hero up")
+	var hp: int = foe.hp
+	st._damage(foe, 2, hero, "", "reflect")
+	check(foe.hp == hp - 2 and hero.links.has("fired_up"), "only attacks use the bonus")
+	st._damage(foe, 2, hero, "", "hit")
+	check(foe.hp < hp - 2 - st.rules.scaled(2.0) + 1 and not hero.links.has("fired_up"), "the next attack hits harder and spends it")
+	var off := _fired_state({})
+	var h2: Object = off.units.filter(func(u: Object) -> bool: return u.team == "party")[0]
+	off._gain_fired_up(h2, 4)
+	check(not h2.links.has("fired_up"), "off by default")
+
+
+func test_enemy_actions_lever_plays() -> void:
+	var cell := { "group": "x", "fight": "ledge_day", "preset": "cl_base", "levers": { "enemyActions": 2 }, "seed": 1, "profile": "random", "party": "balanced" }
+	var line: Dictionary = Sweep.run_fight(db(), cell)
+	check(["win", "lose", "stall"].has(str(line["result"])), "a fight with two enemy actions plays to the end")
+
+
+func test_blind_panel_text() -> void:
+	var d := db()
+	var rec: Dictionary = Rules.preset_rec(d, "ref_unfair")
+	var text := "RULES FOR PRESET ref_unfair\n%s\n%s" % [str(rec["text"]), str(rec["name"])]
+	var out := Play.blind(d, text, "ref_unfair", "Dogwood")
+	check(not out.contains("ref_unfair") and not out.contains(str(rec["text"])) and not out.contains(str(rec["name"])) and out.contains("Dogwood"), "a blind panel hides which preset this is")
+	var q: Dictionary = d["lab/panels/quick"]
+	check((q["aliases"] as Dictionary).size() == 4 and (q["personas"] as Array).size() * 4 * (q["fights"] as Array).size() == int(q["budget"]["fights"]), "the quick panel fits its fight budget")
 

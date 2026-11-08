@@ -1,0 +1,31 @@
+{
+  "comment": "The hit-then-step-off fix put together: Fired Up, Strike as an Action, half of attacks tracking, against tuned_1.",
+  "id": "ff_candidate",
+  "kind": "sets",
+  "sets": [
+    {
+      "id": "tuned_1",
+      "base": "tuned_1",
+      "levers": {}
+    },
+    {
+      "id": "ff_candidate",
+      "base": "ff_candidate",
+      "levers": {}
+    }
+  ],
+  "cells": {
+    "fights": "all",
+    "seeds": 10,
+    "profiles": [
+      "expert",
+      "novice",
+      "greedy",
+      "random"
+    ],
+    "parties": [
+      "balanced"
+    ]
+  },
+  "budgetMinutes": 30
+}
