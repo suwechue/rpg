@@ -7,6 +7,7 @@ const Kits := preload("res://src/core/combat2/kits.gd")
 const Shapes := preload("res://src/core/combat2/shapes.gd")
 const C2Setup := preload("res://src/core/combat2/c2_setup.gd")
 const C2AI := preload("res://src/core/combat2/c2_ai.gd")
+const Perks := preload("res://src/core/combat2/perks.gd")
 
 
 func _fight(id: String = "c2_first_down", opts: Dictionary = {}) -> Object:
@@ -301,3 +302,214 @@ func test_c2_spell_spends_charge() -> void:
 	var before: int = st.charges_left["c2_ash"]["spell:sp_ice_lance"]
 	check(st.use_ability(ash, "spell:sp_ice_lance", g.cell), "cast Ice Lance")
 	check(int(st.charges_left["c2_ash"]["spell:sp_ice_lance"]) == before - 1, "a cast spends one charge")
+
+
+# --- Part 3: weaknesses, knockdown, One More, Baton Pass, All-Out --------------------
+
+## A first_down fight with Ash acting, both Gremlins in Ember range and in sight.
+func _ash_vs_gremlins(opts: Dictionary = {}) -> Dictionary:
+	var st := _fight("c2_first_down", opts)
+	var ash := _unit(st, "c2_ash")
+	var gs := _enemies(st)
+	for u in st.units:
+		if u.team == "party" and u != ash:
+			u.cell = Vector2i(0, 5 - st.units.find(u) % 3)
+	_put(st, ash, Vector2i(2, 2))
+	_put(st, gs[0], Vector2i(4, 2))
+	_put(st, gs[1], Vector2i(4, 4))
+	_make_current(st, ash)
+	return { "st": st, "ash": ash, "g1": gs[0], "g2": gs[1] }
+
+
+func test_c2_markings() -> void:
+	var f := _ash_vs_gremlins()
+	var st: Object = f["st"]
+	var ash: Object = f["ash"]
+	var g: Object = f["g1"]
+	var weak: Dictionary = st.hit_result(ash, g, st.ability_of(ash, "move:ash_ember"))
+	var cold: Dictionary = st.hit_result(ash, g, st.ability_of(ash, "spell:sp_ice_lance"))
+	var plain: Dictionary = st.hit_result(ash, g, st.ability_of(ash, "move:ash_spark"))
+	check(str(weak["mark"]) == "weak" and bool(weak["knock"]), "Gremlins are weak to Heat: knockdown")
+	check(str(cold["mark"]) == "resist" and not bool(cold["knock"]), "and resist Cold")
+	check(str(plain["mark"]) == "" and not bool(plain["knock"]), "Lightning is neutral")
+	var mite := Kits.rec(db(), "enemies", "enemies", "c2_mite")
+	check(str(mite["marks"]["cold"]) == "immune", "Frost Mites are immune to Cold")
+	var st2 := _fight("c2_wrong_answer")
+	var m: Object = _enemies(st2).filter(func(e: Object) -> bool: return str(e.source.get("kind", "")) == "c2_mite")[0]
+	var ash2 := _unit(st2, "c2_ash")
+	check(int(st2.hit_result(ash2, m, st2.ability_of(ash2, "spell:sp_ice_lance"))["amount"]) == 0, "an immune hit does nothing")
+
+
+func test_c2_reveal_rules() -> void:
+	var f := _ash_vs_gremlins()
+	var st: Object = f["st"]
+	var ash: Object = f["ash"]
+	var g: Object = f["g1"]
+	check(st.known_of(g).is_empty() or st.known_of(g).size() == g.source["marks"].size(), "markings start unknown (or all known after the Lens perk)")
+	st.known_marks = {}
+	st.first_hits = { "%s|%s" % [ash.id, g.id]: true }
+	st.use_ability(ash, "move:ash_spark", g.cell)
+	check(st.known_of(g).has("lightning") and not st.known_of(g).has("heat"), "a hit reveals that type only")
+	var st2 := _fight("c2_wrong_answer")
+	var mask: Object = _enemies(st2).filter(func(e: Object) -> bool: return bool(e.source.get("hiddenMarks", false)))[0]
+	var a2 := _unit(st2, "c2_ash")
+	st2.known_marks = {}
+	st2._learn(a2, mask, "sound", "weak")
+	check(st2.known_of(mask).is_empty(), "the Mask reveals nothing when hit")
+	st2.reveal_all(mask)
+	check(st2.known_of(mask).size() == mask.source["marks"].size(), "a scan reveals every marking")
+	var f3 := _ash_vs_gremlins({ "c2Levers": { "revealOnHit": false } })
+	var st3: Object = f3["st"]
+	st3.known_marks = {}
+	st3.first_hits = { "%s|%s" % [f3["ash"].id, f3["g1"].id]: true }
+	st3.use_ability(f3["ash"], "move:ash_spark", f3["g1"].cell)
+	check(st3.known_of(f3["g1"]).is_empty(), "revealOnHit off: hits reveal nothing")
+	var st4 := _fight("c2_first_down", { "known": { "c2_gremlin": { "heat": "weak" } } })
+	check(str(st4.known_of(_enemies(st4)[0]).get("heat", "")) == "weak", "markings met before are remembered")
+
+
+func test_c2_knockdown_and_one_more() -> void:
+	var f := _ash_vs_gremlins()
+	var st: Object = f["st"]
+	var ash: Object = f["ash"]
+	var g1: Object = f["g1"]
+	var g2: Object = f["g2"]
+	check(st.use_ability(ash, "move:ash_ember", g1.cell), "Ember a Gremlin")
+	check(g1.statuses.has("knocked") and st.one_more.get("unit", "") == ash.id and st.current == ash, "weakness: knocked down, One More, still Ash's turn")
+	check(ash.move_left == 0, "One More has no Move (oneMoreStep 0)")
+	var down: int = st.hit_result(ash, g1, st.ability_of(ash, "move:ash_spark"))["amount"]
+	g1.statuses.erase("knocked")
+	var up: int = st.hit_result(ash, g1, st.ability_of(ash, "move:ash_spark"))["amount"]
+	g1.statuses["knocked"] = 99
+	check(down > up, "knocked-down units take more damage (%d > %d)" % [down, up])
+	check(st.use_ability(ash, "spell:sp_fireball", g2.cell), "the extra Ability: Fireball the other Gremlin")
+	check(g2.statuses.has("knocked") and st.one_more.is_empty() and int(st.one_mores_turn) == 1, "One More once per turn: no second one")
+	var f2 := _ash_vs_gremlins({ "c2Levers": { "oneMoreStep": 2, "oneMoreChain": 2 } })
+	f2["st"].use_ability(f2["ash"], "move:ash_ember", f2["g1"].cell)
+	check(f2["ash"].move_left == 2, "oneMoreStep: a 2-tile step")
+	f2["st"].use_ability(f2["ash"], "spell:sp_fireball", f2["g2"].cell)
+	check(not f2["st"].one_more.is_empty(), "oneMoreChain 2: a second One More")
+
+
+func test_c2_stand_up() -> void:
+	var f := _ash_vs_gremlins()
+	var st: Object = f["st"]
+	var g: Object = f["g1"]
+	g.statuses["knocked"] = 99
+	st.current = g
+	st._start_turn(g)
+	check(not g.statuses.has("knocked") and st.must_skip(g), "standing up uses the turn")
+	var f2 := _ash_vs_gremlins({ "c2Levers": { "standUp": "half" } })
+	var g2: Object = f2["g1"]
+	g2.statuses["knocked"] = 99
+	f2["st"].current = g2
+	f2["st"]._start_turn(g2)
+	check(not f2["st"].must_skip(g2) and g2.links.has("c2_half"), "standUp half: it acts at half effect")
+	var q := _unit(f2["st"], "c2_quill")
+	var claw := Kits.ability(g2.source["moves"][0], "move")
+	var half: int = f2["st"].hit_result(g2, q, claw)["amount"]
+	g2.links.erase("c2_half")
+	check(half < int(f2["st"].hit_result(g2, q, claw)["amount"]), "half effect hits softer")
+
+
+func test_c2_baton_pass() -> void:
+	var f := _ash_vs_gremlins()
+	var st: Object = f["st"]
+	var ash: Object = f["ash"]
+	var q := _unit(st, "c2_quill")
+	st.use_ability(ash, "move:ash_ember", f["g1"].cell)
+	check(st.baton_block(ash, ash) != "", "you can't pass to yourself")
+	var move_before: int = q.movement
+	check(st.baton_pass(ash, q), "Baton Pass to Quill")
+	check(st.current == q and is_equal_approx(float(q.links.get("c2_baton", "0")), 0.25), "Quill acts now with +25% damage")
+	check(q.move_left == move_before + 1, "and +1 Movement")
+	var base := Kits.ability({ "id": "x", "shape": "adjacent", "power": 10, "type": "blunt" }, "move")
+	var with_bonus: int = st.hit_result(q, f["g2"], base)["amount"]
+	q.links.erase("c2_baton")
+	var without: int = st.hit_result(q, f["g2"], base)["amount"]
+	q.links["c2_baton"] = "0.25"
+	check(with_bonus > without, "the baton bonus adds damage")
+	st.one_more = { "unit": q.id }
+	var b := _unit(st, "c2_brick")
+	st.baton_pass(q, b)
+	check(is_equal_approx(float(b.links.get("c2_baton", "0")), 0.5), "passed again, the bonus stacks to +50%")
+	st.one_more = { "unit": b.id }
+	st.baton_pass(b, _unit(st, "c2_lyric"))
+	check(float(_unit(st, "c2_lyric").links.get("c2_baton", "0")) <= 0.5 + float(Perks.value(st.kit_of(b), "batonPct")) + 0.001, "and caps at +50%")
+	var f2 := _ash_vs_gremlins({ "c2Levers": { "batonGate": "bond", "labBondTier": "none" } })
+	f2["st"].use_ability(f2["ash"], "move:ash_ember", f2["g1"].cell)
+	check(f2["st"].baton_block(f2["ash"], _unit(f2["st"], "c2_quill")).begins_with("needs a Bond"), "batonGate bond: needs Acquaintance or higher")
+
+
+func test_c2_all_out() -> void:
+	var f := _ash_vs_gremlins()
+	var st: Object = f["st"]
+	var ash: Object = f["ash"]
+	f["g2"].statuses["knocked"] = 99
+	st.use_ability(ash, "move:ash_ember", f["g1"].cell)
+	check(st.all_out_ready, "every enemy down: the All-Out is offered")
+	var hp1: int = f["g1"].hp
+	var far: Object = f["g2"]
+	far.cell = Vector2i(7, 5)
+	for a in st.allies_of(ash):
+		a.cell = Vector2i(0, st.allies_of(ash).find(a))
+	ash.cell = Vector2i(3, 2)
+	var hp_far: int = far.hp
+	check(st.all_out(ash), "launch it")
+	check(f["g1"].hp < hp1 or not f["g1"].alive(), "enemies in reach take big damage")
+	check(far.hp == hp_far, "enemies out of every ally's Movement + 1 are missed")
+	check(not far.statuses.has("knocked"), "then every enemy stands up")
+	var f2 := _ash_vs_gremlins()
+	f2["g2"].statuses["knocked"] = 99
+	f2["st"].use_ability(f2["ash"], "move:ash_ember", f2["g1"].cell)
+	f2["st"].use_ability(f2["ash"], "move:ash_spark", f2["g1"].cell)
+	check(f2["g2"].statuses.has("knocked"), "declining keeps the knockdowns")
+
+
+func test_c2_bond_team_ups() -> void:
+	var f := _ash_vs_gremlins({ "c2Levers": { "followUpChance": 1.0 } })
+	var st: Object = f["st"]
+	var q := _unit(st, "c2_quill")
+	q.cell = f["g1"].cell + Vector2i(0, -1)
+	st.use_ability(f["ash"], "move:ash_ember", f["g1"].cell)
+	check(int(st.tally["followUps"]) == 1, "Friend: an ally next to a knocked-down enemy follows up")
+	var f2 := _ash_vs_gremlins({ "c2Levers": { "labBondTier": "close" } })
+	var st2: Object = f2["st"]
+	var low := _unit(st2, "c2_lyric")
+	low.hp = 2
+	var g: Object = f2["g1"]
+	var hit := Kits.ability({ "id": "big", "shape": "adjacent", "power": 30, "type": "blunt" }, "move")
+	st2._hit(g, low, hit, low.cell)
+	check(low.alive() and int(st2.tally["protects"]) == 1, "Close: an ally takes the killing blow once per fight")
+	check(st2.c2.text("labBondTier") == "close" and Perks.bond_tier(st2) == 3, "the Lab sets the Bond tier by lever")
+
+
+func test_c2_enemy_one_more() -> void:
+	var st := _fight("c2_relay")
+	var w: Object = _enemies(st).filter(func(e: Object) -> bool: return bool(e.source.get("huntsWeakness", false)))[0]
+	var b := _unit(st, "c2_brick")
+	_put(st, w, Vector2i(5, 3))
+	_put(st, b, Vector2i(3, 3))
+	st.order.insert(st.turn_index + 1, w)
+	st.current.links["c2_extra"] = "0"
+	st.turn_index += 1
+	st.current = w
+	st._turn_reset(w)
+	var best := C2AI.best_action(st, w, 0)
+	check(str(best.get("uid", "")) == "move:wi_zap", "the Wisp picks the move that hits Brick's weakness (Lightning)")
+	st.use_ability(w, "move:wi_zap", b.cell)
+	check(b.statuses.has("knocked") and st.one_more.get("unit", "") == w.id, "an enemy hitting a party weakness knocks down and gets One More")
+
+
+func test_c2_ultimate_meter() -> void:
+	var f := _ash_vs_gremlins()
+	var st: Object = f["st"]
+	var ash: Object = f["ash"]
+	check(st.ability_block(ash, st.ability_of(ash, "ultimate:ult_inferno")).begins_with("ultimate not ready"), "the ultimate starts empty")
+	st.use_ability(ash, "move:ash_ember", f["g1"].cell)
+	check(int(st.meter[ash.id]) > 0, "dealing damage and knockdowns fill the meter")
+	st.meter[ash.id] = st.c2.count("ultMax", 100)
+	_make_current(st, ash)
+	check(st.ability_block(ash, st.ability_of(ash, "ultimate:ult_inferno")) == "", "a full meter: the ultimate is ready")
+	st.use_ability(ash, "ultimate:ult_inferno", f["g2"].cell)
+	check(int(st.meter[ash.id]) < st.c2.count("ultMax", 100) and int(st.tally["ultimates"]) == 1, "using it empties the meter")

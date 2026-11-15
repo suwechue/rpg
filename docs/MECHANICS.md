@@ -781,3 +781,14 @@ C2 is a separate ruleset in the Lab (`src/core/combat2/`, `data/combat2/`). The 
 - **Gear:** the weapon sets the basic attack's type, and can change its shape or add a move. Armor sets markings and Movement (light +1, heavy -1).
 - **No MP:** C2 has no MP. Magic drives spell power instead.
 
+**Weaknesses and the knockdown chain (C2 Part 3).**
+- **Markings:** every enemy has weak, resist or immune markings per type (Vectors, plus blunt, blade and pierce). Weak is x1.5, resist x0.5, immune 0 (`weakMul`, `resistMul`).
+- **Discovering them:** markings show as "?" until found. Hitting with a type reveals that type, including "normal". A scan (Read Weakness, Mark Target, Radiant Hymn, or the Lens and Seeker perks on a first hit) reveals all of them. Markings found once are remembered per enemy kind. The Mask of Whispers reveals nothing until scanned.
+- **Knockdown:** hitting a weakness knocks the enemy down; Trip knocks down regardless. A knocked-down unit takes x1.5 (`knockdownMul`) and spends its next turn standing up (`standUp`: skip, or half effect). Back attacks knock down only with `backCritKnockdown` or the Backstab perk.
+- **One More:** a fresh knockdown gives the attacker one extra Ability, with no Move (`oneMoreStep` 0), once per turn (`oneMoreChain` 1).
+- **Baton Pass:** instead of using One More, pass it to an ally. They act now with +25% damage per pass, capped at +50% (`batonBonus`, `batonMax`), and +1 Movement. In the story it needs Bond Acquaintance or higher (`batonGate`); in the Lab it's always on.
+- **All-Out Attack:** with every enemy down, the party may launch it. Every ally hits every knocked-down enemy within their Movement + 1, then all enemies stand up. Declining keeps the knockdowns.
+- **Bond team-ups:** Friend gives a 50% follow-up (half a basic attack) when you knock down an enemy next to that ally. Close lets an ally take a killing blow once per fight. The Lab sets the tier with `labBondTier`.
+- **Enemies too:** enemies that hit a party weakness knock that member down and get their own One More (`enemyOneMore`). The Pom-Pom Wisp picks whichever attack hits a weakness.
+- **The ultimate meter:** fills by 1 per damage dealt, 1.5 per damage taken, 10 per knockdown and 8 per Baton Pass, up to 100. A full meter unlocks the ultimate, and using it empties the meter.
+

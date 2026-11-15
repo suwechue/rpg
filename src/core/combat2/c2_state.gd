@@ -435,8 +435,8 @@ func _hit(u: UnitScript, t: UnitScript, ab: Dictionary, center: Vector2i) -> boo
 		reveal_all(t)
 	var res := hit_result(u, t, ab)
 	var knocked := false
-	if not t.is_prop() and res["mark"] != "":
-		_learn(u, t, vtype, str(res["mark"]))
+	if not t.is_prop() and vtype != "" and float(ab.get("power", 0)) > 0.0:
+		_learn(u, t, vtype, str(res["mark"]) if str(res["mark"]) != "" else "normal")
 	if float(ab.get("power", 0)) > 0.0 or res["amount"] > 0:
 		if u.team == "enemy" and t.team == "party":
 			tally["enemyAttacks"] = int(tally["enemyAttacks"]) + 1
