@@ -558,3 +558,20 @@ Fired Up alone did not fix it: telegraphed damage avoided went from 86% to 83% o
 
 Screening's flat results for `actionsPerTurn` were a test fault: with `moveSeparate` on, that lever is ignored.
 
+## FF quick panel, partial (paused 2026-11-15)
+
+Blind panel: 6 personas, 3 fights (Fire Sale, Hand-Off, Hollow Mascot), 4 rulesets under tree names. It stopped at **55 of 72 fights** when the usage limit hit, and FF was then paused for C2. Missing: Deckbuilder on two rulesets, Breaker on one, Casual and Newcomer on the boring reference, Frustrated on the boring reference.
+
+| Ruleset | Fights | Fun | Tension | Challenge | Frustration | Clarity | Would play again | Results |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `ff_candidate` | 18 | 3.22 | 3.00 | 2.83 | 2.83 | 2.50 | 15 of 18 | 14 wins, 2 losses, 2 stopped |
+| `current` | 17 | 3.18 | 2.18 | 1.82 | 2.18 | 2.88 | 16 of 17 | 16 wins, 1 stopped |
+| `ref_boring` | 7 | 3.00 | 1.71 | 1.71 | 2.57 | 2.86 | 5 of 7 | 7 wins |
+| `ref_unfair` | 13 | 2.46 | 3.38 | 4.00 | 3.85 | 2.31 | 4 of 13 | 3 wins, 6 losses, 4 stopped |
+
+**Calibration:** every persona that played a reference rated it below `ff_candidate`, so none is flagged unreliable. The samples are small (3 fights per persona and ruleset).
+
+**What it says:** the candidate raised tension and challenge over `current` without raising fun. Agents still found stepping off locked attacks easy, and tracking attacks felt "either free or impossible". The most repeated clarity bugs: plans reading "0 damage" that still hurt, cone telegraphs drawn on one tile, enemy friendly fire with no source in the log, identical "Light Bolt" text on different Sage cards, and option lists of 50 to 120 tile targets.
+
+**Panel process notes:** the first wave saw the real preset name in the "saved under" line (fixed mid-run), so their second and third cards were not fully blind. The first "unfair" reference ran on 1 HP enemies and was re-run with real enemy health. Two agents broke the rules by adding output filters or a helper script; neither changed game inputs.
+

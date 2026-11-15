@@ -208,7 +208,8 @@
         "crits": true,
         "trackingShare": 1.0,
         "enemyDamageMul": 3.0,
-        "telegraphTiming": "before_acting"
+        "telegraphTiming": "before_acting",
+        "fightScaled": true
       }
     },
     {

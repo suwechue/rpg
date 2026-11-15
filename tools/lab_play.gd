@@ -43,7 +43,8 @@ func _initialize() -> void:
 	for t in str(args.get("actions", "")).replace(" ", "").replace(";", ",").split(",", false):
 		inputs.append(t)
 	if str(args.get("cmd", "")) == "rate":
-		print(rate(fight, preset, ("panel_%s/" % str(args["panel"]) if args.has("panel") else "") + str(args.get("persona", "")), str(args.get("card", ""))))
+		var saved := rate(fight, preset, ("panel_%s/" % str(args["panel"]) if args.has("panel") else "") + str(args.get("persona", "")), str(args.get("card", "")))
+		print(Play.blind(db, saved, preset, alias) if alias != "" else saved)
 	else:
 		var text := run(db, fight, preset, seed_value, inputs, str(args.get("cmd", "")), args.has("brief"))
 		print(Play.blind(db, text, preset, alias) if alias != "" else text)
