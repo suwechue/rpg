@@ -1,0 +1,27 @@
+{
+  "comment": "C2 slice fights (docs/COMBAT_2.md Part 5). Maps use the Lab legend (P party spawn, E enemy spawn, p pit, x crate, b barrel, O oil barrel, i ice, e ledge, s spikes, # wall). party: character ids. level: 1 or 6 (which loadouts, and the enemy scaling). nights: fights in a row with HP and spell charges carried over; \"rest\" is a rest room. teaches: the line the Lab shows before the fight.",
+  "fights": [
+    { "id": "c2_first_down", "name": "1. First Down", "theme": "school", "seed": 201, "teaches": "Gremlins are weak to Heat. Hit a weakness to knock an enemy down and get One More.",
+      "map": ["P......E", "P.......", "P....x..", "P......E", "........", "........"],
+      "party": ["c2_brick", "c2_ash", "c2_quill", "c2_lyric"], "enemies": ["c2_gremlin", "c2_gremlin"] },
+    { "id": "c2_edge_of_gym", "name": "2. Edge of the Gym", "theme": "school", "seed": 202, "teaches": "Push enemies into the pits. The Golem can't be moved.",
+      "map": ["P...pp...", "P...pp..E", "P......xE", "P...pp..E", "....pp...", "........."],
+      "party": ["c2_brick", "c2_ash", "c2_quill", "c2_lyric"], "enemies": ["c2_rusher", "c2_wasp", "c2_golem"] },
+    { "id": "c2_relay", "name": "3. Relay", "theme": "hospital", "seed": 203, "teaches": "Each enemy is weak to something different. Baton Pass the One More to whoever has the right type.",
+      "map": ["P........E", "P.....x...", "P........E", "P...b.....", ".........E", ".....x....", ".........E"],
+      "party": ["c2_brick", "c2_ash", "c2_quill", "c2_lyric"], "enemies": ["c2_wasp", "c2_rusher", "c2_wisp", "c2_mite"] },
+    { "id": "c2_pep_squad", "name": "4. Pep Squad", "theme": "school", "seed": 204, "teaches": "Five weak enemies. Knock them all down for an All-Out Attack.",
+      "map": ["P.......E", "P......E.", "P.......E", "P......E.", "........E", "........."],
+      "party": ["c2_brick", "c2_ash", "c2_quill", "c2_lyric"], "enemies": ["c2_gremlin", "c2_wasp", "c2_gremlin", "c2_wasp", "c2_gremlin"] },
+    { "id": "c2_wrong_answer", "name": "5. Wrong Answer", "theme": "hospital", "seed": 205, "teaches": "These enemies resist most things. Scan them and switch Vectors.",
+      "map": ["P........E", "P...x.....", "P........E", "P....i....", "........E.", ".........."],
+      "party": ["c2_brick", "c2_ash", "c2_quill", "c2_lyric"], "enemies": ["c2_golem", "c2_mite", "c2_mask"] },
+    { "id": "c2_hollow_mascot", "name": "6. Hollow Mascot", "theme": "school", "seed": 206, "boss": true, "teaches": "The Mascot telegraphs its two big attacks a turn ahead. Get out of the marked tiles.",
+      "map": ["P..........", "P....x.....", "P.........E", "P..........", "......x....", "...........", "..........."],
+      "party": ["c2_brick", "c2_ash", "c2_quill", "c2_lyric"], "enemies": ["c2_mascot"] }
+  ],
+  "nights": [
+    { "id": "c2_night", "name": "Night: Three in a Row", "text": "Three fights with HP and spell charges carried over, and one rest room.", "steps": ["c2_edge_of_gym", "c2_relay", "rest", "c2_wrong_answer"] }
+  ],
+  "partyOrder": ["c2_brick", "c2_ash", "c2_quill", "c2_lyric"]
+}

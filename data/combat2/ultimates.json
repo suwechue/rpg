@@ -1,0 +1,10 @@
+{
+  "comment": "C2 ultimates: one per class, swappable for alternates. Fills from dealing and taking damage, knockdowns and Baton Passes (rules.json ultimate levers). upgrades: what each upgrade level adds (power x, radius +). allAlliesAct: every other ally takes a turn right now.",
+  "ultimates": [
+    { "id": "ult_earthshaker", "class": "fighter", "name": "Earthshaker", "shape": "burst", "range": 2, "power": 14, "type": "force", "push": 1, "target": "self", "cutIn": "The floor splits open!", "upgrades": [{ "power": 1.25 }, { "radius": 1 }] },
+    { "id": "ult_last_stand", "class": "fighter", "name": "Last Stand", "shape": "burst", "range": 3, "shield": 12, "affects": "allies", "target": "self", "cutIn": "Behind me!", "upgrades": [{ "power": 1.25 }, { "power": 1.25 }] },
+    { "id": "ult_inferno", "class": "mage", "name": "Inferno", "shape": "area", "range": 4, "radius": 2, "power": 15, "type": "heat", "status": { "id": "burning", "turns": 2 }, "target": "tile", "cutIn": "Everything burns!", "upgrades": [{ "power": 1.25 }, { "radius": 1 }] },
+    { "id": "ult_thousand_cuts", "class": "rogue", "name": "Thousand Cuts", "shape": "burst", "range": 4, "power": 9, "type": "blade", "target": "self", "cutIn": "You never saw me.", "upgrades": [{ "power": 1.25 }, { "power": 1.25 }] },
+    { "id": "ult_encore_for_all", "class": "bard", "name": "Encore for All", "shape": "self", "allAlliesAct": true, "target": "self", "cutIn": "One more time, everybody!", "upgrades": [{ "heal": 6 }, { "heal": 6 }] }
+  ]
+}

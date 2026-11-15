@@ -1,0 +1,48 @@
+{
+  "comment": "C2 class moves (docs/COMBAT_2.md Part 2). Unlimited uses; some have a cooldown in the user's own turns. shape: adjacent, line, cone, plus, burst (around self), area (radius at a tile in range), leap (land behind the target and hit it), dash (run in a line to the first enemy and hit it), projectile (any unit in range and sight), self, ally. type: blunt, blade, pierce or a Vector. weaponType: the basic attack takes its type from the equipped weapon. target: enemy, ally, self or tile. push/pull: tiles away from or toward the user. status: { id, turns }. scan: reveals the target's markings. tags feed the loadout screen's synergy hints.",
+  "moves": [
+    { "id": "brick_bash", "class": "fighter", "name": "Bash", "basic": true, "weaponType": true, "shape": "adjacent", "power": 6, "type": "blunt", "cooldown": 0, "target": "enemy", "tags": ["basic"] },
+    { "id": "brick_shove", "class": "fighter", "name": "Shove", "shape": "adjacent", "power": 3, "type": "blunt", "push": 2, "cooldown": 1, "target": "enemy", "tags": ["push", "wall-slammer"] },
+    { "id": "brick_heavy_slam", "class": "fighter", "name": "Heavy Slam", "shape": "adjacent", "power": 11, "type": "blunt", "push": 1, "cooldown": 2, "target": "enemy", "tags": ["push", "wall-slammer"] },
+    { "id": "brick_sweep", "class": "fighter", "name": "Sweep", "shape": "cone", "range": 2, "power": 5, "type": "blade", "cooldown": 1, "target": "tile", "tags": ["area"] },
+    { "id": "brick_charge", "class": "fighter", "name": "Charge", "shape": "dash", "range": 4, "power": 6, "type": "blunt", "push": 1, "cooldown": 2, "target": "tile", "tags": ["push", "mobility"] },
+    { "id": "brick_cleave", "class": "fighter", "name": "Cleave", "shape": "burst", "range": 1, "power": 5, "type": "blade", "cooldown": 2, "target": "self", "tags": ["area"] },
+    { "id": "brick_bulwark", "class": "fighter", "name": "Bulwark", "shape": "self", "shield": 10, "cooldown": 3, "target": "self", "tags": ["protector"] },
+    { "id": "brick_ground_pound", "class": "fighter", "name": "Ground Pound", "shape": "burst", "range": 1, "power": 6, "type": "force", "push": 1, "cooldown": 3, "target": "self", "tags": ["push", "area", "wall-slammer"] },
+    { "id": "brick_hook", "class": "fighter", "name": "Hook", "shape": "line", "range": 3, "power": 3, "type": "pierce", "pull": 2, "cooldown": 1, "target": "tile", "tags": ["pull", "protector"] },
+    { "id": "brick_cover_ally", "class": "fighter", "name": "Cover", "shape": "ally", "range": 3, "shield": 8, "cooldown": 2, "target": "ally", "tags": ["protector"] },
+
+    { "id": "ash_staff", "class": "mage", "name": "Staff Tap", "basic": true, "weaponType": true, "shape": "adjacent", "power": 4, "type": "blunt", "cooldown": 0, "target": "enemy", "tags": ["basic"] },
+    { "id": "ash_spark", "class": "mage", "name": "Spark", "shape": "projectile", "range": 4, "power": 5, "type": "lightning", "cooldown": 0, "target": "enemy", "tags": ["weakness hunter"] },
+    { "id": "ash_ember", "class": "mage", "name": "Ember", "shape": "projectile", "range": 4, "power": 4, "type": "heat", "status": { "id": "burning", "turns": 2 }, "cooldown": 1, "target": "enemy", "tags": ["weakness hunter", "burn"] },
+    { "id": "ash_frost_ray", "class": "mage", "name": "Frost Ray", "shape": "line", "range": 4, "power": 5, "type": "cold", "status": { "id": "slow", "turns": 1 }, "cooldown": 1, "target": "tile", "tags": ["terrain controller"] },
+    { "id": "ash_gust", "class": "mage", "name": "Gust", "shape": "cone", "range": 2, "power": 3, "type": "force", "push": 2, "cooldown": 2, "target": "tile", "tags": ["push", "terrain controller"] },
+    { "id": "ash_scan", "class": "mage", "name": "Read Weakness", "shape": "projectile", "range": 5, "scan": true, "cooldown": 1, "target": "enemy", "tags": ["weakness hunter", "scan"] },
+    { "id": "ash_blink", "class": "mage", "name": "Blink", "shape": "leap", "range": 3, "power": 3, "type": "light", "cooldown": 2, "target": "enemy", "tags": ["mobility"] },
+    { "id": "ash_stone_spike", "class": "mage", "name": "Stone Spike", "shape": "projectile", "range": 4, "power": 7, "type": "force", "cooldown": 2, "target": "enemy", "tags": ["weakness hunter"] },
+    { "id": "ash_arc", "class": "mage", "name": "Arc", "shape": "line", "range": 3, "power": 4, "type": "lightning", "cooldown": 1, "target": "tile", "tags": ["area"] },
+    { "id": "ash_ice_floor", "class": "mage", "name": "Ice Floor", "shape": "area", "range": 4, "radius": 1, "power": 2, "type": "cold", "terrain": "ice", "cooldown": 3, "target": "tile", "tags": ["terrain controller"] },
+
+    { "id": "quill_stab", "class": "rogue", "name": "Stab", "basic": true, "weaponType": true, "shape": "adjacent", "power": 5, "type": "blade", "cooldown": 0, "target": "enemy", "tags": ["basic", "back-stabber"] },
+    { "id": "quill_knife", "class": "rogue", "name": "Throwing Knife", "shape": "projectile", "range": 4, "power": 4, "type": "pierce", "cooldown": 0, "target": "enemy", "tags": ["scout"] },
+    { "id": "quill_shadow_step", "class": "rogue", "name": "Shadow Step", "shape": "leap", "range": 3, "power": 6, "type": "shadow", "cooldown": 2, "target": "enemy", "tags": ["back-stabber", "mobility"] },
+    { "id": "quill_poison_dart", "class": "rogue", "name": "Poison Dart", "shape": "projectile", "range": 4, "power": 3, "type": "poison", "status": { "id": "poisoned", "turns": 3 }, "cooldown": 1, "target": "enemy", "tags": ["scout"] },
+    { "id": "quill_twin_cut", "class": "rogue", "name": "Twin Cut", "shape": "adjacent", "power": 8, "type": "blade", "cooldown": 1, "target": "enemy", "tags": ["back-stabber"] },
+    { "id": "quill_smoke", "class": "rogue", "name": "Smoke Bomb", "shape": "burst", "range": 1, "power": 0, "type": "shadow", "status": { "id": "blind", "turns": 1 }, "cooldown": 3, "target": "self", "tags": ["scout"] },
+    { "id": "quill_mark", "class": "rogue", "name": "Mark Target", "shape": "projectile", "range": 5, "scan": true, "status": { "id": "marked", "turns": 2 }, "cooldown": 2, "target": "enemy", "tags": ["scout", "scan"] },
+    { "id": "quill_trip", "class": "rogue", "name": "Trip", "shape": "adjacent", "power": 2, "type": "blunt", "knockdown": true, "cooldown": 3, "target": "enemy", "tags": ["back-stabber"] },
+    { "id": "quill_pin", "class": "rogue", "name": "Pin", "shape": "projectile", "range": 3, "power": 3, "type": "pierce", "status": { "id": "root", "turns": 1 }, "cooldown": 2, "target": "enemy", "tags": ["scout"] },
+    { "id": "quill_finish", "class": "rogue", "name": "Finish Them", "shape": "adjacent", "power": 6, "type": "blade", "downedBonus": 1.0, "cooldown": 2, "target": "enemy", "tags": ["back-stabber"] },
+
+    { "id": "lyric_note", "class": "bard", "name": "Sharp Note", "basic": true, "weaponType": true, "shape": "projectile", "range": 3, "power": 4, "type": "sound", "cooldown": 0, "target": "enemy", "tags": ["basic"] },
+    { "id": "lyric_power_chord", "class": "bard", "name": "Power Chord", "shape": "cone", "range": 2, "power": 5, "type": "sound", "cooldown": 1, "target": "tile", "tags": ["area"] },
+    { "id": "lyric_rally", "class": "bard", "name": "Rally", "shape": "burst", "range": 2, "status": { "id": "haste", "turns": 1 }, "affects": "allies", "cooldown": 3, "target": "self", "tags": ["tempo"] },
+    { "id": "lyric_lullaby", "class": "bard", "name": "Lullaby", "shape": "projectile", "range": 3, "power": 1, "type": "sound", "status": { "id": "stun", "turns": 1 }, "cooldown": 3, "target": "enemy", "tags": ["tempo"] },
+    { "id": "lyric_cue", "class": "bard", "name": "Cue", "shape": "ally", "range": 4, "actNow": true, "cooldown": 3, "target": "ally", "tags": ["baton conductor", "tempo"] },
+    { "id": "lyric_soothe", "class": "bard", "name": "Soothing Tune", "shape": "ally", "range": 3, "heal": 9, "cooldown": 1, "target": "ally", "tags": ["support"] },
+    { "id": "lyric_discord", "class": "bard", "name": "Discord", "shape": "area", "range": 3, "radius": 1, "power": 4, "type": "shadow", "cooldown": 2, "target": "tile", "tags": ["area"] },
+    { "id": "lyric_tempo", "class": "bard", "name": "Off-Beat", "shape": "projectile", "range": 4, "power": 2, "type": "sound", "delay": true, "cooldown": 2, "target": "enemy", "tags": ["tempo"] },
+    { "id": "lyric_bass_drop", "class": "bard", "name": "Bass Drop", "shape": "adjacent", "power": 6, "type": "sound", "push": 2, "cooldown": 2, "target": "enemy", "tags": ["push"] },
+    { "id": "lyric_harmony", "class": "bard", "name": "Harmony", "shape": "ally", "range": 3, "shield": 7, "cooldown": 1, "target": "ally", "tags": ["baton conductor", "support"] }
+  ]
+}

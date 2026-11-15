@@ -748,3 +748,27 @@ A tool for picking a preset, not a game rule: nothing here changes how a fight p
 - **Fun proxies** (`src/core/lab/tuner/metrics.gd`, targets in `data/lab/tuner.json`): real choices per turn, obvious turns, option load, win rates per player, the most-played card, the most common winning opening, close wins, rounds, telegraphed damage avoided, board kills, teamwork, card variety, and a complexity cost from each lever's `learnCost`. The fun score is the weighted closeness to every target minus complexity. Hard limits (any stall, expert under 70%, random over 20%) disqualify.
 - **Text play** (`tools/lab_play.gd`, `src/core/lab/play_text.gd`): a fight as text for agent playtesters. Each call replays its inputs and prints the board, plans, hand and every option with its exact preview.
 - **Speed:** a cheap card index (`DataTables.index_under` is cached per data set) made every card lookup in the game faster, not just the sweeps.
+
+## Combat 2.0 (docs/COMBAT_2.md, the Lab slice)
+
+C2 is a separate ruleset in the Lab (`src/core/combat2/`, `data/combat2/`). The story and arena still use the card combat above. Every number below is a lever in `data/combat2/rules.json`, and the defaults are listed.
+
+**Turns.**
+- **The timeline:** one shared order of allies and enemies by Initiative (Agility, plus gear and perks). Ties go to the party. Haste moves a unit up 5, Slow down 5. Delay puts a unit after the next one. Stun loses the turn.
+- **A turn:** Move (up to Movement tiles), then **one Ability**, which ends the turn. With `moveAfterAct` off (default) you can't move after acting.
+- **Items:** one free item use per turn (`freeItemsPerTurn`).
+- **Brace:** ending a turn with no Ability braces you, for 25% less damage until your next turn (`braceReduction`).
+
+**Positioning.**
+- **Facing:** units face the way they last moved or acted.
+- **Back and side hits:** back x1.5 (`backMul`), side x1.25 (`sideMul`).
+- **Threat:** hovering an enemy shows every tile it could reach and hit next turn, and a toggle shows all enemies at once.
+
+**Enemies.**
+- **No dodge window:** enemy attacks land on the enemy's own turn.
+- **Bosses:** their big attacks are marked one turn ahead and land on the marked tiles (`bossTelegraphs`, every `bossBigEvery` turns).
+
+**Damage.** An Ability's power x (1 + 0.08 x Power or Magic) (`statDamagePer`), then x markings, knockdown, facing, Brace, Marked, Baton and perks.
+- **Physical moves** (blunt, blade, pierce) use Power; spells and Vector moves use Magic.
+- **Enemies** scale by 12% per party level past 1 (`enemyLevelScale`).
+

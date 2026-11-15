@@ -1,0 +1,17 @@
+{
+  "comment": "C2 slice spells: crafted Vector spells as Abilities with charges per dungeon night (docs/COMBAT_2.md Part 2). Charges come from the magnitude (rules.json charges levers), +chargesGradeBonus when grade is great, -chargesMultiVector for more than one Vector. power is the spell's damage (or heal/shield) before the Magic stat. Same shape and effect fields as moves.",
+  "spells": [
+    { "id": "sp_fireball", "name": "Fireball", "magnitude": "Standard", "vectors": ["heat"], "grade": "good", "shape": "area", "range": 4, "radius": 1, "power": 9, "status": { "id": "burning", "turns": 2 }, "target": "tile", "tags": ["weakness hunter", "burn"] },
+    { "id": "sp_ice_lance", "name": "Ice Lance", "magnitude": "Minor", "vectors": ["cold"], "grade": "good", "shape": "projectile", "range": 5, "power": 8, "target": "enemy", "tags": ["weakness hunter"] },
+    { "id": "sp_thunderclap", "name": "Thunderclap", "magnitude": "Major", "vectors": ["lightning", "sound"], "grade": "great", "shape": "area", "range": 3, "radius": 1, "power": 13, "push": 1, "target": "tile", "tags": ["weakness hunter", "push"] },
+    { "id": "sp_stone_fist", "name": "Stone Fist", "magnitude": "Minor", "vectors": ["force"], "grade": "good", "shape": "adjacent", "power": 9, "push": 2, "target": "enemy", "tags": ["wall-slammer", "push"] },
+    { "id": "sp_quake", "name": "Quake", "magnitude": "Standard", "vectors": ["force"], "grade": "good", "shape": "burst", "range": 1, "power": 8, "push": 1, "target": "self", "tags": ["wall-slammer", "area"] },
+    { "id": "sp_static_grip", "name": "Static Grip", "magnitude": "Minor", "vectors": ["lightning"], "grade": "good", "shape": "adjacent", "power": 7, "status": { "id": "root", "turns": 1 }, "target": "enemy", "tags": ["protector"] },
+    { "id": "sp_venom_cloud", "name": "Venom Cloud", "magnitude": "Standard", "vectors": ["poison"], "grade": "good", "shape": "area", "range": 3, "radius": 1, "power": 5, "status": { "id": "poisoned", "turns": 3 }, "target": "tile", "tags": ["scout", "area"] },
+    { "id": "sp_shadow_bolt", "name": "Shadow Bolt", "magnitude": "Minor", "vectors": ["shadow"], "grade": "good", "shape": "projectile", "range": 4, "power": 8, "target": "enemy", "tags": ["back-stabber"] },
+    { "id": "sp_frost_knife", "name": "Frost Knife", "magnitude": "Minor", "vectors": ["cold"], "grade": "great", "shape": "adjacent", "power": 9, "status": { "id": "slow", "turns": 1 }, "target": "enemy", "tags": ["back-stabber"] },
+    { "id": "sp_sonic_boom", "name": "Sonic Boom", "magnitude": "Standard", "vectors": ["sound"], "grade": "good", "shape": "cone", "range": 3, "power": 8, "push": 1, "target": "tile", "tags": ["area", "push"] },
+    { "id": "sp_radiant_hymn", "name": "Radiant Hymn", "magnitude": "Minor", "vectors": ["light"], "grade": "good", "shape": "burst", "range": 2, "heal": 8, "affects": "allies", "scan": true, "target": "self", "tags": ["support", "scan"] },
+    { "id": "sp_dirge", "name": "Dirge", "magnitude": "Major", "vectors": ["shadow"], "grade": "good", "shape": "area", "range": 3, "radius": 2, "power": 9, "target": "tile", "tags": ["area"] }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "comment": "C2 perks: passive rule changers (docs/COMBAT_2.md Part 4). Each perk is one effect read by src/core/combat2/perks.gd. kinds: wallSlam (+value damage when your push slams into something), oneMoreHeal (heal on One More), batonInit (receiver +value Initiative for the fight), firstSpellFree, backKnockdown (back attacks knock down), weakWhileStatus (status -> extra weak type), pinDowned (knocked-down enemies next to you can't stand), chargeMod (vector -> charges +/-), damagePct (filter: tag/type/shape/downed/back -> +value share), pushPlus (+value push tiles), killStep (move value tiles after a kill), braceExtra (+value share damage cut), healPct, batonPct (+value share Baton bonus), revealOnFirstHit, ultRate (meter x), cooldownCut (move id -> -value turns), movementPlus, initiativePlus, maxHpPlus, allOutPct, followUpPlus, protectOnce, standHeal. class: who can equip it (\"any\" for general).",
+  "perks": [
+    { "id": "pk_wall_slammer", "class": "fighter", "name": "Wall Slammer", "text": "Your pushes deal +4 when they slam into a wall or a unit.", "effect": { "kind": "wallSlam", "value": 4 }, "tags": ["wall-slammer"] },
+    { "id": "pk_shove_plus", "class": "fighter", "name": "Long Arms", "text": "Your pushes go 1 tile further.", "effect": { "kind": "pushPlus", "value": 1 }, "tags": ["wall-slammer", "push"] },
+    { "id": "pk_iron_skin", "class": "fighter", "name": "Iron Skin", "text": "+10 max HP.", "effect": { "kind": "maxHpPlus", "value": 10 }, "tags": ["protector"] },
+    { "id": "pk_bodyguard", "class": "fighter", "name": "Bodyguard", "text": "Once per fight, take a killing blow meant for an adjacent ally.", "effect": { "kind": "protectOnce", "value": 1 }, "tags": ["protector"] },
+    { "id": "pk_hold_ground", "class": "fighter", "name": "Hold the Ground", "text": "Bracing cuts 25% more damage.", "effect": { "kind": "braceExtra", "value": 0.25 }, "tags": ["protector"] },
+    { "id": "pk_slam_cd", "class": "fighter", "name": "Quick Recovery", "text": "Heavy Slam's cooldown is 1 shorter.", "effect": { "kind": "cooldownCut", "move": "brick_heavy_slam", "value": 1 }, "tags": ["wall-slammer"] },
+    { "id": "pk_brawler", "class": "fighter", "name": "Brawler", "text": "Blunt hits deal +20%.", "effect": { "kind": "damagePct", "filter": { "type": "blunt" }, "value": 0.2 }, "tags": ["wall-slammer"] },
+    { "id": "pk_second_wind", "class": "fighter", "name": "Second Wind", "text": "One More also heals you 4.", "effect": { "kind": "oneMoreHeal", "value": 4 }, "tags": ["protector"] },
+
+    { "id": "pk_weak_seeker", "class": "mage", "name": "Weakness Seeker", "text": "Your first hit on each enemy reveals all its markings.", "effect": { "kind": "revealOnFirstHit", "value": 1 }, "tags": ["weakness hunter", "scan"] },
+    { "id": "pk_cold_heart", "class": "mage", "name": "Cold Heart", "text": "+1 charge on Cold spells; Heat spells have one fewer.", "effect": { "kind": "chargeMod", "mods": { "cold": 1, "heat": -1 } }, "tags": ["terrain controller"] },
+    { "id": "pk_free_spell", "class": "mage", "name": "Warm-Up", "text": "Your first spell each fight costs no charge.", "effect": { "kind": "firstSpellFree", "value": 1 }, "tags": ["weakness hunter"] },
+    { "id": "pk_burn_force", "class": "mage", "name": "Brittle Embers", "text": "Burning enemies are weak to Force.", "effect": { "kind": "weakWhileStatus", "status": "burning", "type": "force" }, "tags": ["burn", "terrain controller"] },
+    { "id": "pk_exploit", "class": "mage", "name": "Exploit", "text": "Hits on a weakness deal +20%.", "effect": { "kind": "damagePct", "filter": { "weak": true }, "value": 0.2 }, "tags": ["weakness hunter"] },
+    { "id": "pk_storm_focus", "class": "mage", "name": "Storm Focus", "text": "Lightning hits deal +25%.", "effect": { "kind": "damagePct", "filter": { "type": "lightning" }, "value": 0.25 }, "tags": ["weakness hunter"] },
+    { "id": "pk_far_reach", "class": "mage", "name": "Long Stride", "text": "+1 Movement.", "effect": { "kind": "movementPlus", "value": 1 }, "tags": ["terrain controller", "mobility"] },
+    { "id": "pk_overcharge", "class": "mage", "name": "Overcharge", "text": "Your ultimate fills 30% faster.", "effect": { "kind": "ultRate", "value": 0.3 }, "tags": ["weakness hunter"] },
+
+    { "id": "pk_backstab", "class": "rogue", "name": "Backstab", "text": "Back attacks knock down regardless of weakness.", "effect": { "kind": "backKnockdown", "value": 1 }, "tags": ["back-stabber"] },
+    { "id": "pk_pin_down", "class": "rogue", "name": "Pin Down", "text": "Knocked-down enemies next to you can't stand up while you're adjacent.", "effect": { "kind": "pinDowned", "value": 1 }, "tags": ["back-stabber"] },
+    { "id": "pk_kill_step", "class": "rogue", "name": "Vanish", "text": "After a kill, move 2 tiles.", "effect": { "kind": "killStep", "value": 2 }, "tags": ["scout", "mobility"] },
+    { "id": "pk_downed_bonus", "class": "rogue", "name": "No Mercy", "text": "Hits on knocked-down enemies deal +25%.", "effect": { "kind": "damagePct", "filter": { "downed": true }, "value": 0.25 }, "tags": ["back-stabber"] },
+    { "id": "pk_quick_feet", "class": "rogue", "name": "Quick Feet", "text": "+3 Initiative.", "effect": { "kind": "initiativePlus", "value": 3 }, "tags": ["scout"] },
+    { "id": "pk_back_bonus", "class": "rogue", "name": "Knife Work", "text": "Back attacks deal +25%.", "effect": { "kind": "damagePct", "filter": { "back": true }, "value": 0.25 }, "tags": ["back-stabber"] },
+    { "id": "pk_poison_tip", "class": "rogue", "name": "Poison Tips", "text": "Poison hits deal +30%.", "effect": { "kind": "damagePct", "filter": { "type": "poison" }, "value": 0.3 }, "tags": ["scout"] },
+    { "id": "pk_scout_eye", "class": "rogue", "name": "Scout's Eye", "text": "Your first hit on each enemy reveals all its markings.", "effect": { "kind": "revealOnFirstHit", "value": 1 }, "tags": ["scout", "scan"] },
+
+    { "id": "pk_conductor", "class": "bard", "name": "Conductor", "text": "When you Baton Pass, the receiver gets +2 Initiative for the rest of the fight.", "effect": { "kind": "batonInit", "value": 2 }, "tags": ["baton conductor"] },
+    { "id": "pk_crescendo", "class": "bard", "name": "Crescendo", "text": "Baton Passes you give add 15% more damage.", "effect": { "kind": "batonPct", "value": 0.15 }, "tags": ["baton conductor"] },
+    { "id": "pk_tempo", "class": "bard", "name": "Tempo", "text": "+2 Initiative.", "effect": { "kind": "initiativePlus", "value": 2 }, "tags": ["tempo"] },
+    { "id": "pk_cue_cd", "class": "bard", "name": "Stage Cue", "text": "Cue's cooldown is 1 shorter.", "effect": { "kind": "cooldownCut", "move": "lyric_cue", "value": 1 }, "tags": ["tempo", "baton conductor"] },
+    { "id": "pk_healer_heart", "class": "bard", "name": "Warm Voice", "text": "Your heals restore 30% more.", "effect": { "kind": "healPct", "value": 0.3 }, "tags": ["support"] },
+    { "id": "pk_sound_up", "class": "bard", "name": "Amplifier", "text": "Sound hits deal +25%.", "effect": { "kind": "damagePct", "filter": { "type": "sound" }, "value": 0.25 }, "tags": ["tempo"] },
+    { "id": "pk_all_out", "class": "bard", "name": "Showstopper", "text": "All-Out Attacks deal 30% more.", "effect": { "kind": "allOutPct", "value": 0.3 }, "tags": ["baton conductor"] },
+    { "id": "pk_encore_heal", "class": "bard", "name": "Applause", "text": "One More also heals you 4.", "effect": { "kind": "oneMoreHeal", "value": 4 }, "tags": ["support"] },
+
+    { "id": "pk_sturdy", "class": "any", "name": "Sturdy", "text": "+6 max HP.", "effect": { "kind": "maxHpPlus", "value": 6 }, "tags": ["general"] },
+    { "id": "pk_teamwork", "class": "any", "name": "In Sync", "text": "Follow-up attacks happen 25% more often.", "effect": { "kind": "followUpPlus", "value": 0.25 }, "tags": ["general"] },
+    { "id": "pk_get_up", "class": "any", "name": "Get Up", "text": "When you stand up from a knockdown, heal 5.", "effect": { "kind": "standHeal", "value": 5 }, "tags": ["general"] }
+  ]
+}

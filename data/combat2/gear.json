@@ -1,0 +1,26 @@
+{
+  "comment": "C2 slice gear (docs/COMBAT_2.md Part 4). Weapons set the basic attack's type (and can change its shape or add one weapon move). Armor sets markings and Movement. Every armor and trinket has one effect line, using the perk effect kinds in perks.json.",
+  "gear": [
+    { "id": "gw_bat", "slot": "weapon", "name": "Bat", "basicType": "blunt", "text": "Basic attack: blunt." },
+    { "id": "gw_knife", "slot": "weapon", "name": "Knife", "basicType": "blade", "text": "Basic attack: blade." },
+    { "id": "gw_spear", "slot": "weapon", "name": "Mop Spear", "basicType": "pierce", "basicShape": "line", "basicRange": 2, "text": "Basic attack: pierce, reaches 2 tiles in a line." },
+    { "id": "gw_staff", "slot": "weapon", "name": "Staff", "basicType": "blunt", "weaponMove": "ash_arc", "text": "Basic attack: blunt. Adds Arc." },
+    { "id": "gw_tambourine", "slot": "weapon", "name": "Tambourine", "basicType": "sound", "text": "Basic attack: sound." },
+    { "id": "gw_sling", "slot": "weapon", "name": "Sling", "basicType": "pierce", "basicShape": "projectile", "basicRange": 4, "text": "Basic attack: pierce, range 4." },
+    { "id": "ga_light", "slot": "armor", "name": "Hoodie", "movement": 1, "weak": ["pierce"], "effect": { "kind": "initiativePlus", "value": 1 }, "text": "+1 Movement, +1 Initiative. Weak to pierce." },
+    { "id": "ga_medium", "slot": "armor", "name": "Letterman Jacket", "resist": ["blade"], "effect": { "kind": "maxHpPlus", "value": 4 }, "text": "Resists blade. +4 max HP." },
+    { "id": "ga_heavy", "slot": "armor", "name": "Hockey Pads", "movement": -1, "resist": ["blade", "pierce"], "effect": { "kind": "braceExtra", "value": 0.1 }, "text": "-1 Movement. Resists blade and pierce. Bracing cuts 10% more." },
+    { "id": "ga_rubber", "slot": "armor", "name": "Rubber Apron", "resist": ["lightning"], "weak": ["heat"], "effect": { "kind": "maxHpPlus", "value": 2 }, "text": "Resists lightning, weak to heat. +2 max HP." },
+    { "id": "gt_spiked_band", "slot": "trinket", "name": "Spiked Band", "effect": { "kind": "wallSlam", "value": 2 }, "text": "Pushes deal +2 when they slam into something." },
+    { "id": "gt_lens", "slot": "trinket", "name": "Cracked Lens", "effect": { "kind": "revealOnFirstHit", "value": 1 }, "text": "Your first hit on each enemy reveals its markings." },
+    { "id": "gt_lucky_coin", "slot": "trinket", "name": "Lucky Coin", "effect": { "kind": "followUpPlus", "value": 0.2 }, "text": "Follow-ups happen 20% more often." },
+    { "id": "gt_metronome", "slot": "trinket", "name": "Metronome", "effect": { "kind": "initiativePlus", "value": 2 }, "text": "+2 Initiative." },
+    { "id": "gt_ember_charm", "slot": "trinket", "name": "Ember Charm", "effect": { "kind": "damagePct", "filter": { "type": "heat" }, "value": 0.2 }, "text": "Heat hits deal +20%." },
+    { "id": "gt_bandage", "slot": "trinket", "name": "Spare Bandage", "effect": { "kind": "standHeal", "value": 6 }, "text": "Heal 6 when you stand up from a knockdown." }
+  ],
+  "items": [
+    { "id": "it_focus_snack", "name": "Focus Snack", "text": "Restore 1 charge on one of your spells.", "effect": { "charge": 1 } },
+    { "id": "it_soda", "name": "Soda", "text": "Heal 10.", "effect": { "heal": 10 } },
+    { "id": "it_smelling_salts", "name": "Smelling Salts", "text": "Stand up from a knockdown and clear Slow and Root.", "effect": { "stand": true, "cleanse": ["slow", "root"] } }
+  ]
+}

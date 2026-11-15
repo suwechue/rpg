@@ -12,6 +12,10 @@ Parts 1 to 5 are done; Part 6 waits for the user to pick a preset. Every rule th
 
 LT comes before CL Part 6. AI players: `src/core/lab/players/` (`player.gd` search, `evaluator.gd` state score, `legal.gd` steps, `sim.gd` masked snapshots), tuned in `data/lab/players.json`. Sweeps: `tools/lab_sweep.gd -- --plan=res://data/lab/sweeps/<plan>.json` (`--jobs=N`, resumes; `--fresh` starts over), core in `src/core/lab/sweep.gd` and `src/core/lab/tuner/`. Metric targets and weights: `data/lab/tuner.json`; lever `learnCost`/`offValue`/`fights` in `data/lab/lab.json`. Report: `tools/lab_tune_report.gd` appends to `docs/LAB_TUNING.md`. Text play for agents: `tools/lab_play.gd`. After any rules or card change, re-run `--plan=res://data/lab/sweeps/shortlist.json --fresh`. Lever choices and targets go in data, never code; never tune to one number. Scaled per-fight difficulty: lever `fightScaled`, `data/lab/fight_scales.json`, plan `data/lab/sweeps/scaled.json`.
 
+## Combat 2.0 (C2, docs/COMBAT_2.md)
+
+C2 replaces the card direction (CL Part 6 is replaced; FF is paused until C2). It's built as a Lab slice next to today's combat: code in `src/core/combat2/` (`c2_state.gd` extends CombatState for the grid, board, props, pushes and reactions; `c2_rules.gd` levers; `shapes.gd`, `kits.gd`, `perks.gd`, `c2_ai.gd`, `c2_setup.gd`, `c2_check.gd`), content in `data/combat2/`. Every open question is a lever in `data/combat2/rules.json`. Don't change story or arena combat until the user approves Part 6.
+
 ## Current state
 
 The alpha (M0 to M8) is done:

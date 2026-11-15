@@ -106,6 +106,8 @@ func _validate() -> void:
 	_validate_forge()
 	for msg in preload("res://src/core/progression/spark.gd").problems(_tables):
 		errors.append(msg)
+	for msg in preload("res://src/core/combat2/c2_check.gd").problems(_tables):
+		errors.append(msg)
 	for msg in preload("res://src/core/combos.gd").problems(_tables, preload("res://src/core/combat/card_effects.gd").OPS):
 		errors.append(msg)
 	for c in records_under("cutscenes/", "cutscenes"):

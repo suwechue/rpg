@@ -1,0 +1,41 @@
+{
+  "comment": "C2 slice characters (docs/COMBAT_2.md Part 5): the four Lab characters with a 10-move pool, example spells, perks and ultimates, and level 1 and level 6 loadouts. stats: hp, movement, agility (Initiative), power (physical moves), magic (spells and Vector moves). growth: added per level past 1. weak/resist: party markings (armor adds to these). bond: the Lab's Bond tier between the party (rules.json labBondTier).",
+  "characters": [
+    { "id": "c2_brick", "name": "Brick", "class": "fighter", "sprite": "arena_fighter",
+      "stats": { "hp": 36, "movement": 3, "agility": 4, "power": 4, "magic": 1 }, "growth": { "hp": 5, "agility": 0.3, "power": 0.6, "magic": 0.2 },
+      "weak": ["lightning"], "resist": [],
+      "pool": ["brick_bash", "brick_shove", "brick_heavy_slam", "brick_sweep", "brick_charge", "brick_cleave", "brick_bulwark", "brick_ground_pound", "brick_hook", "brick_cover_ally"],
+      "spells": ["sp_stone_fist", "sp_quake", "sp_static_grip"], "ultimates": ["ult_earthshaker", "ult_last_stand"],
+      "loadouts": {
+        "1": { "moves": ["brick_bash", "brick_shove", "brick_heavy_slam", "brick_sweep"], "spells": ["sp_stone_fist", "sp_quake"], "perks": ["pk_wall_slammer"], "ultimate": "ult_earthshaker", "gear": { "weapon": "gw_bat", "armor": "ga_medium", "trinket1": "", "trinket2": "" } },
+        "6": { "moves": ["brick_bash", "brick_shove", "brick_heavy_slam", "brick_charge", "brick_hook"], "spells": ["sp_stone_fist", "sp_quake", "sp_static_grip"], "perks": ["pk_wall_slammer", "pk_shove_plus", "pk_brawler"], "ultimate": "ult_earthshaker", "gear": { "weapon": "gw_bat", "armor": "ga_heavy", "trinket1": "gt_spiked_band", "trinket2": "" } }
+      } },
+    { "id": "c2_ash", "name": "Ash", "class": "mage", "sprite": "arena_mage",
+      "stats": { "hp": 26, "movement": 3, "agility": 5, "power": 1, "magic": 4 }, "growth": { "hp": 3, "agility": 0.3, "power": 0.2, "magic": 0.7 },
+      "weak": ["blade"], "resist": ["heat"],
+      "pool": ["ash_staff", "ash_spark", "ash_ember", "ash_frost_ray", "ash_gust", "ash_scan", "ash_blink", "ash_stone_spike", "ash_arc", "ash_ice_floor"],
+      "spells": ["sp_fireball", "sp_ice_lance", "sp_thunderclap"], "ultimates": ["ult_inferno"],
+      "loadouts": {
+        "1": { "moves": ["ash_staff", "ash_spark", "ash_ember", "ash_scan"], "spells": ["sp_fireball", "sp_ice_lance"], "perks": ["pk_weak_seeker"], "ultimate": "ult_inferno", "gear": { "weapon": "gw_staff", "armor": "ga_light", "trinket1": "", "trinket2": "" } },
+        "6": { "moves": ["ash_staff", "ash_spark", "ash_ember", "ash_frost_ray", "ash_stone_spike"], "spells": ["sp_fireball", "sp_ice_lance", "sp_thunderclap"], "perks": ["pk_weak_seeker", "pk_exploit", "pk_free_spell"], "ultimate": "ult_inferno", "gear": { "weapon": "gw_staff", "armor": "ga_light", "trinket1": "gt_lens", "trinket2": "" } }
+      } },
+    { "id": "c2_quill", "name": "Quill", "class": "rogue", "sprite": "arena_rogue",
+      "stats": { "hp": 28, "movement": 4, "agility": 8, "power": 3, "magic": 2 }, "growth": { "hp": 3, "agility": 0.5, "power": 0.5, "magic": 0.3 },
+      "weak": ["heat"], "resist": [],
+      "pool": ["quill_stab", "quill_knife", "quill_shadow_step", "quill_poison_dart", "quill_twin_cut", "quill_smoke", "quill_mark", "quill_trip", "quill_pin", "quill_finish"],
+      "spells": ["sp_shadow_bolt", "sp_venom_cloud", "sp_frost_knife"], "ultimates": ["ult_thousand_cuts"],
+      "loadouts": {
+        "1": { "moves": ["quill_stab", "quill_knife", "quill_shadow_step", "quill_poison_dart"], "spells": ["sp_shadow_bolt", "sp_frost_knife"], "perks": ["pk_backstab"], "ultimate": "ult_thousand_cuts", "gear": { "weapon": "gw_knife", "armor": "ga_light", "trinket1": "", "trinket2": "" } },
+        "6": { "moves": ["quill_stab", "quill_knife", "quill_shadow_step", "quill_twin_cut", "quill_finish"], "spells": ["sp_shadow_bolt", "sp_frost_knife", "sp_venom_cloud"], "perks": ["pk_backstab", "pk_downed_bonus", "pk_back_bonus"], "ultimate": "ult_thousand_cuts", "gear": { "weapon": "gw_knife", "armor": "ga_light", "trinket1": "gt_lucky_coin", "trinket2": "" } }
+      } },
+    { "id": "c2_lyric", "name": "Lyric", "class": "bard", "sprite": "arena_bard",
+      "stats": { "hp": 28, "movement": 3, "agility": 6, "power": 2, "magic": 3 }, "growth": { "hp": 3, "agility": 0.4, "power": 0.3, "magic": 0.5 },
+      "weak": ["shadow"], "resist": ["sound"],
+      "pool": ["lyric_note", "lyric_power_chord", "lyric_rally", "lyric_lullaby", "lyric_cue", "lyric_soothe", "lyric_discord", "lyric_tempo", "lyric_bass_drop", "lyric_harmony"],
+      "spells": ["sp_sonic_boom", "sp_radiant_hymn", "sp_dirge"], "ultimates": ["ult_encore_for_all"],
+      "loadouts": {
+        "1": { "moves": ["lyric_note", "lyric_power_chord", "lyric_soothe", "lyric_harmony"], "spells": ["sp_sonic_boom", "sp_radiant_hymn"], "perks": ["pk_conductor"], "ultimate": "ult_encore_for_all", "gear": { "weapon": "gw_tambourine", "armor": "ga_light", "trinket1": "", "trinket2": "" } },
+        "6": { "moves": ["lyric_note", "lyric_power_chord", "lyric_soothe", "lyric_cue", "lyric_bass_drop"], "spells": ["sp_sonic_boom", "sp_radiant_hymn", "sp_dirge"], "perks": ["pk_conductor", "pk_crescendo", "pk_all_out"], "ultimate": "ult_encore_for_all", "gear": { "weapon": "gw_tambourine", "armor": "ga_medium", "trinket1": "gt_metronome", "trinket2": "" } }
+      } }
+  ]
+}

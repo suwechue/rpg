@@ -1,0 +1,102 @@
+{
+  "comment": "Combat 2.0 levers (docs/COMBAT_2.md). Every open question is a lever here; code reads them through src/core/combat2/c2_rules.gd. labLevers are the Combat Lab levers the C2 slice runs on top of (it reuses the grid, board, props and reactions). Change any default freely; the Lab's C2 screen can override them per fight.",
+  "basePreset": "cl_base",
+  "labLevers": {
+    "turnStructure": "initiative",
+    "moveSeparate": true,
+    "actionsPerTurn": 1,
+    "splitMove": true,
+    "smallNumbers": false,
+    "crits": false,
+    "misses": false,
+    "keywordsOn": false,
+    "surge": false,
+    "killRefund": "off",
+    "facing": false,
+    "undo": "off",
+    "instability": false,
+    "collisionDamage": 4,
+    "pitKillsEnemies": true,
+    "enemiesAvoidEdges": true,
+    "iceSlide": true,
+    "domino": true,
+    "flatDamageMul": 3.0
+  },
+  "levers": [
+    { "id": "moveAfterAct", "group": "turn", "type": "bool", "default": false, "name": "Move after acting", "hint": "Off: using an Ability ends your turn, so you can't hit and walk away." },
+    { "id": "freeItemsPerTurn", "group": "turn", "type": "int", "default": 1, "min": 0, "max": 3, "name": "Free item uses per turn" },
+    { "id": "braceReduction", "group": "turn", "type": "float", "default": 0.25, "min": 0.0, "max": 0.9, "step": 0.05, "name": "Brace damage cut", "hint": "Ending a turn with no Ability: take this much less damage until your next turn." },
+    { "id": "timelineRounds", "group": "turn", "type": "int", "default": 2, "min": 1, "max": 3, "name": "Timeline rounds shown" },
+    { "id": "hasteInitiative", "group": "turn", "type": "int", "default": 5, "min": 0, "max": 20, "name": "Haste Initiative bonus" },
+    { "id": "slowInitiative", "group": "turn", "type": "int", "default": 5, "min": 0, "max": 20, "name": "Slow Initiative penalty" },
+
+    { "id": "facingOn", "group": "positioning", "type": "bool", "default": true, "name": "Facing and back attacks" },
+    { "id": "backMul", "group": "positioning", "type": "float", "default": 1.5, "min": 1.0, "max": 3.0, "step": 0.05, "name": "Back attack damage x" },
+    { "id": "sideMul", "group": "positioning", "type": "float", "default": 1.25, "min": 1.0, "max": 3.0, "step": 0.05, "name": "Side attack damage x" },
+
+    { "id": "statDamagePer", "group": "damage", "type": "float", "default": 0.08, "min": 0.0, "max": 0.5, "step": 0.01, "name": "Damage per stat point", "hint": "A move's power x (1 + this x Power or Magic)." },
+    { "id": "enemyLevelScale", "group": "damage", "type": "float", "default": 0.12, "min": 0.0, "max": 0.5, "step": 0.01, "name": "Enemy scaling per party level", "hint": "Enemy HP and damage x (1 + this x (level - 1))." },
+    { "id": "enemyDamageMul", "group": "damage", "type": "float", "default": 1.0, "min": 0.25, "max": 4.0, "step": 0.05, "name": "Enemy damage x" },
+    { "id": "enemyHpMul", "group": "damage", "type": "float", "default": 1.0, "min": 0.25, "max": 4.0, "step": 0.05, "name": "Enemy HP x" },
+
+    { "id": "weakMul", "group": "weakness", "type": "float", "default": 1.5, "min": 1.0, "max": 3.0, "step": 0.05, "name": "Weakness damage x" },
+    { "id": "resistMul", "group": "weakness", "type": "float", "default": 0.5, "min": 0.0, "max": 1.0, "step": 0.05, "name": "Resist damage x" },
+    { "id": "markedMul", "group": "weakness", "type": "float", "default": 1.25, "min": 1.0, "max": 3.0, "step": 0.05, "name": "Marked damage x", "hint": "Mark Target: hits on a marked unit deal this much more." },
+    { "id": "revealOnHit", "group": "weakness", "type": "bool", "default": true, "name": "Hitting reveals that type", "hint": "Off: only scans reveal markings." },
+    { "id": "revealRemember", "group": "weakness", "type": "bool", "default": true, "name": "Remember enemies met before", "hint": "Markings found once stay known for that enemy type (the Journal)." },
+    { "id": "scanRevealsAll", "group": "weakness", "type": "bool", "default": true, "name": "Scans reveal every marking" },
+
+    { "id": "knockdownOn", "group": "knockdown", "type": "bool", "default": true, "name": "Knockdown on weakness" },
+    { "id": "knockdownMul", "group": "knockdown", "type": "float", "default": 1.5, "min": 1.0, "max": 3.0, "step": 0.05, "name": "Damage to knocked-down units x" },
+    { "id": "standUp", "group": "knockdown", "type": "enum", "default": "skip", "options": ["skip", "half"], "name": "Standing up", "hint": "skip: the next turn is spent standing up. half: it stands and acts at half effect." },
+    { "id": "backCritKnockdown", "group": "knockdown", "type": "bool", "default": false, "name": "Back attacks knock down", "hint": "A back attack knocks down even without a weakness." },
+    { "id": "enemyOneMore", "group": "knockdown", "type": "bool", "default": true, "name": "Enemies knock down party weaknesses" },
+
+    { "id": "oneMoreOn", "group": "one_more", "type": "bool", "default": true, "name": "One More" },
+    { "id": "oneMoreStep", "group": "one_more", "type": "int", "default": 0, "min": 0, "max": 3, "name": "One More step", "hint": "Tiles you may move before the extra Ability." },
+    { "id": "oneMoreChain", "group": "one_more", "type": "int", "default": 1, "min": 1, "max": 5, "name": "One More per turn" },
+
+    { "id": "batonOn", "group": "baton", "type": "bool", "default": true, "name": "Baton Pass" },
+    { "id": "batonBonus", "group": "baton", "type": "float", "default": 0.25, "min": 0.0, "max": 1.0, "step": 0.05, "name": "Baton damage bonus per pass" },
+    { "id": "batonMax", "group": "baton", "type": "float", "default": 0.5, "min": 0.0, "max": 2.0, "step": 0.05, "name": "Baton bonus cap" },
+    { "id": "batonMove", "group": "baton", "type": "int", "default": 1, "min": 0, "max": 3, "name": "Baton Movement bonus" },
+    { "id": "batonGate", "group": "baton", "type": "enum", "default": "always", "options": ["always", "bond"], "name": "Baton Pass needs a Bond", "hint": "bond: only between characters at Acquaintance or higher (story)." },
+
+    { "id": "allOutOn", "group": "all_out", "type": "bool", "default": true, "name": "All-Out Attack" },
+    { "id": "allOutRange", "group": "all_out", "type": "int", "default": 1, "min": 0, "max": 5, "name": "All-Out reach past Movement" },
+    { "id": "allOutPower", "group": "all_out", "type": "float", "default": 8.0, "min": 0.0, "max": 40.0, "step": 0.5, "name": "All-Out power per ally" },
+    { "id": "allOutStandUp", "group": "all_out", "type": "bool", "default": true, "name": "Enemies stand after an All-Out" },
+
+    { "id": "chargesMinor", "group": "charges", "type": "int", "default": 4, "min": 0, "max": 10, "name": "Charges: Minor" },
+    { "id": "chargesStandard", "group": "charges", "type": "int", "default": 3, "min": 0, "max": 10, "name": "Charges: Standard" },
+    { "id": "chargesMajor", "group": "charges", "type": "int", "default": 2, "min": 0, "max": 10, "name": "Charges: Major" },
+    { "id": "chargesGrand", "group": "charges", "type": "int", "default": 1, "min": 0, "max": 10, "name": "Charges: Grand" },
+    { "id": "chargesGradeBonus", "group": "charges", "type": "int", "default": 1, "min": 0, "max": 3, "name": "Extra charges for a great craft" },
+    { "id": "chargesMultiVector", "group": "charges", "type": "int", "default": 1, "min": 0, "max": 3, "name": "Fewer charges for multi-Vector spells" },
+    { "id": "restRoomRefill", "group": "charges", "type": "int", "default": 1, "min": 0, "max": 5, "name": "Rest room refill per spell" },
+    { "id": "restRoomHeal", "group": "charges", "type": "float", "default": 0.3, "min": 0.0, "max": 1.0, "step": 0.05, "name": "Rest room heal (share of max HP)" },
+
+    { "id": "moveSlots", "group": "slots", "type": "text", "default": "4@1,5@4,6@8,7@12", "name": "Class move slots by level" },
+    { "id": "spellSlots", "group": "slots", "type": "text", "default": "2@1,3@3,4@6,5@10,6@14", "name": "Spell slots by level" },
+    { "id": "perkSlots", "group": "slots", "type": "text", "default": "1@1,2@2,3@5,4@9,5@13", "name": "Perk slots by level" },
+    { "id": "ultimateUpgrades", "group": "slots", "type": "text", "default": "7,13", "name": "Ultimate upgrade levels" },
+
+    { "id": "ultMax", "group": "ultimate", "type": "int", "default": 100, "min": 10, "max": 300, "name": "Ultimate meter size" },
+    { "id": "ultPerDealt", "group": "ultimate", "type": "float", "default": 1.0, "min": 0.0, "max": 10.0, "step": 0.1, "name": "Meter per damage dealt" },
+    { "id": "ultPerTaken", "group": "ultimate", "type": "float", "default": 1.5, "min": 0.0, "max": 10.0, "step": 0.1, "name": "Meter per damage taken" },
+    { "id": "ultPerKnockdown", "group": "ultimate", "type": "int", "default": 10, "min": 0, "max": 100, "name": "Meter per knockdown" },
+    { "id": "ultPerBaton", "group": "ultimate", "type": "int", "default": 8, "min": 0, "max": 100, "name": "Meter per Baton Pass" },
+
+    { "id": "bossTelegraphs", "group": "enemies", "type": "bool", "default": true, "name": "Boss big attacks are telegraphed", "hint": "A boss's big attacks hit the marked tiles on its next turn; every other enemy attack lands at once." },
+    { "id": "bossBigEvery", "group": "enemies", "type": "int", "default": 2, "min": 1, "max": 5, "name": "Boss big attack every N turns" },
+
+    { "id": "bondTeamUps", "group": "bonds", "type": "bool", "default": true, "name": "Bond team-ups" },
+    { "id": "labBondTier", "group": "bonds", "type": "enum", "default": "friend", "options": ["none", "acquaintance", "friend", "close", "unbreakable"], "name": "Party Bond tier (Lab)" },
+    { "id": "followUpChance", "group": "bonds", "type": "float", "default": 0.5, "min": 0.0, "max": 1.0, "step": 0.05, "name": "Follow-up chance" },
+    { "id": "followUpShare", "group": "bonds", "type": "float", "default": 0.5, "min": 0.0, "max": 2.0, "step": 0.05, "name": "Follow-up damage (share of basic attack)" },
+    { "id": "duoPower", "group": "bonds", "type": "float", "default": 20.0, "min": 0.0, "max": 60.0, "step": 1.0, "name": "Duo ultimate power" }
+  ],
+  "magnitudes": { "Minor": "chargesMinor", "Standard": "chargesStandard", "Major": "chargesMajor", "Grand": "chargesGrand" },
+  "bondTiers": ["none", "acquaintance", "friend", "close", "unbreakable"],
+  "physicalTypes": ["blunt", "blade", "pierce"]
+}
