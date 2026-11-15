@@ -772,3 +772,12 @@ C2 is a separate ruleset in the Lab (`src/core/combat2/`, `data/combat2/`). The 
 - **Physical moves** (blunt, blade, pierce) use Power; spells and Vector moves use Magic.
 - **Enemies** scale by 12% per party level past 1 (`enemyLevelScale`).
 
+**Kits (C2 Part 2).** A character's kit is built from their loadout (`src/core/combat2/kits.gd`).
+- **Class moves:** unlimited uses, some with a cooldown of 1 to 3 of your own turns. Each has a fixed shape: adjacent, line, cone, plus, burst around you, area at a tile, leap (land behind the target), dash (run to the first enemy), projectile, self or ally. The basic attack is one of the moves, and its type comes from the weapon.
+- **Spells:** charges per dungeon night. Minor 4, Standard 3, Major 2, Grand 1. A great craft adds 1, and each extra Vector takes 1 away (never under 1). Perks can add or take charges by Vector.
+- **Refills:** all charges at home and at arena checkpoints. A rest room gives +1 charge on each spell and 30% of max HP. A Focus Snack restores one charge. HP and charges carry between the fights of a night.
+- **Ultimate:** one per class, upgraded at levels 7 and 13.
+- **Slots by level:** moves 4 (+1 at 4, 8, 12), spells 2 (+1 at 3, 6, 10, 14), perks 1 (+1 at 2, 5, 9, 13). These are levers in `data/combat2/rules.json`.
+- **Gear:** the weapon sets the basic attack's type, and can change its shape or add a move. Armor sets markings and Movement (light +1, heavy -1).
+- **No MP:** C2 has no MP. Magic drives spell power instead.
+

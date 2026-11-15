@@ -164,3 +164,140 @@ func test_c2_data_checks() -> void:
 	d["combat2/moves"]["moves"].append({ "id": "bad", "shape": "spiral", "type": "glitter", "target": "everyone" })
 	check(Check.problems(d).size() >= 3, "a bad move is reported (shape, type, target)")
 
+
+# --- Part 2: kits ---------------------------------------------------------------------
+
+const Night := preload("res://src/core/combat2/night.gd")
+
+
+func _rules(over: Dictionary = {}) -> C2Rules:
+	return C2Rules.build(db(), over) as C2Rules
+
+
+func test_c2_slots_by_level() -> void:
+	var r := _rules()
+	var s1 := Kits.slots(r, 1)
+	var s6 := Kits.slots(r, 6)
+	var s14 := Kits.slots(r, 14)
+	check(int(s1["moves"]) == 4 and int(s1["spells"]) == 2 and int(s1["perks"]) == 1, "level 1: 4 moves, 2 spells, 1 perk")
+	check(int(s6["moves"]) == 5 and int(s6["spells"]) == 4 and int(s6["perks"]) == 3, "level 6: 5 moves, 4 spells, 3 perks")
+	check(int(s14["moves"]) == 7 and int(s14["spells"]) == 6 and int(s14["perks"]) == 5 and int(s14["ultimateUpgrades"]) == 2, "level 14: every slot")
+
+
+func test_c2_charges() -> void:
+	var r := _rules()
+	check(Kits.charges_for(db(), r, { "magnitude": "Minor", "vectors": ["heat"] }) == 4, "Minor: 4")
+	check(Kits.charges_for(db(), r, { "magnitude": "Standard", "vectors": ["heat"] }) == 3, "Standard: 3")
+	check(Kits.charges_for(db(), r, { "magnitude": "Major", "vectors": ["heat"] }) == 2, "Major: 2")
+	check(Kits.charges_for(db(), r, { "magnitude": "Grand", "vectors": ["heat"] }) == 1, "Grand: 1")
+	check(Kits.charges_for(db(), r, { "magnitude": "Standard", "vectors": ["heat"], "grade": "great" }) == 4, "a great craft adds 1")
+	check(Kits.charges_for(db(), r, { "magnitude": "Standard", "vectors": ["heat", "cold"] }) == 2, "multi-Vector: one fewer")
+	check(Kits.charges_for(db(), r, { "magnitude": "Grand", "vectors": ["heat", "cold"] }) == 1, "never under 1")
+	var fx := [{ "kind": "chargeMod", "mods": { "cold": 1, "heat": -1 } }]
+	check(Kits.charges_for(db(), r, { "magnitude": "Standard", "vectors": ["cold"] }, fx) == 4 and Kits.charges_for(db(), r, { "magnitude": "Standard", "vectors": ["heat"] }, fx) == 2, "Cold Heart: +1 Cold, -1 Heat")
+	check(Kits.charges_for(db(), _rules({ "chargesMinor": 6 }), { "magnitude": "Minor", "vectors": ["heat"] }) == 6, "charges per Magnitude are levers")
+
+
+func test_c2_kit_build() -> void:
+	var r := _rules()
+	var k := Kits.build(db(), r, "c2_brick", 1, C2Setup.default_loadout(db(), "c2_brick", 1))
+	check((k["moves"] as Array).size() == 4 and (k["spells"] as Array).size() == 2 and not (k["ultimate"] as Dictionary).is_empty(), "a level 1 kit: 4 moves, 2 spells, an ultimate")
+	check(str(k["moves"][0]["type"]) == "blunt", "the bat makes the basic attack blunt")
+	var spear := C2Setup.default_loadout(db(), "c2_brick", 1)
+	spear["gear"]["weapon"] = "gw_spear"
+	var ks := Kits.build(db(), r, "c2_brick", 1, spear)
+	check(str(ks["moves"][0]["type"]) == "pierce" and str(ks["moves"][0]["shape"]) == "line", "a weapon sets the basic attack type and shape")
+	var ash := Kits.build(db(), r, "c2_ash", 1, C2Setup.default_loadout(db(), "c2_ash", 1))
+	check((ash["moves"] as Array).any(func(m: Dictionary) -> bool: return str(m["id"]) == "ash_arc" and bool(m.get("fromWeapon", false))), "a weapon can add one move")
+	var k6 := Kits.build(db(), r, "c2_brick", 6, C2Setup.default_loadout(db(), "c2_brick", 6))
+	check(float(k6["stats"]["movement"]) == 2.0 and (k6["resist"] as Array).has("pierce"), "heavy armor: -1 Movement, resists pierce")
+	check(float(k6["stats"]["hp"]) > float(k["stats"]["hp"]), "levels add HP")
+	var up := Kits.build(db(), r, "c2_ash", 13, C2Setup.default_loadout(db(), "c2_ash", 6))
+	check(float(up["ultimate"]["power"]) > float(ash["ultimate"]["power"]) and int(up["ultimate"]["radius"]) > int(ash["ultimate"]["radius"]), "the ultimate upgrades at 7 and 13")
+
+
+func test_c2_cooldowns() -> void:
+	var st := _fight()
+	var q: Object = st.current
+	var g: Object = _enemies(st)[0]
+	_put(st, g, Vector2i(3, 2))
+	_put(st, q, Vector2i(1, 2))
+	check(st.use_ability(q, "move:quill_shadow_step", Vector2i(3, 2)), "Shadow Step (cooldown 2)")
+	check(int(st.cooldowns[q.id]["move:quill_shadow_step"]) == 3, "set for this turn plus 2 more")
+	for i in 2:
+		st.current = q
+		st._start_turn(q)
+		check(st.ability_block(q, st.ability_of(q, "move:quill_shadow_step")).begins_with("cooling"), "still cooling on own turn %d" % (i + 1))
+	st.current = q
+	st._start_turn(q)
+	check(not st.ability_block(q, st.ability_of(q, "move:quill_shadow_step")).begins_with("cooling"), "ready on the third own turn")
+
+
+func test_c2_every_shape() -> void:
+	var st := _fight()
+	var q: Object = st.current
+	var g: Object = _enemies(st)[0]
+	var n := 0
+	for u in st.units:
+		if u != q and u != g:
+			n += 1
+			u.cell = Vector2i(-6 - n, -6)
+	_put(st, q, Vector2i(2, 2))
+	_put(st, g, Vector2i(3, 2))
+	var at: Vector2i = q.cell
+	var mk := func(shape: String, extra: Dictionary = {}) -> Dictionary:
+		var a := { "id": "t_" + shape, "uid": "t:" + shape, "shape": shape, "range": 2, "power": 1, "target": "tile" }
+		a.merge(extra, true)
+		return a
+	check(Shapes.cells(st, q, mk.call("adjacent", { "target": "enemy" }), Vector2i(3, 2)).size() == 1, "adjacent: one tile")
+	check(Shapes.cells(st, q, mk.call("line"), at + Vector2i(1, 0)).size() == 2, "line: range tiles in a row")
+	check(Shapes.cells(st, q, mk.call("cone"), at + Vector2i(1, 0)).size() == 4, "cone 2: 1 then 3 tiles")
+	check(Shapes.cells(st, q, mk.call("plus", { "radius": 1 }), Vector2i(4, 2)).size() == 5, "plus: the tile and its four neighbors")
+	check(Shapes.cells(st, q, mk.call("burst", { "range": 1 }), at).size() == 4, "burst 1: the four tiles around you")
+	check(Shapes.cells(st, q, mk.call("area", { "radius": 1 }), Vector2i(4, 3)).size() == 5, "area: a radius around the aimed tile")
+	check(Shapes.cells(st, q, mk.call("self"), at) == [at], "self: you")
+	check(Shapes.landing(st, q, g.cell, at) == Vector2i(4, 2), "leap: land behind the target")
+	_put(st, q, Vector2i(0, 2))
+	check(Shapes.dash_stop(st, q, q.cell, q.cell + Vector2i(1, 0), 4) == Vector2i(2, 2), "dash: stop next to the first enemy")
+	_put(st, q, Vector2i(2, 2))
+	check(Shapes.targets(st, q, mk.call("projectile", { "target": "enemy", "range": 4 })).has(g.cell), "projectile: an enemy in range and sight")
+	var a := _unit(st, "c2_lyric")
+	a.cell = Vector2i(2, 3)
+	check(Shapes.targets(st, q, mk.call("ally", { "target": "ally", "heal": 3 })).has(a.cell), "ally: a friend in range")
+	check(Shapes.cells(st, q, mk.call("plus_wide", { "range": 5 }), Vector2i(4, 2)).size() >= 9, "plus_wide: the row and column")
+
+
+func test_c2_refills() -> void:
+	var r := _rules()
+	var kits: Array = []
+	for cid in ["c2_ash", "c2_brick"]:
+		kits.append(Kits.build(db(), r, cid, 1, C2Setup.default_loadout(db(), cid, 1)))
+	var full := Night.home(kits)
+	var fb := "spell:sp_fireball"
+	check(int(full["c2_ash"]["charges"][fb]) == 3, "home refills every charge")
+	var spent := full.duplicate(true)
+	spent["c2_ash"]["charges"][fb] = 0
+	spent["c2_ash"]["hp"] = 5
+	var rested := Night.rest_room(spent, kits, r)
+	check(int(rested["c2_ash"]["charges"][fb]) == 1 and int(rested["c2_ash"]["hp"]) > 5, "a rest room: +1 charge on each spell and some HP")
+	check(int(Night.checkpoint(kits)["c2_ash"]["charges"][fb]) == 3, "an arena checkpoint refills too")
+	check(int(Night.charge_use(full, spent)["spent"]) == 3, "charges spent across a night are counted")
+	var st := _fight("c2_first_down", { "carry": spent })
+	var ash := _unit(st, "c2_ash")
+	check(int(st.charges_left["c2_ash"][fb]) == 0 and ash.hp == 5, "charges and HP carry into the next fight")
+	_make_current(st, ash)
+	check(st.ability_block(ash, st.ability_of(ash, fb)) == "no charges left", "an empty spell cannot be cast")
+	check(st.use_item(ash, 0, fb) and int(st.charges_left["c2_ash"][fb]) == 1, "a Focus Snack restores a charge")
+
+
+func test_c2_spell_spends_charge() -> void:
+	var st := _fight()
+	var ash := _unit(st, "c2_ash")
+	_make_current(st, ash)
+	for g in _enemies(st):
+		g.cell = Vector2i(-7, -7)
+	var g: Object = _enemies(st)[0]
+	_put(st, g, ash.cell + Vector2i(3, 0))
+	var before: int = st.charges_left["c2_ash"]["spell:sp_ice_lance"]
+	check(st.use_ability(ash, "spell:sp_ice_lance", g.cell), "cast Ice Lance")
+	check(int(st.charges_left["c2_ash"]["spell:sp_ice_lance"]) == before - 1, "a cast spends one charge")
