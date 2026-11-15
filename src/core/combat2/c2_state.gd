@@ -328,8 +328,9 @@ func use_ability(u: UnitScript, uid: String, target: Vector2i) -> bool:
 	var ab := ability_of(u, uid)
 	if ability_block(u, ab) != "" or not Shapes.targets(self, u, ab).has(target):
 		return false
+	var foes_before := opponents_of(u).size()
 	var fresh := _resolve(u, ab, target)
-	_after_ability(u, ab, fresh)
+	_after_ability(u, ab, fresh, maxi(0, foes_before - opponents_of(u).size()))
 	return true
 
 
@@ -693,7 +694,7 @@ func delay_unit(t: UnitScript) -> void:
 		t.links["c2_init"] = str(int(t.links.get("c2_init", "0")) - 3)
 
 
-func _after_ability(u: UnitScript, ab: Dictionary, fresh: int) -> void:
+func _after_ability(u: UnitScript, ab: Dictionary, fresh: int, kills: int = 0) -> void:
 	var uid := str(ab["uid"])
 	var kind := str(ab.get("kind", ""))
 	acted[u.id] = true
@@ -729,10 +730,14 @@ func _after_ability(u: UnitScript, ab: Dictionary, fresh: int) -> void:
 		one_more = {}
 		if not c2.flag("moveAfterAct"):
 			u.move_left = 0
+	var step := roundi(Perks.value(kit_of(u), "killStep")) if kills > 0 else 0
+	if step > 0:
+		# Vanish: after a kill, a few free tiles before the turn ends.
+		u.move_left = maxi(u.move_left, step)
 	all_out_ready = u.team == "party" and c2.flag("allOutOn", true) and all_enemies_down()
 	if _previewing:
 		return
-	if one_more.is_empty() and not all_out_ready and (u.move_left <= 0 or not c2.flag("moveAfterAct")):
+	if one_more.is_empty() and not all_out_ready and (u.move_left <= 0 or not (c2.flag("moveAfterAct") or step > 0)):
 		end_turn()
 
 

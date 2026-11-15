@@ -513,3 +513,322 @@ func test_c2_ultimate_meter() -> void:
 	check(st.ability_block(ash, st.ability_of(ash, "ultimate:ult_inferno")) == "", "a full meter: the ultimate is ready")
 	st.use_ability(ash, "ultimate:ult_inferno", f["g2"].cell)
 	check(int(st.meter[ash.id]) < st.c2.count("ultMax", 100) and int(st.tally["ultimates"]) == 1, "using it empties the meter")
+
+
+# --- Part 4: loadouts and perks --------------------------------------------------------
+
+const Loadout := preload("res://src/core/combat2/loadout.gd")
+
+
+## A first_down fight where `char_id` carries these extra perks (level 6 loadout).
+func _with_perks(char_id: String, perks: Array, opts: Dictionary = {}) -> Object:
+	var lo := C2Setup.default_loadout(db(), char_id, 6)
+	lo["perks"] = perks
+	var o := opts.duplicate(true)
+	var los: Dictionary = o.get("loadouts", {})
+	los[char_id] = lo
+	o["loadouts"] = los
+	if not o.has("level"):
+		o["level"] = 6
+	return _fight(str(o.get("fight", "c2_first_down")), o)
+
+
+func test_c2_loadout_rules() -> void:
+	var r := _rules()
+	var lo := C2Setup.default_loadout(db(), "c2_brick", 1)
+	check(Loadout.problems(db(), r, "c2_brick", 1, lo).is_empty(), "the stored level 1 loadout fits")
+	var five := lo.duplicate(true)
+	five["moves"].append("brick_charge")
+	check(not Loadout.problems(db(), r, "c2_brick", 1, five).is_empty(), "a fifth move doesn't fit at level 1")
+	check(Loadout.problems(db(), r, "c2_brick", 4, five).is_empty(), "but does at level 4")
+	var foreign := lo.duplicate(true)
+	foreign["moves"].append("ash_spark")
+	check(not Loadout.problems(db(), r, "c2_brick", 6, foreign).is_empty(), "moves come from your own pool")
+	var wrong := lo.duplicate(true)
+	wrong["perks"] = ["pk_exploit"]
+	check(not Loadout.problems(db(), r, "c2_brick", 1, wrong).is_empty(), "class perks are for that class")
+	check(Loadout.toggle(db(), r, "c2_brick", 1, lo, "moves", "brick_bash").is_empty(), "the basic attack can't be unequipped")
+	var off := Loadout.toggle(db(), r, "c2_brick", 1, lo, "moves", "brick_sweep")
+	check(not off.is_empty() and not (off["moves"] as Array).has("brick_sweep"), "unequip a move")
+	var on := Loadout.toggle(db(), r, "c2_brick", 1, off, "moves", "brick_charge")
+	check(not on.is_empty() and (on["moves"] as Array).has("brick_charge"), "equip another in the free slot")
+	check(Loadout.toggle(db(), r, "c2_brick", 1, on, "moves", "brick_hook").is_empty(), "no slot left: refused")
+	var g := Loadout.toggle(db(), r, "c2_brick", 1, lo, "trinket1", "gt_lens")
+	check(str(g["gear"]["trinket1"]) == "gt_lens", "gear slots take gear of that kind")
+	check(Loadout.toggle(db(), r, "c2_brick", 1, lo, "trinket1", "ga_heavy").is_empty(), "armor doesn't go in a trinket slot")
+
+
+func test_c2_swap_places_and_saves() -> void:
+	check(Loadout.can_swap("home", 9) and Loadout.can_swap("workbench", 3) and Loadout.can_swap("checkpoint", 5) and Loadout.can_swap("campfire", 2), "home, the workbench, checkpoints and the campfire are free")
+	check(Loadout.can_swap("rest_room", 0) and not Loadout.can_swap("rest_room", 1), "a rest room: one swap per character")
+	check(not Loadout.can_swap("fight", 0), "never mid-fight")
+	var lo := C2Setup.default_loadout(db(), "c2_ash", 1)
+	var saved := Loadout.save_slot({}, "c2_ash", 2, lo)
+	check((saved["c2_ash"] as Array).size() == 3 and (saved["c2_ash"][2] as Dictionary) == lo, "three saved loadouts per character")
+	check(Loadout.save_slot(saved, "c2_ash", 3, lo) == saved, "there is no fourth")
+
+
+func test_c2_synergies_and_filters() -> void:
+	var lo := C2Setup.default_loadout(db(), "c2_brick", 6)
+	var syn := Loadout.synergies(db(), lo)
+	check(syn.any(func(s: Dictionary) -> bool: return str(s["tag"]) == "wall-slammer"), "Shove and Wall Slammer share a tag: a synergy hint")
+	var col := Loadout.collection(db(), "c2_ash")
+	check((col["moves"] as Array).size() == 10 and (col["spells"] as Array).size() >= 2, "the collection: a 10-move pool and the spells")
+	check(Loadout.filter(db(), col["moves"], "moves", { "vector": "lightning" }).size() == 2, "filter by Vector (Spark and Arc)")
+	check(Loadout.filter(db(), col["moves"], "moves", { "shape": "projectile" }).size() >= 3, "filter by shape")
+	check(Loadout.filter(db(), col["perks"], "perks", { "tag": "weakness hunter" }).size() >= 3, "filter by archetype tag")
+
+
+func test_c2_archetypes() -> void:
+	var tags := {}
+	for cls in ["fighter", "mage", "rogue", "bard"]:
+		tags[cls] = {}
+	for list in [["moves", "moves"], ["spells", "spells"], ["perks", "perks"]]:
+		for r in db()["combat2/" + list[0]][list[1]]:
+			var cls := str(r.get("class", ""))
+			if not tags.has(cls):
+				continue
+			for t in r.get("tags", []):
+				tags[cls][t] = int(tags[cls].get(t, 0)) + 1
+	for cls in tags:
+		var arche: Array = (tags[cls] as Dictionary).keys().filter(func(t: String) -> bool: return int(tags[cls][t]) >= 3 and not t in ["basic", "area", "push", "general", "support", "mobility"])
+		check(arche.size() >= 2, "%s has 2 or more archetypes with 3+ pieces: %s" % [cls, str(arche)])
+
+
+func test_c2_every_armor_and_trinket_has_an_effect() -> void:
+	for g in db()["combat2/gear"]["gear"]:
+		if str(g["slot"]) != "weapon":
+			check(g.has("effect"), "%s has an effect line" % g["id"])
+
+
+func test_c2_perk_stats() -> void:
+	var r := _rules()
+	var base := Kits.build(db(), r, "c2_brick", 6, C2Setup.default_loadout(db(), "c2_brick", 6))
+	var lo := C2Setup.default_loadout(db(), "c2_brick", 6)
+	lo["perks"] = ["pk_iron_skin"]
+	var bare := C2Setup.default_loadout(db(), "c2_brick", 6)
+	bare["perks"] = []
+	var hp0 := float(Kits.build(db(), r, "c2_brick", 6, bare)["stats"]["hp"])
+	check(float(Kits.build(db(), r, "c2_brick", 6, lo)["stats"]["hp"]) == hp0 + 10.0, "Iron Skin: +10 max HP")
+	lo["perks"] = ["pk_sturdy"]
+	check(float(Kits.build(db(), r, "c2_brick", 6, lo)["stats"]["hp"]) == hp0 + 6.0, "Sturdy: +6 max HP")
+	lo["perks"] = ["pk_slam_cd"]
+	var k := Kits.build(db(), r, "c2_brick", 6, lo)
+	check(int(k["moves"].filter(func(m: Dictionary) -> bool: return str(m["id"]) == "brick_heavy_slam")[0]["cooldown"]) == 1, "Quick Recovery: Heavy Slam cooldown 2 -> 1")
+	var ash := C2Setup.default_loadout(db(), "c2_ash", 6)
+	ash["perks"] = ["pk_far_reach"]
+	var ash_plain := C2Setup.default_loadout(db(), "c2_ash", 6)
+	ash_plain["perks"] = []
+	check(float(Kits.build(db(), r, "c2_ash", 6, ash)["stats"]["movement"]) == float(Kits.build(db(), r, "c2_ash", 6, ash_plain)["stats"]["movement"]) + 1.0, "Long Stride: +1 Movement")
+	ash["perks"] = ["pk_cold_heart"]
+	var ka := Kits.build(db(), r, "c2_ash", 6, ash)
+	check(int(ka["spells"].filter(func(s: Dictionary) -> bool: return str(s["id"]) == "sp_ice_lance")[0]["maxCharges"]) == 5, "Cold Heart: Ice Lance (Minor, Cold) 4 -> 5")
+	check(int(ka["spells"].filter(func(s: Dictionary) -> bool: return str(s["id"]) == "sp_fireball")[0]["maxCharges"]) == 2, "and Fireball (Standard, Heat) 3 -> 2")
+	var q := C2Setup.default_loadout(db(), "c2_quill", 6)
+	q["perks"] = []
+	var q0 := float(Kits.build(db(), r, "c2_quill", 6, q)["stats"]["agility"])
+	q["perks"] = ["pk_quick_feet"]
+	check(is_equal_approx(float(Kits.build(db(), r, "c2_quill", 6, q)["stats"]["agility"]), q0 + 3.0), "Quick Feet: +3 Initiative")
+	var ly := C2Setup.default_loadout(db(), "c2_lyric", 6)
+	ly["perks"] = []
+	var l0 := float(Kits.build(db(), r, "c2_lyric", 6, ly)["stats"]["agility"])
+	ly["perks"] = ["pk_tempo"]
+	check(is_equal_approx(float(Kits.build(db(), r, "c2_lyric", 6, ly)["stats"]["agility"]), l0 + 2.0), "Tempo: +2 Initiative")
+	ly["perks"] = ["pk_cue_cd"]
+	check(int(Kits.build(db(), r, "c2_lyric", 6, ly)["moves"].filter(func(m: Dictionary) -> bool: return str(m["id"]) == "lyric_cue")[0]["cooldown"]) == 2, "Stage Cue: Cue cooldown 3 -> 2")
+
+
+## The damage a hit does with and without a perk on the attacker.
+func _perk_gain(char_id: String, perk: String, ab_id: String, setup: Callable) -> Array:
+	var out: Array = []
+	for perks in [[], [perk]]:
+		var st := _with_perks(char_id, perks)
+		var u := _unit(st, char_id)
+		var g: Object = _enemies(st)[0]
+		setup.call(st, u, g)
+		var ab: Dictionary = st.ability_of(u, ab_id)
+		if ab.is_empty():
+			ab = Kits.ability(Kits.move(db(), ab_id.trim_prefix("move:")), "move")
+		out.append(int(st.hit_result(u, g, ab)["amount"]))
+	return out
+
+
+func test_c2_perk_damage() -> void:
+	var plain := func(_st: Object, _u: Object, _g: Object) -> void: pass
+	var a: Array = _perk_gain("c2_brick", "pk_brawler", "move:brick_bash", plain)
+	check(a[1] > a[0], "Brawler: blunt +20% (%d > %d)" % a)
+	a = _perk_gain("c2_ash", "pk_exploit", "move:ash_ember", plain)
+	check(a[1] > a[0], "Exploit: weakness hits +20%")
+	a = _perk_gain("c2_ash", "pk_storm_focus", "move:ash_spark", plain)
+	check(a[1] > a[0], "Storm Focus: Lightning +25%")
+	var down := func(_st: Object, _u: Object, g: Object) -> void: g.statuses["knocked"] = 99
+	a = _perk_gain("c2_quill", "pk_downed_bonus", "move:quill_stab", down)
+	check(a[1] > a[0], "No Mercy: knocked-down targets +25%")
+	var behind := func(st: Object, u: Object, g: Object) -> void:
+		_put(st, g, Vector2i(4, 2))
+		g.facing_dir = Vector2i(1, 0)
+		_put(st, u, Vector2i(3, 2))
+	a = _perk_gain("c2_quill", "pk_back_bonus", "move:quill_stab", behind)
+	check(a[1] > a[0], "Knife Work: back attacks +25%")
+	a = _perk_gain("c2_quill", "pk_poison_tip", "move:quill_poison_dart", plain)
+	check(a[1] > a[0], "Poison Tips: Poison +30%")
+	a = _perk_gain("c2_lyric", "pk_sound_up", "move:lyric_note", plain)
+	check(a[1] > a[0], "Amplifier: Sound +25%")
+	var st := _with_perks("c2_ash", ["pk_burn_force"])
+	var ash := _unit(st, "c2_ash")
+	var g: Object = _enemies(st)[0]
+	var spike: Dictionary = st.ability_of(ash, "move:ash_stone_spike")
+	if spike.is_empty():
+		spike = Kits.ability(Kits.move(db(), "ash_stone_spike"), "move")
+	check(str(st.hit_result(ash, g, spike)["mark"]) == "", "Brittle Embers: Force is neutral on a Gremlin")
+	g.statuses["burning"] = 2
+	check(str(st.hit_result(ash, g, spike)["mark"]) == "weak", "until it's burning: then weak to Force")
+	var st2 := _with_perks("c2_quill", ["pk_backstab"])
+	var q := _unit(st2, "c2_quill")
+	var g2: Object = _enemies(st2)[0]
+	_put(st2, g2, Vector2i(4, 2))
+	g2.facing_dir = Vector2i(1, 0)
+	_put(st2, q, Vector2i(3, 2))
+	check(bool(st2.hit_result(q, g2, st2.ability_of(q, "move:quill_stab"))["knock"]), "Backstab: back attacks knock down")
+
+
+func test_c2_perk_rules() -> void:
+	var st := _with_perks("c2_brick", ["pk_wall_slammer"])
+	var b := _unit(st, "c2_brick")
+	var g: Object = _enemies(st)[0]
+	_make_current(st, b)
+	_put(st, g, Vector2i(6, 0))
+	_put(st, b, Vector2i(5, 0))
+	g.facing_dir = Vector2i(-1, 0)
+	var hp0: int = g.hp
+	st.use_ability(b, "move:brick_shove", g.cell)
+	var slam_loss: int = hp0 - g.hp
+	var st0 := _with_perks("c2_brick", [])
+	var b0 := _unit(st0, "c2_brick")
+	var g0: Object = _enemies(st0)[0]
+	_make_current(st0, b0)
+	_put(st0, g0, Vector2i(6, 0))
+	_put(st0, b0, Vector2i(5, 0))
+	g0.facing_dir = Vector2i(-1, 0)
+	var hp00: int = g0.hp
+	st0.use_ability(b0, "move:brick_shove", g0.cell)
+	check(slam_loss > hp00 - g0.hp, "Wall Slammer: a push into the wall deals +4 (%d > %d)" % [slam_loss, hp00 - g0.hp])
+	var st3 := _with_perks("c2_brick", ["pk_shove_plus"])
+	var b3 := _unit(st3, "c2_brick")
+	var g3: Object = _enemies(st3)[0]
+	_make_current(st3, b3)
+	_put(st3, g3, Vector2i(3, 3))
+	_put(st3, b3, Vector2i(2, 3))
+	st3.use_ability(b3, "move:brick_shove", g3.cell)
+	check(g3.cell == Vector2i(6, 3) or not g3.alive(), "Long Arms: Shove pushes 3 tiles instead of 2")
+	var st4 := _with_perks("c2_brick", ["pk_second_wind"])
+	var b4 := _unit(st4, "c2_brick")
+	b4.hp = 10
+	_make_current(st4, b4)
+	var g4: Object = _enemies(st4)[0]
+	_put(st4, g4, b4.cell + Vector2i(1, 0))
+	g4.statuses.erase("knocked")
+	st4._after_ability(b4, st4.ability_of(b4, "move:brick_bash"), 1)
+	check(b4.hp == 14, "Second Wind: One More heals 4")
+	var st5 := _with_perks("c2_ash", ["pk_weak_seeker"])
+	var a5 := _unit(st5, "c2_ash")
+	var g5: Object = _enemies(st5)[0]
+	_make_current(st5, a5)
+	_put(st5, g5, a5.cell + Vector2i(2, 0))
+	st5.known_marks = {}
+	st5.use_ability(a5, "move:ash_spark", g5.cell)
+	check(st5.known_of(g5).size() == g5.source["marks"].size(), "Weakness Seeker: the first hit reveals every marking")
+	var st6 := _with_perks("c2_ash", ["pk_free_spell"])
+	var a6 := _unit(st6, "c2_ash")
+	var g6: Object = _enemies(st6)[0]
+	_make_current(st6, a6)
+	_put(st6, g6, a6.cell + Vector2i(3, 0))
+	var c0: int = st6.charges_left["c2_ash"]["spell:sp_ice_lance"]
+	st6.use_ability(a6, "spell:sp_ice_lance", g6.cell)
+	check(int(st6.charges_left["c2_ash"]["spell:sp_ice_lance"]) == c0, "Warm-Up: the first spell costs no charge")
+	var st7 := _with_perks("c2_ash", ["pk_overcharge"])
+	var a7 := _unit(st7, "c2_ash")
+	st7._gain_meter(a7, 10.0)
+	check(int(st7.meter[a7.id]) == 13, "Overcharge: the meter fills 30% faster")
+	var st8 := _with_perks("c2_quill", ["pk_pin_down"])
+	var q8 := _unit(st8, "c2_quill")
+	var g8: Object = _enemies(st8)[0]
+	_put(st8, g8, Vector2i(4, 2))
+	_put(st8, q8, Vector2i(3, 2))
+	g8.statuses["knocked"] = 99
+	st8.current = g8
+	st8._start_turn(g8)
+	check(g8.statuses.has("knocked") and st8.must_skip(g8), "Pin Down: a knocked-down enemy next to you can't stand")
+	var st9 := _with_perks("c2_quill", ["pk_kill_step"])
+	var q9 := _unit(st9, "c2_quill")
+	var g9: Object = _enemies(st9)[0]
+	_make_current(st9, q9)
+	_put(st9, g9, q9.cell + Vector2i(1, 0))
+	g9.hp = 1
+	st9.use_ability(q9, "move:quill_stab", g9.cell)
+	check(not g9.alive() and st9.current == q9 and q9.move_left == 2, "Vanish: after a kill, move 2 tiles")
+
+
+func test_c2_perk_team() -> void:
+	var st := _with_perks("c2_lyric", ["pk_conductor", "pk_crescendo"])
+	var ly := _unit(st, "c2_lyric")
+	var q := _unit(st, "c2_quill")
+	_make_current(st, ly)
+	st.one_more = { "unit": ly.id }
+	var init0 := int(q.links.get("c2_init", "0"))
+	st.baton_pass(ly, q)
+	check(int(q.links.get("c2_init", "0")) == init0 + 2, "Conductor: the receiver gets +2 Initiative for the fight")
+	check(is_equal_approx(float(q.links["c2_baton"]), 0.4), "Crescendo: the pass adds 15% more (0.25 + 0.15)")
+	var st2 := _with_perks("c2_lyric", ["pk_healer_heart"])
+	var l2 := _unit(st2, "c2_lyric")
+	var b2 := _unit(st2, "c2_brick")
+	b2.hp = 1
+	_make_current(st2, l2)
+	_put(st2, b2, l2.cell + Vector2i(1, 0))
+	st2.use_ability(l2, "move:lyric_soothe", b2.cell)
+	check(b2.hp == 1 + 12, "Warm Voice: heals restore 30% more (9 -> 12)")
+	var st3 := _with_perks("c2_lyric", ["pk_encore_heal"])
+	var l3 := _unit(st3, "c2_lyric")
+	l3.hp = 5
+	_make_current(st3, l3)
+	st3._after_ability(l3, st3.ability_of(l3, "move:lyric_note"), 1)
+	check(l3.hp == 9, "Applause: One More heals 4")
+	var st4 := _with_perks("c2_brick", ["pk_bodyguard"], { "c2Levers": { "labBondTier": "none" } })
+	var b4 := _unit(st4, "c2_brick")
+	var a4 := _unit(st4, "c2_ash")
+	_put(st4, a4, b4.cell + Vector2i(0, 1))
+	a4.hp = 1
+	var g4: Object = _enemies(st4)[0]
+	st4._hit(g4, a4, Kits.ability({ "id": "big", "shape": "adjacent", "power": 20, "type": "blunt" }, "move"), a4.cell)
+	check(a4.alive() and int(st4.tally["protects"]) == 1, "Bodyguard: takes a killing blow for an adjacent ally")
+	var st5 := _with_perks("c2_brick", ["pk_hold_ground"])
+	var b5 := _unit(st5, "c2_brick")
+	var g5: Object = _enemies(st5)[0]
+	b5.statuses["braced"] = 1
+	var claw := Kits.ability(g5.source["moves"][0], "move")
+	var with_perk: int = st5.hit_result(g5, b5, claw)["amount"]
+	var st6 := _with_perks("c2_brick", [])
+	var b6 := _unit(st6, "c2_brick")
+	b6.statuses["braced"] = 1
+	check(with_perk < int(st6.hit_result(_enemies(st6)[0], b6, claw)["amount"]), "Hold the Ground: bracing cuts more")
+	var st7 := _with_perks("c2_brick", ["pk_get_up"])
+	var b7 := _unit(st7, "c2_brick")
+	b7.hp = 10
+	b7.statuses["knocked"] = 99
+	st7.current = b7
+	st7._start_turn(b7)
+	check(b7.hp == 15, "Get Up: heal 5 on standing up")
+	var st8 := _with_perks("c2_lyric", ["pk_all_out"])
+	var l8 := _unit(st8, "c2_lyric")
+	check(is_equal_approx(Perks.value(st8.kit_of(l8), "allOutPct"), 0.3), "Showstopper: All-Out +30%")
+	var st9 := _with_perks("c2_quill", ["pk_teamwork"])
+	var st9b := _with_perks("c2_quill", [])
+	check(is_equal_approx(Perks.value(st9.kit_of(_unit(st9, "c2_quill")), "followUpPlus") - Perks.value(st9b.kit_of(_unit(st9b, "c2_quill")), "followUpPlus"), 0.25), "In Sync: follow-ups 25% more often")
+	var st10 := _with_perks("c2_quill", ["pk_scout_eye"])
+	var q10 := _unit(st10, "c2_quill")
+	var g10: Object = _enemies(st10)[0]
+	_make_current(st10, q10)
+	_put(st10, g10, q10.cell + Vector2i(2, 0))
+	st10.known_marks = {}
+	st10.use_ability(q10, "move:quill_knife", g10.cell)
+	check(st10.known_of(g10).size() == g10.source["marks"].size(), "Scout's Eye: the first hit reveals every marking")

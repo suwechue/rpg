@@ -792,3 +792,13 @@ C2 is a separate ruleset in the Lab (`src/core/combat2/`, `data/combat2/`). The 
 - **Enemies too:** enemies that hit a party weakness knock that member down and get their own One More (`enemyOneMore`). The Pom-Pom Wisp picks whichever attack hits a weakness.
 - **The ultimate meter:** fills by 1 per damage dealt, 1.5 per damage taken, 10 per knockdown and 8 per Baton Pass, up to 100. A full meter unlocks the ultimate, and using it empties the meter.
 
+**Loadouts (C2 Part 4).** This is the deck-builder feel: you pick what to equip in limited slots from your collection (`src/core/combat2/loadout.gd`).
+- **What you can equip:** your class pool's moves, your known spells, class and general perks, your ultimates, and gear for each slot.
+- **The rules:** the basic attack always stays equipped, and slots can't be overfilled.
+- **Where you can change it:** free at home, the workbench, arena checkpoints and the campfire. One swap per character at a dungeon rest room. Never mid-fight.
+- **Saved loadouts:** three per character.
+- **Synergy hints:** shown when two equipped pieces share an archetype tag, such as wall-slammer, weakness hunter, back-stabber or baton conductor.
+- **Filters:** the collection filters by Vector, shape and tag.
+- **Perks** (35 in the slice, `data/combat2/perks.json`) change rules: wall-slam damage, longer pushes, Protect, a first free spell, Burning makes enemies weak to Force, back attacks knock down, pinning knocked-down enemies, Baton Initiative and bonus, All-Out damage, Cold and Heat charge changes, and more.
+- **Gear:** every armor and trinket has one effect line, using the same effect kinds as perks.
+
