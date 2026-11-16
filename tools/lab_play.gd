@@ -17,6 +17,7 @@ const DT := preload("res://src/core/data_tables.gd")
 const Play := preload("res://src/core/lab/play_text.gd")
 const Setup := preload("res://src/core/lab/lab_setup.gd")
 const Rules := preload("res://src/core/combat/rules.gd")
+const C2Setup := preload("res://src/core/combat2/c2_setup.gd")
 
 
 func _initialize() -> void:
@@ -42,6 +43,32 @@ func _initialize() -> void:
 	var inputs: Array = []
 	for t in str(args.get("actions", "")).replace(" ", "").replace(";", ",").split(",", false):
 		inputs.append(t)
+	if args.has("c2"):
+		# Combat 2.0 slice fights (docs/COMBAT_2.md Part 5): --c2 --fight=c2_first_down --level=1.
+		var C2Text: GDScript = load("res://src/core/lab/c2_play_text.gd")
+		if str(args.get("cmd", "")) == "rate":
+			print(rate(fight, "c2_L%s" % str(args.get("level", "1")), str(args.get("persona", "")), str(args.get("card", ""))))
+		elif str(args.get("cmd", "")) == "rules":
+			print(C2Text.rules_text(db))
+		elif str(args.get("cmd", "")) == "fights":
+			print("
+".join(PackedStringArray(C2Setup.fights(db).map(func(f: Dictionary) -> String: return "%s: %s" % [f["id"], f.get("teaches", "")]))))
+		else:
+			var carry: Dictionary = {}
+			var night := str(args.get("night", ""))
+			var step := int(args.get("step", "1"))
+			if night != "":
+				var fights: Array = C2Setup.night(db, night).get("steps", []).filter(func(x: Variant) -> bool: return str(x) != "rest")
+				fight = str(fights[clampi(step - 1, 0, fights.size() - 1)]) if not fights.is_empty() else fight
+				var parsed: Variant = JSON.parse_string(str(args.get("carry", "{}")))
+				carry = parsed if typeof(parsed) == TYPE_DICTIONARY else {}
+			var r: Dictionary = C2Text.replay(db, fight, int(args.get("level", "1")), seed_value, inputs, {}, carry)
+			if night != "":
+				r["night"] = night
+				r["step"] = step
+			print(C2Text.render(db, r, args.has("brief")))
+		quit(0)
+		return
 	if str(args.get("cmd", "")) == "rate":
 		var saved := rate(fight, preset, ("panel_%s/" % str(args["panel"]) if args.has("panel") else "") + str(args.get("persona", "")), str(args.get("card", "")))
 		print(Play.blind(db, saved, preset, alias) if alias != "" else saved)

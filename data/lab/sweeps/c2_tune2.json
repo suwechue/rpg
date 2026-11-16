@@ -1,0 +1,150 @@
+{
+  "comment": "C2 slice tuning, round 2: the first round showed fights ending in about 2 rounds at any HP, because weakness x knockdown x All-Out damage stacks. This tries more enemy HP with a weaker All-Out and knockdown bonus, and more enemy damage. Re-run after Baton Pass was fixed to move the ally's own turn up (batonMovesTurn) and All-Outs were limited to one per round.",
+  "id": "c2_tune2",
+  "kind": "sets",
+  "sets": [
+    {
+      "id": "L1_default",
+      "c2": {
+        "level": 1
+      },
+      "levers": {}
+    },
+    {
+      "id": "L6_default",
+      "c2": {
+        "level": 6
+      },
+      "levers": {}
+    },
+    {
+      "id": "L1_hp25",
+      "c2": {
+        "level": 1
+      },
+      "levers": {
+        "enemyHpMul": 2.5
+      }
+    },
+    {
+      "id": "L1_hp25_ao4",
+      "c2": {
+        "level": 1
+      },
+      "levers": {
+        "enemyHpMul": 2.5,
+        "allOutPower": 4.0
+      }
+    },
+    {
+      "id": "L1_hp25_ao4_kd125",
+      "c2": {
+        "level": 1
+      },
+      "levers": {
+        "enemyHpMul": 2.5,
+        "allOutPower": 4.0,
+        "knockdownMul": 1.25
+      }
+    },
+    {
+      "id": "L1_hp3_ao4_kd125_dmg125",
+      "c2": {
+        "level": 1
+      },
+      "levers": {
+        "enemyHpMul": 3.0,
+        "allOutPower": 4.0,
+        "knockdownMul": 1.25,
+        "enemyDamageMul": 1.25
+      }
+    },
+    {
+      "id": "L1_hp2_ao4_kd125_dmg14",
+      "c2": {
+        "level": 1
+      },
+      "levers": {
+        "enemyHpMul": 2.0,
+        "allOutPower": 4.0,
+        "knockdownMul": 1.25,
+        "enemyDamageMul": 1.4
+      }
+    },
+    {
+      "id": "L6_hp25",
+      "c2": {
+        "level": 6
+      },
+      "levers": {
+        "enemyHpMul": 2.5
+      }
+    },
+    {
+      "id": "L6_hp25_ao4",
+      "c2": {
+        "level": 6
+      },
+      "levers": {
+        "enemyHpMul": 2.5,
+        "allOutPower": 4.0
+      }
+    },
+    {
+      "id": "L6_hp25_ao4_kd125",
+      "c2": {
+        "level": 6
+      },
+      "levers": {
+        "enemyHpMul": 2.5,
+        "allOutPower": 4.0,
+        "knockdownMul": 1.25
+      }
+    },
+    {
+      "id": "L6_hp3_ao4_kd125_dmg125",
+      "c2": {
+        "level": 6
+      },
+      "levers": {
+        "enemyHpMul": 3.0,
+        "allOutPower": 4.0,
+        "knockdownMul": 1.25,
+        "enemyDamageMul": 1.25
+      }
+    },
+    {
+      "id": "L6_hp2_ao4_kd125_dmg14",
+      "c2": {
+        "level": 6
+      },
+      "levers": {
+        "enemyHpMul": 2.0,
+        "allOutPower": 4.0,
+        "knockdownMul": 1.25,
+        "enemyDamageMul": 1.4
+      }
+    }
+  ],
+  "cells": {
+    "fights": [
+      "c2_first_down",
+      "c2_edge_of_gym",
+      "c2_relay",
+      "c2_pep_squad",
+      "c2_wrong_answer",
+      "c2_hollow_mascot"
+    ],
+    "seeds": 4,
+    "profiles": [
+      "expert",
+      "novice",
+      "greedy",
+      "random"
+    ],
+    "parties": [
+      "balanced"
+    ]
+  },
+  "budgetMinutes": 90
+}

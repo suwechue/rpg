@@ -31,6 +31,7 @@ var first_hits: Dictionary = {}       # "attacker|enemy" -> true (reveal on firs
 var acted: Dictionary = {}            # unit id -> used an Ability this turn
 var items_turn := 0
 var big_counter: Dictionary = {}      # boss id -> own turns since its last big attack
+var all_out_rounds: Dictionary = {}   # round -> All-Outs launched in it
 var _deferred := true
 var _previewing := false
 
@@ -177,6 +178,9 @@ func _start_turn(u: UnitScript) -> void:
 	super._start_turn(u)
 	u.links.erase("c2_extra_turn")
 	_turn_reset(u)
+	if u.links.has("c2_baton_move"):
+		u.move_left += int(u.links["c2_baton_move"])
+		u.links.erase("c2_baton_move")
 	for uid in cooldowns.get(u.id, {}).keys():
 		cooldowns[u.id][uid] = maxi(0, int(cooldowns[u.id][uid]) - 1)
 	u.statuses.erase("braced")
@@ -246,6 +250,23 @@ func end_turn() -> void:
 func insert_turn(u: UnitScript, move_bonus: int = 0) -> void:
 	u.links["c2_extra"] = str(move_bonus)
 	order.insert(turn_index + 1, u)
+
+
+## Whether this unit still has its own turn to come this round.
+func turn_pending(u: UnitScript) -> bool:
+	return order.slice(turn_index + 1).has(u)
+
+
+## Move this unit's own turn this round up to right after the current one.
+func move_turn_up(u: UnitScript, move_bonus: int = 0) -> bool:
+	var i := order.find(u, turn_index + 1)
+	if i < 0:
+		return false
+	order.remove_at(i)
+	order.insert(turn_index + 1, u)
+	if move_bonus > 0:
+		u.links["c2_baton_move"] = str(move_bonus)
+	return true
 
 
 ## The next rounds of turns, for the timeline at the top: [{ unit, round }].
@@ -363,8 +384,13 @@ func _resolve(u: UnitScript, ab: Dictionary, target: Vector2i) -> int:
 	if bool(ab.get("actNow", false)):
 		var ally := unit_at(target)
 		if ally != null and ally != u and ally.team == u.team and ally.alive():
-			insert_turn(ally, 0)
-			_emit({ "t": "log", "text": "%s cues %s: they act next." % [u.name, ally.name] })
+			if not c2.flag("batonMovesTurn", true):
+				insert_turn(ally, 0)
+				_emit({ "t": "log", "text": "%s cues %s: they act next." % [u.name, ally.name] })
+			elif move_turn_up(ally):
+				_emit({ "t": "log", "text": "%s cues %s: their turn comes next." % [u.name, ally.name] })
+			else:
+				_emit({ "t": "log", "text": "%s already acted this round." % ally.name })
 	if bool(ab.get("allAlliesAct", false)):
 		var others: Array = allies_of(u).filter(func(a: UnitScript) -> bool: return a != u)
 		others.reverse()
@@ -734,7 +760,7 @@ func _after_ability(u: UnitScript, ab: Dictionary, fresh: int, kills: int = 0) -
 	if step > 0:
 		# Vanish: after a kill, a few free tiles before the turn ends.
 		u.move_left = maxi(u.move_left, step)
-	all_out_ready = u.team == "party" and c2.flag("allOutOn", true) and all_enemies_down()
+	all_out_ready = u.team == "party" and c2.flag("allOutOn", true) and all_enemies_down() and int(all_out_rounds.get(round_num, 0)) < c2.count("allOutPerRound", 1)
 	if _previewing:
 		return
 	if one_more.is_empty() and not all_out_ready and (u.move_left <= 0 or not (c2.flag("moveAfterAct") or step > 0)):
@@ -761,6 +787,8 @@ func baton_block(u: UnitScript, ally: UnitScript) -> String:
 		return "can't pass to them"
 	if c2.text("batonGate", "always") == "bond" and Perks.bond_tier(self) < 1:
 		return "needs a Bond (Acquaintance or higher)"
+	if c2.flag("batonMovesTurn", true) and not turn_pending(ally):
+		return "they already acted this round"
 	return ""
 
 
@@ -770,7 +798,10 @@ func baton_pass(u: UnitScript, ally: UnitScript) -> bool:
 	var stack := float(u.links.get("c2_baton", "0")) + c2.num("batonBonus", 0.25) + Perks.value(kit_of(u), "batonPct")
 	stack = minf(stack, c2.num("batonMax", 0.5) + Perks.value(kit_of(u), "batonPct"))
 	one_more = {}
-	insert_turn(ally, c2.count("batonMove", 1))
+	if c2.flag("batonMovesTurn", true):
+		move_turn_up(ally, c2.count("batonMove", 1))
+	else:
+		insert_turn(ally, c2.count("batonMove", 1))
 	ally.links["c2_baton"] = str(snappedf(stack, 0.01))
 	var init := Perks.value(kit_of(u), "batonInit")
 	if init > 0.0:
@@ -790,6 +821,7 @@ func all_out(u: UnitScript) -> bool:
 		return false
 	_emit({ "t": "cutin", "kind": "all_out", "unit": u.id, "text": "ALL-OUT ATTACK!" })
 	tally["allOuts"] = int(tally["allOuts"]) + 1
+	all_out_rounds[round_num] = int(all_out_rounds.get(round_num, 0)) + 1
 	for a in allies_of(u):
 		if a.statuses.has("knocked"):
 			continue

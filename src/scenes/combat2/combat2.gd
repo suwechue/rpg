@@ -34,6 +34,7 @@ var _hover: Label
 var _cutin: Label
 var _teach: Label
 var _result: PanelContainer
+var _hold_cutin := false
 
 
 func _ready() -> void:
@@ -56,7 +57,44 @@ func _ready() -> void:
 	_take_events()
 	_sync()
 	Audio.play_music_first(["battle_boss" if bool(f.get("boss", false)) else "battle", "battle"])
+	if Flow.dev_moment != "":
+		_dev_moment(Flow.dev_moment)
+		return
 	_run_others()
+
+
+## --c2shot moments (screenshots): Ash Embers a Gremlin for ONE MORE, then passes
+## the baton, or knocks the last one down for an All-Out. The cut-in stays up.
+func _dev_moment(kind: String) -> void:
+	if kind == "timeline":
+		return
+	_hold_cutin = true
+	var ash: Object = state.unit_by_id("c2_ash")
+	var foes: Array = state.units.filter(func(x: Object) -> bool: return x.team == "enemy" and x.alive())
+	if ash == null or foes.is_empty():
+		return
+	ash.cell = Vector2i(3, 2)
+	foes[0].cell = Vector2i(6, 2)
+	if foes.size() > 1:
+		foes[1].cell = Vector2i(6, 4)
+		if kind == "all_out":
+			foes[1].statuses["knocked"] = 99
+	state.order.insert(state.turn_index + 1, ash)
+	state.current.links["c2_extra"] = "0"
+	state.turn_index += 1
+	state.current = ash
+	state._turn_reset(ash)
+	_sync()
+	await get_tree().create_timer(0.3).timeout
+	state.use_ability(ash, "move:ash_ember", foes[0].cell)
+	if kind == "baton":
+		await _take_events()
+		state.baton_pass(ash, state.unit_by_id("c2_brick"))
+	elif kind == "all_out":
+		await _take_events()
+		state.all_out(ash)
+	await _take_events()
+	_sync()
 
 
 # --- UI ---------------------------------------------------------------------------
@@ -411,7 +449,8 @@ func _show_cutin(text: String) -> void:
 	Audio.play_sfx("ui_confirm")
 	var tw := create_tween()
 	tw.tween_interval(0.5)
-	tw.tween_property(_cutin, "modulate:a", 0.0, 0.3)
+	if not _hold_cutin:
+		tw.tween_property(_cutin, "modulate:a", 0.0, 0.3)
 	await tw.finished
 
 

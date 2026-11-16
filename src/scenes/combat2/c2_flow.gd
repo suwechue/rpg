@@ -26,6 +26,7 @@ static var at_rest := false
 static var loadouts: Dictionary = {}    # level -> char id -> loadout
 static var saved: Dictionary = {}       # char id -> [3 saved loadouts]
 static var last_result := ""
+static var dev_moment := ""        # --c2shot: a scripted moment for screenshots (timeline, one_more, baton, all_out)
 static var _loaded := false
 
 

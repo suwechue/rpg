@@ -416,13 +416,16 @@ func test_c2_baton_pass() -> void:
 	var f := _ash_vs_gremlins()
 	var st: Object = f["st"]
 	var ash: Object = f["ash"]
-	var q := _unit(st, "c2_quill")
+	var q := _unit(st, "c2_brick")
 	st.use_ability(ash, "move:ash_ember", f["g1"].cell)
 	check(st.baton_block(ash, ash) != "", "you can't pass to yourself")
-	var move_before: int = q.movement
-	check(st.baton_pass(ash, q), "Baton Pass to Quill")
-	check(st.current == q and is_equal_approx(float(q.links.get("c2_baton", "0")), 0.25), "Quill acts now with +25% damage")
+	check(st.baton_block(ash, _unit(st, "c2_quill")) == "they already acted this round", "batonMovesTurn: not to someone who already acted (Quill)")
+	var move_before: int = q.movement - (1 if q.statuses.has("slow") else 0)
+	var later_turns: int = st.order.slice(st.turn_index + 1).count(q)
+	check(st.baton_pass(ash, q), "Baton Pass to Brick")
+	check(st.current == q and is_equal_approx(float(q.links.get("c2_baton", "0")), 0.25), "Brick acts now with +25% damage")
 	check(q.move_left == move_before + 1, "and +1 Movement")
+	check(st.order.slice(st.turn_index + 1).count(q) == later_turns - 1, "it is Brick's own turn, moved up (no extra turn)")
 	var base := Kits.ability({ "id": "x", "shape": "adjacent", "power": 10, "type": "blunt" }, "move")
 	var with_bonus: int = st.hit_result(q, f["g2"], base)["amount"]
 	q.links.erase("c2_baton")
@@ -430,12 +433,20 @@ func test_c2_baton_pass() -> void:
 	q.links["c2_baton"] = "0.25"
 	check(with_bonus > without, "the baton bonus adds damage")
 	st.one_more = { "unit": q.id }
-	var b := _unit(st, "c2_brick")
-	st.baton_pass(q, b)
+	var b := _unit(st, "c2_lyric")
+	check(st.baton_pass(q, b), "pass again to Lyric")
 	check(is_equal_approx(float(b.links.get("c2_baton", "0")), 0.5), "passed again, the bonus stacks to +50%")
-	st.one_more = { "unit": b.id }
-	st.baton_pass(b, _unit(st, "c2_lyric"))
-	check(float(_unit(st, "c2_lyric").links.get("c2_baton", "0")) <= 0.5 + float(Perks.value(st.kit_of(b), "batonPct")) + 0.001, "and caps at +50%")
+	var f3 := _ash_vs_gremlins({ "c2Levers": { "batonMovesTurn": false, "batonBonus": 0.3 } })
+	f3["st"].use_ability(f3["ash"], "move:ash_ember", f3["g1"].cell)
+	var qq := _unit(f3["st"], "c2_quill")
+	check(f3["st"].baton_pass(f3["ash"], qq) and f3["st"].current == qq, "batonMovesTurn off: an extra turn, even after acting")
+	f3["st"].one_more = { "unit": qq.id }
+	var bb := _unit(f3["st"], "c2_brick")
+	f3["st"].baton_pass(qq, bb)
+	f3["st"].one_more = { "unit": bb.id }
+	var ll := _unit(f3["st"], "c2_lyric")
+	f3["st"].baton_pass(bb, ll)
+	check(float(ll.links.get("c2_baton", "0")) <= 0.5 + float(Perks.value(f3["st"].kit_of(bb), "batonPct")) + 0.001, "and the bonus caps at +50%")
 	var f2 := _ash_vs_gremlins({ "c2Levers": { "batonGate": "bond", "labBondTier": "none" } })
 	f2["st"].use_ability(f2["ash"], "move:ash_ember", f2["g1"].cell)
 	check(f2["st"].baton_block(f2["ash"], _unit(f2["st"], "c2_quill")).begins_with("needs a Bond"), "batonGate bond: needs Acquaintance or higher")
@@ -772,7 +783,7 @@ func test_c2_perk_rules() -> void:
 func test_c2_perk_team() -> void:
 	var st := _with_perks("c2_lyric", ["pk_conductor", "pk_crescendo"])
 	var ly := _unit(st, "c2_lyric")
-	var q := _unit(st, "c2_quill")
+	var q := _unit(st, "c2_brick")
 	_make_current(st, ly)
 	st.one_more = { "unit": ly.id }
 	var init0 := int(q.links.get("c2_init", "0"))
@@ -883,3 +894,20 @@ func test_c2_sweep_line() -> void:
 	check(int(nl["fights"]) >= 1 and int(nl["chargesMax"]) > 0, "a night cell plays its fights in a row and counts charges")
 	var m := C2Metrics.summarize(db(), [line, nl], "greedy")
 	check(m.has("knockdownsPerFight") and m.has("chargeUse") and m.has("basicShare") and m.has("loadoutVariety") and m.has("enemyHitRate"), "the C2 metrics come out")
+
+
+func test_c2_all_out_once_per_round() -> void:
+	var f := _ash_vs_gremlins()
+	var st: Object = f["st"]
+	var ash: Object = f["ash"]
+	f["g2"].statuses["knocked"] = 99
+	st.use_ability(ash, "move:ash_ember", f["g1"].cell)
+	st.all_out(ash)
+	for g in [f["g1"], f["g2"]]:
+		if g.alive():
+			g.statuses["knocked"] = 99
+	var b := _unit(st, "c2_brick")
+	_make_current(st, b)
+	st._after_ability(b, st.ability_of(b, "move:brick_bash"), 0)
+	check(not st.all_out_ready, "allOutPerRound 1: no second All-Out this round")
+

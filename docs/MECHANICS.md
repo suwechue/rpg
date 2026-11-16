@@ -802,3 +802,11 @@ C2 is a separate ruleset in the Lab (`src/core/combat2/`, `data/combat2/`). The 
 - **Perks** (35 in the slice, `data/combat2/perks.json`) change rules: wall-slam damage, longer pushes, Protect, a first free spell, Burning makes enemies weak to Force, back attacks knock down, pinning knocked-down enemies, Baton Initiative and bonus, All-Out damage, Cold and Heat charge changes, and more.
 - **Gear:** every armor and trinket has one effect line, using the same effect kinds as perks.
 
+**Slice defaults after tuning (C2 Part 5).** At the first defaults, the expert AI won 100% of fights in about 2 rounds, because weakness, knockdown and All-Out damage stacked. Two sweeps (`data/lab/sweeps/c2_tune.json`, `c2_tune2.json`) set new defaults: enemy HP x2.5 (`enemyHpMul`), knocked-down damage x1.25 (`knockdownMul`), All-Out power 4 (`allOutPower`). At level 1 that gives the expert 92%, the novice 54% and random play 8%, in 3.6 rounds. Baton Pass now moves the receiver's own turn up (`batonMovesTurn`): only allies who haven't acted this round can take it. All-Out is once per round (`allOutPerRound`).
+
+**Playing the slice.** Title > Lab > "Combat 2.0 slice" opens the six fights, the night mode (three fights with HP and charges carried, plus a rest room), the level switch (1 or 6) and the loadout screen.
+- **In a fight:** click a blue tile to move, pick an Ability (buttons or 1 to 9), then click a target; the preview shows exact HP changes and knockdowns.
+- **Keys:** Space ends the turn (Brace), T shows every enemy's threat, right-click or Esc cancels.
+- **Hovering an enemy** shows its known markings and the tiles it can reach and hit.
+- **Text play for agents:** `tools/lab_play.gd -- --c2 --fight=<id> --level=1` (or `--night=c2_night --step=N --carry='...'`).
+

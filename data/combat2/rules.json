@@ -37,7 +37,7 @@
     { "id": "statDamagePer", "group": "damage", "type": "float", "default": 0.08, "min": 0.0, "max": 0.5, "step": 0.01, "name": "Damage per stat point", "hint": "A move's power x (1 + this x Power or Magic)." },
     { "id": "enemyLevelScale", "group": "damage", "type": "float", "default": 0.12, "min": 0.0, "max": 0.5, "step": 0.01, "name": "Enemy scaling per party level", "hint": "Enemy HP and damage x (1 + this x (level - 1))." },
     { "id": "enemyDamageMul", "group": "damage", "type": "float", "default": 1.0, "min": 0.25, "max": 4.0, "step": 0.05, "name": "Enemy damage x" },
-    { "id": "enemyHpMul", "group": "damage", "type": "float", "default": 1.0, "min": 0.25, "max": 4.0, "step": 0.05, "name": "Enemy HP x" },
+    { "id": "enemyHpMul", "group": "damage", "type": "float", "default": 2.5, "min": 0.25, "max": 4.0, "step": 0.05, "name": "Enemy HP x" },
 
     { "id": "weakMul", "group": "weakness", "type": "float", "default": 1.5, "min": 1.0, "max": 3.0, "step": 0.05, "name": "Weakness damage x" },
     { "id": "resistMul", "group": "weakness", "type": "float", "default": 0.5, "min": 0.0, "max": 1.0, "step": 0.05, "name": "Resist damage x" },
@@ -47,7 +47,7 @@
     { "id": "scanRevealsAll", "group": "weakness", "type": "bool", "default": true, "name": "Scans reveal every marking" },
 
     { "id": "knockdownOn", "group": "knockdown", "type": "bool", "default": true, "name": "Knockdown on weakness" },
-    { "id": "knockdownMul", "group": "knockdown", "type": "float", "default": 1.5, "min": 1.0, "max": 3.0, "step": 0.05, "name": "Damage to knocked-down units x" },
+    { "id": "knockdownMul", "group": "knockdown", "type": "float", "default": 1.25, "min": 1.0, "max": 3.0, "step": 0.05, "name": "Damage to knocked-down units x" },
     { "id": "standUp", "group": "knockdown", "type": "enum", "default": "skip", "options": ["skip", "half"], "name": "Standing up", "hint": "skip: the next turn is spent standing up. half: it stands and acts at half effect." },
     { "id": "backCritKnockdown", "group": "knockdown", "type": "bool", "default": false, "name": "Back attacks knock down", "hint": "A back attack knocks down even without a weakness." },
     { "id": "enemyOneMore", "group": "knockdown", "type": "bool", "default": true, "name": "Enemies knock down party weaknesses" },
@@ -60,11 +60,13 @@
     { "id": "batonBonus", "group": "baton", "type": "float", "default": 0.25, "min": 0.0, "max": 1.0, "step": 0.05, "name": "Baton damage bonus per pass" },
     { "id": "batonMax", "group": "baton", "type": "float", "default": 0.5, "min": 0.0, "max": 2.0, "step": 0.05, "name": "Baton bonus cap" },
     { "id": "batonMove", "group": "baton", "type": "int", "default": 1, "min": 0, "max": 3, "name": "Baton Movement bonus" },
+    { "id": "batonMovesTurn", "group": "baton", "type": "bool", "default": true, "name": "Baton Pass moves the ally's turn up", "hint": "On: the ally takes their own turn now, so only allies who haven't acted this round can receive it. Off: it gives them an extra turn (chains can run all round)." },
     { "id": "batonGate", "group": "baton", "type": "enum", "default": "always", "options": ["always", "bond"], "name": "Baton Pass needs a Bond", "hint": "bond: only between characters at Acquaintance or higher (story)." },
 
     { "id": "allOutOn", "group": "all_out", "type": "bool", "default": true, "name": "All-Out Attack" },
     { "id": "allOutRange", "group": "all_out", "type": "int", "default": 1, "min": 0, "max": 5, "name": "All-Out reach past Movement" },
-    { "id": "allOutPower", "group": "all_out", "type": "float", "default": 8.0, "min": 0.0, "max": 40.0, "step": 0.5, "name": "All-Out power per ally" },
+    { "id": "allOutPower", "group": "all_out", "type": "float", "default": 4.0, "min": 0.0, "max": 40.0, "step": 0.5, "name": "All-Out power per ally" },
+    { "id": "allOutPerRound", "group": "all_out", "type": "int", "default": 1, "min": 1, "max": 5, "name": "All-Out Attacks per round" },
     { "id": "allOutStandUp", "group": "all_out", "type": "bool", "default": true, "name": "Enemies stand after an All-Out" },
 
     { "id": "chargesMinor", "group": "charges", "type": "int", "default": 4, "min": 0, "max": 10, "name": "Charges: Minor" },

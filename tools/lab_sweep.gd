@@ -531,11 +531,20 @@ func _sets(plan: Dictionary, dir: String, run: String) -> Dictionary:
 	var complete := true
 	for rec in plan.get("sets", []):
 		var id := str(rec["id"])
-		var cells := Plan.set_cells(db, [{ "group": "set:" + id, "base": str(rec["base"]), "levers": rec.get("levers", {}) }], plan.get("cells", {}))
+		var cells := Plan.set_cells(db, [{ "group": "set:" + id, "base": str(rec.get("base", "c2")), "levers": rec.get("levers", {}) }], plan.get("cells", {}))
+		if rec.has("c2"):
+			for c in cells:
+				c["c2"] = rec["c2"]
+				c["preset"] = "c2"
 		var lines := run_cells(dir, run, cells, id)
+		if rec.has("c2"):
+			var cm: Dictionary = (load("res://src/core/lab/tuner/c2_metrics.gd") as GDScript).summarize(db, lines)
+			print("  %s C2: knockdowns %.1f, One Mores %.1f, batons %.1f, All-Outs %.1f per fight; charges used %d%%; basic %d%%; enemy hit rate %d%%; top move %s %d%%" % [id,
+				float(cm["knockdownsPerFight"]), float(cm["oneMoresPerFight"]), float(cm["batonsPerFight"]), float(cm["allOutsPerFight"]), roundi(float(cm["chargeUse"]) * 100.0),
+				roundi(float(cm["basicShare"]) * 100.0), roundi(float(cm["enemyHitRate"]) * 100.0), str(cm["topMove"]), roundi(float(cm["topMoveShare"]) * 100.0)])
 		complete = complete and lines.size() >= cells.size()
 		var m := Metrics.summarize(lines, Metrics.cfg(db))
-		var full := Rules.values_for(db, str(rec["base"]))
+		var full := Rules.values_for(db, str(rec.get("base", "cl_base")))
 		full.merge(rec.get("levers", {}), true)
 		var sc := Metrics.fun_score(m, Metrics.cfg(db), Metrics.complexity(db, full))
 		rows.append({ "id": id, "metrics": m, "score": sc["score"], "dq": sc["dq"], "reasons": sc["reasons"] })

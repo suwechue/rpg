@@ -1,0 +1,138 @@
+{
+  "comment": "C2 slice difficulty tuning (docs/COMBAT_2.md Part 5): enemy HP and damage levers at levels 1 and 6 on all six slice fights, every AI profile. Pick defaults where the expert wins about 85 to 95%, the novice 50 to 70%, random play under 10%, fights 3 to 5 rounds and the boss 6 to 8.",
+  "id": "c2_tune",
+  "kind": "sets",
+  "sets": [
+    {
+      "id": "L1_default",
+      "c2": {
+        "level": 1
+      },
+      "levers": {}
+    },
+    {
+      "id": "L1_hp14",
+      "c2": {
+        "level": 1
+      },
+      "levers": {
+        "enemyHpMul": 1.4
+      }
+    },
+    {
+      "id": "L1_hp18",
+      "c2": {
+        "level": 1
+      },
+      "levers": {
+        "enemyHpMul": 1.8
+      }
+    },
+    {
+      "id": "L1_hp14_dmg125",
+      "c2": {
+        "level": 1
+      },
+      "levers": {
+        "enemyHpMul": 1.4,
+        "enemyDamageMul": 1.25
+      }
+    },
+    {
+      "id": "L1_hp18_dmg125",
+      "c2": {
+        "level": 1
+      },
+      "levers": {
+        "enemyHpMul": 1.8,
+        "enemyDamageMul": 1.25
+      }
+    },
+    {
+      "id": "L1_hp22_dmg14",
+      "c2": {
+        "level": 1
+      },
+      "levers": {
+        "enemyHpMul": 2.2,
+        "enemyDamageMul": 1.4
+      }
+    },
+    {
+      "id": "L6_default",
+      "c2": {
+        "level": 6
+      },
+      "levers": {}
+    },
+    {
+      "id": "L6_hp14",
+      "c2": {
+        "level": 6
+      },
+      "levers": {
+        "enemyHpMul": 1.4
+      }
+    },
+    {
+      "id": "L6_hp18",
+      "c2": {
+        "level": 6
+      },
+      "levers": {
+        "enemyHpMul": 1.8
+      }
+    },
+    {
+      "id": "L6_hp14_dmg125",
+      "c2": {
+        "level": 6
+      },
+      "levers": {
+        "enemyHpMul": 1.4,
+        "enemyDamageMul": 1.25
+      }
+    },
+    {
+      "id": "L6_hp18_dmg125",
+      "c2": {
+        "level": 6
+      },
+      "levers": {
+        "enemyHpMul": 1.8,
+        "enemyDamageMul": 1.25
+      }
+    },
+    {
+      "id": "L6_hp22_dmg14",
+      "c2": {
+        "level": 6
+      },
+      "levers": {
+        "enemyHpMul": 2.2,
+        "enemyDamageMul": 1.4
+      }
+    }
+  ],
+  "cells": {
+    "fights": [
+      "c2_first_down",
+      "c2_edge_of_gym",
+      "c2_relay",
+      "c2_pep_squad",
+      "c2_wrong_answer",
+      "c2_hollow_mascot"
+    ],
+    "seeds": 4,
+    "profiles": [
+      "expert",
+      "novice",
+      "greedy",
+      "random"
+    ],
+    "parties": [
+      "balanced"
+    ]
+  },
+  "budgetMinutes": 90
+}
