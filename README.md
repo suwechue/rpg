@@ -103,6 +103,9 @@ Most changes to content or balance need no code: edit the JSON in `data/`.
 | `docs/MECHANICS.md` | Every rule and number as the game works now. The best description of the game |
 | `docs/COMBAT_LAB.md` | The Combat Lab plan: rules as switches, hand-made fights, and picking what's fun |
 | `docs/LAB_TUNER.md` | The Lab Tuner plan: AI sweeps, fun proxies, agent playtesters and a shortlist for the user |
+| `docs/LAB_TUNING.md` | Lab Tuner results: sweeps, agent playtests, the ranking, the turn grid and the C2 slice comparison |
+| `docs/FUN_AND_FEEL.md` | FF, Fun and Feel testing (paused for C2) |
+| `docs/COMBAT_2.md` | C2, Combat 2.0: kits, spell charges, weaknesses and One More, loadouts; built as a Lab slice |
 | `docs/LAB_TUNING.md` | The Lab Tuner's results: baseline, lever effects, pairs, the shortlist, the agent playtest |
 | `docs/PROGRESS.md` | What's done, what was decided, what's left, balance results |
 | `docs/CHANGELOG.md` | What changed in each version |

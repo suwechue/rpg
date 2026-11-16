@@ -120,3 +120,36 @@ static func filter(db: Dictionary, ids: Array, kind: String, f: Dictionary) -> A
 			continue
 		out.append(str(id))
 	return out
+
+
+## A random loadout that fits this level (for loadout variety in sweeps): the
+## basic attack, then random picks from the collection up to each slot count.
+static func random(db: Dictionary, rules: RefCounted, char_id: String, level: int, rng: RandomNumberGenerator) -> Dictionary:
+	var col := collection(db, char_id)
+	var sl := Kits.slots(rules, level)
+	var moves: Array = []
+	var rest: Array = []
+	for m in col["moves"]:
+		if bool(Kits.move(db, str(m)).get("basic", false)):
+			moves.append(str(m))
+		else:
+			rest.append(str(m))
+	moves.append_array(_pick(rest, int(sl["moves"]) - moves.size(), rng))
+	var gear := {}
+	for slot in ["weapon", "armor", "trinket1", "trinket2"]:
+		var pool: Array = col["gear"][slot.rstrip("12")]
+		gear[slot] = str(pool[rng.randi_range(0, pool.size() - 1)]) if not pool.is_empty() else ""
+	if str(gear["trinket1"]) == str(gear["trinket2"]):
+		gear["trinket2"] = ""
+	var ults: Array = col["ultimates"]
+	return { "moves": moves, "spells": _pick(col["spells"], int(sl["spells"]), rng), "perks": _pick(col["perks"], int(sl["perks"]), rng),
+		"ultimate": str(ults[rng.randi_range(0, ults.size() - 1)]) if not ults.is_empty() else "", "gear": gear }
+
+
+static func _pick(pool: Array, n: int, rng: RandomNumberGenerator) -> Array:
+	var left: Array = pool.duplicate()
+	var out: Array = []
+	while out.size() < n and not left.is_empty():
+		out.append(left.pop_at(rng.randi_range(0, left.size() - 1)))
+	return out
+

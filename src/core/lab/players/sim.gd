@@ -4,7 +4,7 @@
 ## can't learn the deck order or the next roll by trying things.
 extends RefCounted
 
-const SKIP_STATE := ["rules", "lab_log", "db", "rng", "forms", "events", "_ai", "_fx", "_undo", "undo_lock", "ai_overrides", "library", "_rubble_marker"]
+const SKIP_STATE := ["rules", "lab_log", "db", "rng", "forms", "events", "_ai", "_fx", "_undo", "undo_lock", "ai_overrides", "library", "_rubble_marker", "c2", "c2_setup", "kits"]
 # Fixed for a whole fight: copying them every step would only cost time.
 const SKIP_UNIT := ["deck", "source", "actions", "phases", "known_vectors", "known_forms", "affinity", "disposition", "signature", "resist", "sprite"]
 

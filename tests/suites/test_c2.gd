@@ -656,7 +656,7 @@ func _perk_gain(char_id: String, perk: String, ab_id: String, setup: Callable) -
 func test_c2_perk_damage() -> void:
 	var plain := func(_st: Object, _u: Object, _g: Object) -> void: pass
 	var a: Array = _perk_gain("c2_brick", "pk_brawler", "move:brick_bash", plain)
-	check(a[1] > a[0], "Brawler: blunt +20% (%d > %d)" % a)
+	check(a[1] > a[0], "Brawler: blunt +20%% (%d > %d)" % a)
 	a = _perk_gain("c2_ash", "pk_exploit", "move:ash_ember", plain)
 	check(a[1] > a[0], "Exploit: weakness hits +20%")
 	a = _perk_gain("c2_ash", "pk_storm_focus", "move:ash_spark", plain)
@@ -832,3 +832,54 @@ func test_c2_perk_team() -> void:
 	st10.known_marks = {}
 	st10.use_ability(q10, "move:quill_knife", g10.cell)
 	check(st10.known_of(g10).size() == g10.source["marks"].size(), "Scout's Eye: the first hit reveals every marking")
+
+
+# --- Part 5: the slice's sweeps -------------------------------------------------------
+
+const C2Sweep := preload("res://src/core/lab/c2_sweep.gd")
+const C2Player := preload("res://src/core/lab/players/c2_player.gd")
+const C2Metrics := preload("res://src/core/lab/tuner/c2_metrics.gd")
+const Sweep := preload("res://src/core/lab/sweep.gd")
+
+
+func test_c2_random_loadouts_fit() -> void:
+	var r := _rules()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 7
+	for cid in ["c2_brick", "c2_ash", "c2_quill", "c2_lyric"]:
+		for lvl in [1, 6]:
+			var lo := Loadout.random(db(), r, cid, lvl, rng)
+			check(Loadout.problems(db(), r, cid, lvl, lo).is_empty(), "a random loadout fits: %s level %d %s" % [cid, lvl, str(Loadout.problems(db(), r, cid, lvl, lo))])
+
+
+func test_c2_players() -> void:
+	var st := _fight()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 3
+	var u: Object = st.current
+	var rec: Dictionary = C2Player.take_turn(st, C2Player.profile(db(), "expert"), rng)
+	check(st.current != u and int(rec["load"]) > 1 and not (rec["values"] as Array).is_empty(), "the expert plays a whole turn and records its options")
+	var vals: Array = rec["values"]
+	check(vals.size() < 2 or float(vals[0]) >= float(vals[1]), "values are best first")
+	var st2 := _fight()
+	var u2: Object = st2.current
+	C2Player.take_turn(st2, C2Player.profile(db(), "random"), rng)
+	check(st2.current != u2, "the random player ends its turn too")
+	var before: float = C2Player.score(st2, C2Player.weights(db(), {}))
+	check(is_finite(before), "positions score to a number")
+
+
+func test_c2_sweep_line() -> void:
+	var cell := { "group": "t", "fight": "c2_first_down", "preset": "c2", "levers": {}, "seed": 1, "profile": "greedy", "party": "balanced", "c2": { "level": 1 } }
+	var line: Dictionary = Sweep.run_fight(db(), cell)
+	check(["win", "lose", "stall"].has(str(line["result"])) and bool(line["c2"]) and int(line["rounds"]) >= 1, "a C2 cell plays through the sweep runner")
+	check(Sweep.cell_key(cell).begins_with("c2|c2_first_down|L1"), "C2 cells have their own keys")
+	for k in ["knockdowns", "oneMores", "batons", "allOuts", "chargesSpent", "enemyHits", "plays", "loadouts", "ai"]:
+		check(line.has(k), "the line has %s" % k)
+	var night := cell.duplicate(true)
+	night["fight"] = "c2_night"
+	night["c2"] = { "level": 6, "mix": true }
+	var nl: Dictionary = Sweep.run_fight(db(), night)
+	check(int(nl["fights"]) >= 1 and int(nl["chargesMax"]) > 0, "a night cell plays its fights in a row and counts charges")
+	var m := C2Metrics.summarize(db(), [line, nl], "greedy")
+	check(m.has("knockdownsPerFight") and m.has("chargeUse") and m.has("basicShare") and m.has("loadoutVariety") and m.has("enemyHitRate"), "the C2 metrics come out")

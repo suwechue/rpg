@@ -1,0 +1,10 @@
+{
+  "comment": "Combat 2.0 Lab players (docs/COMBAT_2.md Part 5), used by src/core/lab/players/c2_player.gd in sweeps. weights score a position from the party's side: partyHp per HP, downed per member down, enemyHp per enemy HP, enemyAlive per enemy left, knocked per enemy knocked down, partyKnocked per member knocked down, danger per point of damage enemies can probably deal next turn, charge per spell charge kept, meter per ultimate point, win/loss. Profiles: expert searches every move tile, Ability and target, then the One More, Baton Pass or All-Out after it; novice adds noise and sometimes ignores Baton Pass, scans and spells; greedy counts only damage; random picks any legal step.",
+  "weights": { "partyHp": 1.0, "downed": 10.0, "enemyHp": 1.0, "enemyAlive": 6.0, "knocked": 4.0, "partyKnocked": 4.0, "danger": 0.5, "charge": 1.5, "meter": 0.05, "win": 200.0, "loss": 200.0 },
+  "profiles": {
+    "expert": { "moveCells": 99, "followUp": true, "noise": 0.0, "record": true },
+    "novice": { "moveCells": 6, "followUp": false, "noise": 0.35, "ignoreChance": 0.5, "ignoreKinds": ["baton", "scan", "spell", "allOut"], "weights": { "danger": 0.15, "charge": 0.5 } },
+    "greedy": { "moveCells": 99, "followUp": false, "noise": 0.0, "weights": { "partyHp": 0.0, "downed": 0.0, "partyKnocked": 0.0, "danger": 0.0, "charge": 0.0, "meter": 0.0, "loss": 0.0 } },
+    "random": { "random": true }
+  }
+}

@@ -39,6 +39,8 @@ static func norm(v: Variant) -> String:
 
 ## A stable id for a cell, so a stopped sweep can skip what it already ran.
 static func cell_key(cell: Dictionary) -> String:
+	if cell.has("c2"):
+		return (load("res://src/core/lab/c2_sweep.gd") as GDScript).cell_key(cell)
 	var levers: Dictionary = cell.get("levers", {})
 	var keys: Array = levers.keys()
 	keys.sort()
@@ -51,6 +53,8 @@ static func cell_key(cell: Dictionary) -> String:
 
 ## Play one cell. cell: { fight, preset, levers, seed, profile, party }.
 static func run_fight(db: Dictionary, cell: Dictionary) -> Dictionary:
+	if cell.has("c2"):
+		return (load("res://src/core/lab/c2_sweep.gd") as GDScript).run(db, cell)
 	var cfg := tuner(db)
 	var fight_id := str(cell.get("fight", ""))
 	var seed_value := int(cell.get("seed", 1))

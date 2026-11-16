@@ -13,7 +13,7 @@ const GridScript := preload("res://src/core/combat/grid.gd")
 static func take_turn(st: Object, u: Object) -> void:
 	if st.result != "" or st.current != u:
 		return
-	if st.must_skip(u):
+	if st.must_skip(u) or not u.alive():
 		st.end_turn()
 		return
 	if st.boss_plans.has(u.id):
@@ -42,8 +42,10 @@ static func take_turn(st: Object, u: Object) -> void:
 			break
 		if best["spot"] != u.cell:
 			st.move(u, best["spot"])
-			if st.result != "" or st.current != u or not u.alive():
+			if st.result != "" or st.current != u:
 				return
+			if not u.alive():
+				break
 		if not st.use_ability(u, str(best["uid"]), best["target"]):
 			break
 	if st.result == "" and st.current == u:

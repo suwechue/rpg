@@ -122,6 +122,10 @@ func _fill_fights() -> void:
 				start_fight())
 		sb.tooltip_text = str(_db.get("lab/lab", {}).get("abShortlist", {}).get("text", ""))
 		_left.add_child(sb)
+	var c2 := UiTheme.button(Strings.t("lab.combat2"), func() -> void: SceneRouter.goto("res://src/scenes/combat2/c2_menu.tscn"))
+	c2.name = "Combat2Button"
+	c2.tooltip_text = Strings.t("lab.combat2_hint")
+	_left.add_child(c2)
 	play.grab_focus.call_deferred()
 
 
